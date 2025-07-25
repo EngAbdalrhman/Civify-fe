@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader } from './Loader';
 import { exportToPdf } from '@/lib/pdf';
 import type { FormData } from '@/app/page';
+import { Copy } from 'lucide-react';
 
 interface Step4ResultsProps {
   prevStep: () => void;
@@ -23,7 +24,6 @@ export default function Step4Results({ prevStep, formData }: Step4ResultsProps) 
   const { toast } = useToast();
 
   const cvContainerRef = useRef<HTMLDivElement>(null);
-  const coverLetterContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const generateDocuments = async () => {
@@ -85,10 +85,17 @@ export default function Step4Results({ prevStep, formData }: Step4ResultsProps) 
         return;
     }
     toast({ title: 'Exporting...', description: 'Your PDF is being generated.' });
-    await exportToPdf(
-        cvContainerRef.current,
-        formData.generateCoverLetter ? coverLetterContainerRef.current : null
-    );
+    await exportToPdf(cvContainerRef.current, null);
+  };
+
+  const handleCopyCoverLetter = () => {
+    if (coverLetter) {
+      navigator.clipboard.writeText(coverLetter.replace(/<br \/>/g, '\n').replace(/<br>/g, '\n'));
+      toast({
+        title: "Copied!",
+        description: "Cover letter copied to clipboard.",
+      });
+    }
   };
 
 
@@ -124,6 +131,9 @@ export default function Step4Results({ prevStep, formData }: Step4ResultsProps) 
             <CardTitle className="font-headline text-2xl">Your Tailored CV</CardTitle>
             <CardDescription>Review your new AI-optimized curriculum vitae.</CardDescription>
           </div>
+          <Button onClick={handleExport} size="lg">
+            Export CV as PDF
+          </Button>
         </CardHeader>
         <CardContent>
           <div ref={cvContainerRef} className="p-6 md:p-8 bg-white rounded-xl shadow-inner border">
@@ -134,12 +144,18 @@ export default function Step4Results({ prevStep, formData }: Step4ResultsProps) 
 
       {formData.generateCoverLetter && coverLetter && (
          <Card className="shadow-lg rounded-2xl">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
               <CardTitle className="font-headline text-2xl">Your Cover Letter</CardTitle>
               <CardDescription>A compelling cover letter generated just for you.</CardDescription>
+            </div>
+            <Button onClick={handleCopyCoverLetter} variant="outline">
+              <Copy className="mr-2 h-4 w-4" />
+              Copy Text
+            </Button>
           </CardHeader>
           <CardContent>
-            <div ref={coverLetterContainerRef} className="p-6 md:p-8 bg-white rounded-xl shadow-inner border text-gray-800">
+            <div className="p-6 md:p-8 bg-white rounded-xl shadow-inner border text-gray-800">
               <div className="cover-letter-output prose max-w-none" dangerouslySetInnerHTML={{ __html: coverLetter.replace(/\n/g, '<br />') }} />
             </div>
           </CardContent>
@@ -148,9 +164,6 @@ export default function Step4Results({ prevStep, formData }: Step4ResultsProps) 
 
       <div className="flex justify-between items-center py-4">
         <Button variant="outline" onClick={prevStep}>Back</Button>
-        <Button onClick={handleExport} size="lg">
-          Export as PDF
-        </Button>
       </div>
     </div>
   );

@@ -6,10 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Loader } from './Loader';
 import { useToast } from "@/hooks/use-toast";
 import { cn } from '@/lib/utils';
+import {extractTextFromPdf} from "@/lib/pdf";
 
 interface Step1UploadProps {
   nextStep: () => void;
-  updateFormData: (data: { cvFileName: string }) => void;
+  updateFormData: (data: { cvFileName: string; rawCvText: string }) => void;
 }
 
 export default function Step1Upload({ nextStep, updateFormData }: Step1UploadProps) {
@@ -62,15 +63,25 @@ export default function Step1Upload({ nextStep, updateFormData }: Step1UploadPro
     handleFileChange(e.dataTransfer.files ? e.dataTransfer.files[0] : null);
   };
 
-  const handleProceed = () => {
+  const handleProceed = async () => {
     if (file) {
       setIsParsing(true);
-      updateFormData({ cvFileName: file.name });
-      // Simulate parsing delay
-      setTimeout(() => {
-        setIsParsing(false);
+      try {
+        const text = await extractTextFromPdf(file);
+        updateFormData({
+          cvFileName: file.name,
+          rawCvText: text,
+        });
         nextStep();
-      }, 1500);
+      } catch (error) {
+        toast({
+          title: "PDF Parsing Error",
+          description: "Could not extract text from the PDF. Please ensure it's a valid, text-based PDF and try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsParsing(false);
+      }
     }
   };
 
