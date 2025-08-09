@@ -50,8 +50,22 @@ export default function Step4Results({
       try {
         // Generate CV
         setGenerationStatus("cv");
+
+        // Ensure we have structured CV data
+        if (!formData.structuredCvData) {
+          throw new Error(
+            "No structured CV data available. Please go back and re-upload your CV."
+          );
+        }
+
+        console.log(
+          "Generating CV with structured data:",
+          formData.structuredCvData
+        );
+        console.log("Job description:", formData.jobDescription);
+
         const cvResult = await tailorCv({
-          structuredCvData: formData.structuredCvData || formData.rawCvText,
+          structuredCvData: formData.structuredCvData,
           jobDescription: formData.jobDescription,
         });
 
@@ -64,17 +78,75 @@ export default function Step4Results({
         // Generate Cover Letter if requested
         if (formData.generateCoverLetter) {
           setGenerationStatus("cover-letter");
+
+          // Create comprehensive user profile from structured data
+          const userProfile = formData.structuredCvData
+            ? `
+            Personal Information:
+            Name: ${
+              formData.structuredCvData.personalInfo?.fullName ||
+              formData.profile.name
+            }
+            Email: ${
+              formData.structuredCvData.personalInfo?.email ||
+              formData.profile.email
+            }
+            Phone: ${
+              formData.structuredCvData.personalInfo?.phone ||
+              formData.profile.phone
+            }
+            
+            Professional Summary:
+            ${
+              formData.structuredCvData.professionalSummary ||
+              formData.profile.summary
+            }
+            
+            Work Experience:
+            ${
+              formData.structuredCvData.workExperience
+                ?.map(
+                  (exp: any) =>
+                    `${exp.jobTitle} at ${exp.company} (${exp.startDate} - ${exp.endDate})\n${exp.description}`
+                )
+                .join("\n\n") || formData.profile.experience
+            }
+            
+            Education:
+            ${
+              formData.structuredCvData.education
+                ?.map(
+                  (edu: any) =>
+                    `${edu.degree} from ${edu.institution} (${edu.graduationDate})`
+                )
+                .join("\n") || formData.profile.education
+            }
+            
+            Skills:
+            Technical: ${
+              formData.structuredCvData.skills?.technical?.join(", ") || ""
+            }
+            Soft Skills: ${
+              formData.structuredCvData.skills?.soft?.join(", ") || ""
+            }
+            Certifications: ${
+              formData.structuredCvData.skills?.certifications?.join(", ") || ""
+            }
+            ${formData.profile.skills}
+          `
+            : `
+            Name: ${formData.profile.name}
+            Email: ${formData.profile.email}
+            Phone: ${formData.profile.phone}
+            Professional Summary: ${formData.profile.summary}
+            Work Experience: ${formData.profile.experience}
+            Education: ${formData.profile.education}
+            Skills: ${formData.profile.skills}
+          `;
+
           const coverLetterResult = await generateCoverLetterFlow({
             jobDescription: formData.jobDescription,
-            userProfile: `
-              Name: ${formData.profile.name}
-              Email: ${formData.profile.email}
-              Phone: ${formData.profile.phone}
-              Professional Summary: ${formData.profile.summary}
-              Work Experience: ${formData.profile.experience}
-              Education: ${formData.profile.education}
-              Skills: ${formData.profile.skills}
-            `,
+            userProfile: userProfile,
           });
 
           if (coverLetterResult?.coverLetter) {
@@ -84,7 +156,7 @@ export default function Step4Results({
 
         setGenerationStatus("complete");
       } catch (err) {
-        console.error(err);
+        console.error("CV generation error:", err);
         const errorMessage =
           err instanceof Error ? err.message : "An unknown error occurred.";
         setError(`Failed to generate documents. ${errorMessage}`);
@@ -148,13 +220,77 @@ export default function Step4Results({
 
   const handleCopyCv = () => {
     if (tailoredCv) {
+      // Create a more formatted plain text version for copying
       const tempDiv = document.createElement("div");
       tempDiv.innerHTML = tailoredCv;
-      const textContent = tempDiv.textContent || tempDiv.innerText || "";
-      navigator.clipboard.writeText(textContent);
+
+      // Process HTML to create formatted plain text
+      const formatForClipboard = (element: Element): string => {
+        const tagName = element.tagName?.toLowerCase();
+        const text = element.textContent?.trim() || "";
+
+        if (!text) return "";
+
+        switch (tagName) {
+          case "h1":
+            return `${text}\n${"=".repeat(text.length)}\n\n`;
+          case "h2":
+            return `\n${text.toUpperCase()}\n${"-".repeat(text.length)}\n`;
+          case "h3":
+            return `\n${text}\n`;
+          case "p":
+            return `${text}\n\n`;
+          case "li":
+            return `• ${text}\n`;
+          case "strong":
+          case "b":
+            return text; // Keep text but remove formatting for ATS
+          default:
+            if (element.children.length === 0) {
+              return text + "\n";
+            }
+            return "";
+        }
+      };
+
+      // Walk through elements and build formatted text
+      const walkAndFormat = (element: Element): string => {
+        let result = "";
+
+        if (element.children.length === 0) {
+          result += formatForClipboard(element);
+        } else {
+          if (
+            ["h1", "h2", "h3", "p"].includes(element.tagName?.toLowerCase())
+          ) {
+            result += formatForClipboard(element);
+          } else if (element.tagName?.toLowerCase() === "ul") {
+            Array.from(element.children).forEach((child) => {
+              result += formatForClipboard(child);
+            });
+            result += "\n";
+          } else {
+            Array.from(element.children).forEach((child) => {
+              result += walkAndFormat(child);
+            });
+          }
+        }
+
+        return result;
+      };
+
+      let formattedText = "";
+      Array.from(tempDiv.children).forEach((child) => {
+        formattedText += walkAndFormat(child);
+      });
+
+      // Clean up excessive newlines while preserving structure
+      const cleanText = formattedText.replace(/\n{3,}/g, "\n\n").trim();
+
+      navigator.clipboard.writeText(cleanText);
       toast({
         title: "Copied!",
-        description: "CV content copied to clipboard.",
+        description: "CV content copied to clipboard in ATS-friendly format.",
       });
     }
   };

@@ -11,83 +11,191 @@ export const exportToPdfAsText = async (
   const pdf = new jsPDF("p", "mm", "a4");
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
-  const margin = 20;
-  const lineHeight = 6;
+  const margin = 15;
+  const lineHeight = 5;
   const maxWidth = pageWidth - margin * 2;
 
   let yPosition = margin;
 
-  // Helper function to add text with proper wrapping
-  const addTextWithWrapping = (text: string, fontSize = 11, isBold = false) => {
+  // Helper function to add text with proper wrapping and formatting
+  const addTextWithWrapping = (
+    text: string,
+    fontSize = 10,
+    isBold = false,
+    isItalic = false,
+    leftIndent = 0
+  ) => {
     pdf.setFontSize(fontSize);
-    if (isBold) {
+
+    if (isBold && isItalic) {
+      pdf.setFont("helvetica", "bolditalic");
+    } else if (isBold) {
       pdf.setFont("helvetica", "bold");
+    } else if (isItalic) {
+      pdf.setFont("helvetica", "italic");
     } else {
       pdf.setFont("helvetica", "normal");
     }
 
-    const lines = pdf.splitTextToSize(text, maxWidth);
+    const effectiveWidth = maxWidth - leftIndent;
+    const lines = pdf.splitTextToSize(text, effectiveWidth);
 
     for (const line of lines) {
       if (yPosition > pageHeight - margin) {
         pdf.addPage();
         yPosition = margin;
       }
-      pdf.text(line, margin, yPosition);
+      pdf.text(line, margin + leftIndent, yPosition);
       yPosition += lineHeight;
     }
-    yPosition += 2; // Extra spacing after paragraphs
   };
 
   // Helper function to add section header
   const addSectionHeader = (header: string) => {
-    if (yPosition > pageHeight - margin - 20) {
+    if (yPosition > pageHeight - margin - 15) {
       pdf.addPage();
       yPosition = margin;
     }
+    yPosition += 3;
+    addTextWithWrapping(header, 12, true);
+    // Add a line under the header
+    pdf.setLineWidth(0.5);
+    pdf.line(margin, yPosition + 1, pageWidth - margin, yPosition + 1);
     yPosition += 4;
-    addTextWithWrapping(header.toUpperCase(), 12, true);
-    yPosition += 2;
+  };
+
+  // Helper function to add spacing
+  const addSpacing = (space = 2) => {
+    yPosition += space;
   };
 
   try {
-    // Convert HTML to plain text for PDF
+    // Parse HTML content while preserving structure
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = cvContent;
 
-    // Extract text content while preserving structure
-    const sections = tempDiv.querySelectorAll("*");
-    let plainTextContent = "";
-
-    sections.forEach((element) => {
+    // Process different HTML elements to maintain formatting
+    const processElement = (element: Element) => {
       const tagName = element.tagName?.toLowerCase();
-      const text = element.textContent?.trim();
+      const text = element.textContent?.trim() || "";
 
-      if (text && !element.querySelector("*")) {
-        // Only leaf nodes
-        if (["h1", "h2", "h3"].includes(tagName)) {
-          plainTextContent += `\n\n${text.toUpperCase()}\n`;
-        } else if (tagName === "li") {
-          plainTextContent += `• ${text}\n`;
-        } else if (["p", "div"].includes(tagName)) {
-          plainTextContent += `${text}\n`;
-        }
+      if (!text) return;
+
+      switch (tagName) {
+        case "h1":
+          addSectionHeader(text.toUpperCase());
+          break;
+        case "h2":
+          addSpacing(3);
+          addTextWithWrapping(text, 11, true);
+          addSpacing(2);
+          break;
+        case "h3":
+          addSpacing(2);
+          addTextWithWrapping(text, 10, true);
+          addSpacing(1);
+          break;
+        case "p":
+          if (text.length > 0) {
+            addTextWithWrapping(text);
+            addSpacing(2);
+          }
+          break;
+        case "li":
+          addTextWithWrapping(`• ${text}`, 10, false, false, 5);
+          addSpacing(1);
+          break;
+        case "strong":
+        case "b":
+          addTextWithWrapping(text, 10, true);
+          break;
+        case "em":
+        case "i":
+          addTextWithWrapping(text, 10, false, true);
+          break;
+        case "span":
+          // Check for styling classes to preserve formatting
+          if (
+            element.classList.contains("font-bold") ||
+            element.classList.contains("font-semibold")
+          ) {
+            addTextWithWrapping(text, 10, true);
+          } else {
+            addTextWithWrapping(text);
+          }
+          break;
+        default:
+          // For other elements, check if they have child elements
+          if (element.children.length === 0) {
+            addTextWithWrapping(text);
+            addSpacing(1);
+          }
+          break;
       }
-    });
+    };
 
-    // Add content to PDF
-    addTextWithWrapping(plainTextContent);
+    // Process the HTML structure
+    const walkElements = (element: Element) => {
+      // Process headers first
+      if (["h1", "h2", "h3"].includes(element.tagName?.toLowerCase())) {
+        processElement(element);
+        return;
+      }
+
+      // Process lists
+      if (
+        element.tagName?.toLowerCase() === "ul" ||
+        element.tagName?.toLowerCase() === "ol"
+      ) {
+        const listItems = element.querySelectorAll("li");
+        listItems.forEach((li) => processElement(li));
+        addSpacing(2);
+        return;
+      }
+
+      // Process paragraphs and divs
+      if (["p", "div"].includes(element.tagName?.toLowerCase())) {
+        if (element.children.length === 0) {
+          processElement(element);
+        } else {
+          // Process children recursively
+          Array.from(element.children).forEach((child) => walkElements(child));
+        }
+        return;
+      }
+
+      // Process other elements
+      if (element.children.length === 0) {
+        processElement(element);
+      } else {
+        Array.from(element.children).forEach((child) => walkElements(child));
+      }
+    };
+
+    // Start processing from the root
+    Array.from(tempDiv.children).forEach((child) => walkElements(child));
 
     // Add cover letter if provided
     if (coverLetter) {
       pdf.addPage();
       yPosition = margin;
-      addSectionHeader("Cover Letter");
+      addSectionHeader("COVER LETTER");
 
       const tempDiv2 = document.createElement("div");
       tempDiv2.innerHTML = coverLetter;
-      const coverLetterText = tempDiv2.textContent || "";
-      addTextWithWrapping(coverLetterText);
+
+      // Process cover letter with paragraph formatting
+      const paragraphs = coverLetter.split(/\n+/);
+      paragraphs.forEach((paragraph) => {
+        if (paragraph.trim()) {
+          // Remove HTML tags but preserve line breaks
+          const cleanText = paragraph.replace(/<[^>]*>/g, "").trim();
+          if (cleanText) {
+            addTextWithWrapping(cleanText);
+            addSpacing(3);
+          }
+        }
+      });
     }
 
     pdf.save(fileName);
@@ -144,16 +252,83 @@ export const exportToPdf = async (
   }
 };
 
-// Export CV as plain text file
+// Enhanced plain text export that preserves formatting
 export const exportAsTextFile = (
   content: string,
   fileName: string = "CV.txt"
 ) => {
   const tempDiv = document.createElement("div");
   tempDiv.innerHTML = content;
-  const textContent = tempDiv.textContent || tempDiv.innerText || "";
 
-  const blob = new Blob([textContent], { type: "text/plain" });
+  // Process HTML to maintain structure in plain text
+  const processToText = (element: Element): string => {
+    const tagName = element.tagName?.toLowerCase();
+    const text = element.textContent?.trim() || "";
+
+    if (!text) return "";
+
+    switch (tagName) {
+      case "h1":
+      case "h2":
+      case "h3":
+        return `\n\n${text.toUpperCase()}\n${"=".repeat(text.length)}\n`;
+      case "p":
+        return `${text}\n\n`;
+      case "li":
+        return `• ${text}\n`;
+      case "br":
+        return "\n";
+      case "strong":
+      case "b":
+        return `**${text}**`;
+      case "em":
+      case "i":
+        return `*${text}*`;
+      default:
+        if (element.children.length === 0) {
+          return text + "\n";
+        }
+        return "";
+    }
+  };
+
+  // Walk through elements and build formatted text
+  const walkAndFormat = (element: Element): string => {
+    let result = "";
+
+    if (element.children.length === 0) {
+      result += processToText(element);
+    } else {
+      // Process headers and lists specially
+      if (["h1", "h2", "h3"].includes(element.tagName?.toLowerCase())) {
+        result += processToText(element);
+      } else if (
+        element.tagName?.toLowerCase() === "ul" ||
+        element.tagName?.toLowerCase() === "ol"
+      ) {
+        Array.from(element.children).forEach((child) => {
+          result += processToText(child);
+        });
+        result += "\n";
+      } else {
+        Array.from(element.children).forEach((child) => {
+          result += walkAndFormat(child);
+        });
+      }
+    }
+
+    return result;
+  };
+
+  let formattedText = "";
+  Array.from(tempDiv.children).forEach((child) => {
+    formattedText += walkAndFormat(child);
+  });
+
+  // Clean up excessive newlines while preserving structure
+  formattedText = formattedText.replace(/\n{3,}/g, "\n\n").trim();
+
+  const blob = new Blob([formattedText], { type: "text/plain" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;

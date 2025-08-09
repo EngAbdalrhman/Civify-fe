@@ -104,6 +104,8 @@ export default function Step1Upload({
         setParsingStatus("parsing");
         const structuredData = await parseCv({ cvText: text });
 
+        console.log("Parsed structured CV data:", structuredData);
+
         setParsingStatus("complete");
 
         updateFormData({
@@ -111,6 +113,8 @@ export default function Step1Upload({
           rawCvText: text,
           structuredCvData: structuredData,
         });
+
+        console.log("Updated form data with structured CV data");
 
         toast({
           title: "CV Processed Successfully!",
