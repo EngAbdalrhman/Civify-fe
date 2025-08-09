@@ -109,7 +109,17 @@ const ParseCvOutputSchema = z.object({
 export type ParseCvOutput = z.infer<typeof ParseCvOutputSchema>;
 
 export async function parseCv(input: ParseCvInput): Promise<ParseCvOutput> {
-  return parseCvFlow(input);
+  console.log("CV Parsing Input - Text Length:", input.cvText?.length || 0);
+  console.log(
+    "CV Parsing Input - Text Preview:",
+    input.cvText?.substring(0, 300)
+  );
+
+  const result = await parseCvFlow(input);
+
+  console.log("CV Parsing Output:", JSON.stringify(result, null, 2));
+
+  return result;
 }
 
 const prompt = ai.definePrompt({
