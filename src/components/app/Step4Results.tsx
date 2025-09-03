@@ -12,10 +12,19 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/auth-context";
+import { useDatabase } from "@/hooks/use-database";
 import { Loader } from "./Loader";
 import { exportToPdf, exportToPdfAsText, exportAsTextFile } from "@/lib/pdf";
 import type { FormData } from "@/app/page";
-import { Copy, Download, FileText, Image, CheckCircle } from "lucide-react";
+import {
+  Copy,
+  Download,
+  FileText,
+  Image,
+  CheckCircle,
+  Save,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,9 +48,84 @@ export default function Step4Results({
   const [generationStatus, setGenerationStatus] = useState<
     "cv" | "cover-letter" | "complete"
   >("cv");
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
   const { toast } = useToast();
+  const { user } = useAuth();
+  const database = useDatabase();
 
   const cvContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleSaveToFirebase = async () => {
+    if (!database || !user) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "You must be logged in to save your CV.",
+      });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      // Save CV data to Firebase
+      const cvId = await database.saveCVData({
+        fileName: formData.cvFileName || "Untitled CV",
+        rawText: formData.rawCvText,
+        structuredData: formData.structuredCvData,
+        profile: formData.profile,
+      });
+
+      // Save job application if job description was provided
+      if (formData.jobDescription.trim()) {
+        await database.saveJobApplication({
+          cvId,
+          jobTitle: "Job Application",
+          company: "Unknown Company",
+          jobDescription: formData.jobDescription,
+          tailoredCV: tailoredCv,
+          coverLetter: formData.generateCoverLetter ? coverLetter : undefined,
+          applicationStatus: "draft",
+        });
+      }
+
+      // Save generated content
+      if (tailoredCv) {
+        await database.saveGeneratedContent({
+          cvId,
+          type: "tailored_cv",
+          content: tailoredCv,
+          prompt: `Job Description: ${formData.jobDescription}`,
+        });
+      }
+
+      if (coverLetter && formData.generateCoverLetter) {
+        await database.saveGeneratedContent({
+          cvId,
+          type: "cover_letter",
+          content: coverLetter,
+          prompt: `Job Description: ${formData.jobDescription}`,
+        });
+      }
+
+      setSaved(true);
+      toast({
+        title: "CV Saved Successfully!",
+        description:
+          "Your CV and generated content have been saved to your account.",
+      });
+    } catch (error) {
+      console.error("Error saving to Firebase:", error);
+      toast({
+        variant: "destructive",
+        title: "Save Failed",
+        description: "Failed to save your CV. Please try again.",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   useEffect(() => {
     const generateDocuments = async () => {
@@ -371,6 +455,29 @@ export default function Step4Results({
             </CardDescription>
           </div>
           <div className="flex gap-2">
+            <Button
+              onClick={handleSaveToFirebase}
+              variant={saved ? "default" : "outline"}
+              size="lg"
+              disabled={saving}
+            >
+              {saving ? (
+                <>
+                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  Saving...
+                </>
+              ) : saved ? (
+                <>
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Saved
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Save to Account
+                </>
+              )}
+            </Button>
             <Button onClick={handleCopyCv} variant="outline" size="lg">
               <Copy className="mr-2 h-4 w-4" />
               Copy Text

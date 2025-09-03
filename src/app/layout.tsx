@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/toaster";
+import { AuthProvider } from "@/context/auth-context";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -30,8 +31,10 @@ export default function RootLayout({
         className="font-body antialiased h-full bg-gradient-to-br from-indigo-50 to-purple-100 dark:from-gray-900 dark:to-indigo-950"
         suppressHydrationWarning={true}
       >
-        {children}
-        <Toaster />
+        <AuthProvider>
+          {children}
+          <Toaster />
+        </AuthProvider>
       </body>
     </html>
   );
