@@ -14,6 +14,8 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { extractTextFromPdf } from "@/lib/pdf";
 import { parseCv } from "@/ai/flows/cv-parsing";
+import { useDatabase } from "@/hooks/use-database";
+import { useAuth } from "@/context/auth-context";
 
 interface Step1UploadProps {
   nextStep: () => void;
@@ -28,6 +30,8 @@ export default function Step1Upload({
   nextStep,
   updateFormData,
 }: Step1UploadProps) {
+  const database = useDatabase();
+  const { user } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [isParsing, setIsParsing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -113,6 +117,46 @@ export default function Step1Upload({
           rawCvText: text,
           structuredCvData: structuredData,
         });
+
+        // Automatically save CV to Realtime Database
+        if (database && user) {
+          try {
+            await database.saveCVData({
+              fileName: file.name,
+              rawText: text,
+              structuredData: {
+                personalInfo: structuredData?.personalInfo || {},
+                summary: structuredData?.summary || "",
+                experience: structuredData?.experience || [],
+                education: structuredData?.education || [],
+                skills: structuredData?.skills || [],
+                certifications: structuredData?.certifications || [],
+                languages: structuredData?.languages || [],
+                projects: structuredData?.projects || [],
+              },
+              profile: {
+                name: structuredData?.personalInfo?.name || "",
+                email: structuredData?.personalInfo?.email || "",
+                phone: structuredData?.personalInfo?.phone || "",
+                summary: structuredData?.summary || "",
+                experience: JSON.stringify(structuredData?.experience || []),
+                education: JSON.stringify(structuredData?.education || []),
+                skills: JSON.stringify(structuredData?.skills || []),
+              },
+            });
+            toast({
+              title: "CV Saved!",
+              description: "Your CV has been saved to your account.",
+            });
+          } catch (dbError) {
+            console.error("Error saving CV to DB:", dbError);
+            toast({
+              title: "Database Error",
+              description: "Could not save your CV to your account.",
+              variant: "destructive",
+            });
+          }
+        }
 
         console.log("Updated form data with structured CV data");
 

@@ -188,7 +188,7 @@ export default function Home() {
         <div className="w-full max-w-5xl flex-grow">{renderStep()}</div>
 
         <footer className="mt-16 text-center text-sm text-gray-500">
-          <p>© 2024 AI-Refactor Pro • Powered by Advanced AI Technology</p>
+          <p>© 2025 AI-Refactor Pro • Powered by Speedy</p>
         </footer>
       </div>
     </main>

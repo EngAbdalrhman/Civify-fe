@@ -250,7 +250,7 @@ export default function DashboardPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => router.push(`/cv/${cv.id}`)}
+                            onClick={() => router.push(`/dashboard/cv/${cv.id}`)}
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
