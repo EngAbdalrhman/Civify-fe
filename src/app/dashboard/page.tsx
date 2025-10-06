@@ -144,7 +144,7 @@ export default function DashboardPage() {
               <p className="text-gray-600">Manage your CVs and applications</p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <Button
               variant="outline"
@@ -183,7 +183,9 @@ export default function DashboardPage() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Job Applications</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Job Applications
+              </CardTitle>
               <Plus className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -192,12 +194,20 @@ export default function DashboardPage() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Applications</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Active Applications
+              </CardTitle>
               <Eye className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {jobApplications.filter(app => app.applicationStatus === 'applied' || app.applicationStatus === 'interview').length}
+                {
+                  jobApplications.filter(
+                    (app) =>
+                      app.applicationStatus === "applied" ||
+                      app.applicationStatus === "interview"
+                  ).length
+                }
               </div>
             </CardContent>
           </Card>
@@ -213,7 +223,10 @@ export default function DashboardPage() {
                   Manage and organize your CV documents
                 </CardDescription>
               </div>
-              <Button onClick={() => router.push("/")} className="flex items-center gap-2">
+              <Button
+                onClick={() => router.push("/")}
+                className="flex items-center gap-2"
+              >
                 <Plus className="h-4 w-4" />
                 Create New CV
               </Button>
@@ -224,7 +237,10 @@ export default function DashboardPage() {
               <div className="text-center py-8">
                 <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-500 mb-4">No CVs found</p>
-                <Button onClick={() => router.push("/")} className="flex items-center gap-2">
+                <Button
+                  onClick={() => router.push("/")}
+                  className="flex items-center gap-2"
+                >
                   <Plus className="h-4 w-4" />
                   Create Your First CV
                 </Button>
@@ -242,7 +258,9 @@ export default function DashboardPage() {
                 <TableBody>
                   {cvs.map((cv) => (
                     <TableRow key={cv.id}>
-                      <TableCell className="font-medium">{cv.fileName}</TableCell>
+                      <TableCell className="font-medium">
+                        {cv.fileName}
+                      </TableCell>
                       <TableCell>{formatDate(cv.createdAt)}</TableCell>
                       <TableCell>{formatDate(cv.updatedAt)}</TableCell>
                       <TableCell>
@@ -250,7 +268,9 @@ export default function DashboardPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => router.push(`/dashboard/cv/${cv.id}`)}
+                            onClick={() =>
+                              router.push(`/dashboard/cv/${cv.id}`)
+                            }
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -298,15 +318,22 @@ export default function DashboardPage() {
                 <TableBody>
                   {jobApplications.slice(0, 5).map((app) => (
                     <TableRow key={app.id}>
-                      <TableCell className="font-medium">{app.jobTitle}</TableCell>
+                      <TableCell className="font-medium">
+                        {app.jobTitle}
+                      </TableCell>
                       <TableCell>{app.company}</TableCell>
                       <TableCell>
-                        <Badge variant={
-                          app.applicationStatus === 'applied' ? 'default' :
-                          app.applicationStatus === 'interview' ? 'secondary' :
-                          app.applicationStatus === 'accepted' ? 'default' :
-                          'destructive'
-                        }>
+                        <Badge
+                          variant={
+                            app.applicationStatus === "applied"
+                              ? "default"
+                              : app.applicationStatus === "interview"
+                              ? "secondary"
+                              : app.applicationStatus === "accepted"
+                              ? "default"
+                              : "destructive"
+                          }
+                        >
                           {app.applicationStatus}
                         </Badge>
                       </TableCell>

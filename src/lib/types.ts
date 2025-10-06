@@ -9,7 +9,7 @@ export interface UserProfile {
   skills: string;
 }
 
-// CV Data Types
+// CV Data Types.
 export interface CVData {
   id: string;
   userId: string;
@@ -67,7 +67,7 @@ export interface SkillCategory {
   id: string;
   category: string;
   skills: string[];
-  proficiencyLevel?: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
+  proficiencyLevel?: "Beginner" | "Intermediate" | "Advanced" | "Expert";
 }
 
 export interface CertificationItem {
@@ -83,7 +83,7 @@ export interface CertificationItem {
 export interface LanguageItem {
   id: string;
   language: string;
-  proficiency: 'Basic' | 'Conversational' | 'Fluent' | 'Native';
+  proficiency: "Basic" | "Conversational" | "Fluent" | "Native";
 }
 
 export interface ProjectItem {
@@ -108,7 +108,12 @@ export interface JobApplication {
   jobDescription: string;
   tailoredCV?: string;
   coverLetter?: string;
-  applicationStatus: 'draft' | 'applied' | 'interview' | 'rejected' | 'accepted';
+  applicationStatus:
+    | "draft"
+    | "applied"
+    | "interview"
+    | "rejected"
+    | "accepted";
   createdAt: string;
   updatedAt: string;
   notes?: string;
@@ -120,7 +125,7 @@ export interface GeneratedContent {
   userId: string;
   cvId: string;
   jobApplicationId?: string;
-  type: 'tailored_cv' | 'cover_letter' | 'summary' | 'skills_match';
+  type: "tailored_cv" | "cover_letter" | "summary" | "skills_match";
   content: string;
   prompt: string;
   createdAt: string;
@@ -144,7 +149,7 @@ export interface UserData {
 }
 
 export interface UserSettings {
-  theme: 'light' | 'dark' | 'system';
+  theme: "light" | "dark" | "system";
   notifications: {
     email: boolean;
     browser: boolean;

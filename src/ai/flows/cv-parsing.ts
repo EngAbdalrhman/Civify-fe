@@ -4,8 +4,8 @@
  * @fileOverview Enhanced CV parsing with structured field extraction
  *
  * - parseCv - A function that parses CV text into structured fields
- * - ParseCvInput - The input type for the parseCv function
- * - ParseCvOutput - The return type for the parseCv function
+ * - ParseCvInput - The input type for the parseCv function.
+ * - ParseCvOutput - The return type for the parseCv function.
  */
 
 import { ai } from "@/ai/genkit";

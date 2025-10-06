@@ -303,13 +303,21 @@ const tailorCvFlow = ai.defineFlow(
         return output!;
       } catch (err) {
         // Check for 503 error
-  const errorMessage = typeof err === "object" && err !== null && "message" in err ? String((err as any).message) : String(err);
-  if (errorMessage.includes("503") || errorMessage.includes("overloaded")) {
+        const errorMessage =
+          typeof err === "object" && err !== null && "message" in err
+            ? String((err as any).message)
+            : String(err);
+        if (
+          errorMessage.includes("503") ||
+          errorMessage.includes("overloaded")
+        ) {
           attempts++;
           if (attempts < maxAttempts) {
             const delay = baseDelay * attempts;
-            console.warn(`Gemini API overloaded, retrying in ${delay}ms (attempt ${attempts})...`);
-            await new Promise(res => setTimeout(res, delay));
+            console.warn(
+              `Gemini API overloaded, retrying in ${delay}ms (attempt ${attempts})...`
+            );
+            await new Promise((res) => setTimeout(res, delay));
             continue;
           }
         }
