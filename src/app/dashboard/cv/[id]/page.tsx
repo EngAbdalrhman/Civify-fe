@@ -124,16 +124,70 @@ export default function CVViewPage({ params }: { params: { id: string } }) {
       maskedText = maskedText.replace(phoneRegex, maskPhone(cv.profile.phone));
     }
 
-    // Mask common social media patterns
+    // Mask address patterns (generic address detection)
     maskedText = maskedText.replace(
-      /https?:\/\/(www\.)?(linkedin|github|twitter|facebook|instagram)\.com\/[^\s]+/gi,
-      "[Social Profile Hidden]"
+      /\b\d+\s+[A-Za-z\s]+(?:Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Lane|Ln|Drive|Dr|Court|Ct|Place|Pl)\b[^,\n]*(?:,\s*[A-Za-z\s]+)?(?:,\s*[A-Z]{2}\s*\d{5})?/gi,
+      "[Address Hidden]"
     );
+
+    // Mask social media profiles - more comprehensive patterns
+    // LinkedIn patterns
     maskedText = maskedText.replace(
-      /linkedin\.com\/in\/[^\s]+/gi,
+      /https?:\/\/(www\.)?linkedin\.com\/in\/[^\s<>]+/gi,
       "[LinkedIn Hidden]"
     );
-    maskedText = maskedText.replace(/github\.com\/[^\s]+/gi, "[GitHub Hidden]");
+    maskedText = maskedText.replace(
+      /linkedin\.com\/in\/[^\s<>]+/gi,
+      "[LinkedIn Hidden]"
+    );
+    maskedText = maskedText.replace(
+      /LinkedIn:\s*[^\s<>|]+/gi,
+      "LinkedIn: [Hidden]"
+    );
+    maskedText = maskedText.replace(
+      /LinkedIn:\s+[a-zA-Z0-9._-]+/gi,
+      "LinkedIn: [Hidden]"
+    );
+
+    // GitHub patterns
+    maskedText = maskedText.replace(
+      /https?:\/\/(www\.)?github\.com\/[^\s<>]+/gi,
+      "[GitHub Hidden]"
+    );
+    maskedText = maskedText.replace(
+      /github\.com\/[^\s<>]+/gi,
+      "[GitHub Hidden]"
+    );
+    maskedText = maskedText.replace(
+      /GitHub:\s*[^\s<>|]+/gi,
+      "GitHub: [Hidden]"
+    );
+    maskedText = maskedText.replace(
+      /GitHub:\s+[a-zA-Z0-9._-]+/gi,
+      "GitHub: [Hidden]"
+    );
+
+    // General social media patterns
+    maskedText = maskedText.replace(
+      /https?:\/\/(www\.)?(twitter|facebook|instagram)\.com\/[^\s<>]+/gi,
+      "[Social Profile Hidden]"
+    );
+
+    // Portfolio/website patterns
+    maskedText = maskedText.replace(
+      /Portfolio:\s*https?:\/\/[^\s<>]+/gi,
+      "Portfolio: [Hidden]"
+    );
+    maskedText = maskedText.replace(
+      /Website:\s*https?:\/\/[^\s<>]+/gi,
+      "Website: [Hidden]"
+    );
+
+    // Generic URL patterns that might be personal
+    maskedText = maskedText.replace(
+      /https?:\/\/[a-zA-Z0-9.-]+\.(com|org|net|io|dev|me)\/[^\s<>]+/gi,
+      "[Personal Link Hidden]"
+    );
 
     return maskedText;
   };
