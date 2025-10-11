@@ -3,11 +3,18 @@ import { authenticateApiRequest } from "@/lib/middleware/api-auth";
 import { logApiUsage } from "@/lib/services/appwrite-server-database";
 import { jsPDF } from "jspdf";
 
+// @ts-ignore - pdf-parse doesn't have proper TypeScript types
+const pdfParse = require("pdf-parse");
+
 /**
- * API Endpoint: Generate Masked CV from Text
+ * API Endpoint: Generate Masked CV from Text or PDF
  * POST /api/cv/generate-masked
  *
- * Accepts CV text, masks personal information, and returns a PDF.
+ * Accepts:
+ * - JSON: { "cv": "text content", "isPdf": false }
+ * - Multipart: file upload with optional "isPdf" field
+ *
+ * Returns: Masked PDF as base64
  */
 export async function POST(request: NextRequest) {
   try {
@@ -20,19 +27,65 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse request body
-    const body = await request.json();
-    const { cv } = body;
+    let cvText = "";
+    const contentType = request.headers.get("content-type") || "";
 
-    if (!cv) {
+    // Handle multipart/form-data (file upload)
+    if (contentType.includes("multipart/form-data")) {
+      const formData = await request.formData();
+      const file = formData.get("cv") as File;
+      const isPdf =
+        formData.get("isPdf") === "true" || file?.type === "application/pdf";
+
+      if (!file) {
+        return NextResponse.json(
+          { error: "Missing required field: cv (file)" },
+          { status: 400 }
+        );
+      }
+
+      if (isPdf) {
+        // Extract text from PDF
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const data = await pdfParse(buffer);
+        cvText = data.text;
+      } else {
+        // Read text file
+        cvText = await file.text();
+      }
+    }
+    // Handle JSON (text content)
+    else {
+      const body = await request.json();
+      const { cv, isPdf } = body;
+
+      if (!cv) {
+        return NextResponse.json(
+          { error: "Missing required field: cv" },
+          { status: 400 }
+        );
+      }
+
+      if (isPdf) {
+        // Decode base64 PDF and extract text
+        const base64String = cv.replace(/^data:application\/pdf;base64,/, "");
+        const buffer = Buffer.from(base64String, "base64");
+        const data = await pdfParse(buffer);
+        cvText = data.text;
+      } else {
+        cvText = cv;
+      }
+    }
+
+    if (!cvText || cvText.trim().length === 0) {
       return NextResponse.json(
-        { error: "Missing required field: cv" },
+        { error: "Failed to extract text from CV" },
         { status: 400 }
       );
     }
 
     // Mask personal information
-    const maskedText = maskPersonalInformation(cv);
+    const maskedText = maskPersonalInformation(cvText);
 
     // Generate PDF from masked text
     const pdfBase64 = generatePDF(maskedText);
@@ -46,10 +99,20 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Generate unique filename: masked-cv-YYYYMMDD-HHMMSS-RANDOM.pdf
+    const timestamp = new Date()
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .replace(/\..+/, "")
+      .replace("T", "-");
+    const randomId = Math.random().toString(36).substring(2, 8);
+    const filename = `masked-cv-${timestamp}-${randomId}.pdf`;
+
     // Return masked PDF as base64
     return NextResponse.json({
       success: true,
       pdf: pdfBase64,
+      filename: filename,
       message: "Masked CV generated successfully",
     });
   } catch (error) {

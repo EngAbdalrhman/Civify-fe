@@ -92,7 +92,7 @@ export default function ApiDocsPage() {
           <p className="text-gray-600 mt-2">
             Complete guide to using the HICv API for CV generation
           </p>
-          {apiBaseUrl && (
+          {/* {apiBaseUrl && (
             <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-900">
                 <strong>API Base URL:</strong>{" "}
@@ -106,7 +106,7 @@ export default function ApiDocsPage() {
                   : "🌐 Production environment"}
               </p>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Quick Start */}
@@ -144,9 +144,8 @@ export default function ApiDocsPage() {
 
         {/* API Endpoints */}
         <Tabs defaultValue="masked" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="masked">Generate Masked CV</TabsTrigger>
-            <TabsTrigger value="masked-pdf">Masked PDF</TabsTrigger>
             <TabsTrigger value="tailored">Generate Tailored CV</TabsTrigger>
           </TabsList>
 
@@ -183,9 +182,24 @@ Authorization: Bearer YOUR_API_KEY`}
                         id="masked-body"
                         language="JSON"
                         code={`{
-  "cv": "Your CV text content here..."
+  "cv": "Your CV text content here...",
+  "isPdf": false
 }`}
                       />
+                      <div className="mt-2 space-y-1 text-sm text-gray-600">
+                        <p>
+                          <strong>cv</strong> (required): Your CV text content
+                          or base64-encoded PDF
+                        </p>
+                        <p>
+                          <strong>isPdf</strong> (optional): Set to{" "}
+                          <code className="bg-gray-100 px-1 rounded">true</code>{" "}
+                          if cv is a base64-encoded PDF. Default:{" "}
+                          <code className="bg-gray-100 px-1 rounded">
+                            false
+                          </code>
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -199,14 +213,25 @@ Authorization: Bearer YOUR_API_KEY`}
                     code={`{
   "success": true,
   "pdf": "JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXS9QYXJlbnQgMiAwIFIvUmVzb3VyY2VzPDw+Pj4+CmVuZG9iago...",
+  "filename": "masked-cv-20251011-202336-bhx0jw.pdf",
   "message": "Masked CV generated successfully"
 }`}
                   />
-                  <p className="text-sm text-gray-600 mt-2">
-                    The{" "}
-                    <code className="bg-gray-100 px-2 py-1 rounded">pdf</code>{" "}
-                    field contains a base64-encoded PDF file.
-                  </p>
+                  <div className="mt-2 space-y-1 text-sm text-gray-600">
+                    <p>
+                      The{" "}
+                      <code className="bg-gray-100 px-2 py-1 rounded">pdf</code>{" "}
+                      field contains a base64-encoded PDF file.
+                    </p>
+                    <p>
+                      The{" "}
+                      <code className="bg-gray-100 px-2 py-1 rounded">
+                        filename
+                      </code>{" "}
+                      field contains a unique filename with timestamp and random
+                      ID to prevent file collisions.
+                    </p>
+                  </div>
                 </div>
 
                 {/* Example */}
@@ -243,191 +268,21 @@ Authorization: Bearer YOUR_API_KEY`}
     'Authorization': 'Bearer hicv_live_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
   },
   body: JSON.stringify({
-    cv: 'Your CV text content here...'
+    cv: 'Your CV text content here...',
+    isPdf: false
   })
 });
 
 const data = await response.json();
 
-// Decode base64 PDF and download
+// Decode base64 PDF and download with unique filename
 const pdfBlob = await fetch(\`data:application/pdf;base64,\${data.pdf}\`).then(r => r.blob());
 const url = URL.createObjectURL(pdfBlob);
 const a = document.createElement('a');
 a.href = url;
-a.download = 'masked-cv.pdf';
-a.click();`}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Masked PDF Endpoint */}
-          <TabsContent value="masked-pdf" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Code className="h-5 w-5" />
-                  POST /api/cv/generate-masked-pdf
-                </CardTitle>
-                <CardDescription>
-                  Generate a masked PDF CV from an existing PDF file with
-                  personal information redacted
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Request */}
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Request</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="text-sm font-medium mb-2">Headers</h4>
-                      <CodeBlock
-                        id="masked-pdf-headers"
-                        language="HTTP"
-                        code={`Content-Type: application/json
-Authorization: Bearer YOUR_API_KEY`}
-                      />
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium mb-2">Body</h4>
-                      <CodeBlock
-                        id="masked-pdf-body"
-                        language="JSON"
-                        code={`{
-  "cvPdf": "JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXS9QYXJlbnQgMiAwIFIvUmVzb3VyY2VzPDw+Pj4+CmVuZG9iago..."
-}`}
-                      />
-                      <p className="text-sm text-gray-600 mt-2">
-                        The{" "}
-                        <code className="bg-gray-100 px-2 py-1 rounded">
-                          cvPdf
-                        </code>{" "}
-                        field should contain a base64-encoded PDF file.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Response */}
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Response</h3>
-                  <CodeBlock
-                    id="masked-pdf-response"
-                    language="JSON"
-                    code={`{
-  "success": true,
-  "maskedPdf": "JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXS9QYXJlbnQgMiAwIFIvUmVzb3VyY2VzPDw+Pj4+CmVuZG9iago...",
-  "message": "CV masked successfully"
-}`}
-                  />
-                  <p className="text-sm text-gray-600 mt-2">
-                    The{" "}
-                    <code className="bg-gray-100 px-2 py-1 rounded">
-                      maskedPdf
-                    </code>{" "}
-                    field contains a base64-encoded PDF file with personal
-                    information redacted.
-                  </p>
-                </div>
-
-                {/* Example */}
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Example (cURL)</h3>
-                  <CodeBlock
-                    id="masked-pdf-curl"
-                    language="bash"
-                    code={`curl -X POST ${
-                      apiBaseUrl || "http://localhost:3000"
-                    }/api/cv/generate-masked-pdf \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer hicv_live_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" \\
-  -d '{
-    "cvPdf": "JVBERi0xLjQKJeLjz9MK..."
-  }'`}
-                  />
-                </div>
-
-                {/* Example (JavaScript) */}
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">
-                    Example (JavaScript)
-                  </h3>
-                  <CodeBlock
-                    id="masked-pdf-js"
-                    language="javascript"
-                    code={`// Read PDF file and convert to base64
-const fileInput = document.getElementById('pdfInput');
-const file = fileInput.files[0];
-const reader = new FileReader();
-
-reader.onload = async function(e) {
-  const base64Pdf = e.target.result.split(',')[1]; // Remove data URL prefix
-
-  const response = await fetch('${
-    apiBaseUrl || "http://localhost:3000"
-  }/api/cv/generate-masked-pdf', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer hicv_live_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-    },
-    body: JSON.stringify({
-      cvPdf: base64Pdf
-    })
-  });
-
-  const data = await response.json();
-
-  // Download masked PDF
-  const pdfBlob = await fetch(\`data:application/pdf;base64,\${data.maskedPdf}\`).then(r => r.blob());
-  const url = URL.createObjectURL(pdfBlob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'masked-cv.pdf';
-  a.click();
-};
-
-reader.readAsDataURL(file);`}
-                  />
-                </div>
-
-                {/* Example (Python) */}
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">
-                    Example (Python)
-                  </h3>
-                  <CodeBlock
-                    id="masked-pdf-python"
-                    language="python"
-                    code={`import requests
-import base64
-
-# Read PDF file and encode to base64
-with open('cv.pdf', 'rb') as f:
-    pdf_bytes = f.read()
-    pdf_base64 = base64.b64encode(pdf_bytes).decode('utf-8')
-
-url = "${apiBaseUrl || "http://localhost:3000"}/api/cv/generate-masked-pdf"
-headers = {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer hicv_live_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-}
-payload = {
-    "cvPdf": pdf_base64
-}
-
-response = requests.post(url, json=payload, headers=headers)
-data = response.json()
-
-# Save masked PDF
-if data.get('success'):
-    masked_pdf_bytes = base64.b64decode(data['maskedPdf'])
-    with open('masked-cv.pdf', 'wb') as f:
-        f.write(masked_pdf_bytes)
-    print("Masked PDF saved successfully!")
-else:
-    print("Error:", data.get('error'))`}
+a.download = data.filename; // Use unique filename from response
+a.click();
+console.log('Saved as:', data.filename);`}
                   />
                 </div>
               </CardContent>
@@ -444,7 +299,8 @@ else:
                 </CardTitle>
                 <CardDescription>
                   Generate an AI-tailored PDF CV optimized for a specific job
-                  description
+                  description. Uses AI to parse CV structure and tailor content
+                  to match job requirements.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -470,12 +326,14 @@ Authorization: Bearer YOUR_API_KEY`}
                         code={`{
   "cv": "Your CV text content here...",
   "jobDescription": "Job description text here...",
-  "masked": false
+  "masked": false,
+  "isPdf": false
 }`}
                       />
                       <div className="mt-2 space-y-1 text-sm text-gray-600">
                         <p>
                           <strong>cv</strong> (required): Your CV text content
+                          or base64-encoded PDF
                         </p>
                         <p>
                           <strong>jobDescription</strong> (required): The job
@@ -484,7 +342,16 @@ Authorization: Bearer YOUR_API_KEY`}
                         <p>
                           <strong>masked</strong> (optional): Set to{" "}
                           <code className="bg-gray-100 px-1 rounded">true</code>{" "}
-                          to mask personal information. Default:{" "}
+                          to mask personal information (email, phone, LinkedIn,
+                          GitHub, etc.). Default:{" "}
+                          <code className="bg-gray-100 px-1 rounded">
+                            false
+                          </code>
+                        </p>
+                        <p>
+                          <strong>isPdf</strong> (optional): Set to{" "}
+                          <code className="bg-gray-100 px-1 rounded">true</code>{" "}
+                          if cv is a base64-encoded PDF. Default:{" "}
                           <code className="bg-gray-100 px-1 rounded">
                             false
                           </code>
@@ -502,10 +369,33 @@ Authorization: Bearer YOUR_API_KEY`}
                     language="JSON"
                     code={`{
   "success": true,
-  "pdf": "JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXS9QYXJlbnQgMiAwIFIvUmVzb3VyY2VzPDw+Pj4+CmVuZG9iago...",
-  "message": "Tailored CV generated successfully"
+  "data": {
+    "pdf": "JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXS9QYXJlbnQgMiAwIFIvUmVzb3VyY2VzPDw+Pj4+CmVuZG9iago...",
+    "filename": "tailored-cv-20251011-202445-xyz123.pdf"
+  }
 }`}
                   />
+                  <div className="mt-2 space-y-1 text-sm text-gray-600">
+                    <p>
+                      The{" "}
+                      <code className="bg-gray-100 px-2 py-1 rounded">
+                        data.pdf
+                      </code>{" "}
+                      field contains a base64-encoded PDF file.
+                    </p>
+                    <p>
+                      The{" "}
+                      <code className="bg-gray-100 px-2 py-1 rounded">
+                        data.filename
+                      </code>{" "}
+                      field contains a unique filename. For masked CVs, it
+                      includes "masked" in the name (e.g.,{" "}
+                      <code className="bg-gray-100 px-1 rounded">
+                        tailored-cv-masked-20251011-203550-abc789.pdf
+                      </code>
+                      ).
+                    </p>
+                  </div>
                 </div>
 
                 {/* Example */}
@@ -546,22 +436,120 @@ headers = {
 payload = {
     "cv": "Your CV text content here...",
     "jobDescription": "Job description text here...",
-    "masked": False
+    "masked": False,
+    "isPdf": False
 }
 
 response = requests.post(url, json=payload, headers=headers)
 data = response.json()
 
-# Decode and save PDF
-pdf_data = base64.b64decode(data["pdf"])
-with open("tailored-cv.pdf", "wb") as f:
-    f.write(pdf_data)`}
+# Decode and save PDF with unique filename
+pdf_data = base64.b64decode(data["data"]["pdf"])
+filename = data["data"]["filename"]  # Use unique filename from response
+with open(filename, "wb") as f:
+    f.write(pdf_data)
+print(f"Saved as: {filename}")`}
                   />
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* AI Features */}
+        {/* <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>AI-Powered Features</CardTitle>
+            <CardDescription>
+              How our AI processes and tailors your CV
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-semibold mb-2">CV Parsing</h4>
+                <p className="text-sm text-gray-700">
+                  The{" "}
+                  <code className="bg-gray-100 px-2 py-1 rounded">
+                    /api/cv/generate-tailored
+                  </code>{" "}
+                  endpoint uses AI to:
+                </p>
+                <ul className="list-disc list-inside text-sm text-gray-700 mt-2 space-y-1">
+                  <li>Extract structured data from your CV text or PDF</li>
+                  <li>
+                    Identify personal information, work experience, education,
+                    skills, etc.
+                  </li>
+                  <li>
+                    Understand the context and relationships between different
+                    sections
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-2">CV Tailoring</h4>
+                <p className="text-sm text-gray-700">
+                  The AI then tailors your CV by:
+                </p>
+                <ul className="list-disc list-inside text-sm text-gray-700 mt-2 space-y-1">
+                  <li>Analyzing the job description requirements</li>
+                  <li>Highlighting relevant skills and experience</li>
+                  <li>Optimizing content to match job keywords</li>
+                  <li>Generating a professionally formatted PDF</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-2">
+                  Personal Information Masking
+                </h4>
+                <p className="text-sm text-gray-700">
+                  When{" "}
+                  <code className="bg-gray-100 px-1 rounded">masked: true</code>
+                  , the following information is redacted:
+                </p>
+                <ul className="list-disc list-inside text-sm text-gray-700 mt-2 space-y-1">
+                  <li>
+                    Email addresses →{" "}
+                    <code className="bg-gray-100 px-1 rounded">
+                      [EMAIL REDACTED]
+                    </code>
+                  </li>
+                  <li>
+                    Phone numbers →{" "}
+                    <code className="bg-gray-100 px-1 rounded">
+                      [PHONE REDACTED]
+                    </code>
+                  </li>
+                  <li>
+                    LinkedIn URLs →{" "}
+                    <code className="bg-gray-100 px-1 rounded">
+                      [LINKEDIN REDACTED]
+                    </code>
+                  </li>
+                  <li>
+                    GitHub URLs →{" "}
+                    <code className="bg-gray-100 px-1 rounded">
+                      [GITHUB REDACTED]
+                    </code>
+                  </li>
+                  <li>
+                    Website URLs →{" "}
+                    <code className="bg-gray-100 px-1 rounded">
+                      [WEBSITE REDACTED]
+                    </code>
+                  </li>
+                  <li>
+                    Physical addresses →{" "}
+                    <code className="bg-gray-100 px-1 rounded">
+                      [ADDRESS REDACTED]
+                    </code>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card> */}
 
         {/* Rate Limits */}
         <Card className="mb-8">
