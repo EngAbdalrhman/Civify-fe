@@ -3,8 +3,15 @@ import { authenticateApiRequest } from "@/lib/middleware/api-auth";
 import { logApiUsage } from "@/lib/services/appwrite-server-database";
 import { jsPDF } from "jspdf";
 
-// @ts-ignore - pdf-parse doesn't have proper TypeScript types
-const pdfParse = require("pdf-parse");
+// PDF parsing - only load if available (not in serverless)
+let pdfParse: any = null;
+try {
+  pdfParse = require("pdf-parse");
+} catch (error) {
+  console.warn(
+    "pdf-parse not available in this environment. PDF input will not be supported."
+  );
+}
 
 /**
  * API Endpoint: Generate Masked CV from Text or PDF
@@ -45,6 +52,16 @@ export async function POST(request: NextRequest) {
       }
 
       if (isPdf) {
+        if (!pdfParse) {
+          return NextResponse.json(
+            {
+              success: false,
+              error:
+                "PDF input is not supported in this environment. Please provide CV as text.",
+            },
+            { status: 400 }
+          );
+        }
         // Extract text from PDF
         const buffer = Buffer.from(await file.arrayBuffer());
         const data = await pdfParse(buffer);
@@ -67,6 +84,16 @@ export async function POST(request: NextRequest) {
       }
 
       if (isPdf) {
+        if (!pdfParse) {
+          return NextResponse.json(
+            {
+              success: false,
+              error:
+                "PDF input is not supported in this environment. Please provide CV as text.",
+            },
+            { status: 400 }
+          );
+        }
         // Decode base64 PDF and extract text
         const base64String = cv.replace(/^data:application\/pdf;base64,/, "");
         const buffer = Buffer.from(base64String, "base64");

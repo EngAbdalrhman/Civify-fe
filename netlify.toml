@@ -1,4 +1,5 @@
-# Netlify Configuration for HICv Next.js App
+# Netlify Configuration for Next.js App
+# Using Essential Next.js Plugin for proper Next.js support
 
 [build]
   command = "npm run build"
@@ -6,28 +7,7 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  NPM_FLAGS = "--legacy-peer-deps"
 
-# Redirect API routes to serverless functions
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-
-# Functions configuration
-[functions]
-  node_bundler = "esbuild"
-  external_node_modules = ["canvas", "pdf-parse", "sharp"]
-
-# Apply function settings to all functions
-[functions."*"]
-  # Increase timeout for AI processing (default is 10 seconds)
-  timeout = 60
-
-# Headers for security
-[[headers]]
-  for = "/api/*"
-  [headers.values]
-    Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
-    Access-Control-Allow-Headers = "Content-Type, Authorization"
+# Use the Essential Next.js Plugin
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
