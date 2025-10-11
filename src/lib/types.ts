@@ -7,6 +7,17 @@ export interface UserProfile {
   experience: string;
   education: string;
   skills: string;
+  // License management fields
+  isAdmin?: boolean;
+  isLicensed?: boolean;
+  licenseKey?: string;
+  licenseActivatedAt?: string;
+  apiKeyHash?: string;
+  apiUsage?: {
+    month: string; // Format: YYYY-MM
+    count: number;
+  };
+  cvCount?: number;
 }
 
 // CV Data Types.
@@ -15,6 +26,7 @@ export interface CVData {
   userId: string;
   fileName: string;
   rawText: string;
+  fileId?: string; // Appwrite Storage file ID
   structuredData: StructuredCVData | null;
   profile: UserProfile;
   createdAt: string;
@@ -181,4 +193,45 @@ export interface FormData {
   profile: UserProfile;
   jobDescription: string;
   generateCoverLetter: boolean;
+}
+
+// License Management Types
+export interface LicenseKey {
+  id: string;
+  key: string; // Format: HICV-XXXX-XXXX-XXXX
+  createdAt: string;
+  createdBy: string; // Admin user ID
+  activatedBy?: string; // User ID who activated the license
+  activatedAt?: string;
+  isActive: boolean;
+}
+
+export interface ApiKey {
+  id: string;
+  userId: string;
+  key: string; // The actual API key (only shown once)
+  keyHash: string; // SHA-256 hash for verification
+  createdAt: string;
+  lastUsedAt?: string;
+  isActive: boolean;
+}
+
+export interface ApiUsageLog {
+  id: string;
+  userId: string;
+  endpoint: string;
+  timestamp: string;
+  month: string; // Format: YYYY-MM
+  success: boolean;
+  errorMessage?: string;
+}
+
+export interface AdminStats {
+  totalUsers: number;
+  licensedUsers: number;
+  totalCVs: number;
+  totalApiCalls: number;
+  apiCallsThisMonth: number;
+  activeLicenses: number;
+  unusedLicenses: number;
 }

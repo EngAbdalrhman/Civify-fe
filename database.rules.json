@@ -1,0 +1,47 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('profile').child('isAdmin').val() === true || auth.token.email === 'amabdo30@gmail.com'",
+        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('profile').child('isAdmin').val() === true || auth.token.email === 'amabdo30@gmail.com'",
+        "profile": {
+          ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('profile').child('isAdmin').val() === true || auth.token.email === 'amabdo30@gmail.com'",
+          ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('profile').child('isAdmin').val() === true || auth.token.email === 'amabdo30@gmail.com'"
+        },
+        "cvs": {
+          ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('profile').child('isAdmin').val() === true || auth.token.email === 'amabdo30@gmail.com'",
+          ".write": "$uid === auth.uid"
+        },
+        "jobApplications": {
+          ".read": "$uid === auth.uid",
+          ".write": "$uid === auth.uid"
+        },
+        "generatedContent": {
+          ".read": "$uid === auth.uid",
+          ".write": "$uid === auth.uid"
+        },
+        "settings": {
+          ".read": "$uid === auth.uid",
+          ".write": "$uid === auth.uid"
+        },
+        "apiKeys": {
+          ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('profile').child('isAdmin').val() === true || auth.token.email === 'amabdo30@gmail.com'",
+          ".write": "$uid === auth.uid"
+        },
+        "apiUsageLogs": {
+          ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('profile').child('isAdmin').val() === true || auth.token.email === 'amabdo30@gmail.com'",
+          ".write": "$uid === auth.uid"
+        }
+      }
+    },
+    "licenses": {
+      ".read": "auth != null",
+      ".write": "root.child('users').child(auth.uid).child('profile').child('isAdmin').val() === true || auth.token.email === 'amabdo30@gmail.com'",
+      "$licenseId": {
+        ".read": "auth != null",
+        ".write": "root.child('users').child(auth.uid).child('profile').child('isAdmin').val() === true || auth.token.email === 'amabdo30@gmail.com'"
+      }
+    }
+  }
+}
+

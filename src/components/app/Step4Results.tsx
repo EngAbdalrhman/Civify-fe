@@ -196,10 +196,23 @@ export default function Step4Results({
 
     setSaving(true);
     try {
-      // Save CV data to Firebase
+      // Check current CV count
+      const currentCVs = await database.getAllCVs();
+
+      // Upload CV file to Appwrite Storage
+      const cvBlob = new Blob([formData.rawCvText], { type: "text/plain" });
+      const cvFile = new File([cvBlob], formData.cvFileName || "cv.txt", {
+        type: "text/plain",
+      });
+
+      const { uploadCVFile } = await import("@/lib/appwrite");
+      const fileId = await uploadCVFile(cvFile, user.uid);
+
+      // Save CV data to Firebase with Appwrite file ID
       const cvId = await database.saveCVData({
         fileName: formData.cvFileName || "Untitled CV",
-        rawText: formData.rawCvText,
+        fileId: fileId, // Store Appwrite file ID instead of raw text
+        rawText: formData.rawCvText, // Keep for backward compatibility
         structuredData: formData.structuredCvData,
         profile: formData.profile,
       });
@@ -237,17 +250,25 @@ export default function Step4Results({
       }
 
       setSaved(true);
+
+      // Get updated CV count
+      const updatedCVs = await database.getAllCVs();
+
       toast({
         title: "CV Saved Successfully!",
-        description:
-          "Your CV and generated content have been saved to your account.",
+        description: `Your CV has been saved to your account. (${updatedCVs.length}/3 CVs used)`,
       });
     } catch (error) {
       console.error("Error saving to Firebase:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to save your CV. Please try again.";
+
       toast({
         variant: "destructive",
         title: "Save Failed",
-        description: "Failed to save your CV. Please try again.",
+        description: errorMessage,
       });
     } finally {
       setSaving(false);

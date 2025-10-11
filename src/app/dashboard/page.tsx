@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { useDatabase } from "@/hooks/use-database";
-import { CVData, JobApplication } from "@/lib/types";
+import { CVData, JobApplication, UserProfile } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -33,6 +33,8 @@ import {
   ArrowLeft,
   User,
   LogOut,
+  Shield,
+  Key,
 } from "lucide-react";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
@@ -47,6 +49,8 @@ export default function DashboardPage() {
   const [cvs, setCvs] = useState<CVData[]>([]);
   const [jobApplications, setJobApplications] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (isHydrated && !user) {
@@ -64,12 +68,21 @@ export default function DashboardPage() {
 
     try {
       setLoading(true);
-      const [cvsData, jobAppsData] = await Promise.all([
+      const [cvsData, jobAppsData, profile] = await Promise.all([
         database.getAllCVs(),
         database.getAllJobApplications(),
+        database.getUserProfile(),
       ]);
       setCvs(cvsData);
       setJobApplications(jobAppsData);
+      setUserProfile(profile);
+
+      // Check if user is admin
+      const adminEmail =
+        process.env.NEXT_PUBLIC_ADMIN_EMAIL || "amabdo30@gmail.com";
+      const isUserAdmin =
+        user?.email === adminEmail || profile?.isAdmin === true;
+      setIsAdmin(isUserAdmin);
     } catch (error) {
       console.error("Error loading data:", error);
       toast({
@@ -154,6 +167,42 @@ export default function DashboardPage() {
               <ArrowLeft className="h-4 w-4" />
               Back to CV Builder
             </Button>
+
+            {/* License/API Key Button for Licensed Users */}
+            {userProfile?.isLicensed && (
+              <Button
+                variant="outline"
+                onClick={() => router.push("/dashboard/api-keys")}
+                className="flex items-center gap-2 border-green-500 text-green-600 hover:bg-green-50"
+              >
+                <Key className="h-4 w-4" />
+                API Keys
+              </Button>
+            )}
+
+            {/* License Activation Button for Non-Licensed Users */}
+            {!userProfile?.isLicensed && (
+              <Button
+                variant="outline"
+                onClick={() => router.push("/dashboard/license")}
+                className="flex items-center gap-2 border-purple-500 text-purple-600 hover:bg-purple-50"
+              >
+                <Key className="h-4 w-4" />
+                Activate License
+              </Button>
+            )}
+
+            {/* Admin Dashboard Button */}
+            {isAdmin && (
+              <Button
+                onClick={() => router.push("/admin/dashboard")}
+                className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600"
+              >
+                <Shield className="h-4 w-4" />
+                Admin Dashboard
+              </Button>
+            )}
+
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <User className="h-4 w-4" />
               <span>{user.email}</span>
@@ -178,7 +227,16 @@ export default function DashboardPage() {
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{cvs.length}</div>
+              <div className="text-2xl font-bold">{cvs.length}/3</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {cvs.length >= 3 ? (
+                  <span className="text-red-500">Limit reached</span>
+                ) : (
+                  <span className="text-green-500">
+                    {3 - cvs.length} slots available
+                  </span>
+                )}
+              </p>
             </CardContent>
           </Card>
           <Card>
