@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { databases } from "@/lib/appwrite";
-import { Query } from "appwrite";
+import {
+  serverDatabases,
+  Query,
+  DATABASE_ID,
+  USERS_COLLECTION_ID,
+  API_KEYS_COLLECTION_ID,
+} from "@/lib/appwrite-server";
 import { verifyApiKey } from "@/lib/utils/license";
 import { UserProfile } from "@/lib/types";
-
-const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!;
-const USERS_COLLECTION_ID =
-  process.env.NEXT_PUBLIC_APPWRITE_USERS_COLLECTION_ID!;
-const API_KEYS_COLLECTION_ID =
-  process.env.NEXT_PUBLIC_APPWRITE_API_KEYS_COLLECTION_ID!;
 
 export interface AuthenticatedRequest extends NextRequest {
   userId?: string;
@@ -51,7 +50,7 @@ export async function authenticateApiRequest(
 
   try {
     // Get all API keys
-    const apiKeysResponse = await databases.listDocuments(
+    const apiKeysResponse = await serverDatabases.listDocuments(
       DATABASE_ID,
       API_KEYS_COLLECTION_ID,
       [Query.equal("isActive", true), Query.limit(10000)]
@@ -62,63 +61,71 @@ export async function authenticateApiRequest(
       const isValid = await verifyApiKey(apiKey, apiKeyDoc.keyHash);
 
       if (isValid) {
-        const userId = apiKeyDoc.userId;
+        // Get userId from the relationship field
+        const userId = apiKeyDoc.users;
 
-        // Get user profile
-        const usersResponse = await databases.listDocuments(
-          DATABASE_ID,
-          USERS_COLLECTION_ID,
-          [Query.equal("userId", userId)]
-        );
+        // Get user document by ID (document ID is the Firebase userId)
+        try {
+          const userDoc = await serverDatabases.getDocument(
+            DATABASE_ID,
+            USERS_COLLECTION_ID,
+            userId
+          );
 
-        if (usersResponse.documents.length === 0) {
+          if (!userDoc) {
+            return {
+              authenticated: false,
+              error: "User not found",
+              status: 401,
+            };
+          }
+
+          // Check if user is licensed
+          if (!userDoc.isLicensed) {
+            return {
+              authenticated: false,
+              error: "API access requires an active license",
+              status: 403,
+            };
+          }
+
+          // Check rate limit
+          const currentMonth = new Date().toISOString().substring(0, 7);
+          const apiUsageMonth = userDoc.apiUsageMonth;
+          const apiUsageCount = userDoc.apiUsageCount || 0;
+          const apiRateLimit = userDoc.apiRateLimit || 500; // Custom or default limit
+
+          if (apiUsageMonth === currentMonth && apiUsageCount >= apiRateLimit) {
+            return {
+              authenticated: false,
+              error: `API rate limit exceeded (${apiRateLimit} calls/month)`,
+              status: 429,
+            };
+          }
+
+          // Update last used timestamp
+          await serverDatabases.updateDocument(
+            DATABASE_ID,
+            API_KEYS_COLLECTION_ID,
+            apiKeyDoc.$id,
+            {
+              lastUsedAt: new Date().toISOString(),
+            }
+          );
+
+          return {
+            authenticated: true,
+            userId,
+            status: 200,
+          };
+        } catch (userError) {
+          console.error("Error getting user document:", userError);
           return {
             authenticated: false,
             error: "User not found",
             status: 401,
           };
         }
-
-        const userDoc = usersResponse.documents[0];
-
-        // Check if user is licensed
-        if (!userDoc.isLicensed) {
-          return {
-            authenticated: false,
-            error: "API access requires an active license",
-            status: 403,
-          };
-        }
-
-        // Check rate limit
-        const currentMonth = new Date().toISOString().substring(0, 7);
-        const apiUsageMonth = userDoc.apiUsageMonth;
-        const apiUsageCount = userDoc.apiUsageCount || 0;
-        const apiRateLimit = userDoc.apiRateLimit || 500; // Custom or default limit
-
-        if (apiUsageMonth === currentMonth && apiUsageCount >= apiRateLimit) {
-          return {
-            authenticated: false,
-            error: `API rate limit exceeded (${apiRateLimit} calls/month)`,
-            status: 429,
-          };
-        }
-
-        // Update last used timestamp
-        await databases.updateDocument(
-          DATABASE_ID,
-          API_KEYS_COLLECTION_ID,
-          apiKeyDoc.$id,
-          {
-            lastUsedAt: new Date().toISOString(),
-          }
-        );
-
-        return {
-          authenticated: true,
-          userId,
-          status: 200,
-        };
       }
     }
 

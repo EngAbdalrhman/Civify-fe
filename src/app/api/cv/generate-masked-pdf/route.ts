@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateApiRequest } from "@/lib/middleware/api-auth";
+import { logApiUsage } from "@/lib/services/appwrite-server-database";
 import { jsPDF } from "jspdf";
 import { getDocument } from "pdfjs-dist";
 
 /**
  * API Endpoint: Generate Masked CV from PDF
  * POST /api/cv/generate-masked-pdf
- * 
+ *
  * Accepts a base64-encoded PDF, extracts text, masks personal information,
  * and returns a masked PDF.
  */
@@ -58,11 +59,7 @@ export async function POST(request: NextRequest) {
 
     // Log API usage
     if (authResult.userId) {
-      const { AppwriteDatabaseService } = await import(
-        "@/lib/services/appwrite-database"
-      );
-      const dbService = new AppwriteDatabaseService(authResult.userId);
-      await dbService.logApiUsage({
+      await logApiUsage(authResult.userId, {
         endpoint: "/api/cv/generate-masked-pdf",
         timestamp: new Date().toISOString(),
         success: true,
@@ -82,11 +79,7 @@ export async function POST(request: NextRequest) {
     try {
       const authResult = await authenticateApiRequest(request);
       if (authResult.userId) {
-        const { AppwriteDatabaseService } = await import(
-          "@/lib/services/appwrite-database"
-        );
-        const dbService = new AppwriteDatabaseService(authResult.userId);
-        await dbService.logApiUsage({
+        await logApiUsage(authResult.userId, {
           endpoint: "/api/cv/generate-masked-pdf",
           timestamp: new Date().toISOString(),
           success: false,
@@ -115,11 +108,11 @@ function isValidBase64(str: string): boolean {
   try {
     // Remove data URL prefix if present
     const base64String = str.replace(/^data:application\/pdf;base64,/, "");
-    
+
     // Check if valid base64
     const decoded = Buffer.from(base64String, "base64");
     const encoded = decoded.toString("base64");
-    
+
     return base64String === encoded;
   } catch (error) {
     return false;
@@ -140,8 +133,14 @@ async function extractTextFromPDF(base64Pdf: string): Promise<string> {
     // Convert base64 to buffer
     const pdfBuffer = Buffer.from(base64String, "base64");
 
-    // Load PDF document
-    const loadingTask = getDocument({ data: pdfBuffer });
+    // Load PDF document with proper configuration
+    const loadingTask = getDocument({
+      data: new Uint8Array(pdfBuffer),
+      useSystemFonts: true,
+      standardFontDataUrl:
+        "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/",
+    });
+
     const pdf = await loadingTask.promise;
 
     let fullText = "";
@@ -150,9 +149,7 @@ async function extractTextFromPDF(base64Pdf: string): Promise<string> {
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
       const page = await pdf.getPage(pageNum);
       const textContent = await page.getTextContent();
-      const pageText = textContent.items
-        .map((item: any) => item.str)
-        .join(" ");
+      const pageText = textContent.items.map((item: any) => item.str).join(" ");
       fullText += pageText + "\n\n";
     }
 
@@ -254,4 +251,3 @@ function generateMaskedPDF(text: string): string {
   const pdfBase64 = doc.output("datauristring");
   return pdfBase64;
 }
-

@@ -4,7 +4,7 @@ import {
   createErrorResponse,
   createSuccessResponse,
 } from "@/lib/middleware/api-auth";
-import { AppwriteDatabaseService } from "@/lib/services/appwrite-database";
+import { logApiUsage } from "@/lib/services/appwrite-server-database";
 import { tailorCv } from "@/ai/flows/cv-tailoring";
 import jsPDF from "jspdf";
 
@@ -110,8 +110,7 @@ export async function POST(request: NextRequest) {
     const pdfBase64 = pdf.output("datauristring").split(",")[1];
 
     // Log API usage
-    const database = new AppwriteDatabaseService(userId);
-    await database.logApiUsage({
+    await logApiUsage(userId, {
       endpoint: "/api/cv/generate-tailored",
       timestamp: new Date().toISOString(),
       success: true,
@@ -123,8 +122,7 @@ export async function POST(request: NextRequest) {
 
     // Log failed API usage
     try {
-      const database = new AppwriteDatabaseService(userId);
-      await database.logApiUsage({
+      await logApiUsage(userId, {
         endpoint: "/api/cv/generate-tailored",
         timestamp: new Date().toISOString(),
         success: false,

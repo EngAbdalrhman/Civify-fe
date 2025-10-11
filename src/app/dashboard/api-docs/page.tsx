@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -19,6 +19,14 @@ export default function ApiDocsPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [apiBaseUrl, setApiBaseUrl] = useState<string>("");
+
+  // Get the current domain (works for both local and production)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setApiBaseUrl(window.location.origin);
+    }
+  }, []);
 
   const handleCopyCode = (code: string, id: string) => {
     navigator.clipboard.writeText(code);
@@ -84,6 +92,21 @@ export default function ApiDocsPage() {
           <p className="text-gray-600 mt-2">
             Complete guide to using the HICv API for CV generation
           </p>
+          {apiBaseUrl && (
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-900">
+                <strong>API Base URL:</strong>{" "}
+                <code className="bg-blue-100 px-2 py-1 rounded text-blue-800">
+                  {apiBaseUrl}
+                </code>
+              </p>
+              <p className="text-xs text-blue-700 mt-1">
+                {apiBaseUrl.includes("localhost")
+                  ? "🔧 Running locally - Use this URL for testing"
+                  : "🌐 Production environment"}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Quick Start */}
@@ -192,7 +215,9 @@ Authorization: Bearer YOUR_API_KEY`}
                   <CodeBlock
                     id="masked-curl"
                     language="bash"
-                    code={`curl -X POST https://your-domain.com/api/cv/generate-masked \\
+                    code={`curl -X POST ${
+                      apiBaseUrl || "http://localhost:3000"
+                    }/api/cv/generate-masked \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer hicv_live_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" \\
   -d '{
@@ -209,7 +234,9 @@ Authorization: Bearer YOUR_API_KEY`}
                   <CodeBlock
                     id="masked-js"
                     language="javascript"
-                    code={`const response = await fetch('https://your-domain.com/api/cv/generate-masked', {
+                    code={`const response = await fetch('${
+                      apiBaseUrl || "http://localhost:3000"
+                    }/api/cv/generate-masked', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -310,7 +337,9 @@ Authorization: Bearer YOUR_API_KEY`}
                   <CodeBlock
                     id="masked-pdf-curl"
                     language="bash"
-                    code={`curl -X POST https://your-domain.com/api/cv/generate-masked-pdf \\
+                    code={`curl -X POST ${
+                      apiBaseUrl || "http://localhost:3000"
+                    }/api/cv/generate-masked-pdf \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer hicv_live_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" \\
   -d '{
@@ -335,7 +364,9 @@ const reader = new FileReader();
 reader.onload = async function(e) {
   const base64Pdf = e.target.result.split(',')[1]; // Remove data URL prefix
 
-  const response = await fetch('https://your-domain.com/api/cv/generate-masked-pdf', {
+  const response = await fetch('${
+    apiBaseUrl || "http://localhost:3000"
+  }/api/cv/generate-masked-pdf', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -377,7 +408,7 @@ with open('cv.pdf', 'rb') as f:
     pdf_bytes = f.read()
     pdf_base64 = base64.b64encode(pdf_bytes).decode('utf-8')
 
-url = "https://your-domain.com/api/cv/generate-masked-pdf"
+url = "${apiBaseUrl || "http://localhost:3000"}/api/cv/generate-masked-pdf"
 headers = {
     "Content-Type": "application/json",
     "Authorization": "Bearer hicv_live_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
@@ -483,7 +514,9 @@ Authorization: Bearer YOUR_API_KEY`}
                   <CodeBlock
                     id="tailored-curl"
                     language="bash"
-                    code={`curl -X POST https://your-domain.com/api/cv/generate-tailored \\
+                    code={`curl -X POST ${
+                      apiBaseUrl || "http://localhost:3000"
+                    }/api/cv/generate-tailored \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer hicv_live_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" \\
   -d '{
@@ -505,7 +538,7 @@ Authorization: Bearer YOUR_API_KEY`}
                     code={`import requests
 import base64
 
-url = "https://your-domain.com/api/cv/generate-tailored"
+url = "${apiBaseUrl || "http://localhost:3000"}/api/cv/generate-tailored"
 headers = {
     "Content-Type": "application/json",
     "Authorization": "Bearer hicv_live_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
