@@ -17,9 +17,7 @@
 # Functions configuration
 [functions]
   node_bundler = "esbuild"
-  # Increase timeout for AI processing (default is 10 seconds)
-  timeout = 60
-  # Exclude native modules from bundling
+  timeout = 60  # Increase timeout for AI processing (default is 10 seconds)
   external_node_modules = ["canvas", "pdf-parse", "sharp"]
 
 # Headers for security
@@ -29,4 +27,3 @@
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
     Access-Control-Allow-Headers = "Content-Type, Authorization"
-
