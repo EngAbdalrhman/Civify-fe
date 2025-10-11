@@ -41,44 +41,47 @@ export async function logApiUsage(
       }
     );
 
-    // Update user's API usage count
-    const currentMonth = new Date().toISOString().substring(0, 7);
+    // Only increment API usage count for successful requests
+    if (log.success) {
+      // Update user's API usage count
+      const currentMonth = new Date().toISOString().substring(0, 7);
 
-    // Get current user document
-    const userDoc = await serverDatabases.getDocument(
-      DATABASE_ID,
-      USERS_COLLECTION_ID,
-      userId
-    );
-
-    const apiUsageMonth = userDoc.apiUsageMonth;
-    const apiUsageCount = userDoc.apiUsageCount || 0;
-
-    // If it's a new month, reset the counter
-    if (apiUsageMonth !== currentMonth) {
-      await serverDatabases.updateDocument(
+      // Get current user document
+      const userDoc = await serverDatabases.getDocument(
         DATABASE_ID,
         USERS_COLLECTION_ID,
-        userId,
-        {
-          apiUsageMonth: currentMonth,
-          apiUsageCount: 1,
-        }
+        userId
       );
-    } else {
-      // Increment the counter
-      await serverDatabases.updateDocument(
-        DATABASE_ID,
-        USERS_COLLECTION_ID,
-        userId,
-        {
-          apiUsageCount: apiUsageCount + 1,
-        }
-      );
+
+      const apiUsageMonth = userDoc.apiUsageMonth;
+      const apiUsageCount = userDoc.apiUsageCount || 0;
+
+      // If it's a new month, reset the counter
+      if (apiUsageMonth !== currentMonth) {
+        await serverDatabases.updateDocument(
+          DATABASE_ID,
+          USERS_COLLECTION_ID,
+          userId,
+          {
+            apiUsageMonth: currentMonth,
+            apiUsageCount: 1,
+          }
+        );
+      } else {
+        // Increment the counter
+        await serverDatabases.updateDocument(
+          DATABASE_ID,
+          USERS_COLLECTION_ID,
+          userId,
+          {
+            apiUsageCount: apiUsageCount + 1,
+          }
+        );
+      }
     }
+    // If success is false, we still log the error but don't increment the counter
   } catch (error) {
     console.error("Error logging API usage:", error);
-    // Don't throw - we don't want to fail the API request if logging fails
   }
 }
 
@@ -107,4 +110,3 @@ export async function getApiUsageThisMonth(userId: string): Promise<number> {
     return 0;
   }
 }
-

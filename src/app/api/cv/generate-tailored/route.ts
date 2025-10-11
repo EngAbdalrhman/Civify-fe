@@ -156,6 +156,10 @@ export async function POST(request: NextRequest) {
     return createSuccessResponse({ pdf: pdfBase64, filename: filename });
   } catch (error) {
     console.error("Error generating tailored CV:", error);
+    console.error(
+      "Error stack:",
+      error instanceof Error ? error.stack : "No stack trace"
+    );
 
     // Log failed API usage
     try {
@@ -169,7 +173,17 @@ export async function POST(request: NextRequest) {
       console.error("Error logging API usage:", logError);
     }
 
-    return createErrorResponse("Failed to generate tailored CV", 500);
+    // Return detailed error in development, generic in production
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    const isDevelopment = process.env.NODE_ENV === "development";
+
+    return createErrorResponse(
+      isDevelopment
+        ? `Failed to generate tailored CV: ${errorMessage}`
+        : "Failed to generate tailored CV",
+      500
+    );
   }
 }
 

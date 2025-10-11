@@ -1,0 +1,32 @@
+# Netlify Configuration for HICv Next.js App
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--legacy-peer-deps"
+
+# Redirect API routes to serverless functions
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Functions configuration
+[functions]
+  node_bundler = "esbuild"
+  # Increase timeout for AI processing (default is 10 seconds)
+  timeout = 60
+  # Exclude native modules from bundling
+  external_node_modules = ["canvas", "pdf-parse", "sharp"]
+
+# Headers for security
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+

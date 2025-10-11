@@ -117,6 +117,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error generating masked CV:", error);
+    console.error(
+      "Error stack:",
+      error instanceof Error ? error.stack : "No stack trace"
+    );
 
     // Log failed API usage
     try {
@@ -134,10 +138,16 @@ export async function POST(request: NextRequest) {
       console.error("Error logging API usage:", logError);
     }
 
+    // Return detailed error in development, generic in production
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    const isDevelopment = process.env.NODE_ENV === "development";
+
     return NextResponse.json(
       {
+        success: false,
         error: "Failed to generate masked CV",
-        details: error instanceof Error ? error.message : "Unknown error",
+        details: isDevelopment ? errorMessage : undefined,
       },
       { status: 500 }
     );
