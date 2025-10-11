@@ -17,8 +17,12 @@
 # Functions configuration
 [functions]
   node_bundler = "esbuild"
-  timeout = 60  # Increase timeout for AI processing (default is 10 seconds)
   external_node_modules = ["canvas", "pdf-parse", "sharp"]
+
+# Apply function settings to all functions
+[functions."*"]
+  # Increase timeout for AI processing (default is 10 seconds)
+  timeout = 60
 
 # Headers for security
 [[headers]]
