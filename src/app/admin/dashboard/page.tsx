@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
-import { AdminDatabaseService } from "@/lib/services/admin-database";
+import { AppwriteAdminDatabaseService } from "@/lib/services/appwrite-admin-database";
 import { generateLicenseKey } from "@/lib/utils/license";
 import {
   Card,
@@ -49,7 +49,7 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<Array<UserProfile & { userId: string }>>(
     []
   );
-  const [adminService] = useState(() => new AdminDatabaseService());
+  const [adminService] = useState(() => new AppwriteAdminDatabaseService());
 
   // Check if user is admin
   useEffect(() => {
@@ -68,8 +68,10 @@ export default function AdminDashboard() {
         await loadAdminData();
       } else {
         // Check database for admin flag
-        const { DatabaseService } = await import("@/lib/services/database");
-        const db = new DatabaseService(user.uid);
+        const { AppwriteDatabaseService } = await import(
+          "@/lib/services/appwrite-database"
+        );
+        const db = new AppwriteDatabaseService(user.uid);
         const profile = await db.getUserProfile();
 
         if (profile?.isAdmin) {
@@ -116,7 +118,6 @@ export default function AdminDashboard() {
     try {
       const key = generateLicenseKey();
       const licenseId = await adminService.createLicenseKey({
-        id: "",
         key,
         createdAt: new Date().toISOString(),
         createdBy: user!.uid,
@@ -185,10 +186,23 @@ export default function AdminDashboard() {
 
   const handleGrantLicense = async (userId: string) => {
     try {
-      await adminService.grantLicense(userId);
+      // Generate a new license key
+      const licenseKey = generateLicenseKey();
+
+      // Create the license in the database
+      await adminService.createLicenseKey({
+        key: licenseKey,
+        createdAt: new Date().toISOString(),
+        createdBy: user?.uid || "",
+        isActive: true,
+      });
+
+      // Grant it to the user
+      await adminService.grantLicense(userId, licenseKey);
+
       toast({
         title: "License Granted",
-        description: "User has been granted a license.",
+        description: `User has been granted license: ${licenseKey}`,
       });
       await loadAdminData();
     } catch (error) {
@@ -314,7 +328,7 @@ export default function AdminDashboard() {
           <TabsList>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="licenses">License Keys</TabsTrigger>
-            <TabsTrigger value="migration">Migration</TabsTrigger>
+            <TabsTrigger value="cv-limits">CV Limits</TabsTrigger>
           </TabsList>
 
           {/* Users Tab */}
@@ -474,9 +488,14 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
 
-          {/* Migration Tab */}
-          <TabsContent value="migration">
-            <MigrationTab adminService={adminService} toast={toast} />
+          {/* CV Limits Tab */}
+          <TabsContent value="cv-limits">
+            <CVLimitsTab
+              adminService={adminService}
+              users={users}
+              toast={toast}
+              onUpdate={loadAdminData}
+            />
           </TabsContent>
         </Tabs>
       </div>
@@ -484,71 +503,39 @@ export default function AdminDashboard() {
   );
 }
 
-// Migration Tab Component
-function MigrationTab({
+// CV Limits Tab Component
+function CVLimitsTab({
   adminService,
+  users,
   toast,
+  onUpdate,
 }: {
-  adminService: AdminDatabaseService;
+  adminService: AppwriteAdminDatabaseService;
+  users: Array<UserProfile & { userId: string }>;
   toast: any;
+  onUpdate: () => Promise<void>;
 }) {
   const [loading, setLoading] = useState(false);
-  const [oldCVsInfo, setOldCVsInfo] = useState<{
-    totalOldCVs: number;
-    usersWithOldCVs: number;
-    details: { userId: string; email: string; oldCVCount: number }[];
-  } | null>(null);
-  const [migrationResult, setMigrationResult] = useState<{
-    totalDeleted: number;
-    usersAffected: number;
-    details: { userId: string; email: string; deletedCount: number }[];
-  } | null>(null);
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [newLimit, setNewLimit] = useState<number>(3);
 
-  const handleCheckOldCVs = async () => {
+  const handleSetLimit = async (userId: string, limit: number) => {
     setLoading(true);
     try {
-      const result = await adminService.getOldCVsCount();
-      setOldCVsInfo(result);
+      await adminService.setUserCVLimit(userId, limit);
       toast({
-        title: "Scan Complete",
-        description: `Found ${result.totalOldCVs} old CVs across ${result.usersWithOldCVs} users.`,
+        title: "CV Limit Updated",
+        description: `User CV limit has been set to ${limit}.`,
       });
+      await onUpdate();
+      setSelectedUser(null);
+      setNewLimit(3);
     } catch (error) {
-      console.error("Error checking old CVs:", error);
+      console.error("Error setting CV limit:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to scan for old CVs.",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleTruncateOldCVs = async () => {
-    if (
-      !confirm(
-        "Are you sure you want to delete all old CVs? This action cannot be undone!"
-      )
-    ) {
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const result = await adminService.truncateOldCVs();
-      setMigrationResult(result);
-      setOldCVsInfo(null);
-      toast({
-        title: "Migration Complete! 🎉",
-        description: `Deleted ${result.totalDeleted} old CVs from ${result.usersAffected} users.`,
-      });
-    } catch (error) {
-      console.error("Error truncating old CVs:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to truncate old CVs.",
+        description: "Failed to update CV limit.",
       });
     } finally {
       setLoading(false);
@@ -558,108 +545,102 @@ function MigrationTab({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>CV Migration Utility</CardTitle>
+        <CardTitle>CV Limits Management</CardTitle>
         <CardDescription>
-          Manage migration from old CV storage format to Appwrite Storage
+          Set custom CV storage limits for individual users
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+      <CardContent>
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
           <h3 className="text-sm font-semibold text-blue-900 mb-2">
-            About This Tool
+            About CV Limits
           </h3>
           <p className="text-sm text-blue-800">
-            This utility helps you migrate from the old CV storage format
-            (storing CV text directly in Firebase) to the new Appwrite Storage
-            format. Old CVs without a{" "}
-            <code className="bg-blue-100 px-1 rounded">fileId</code> will be
-            identified and can be deleted.
+            By default, users can save up to 3 CVs. You can set custom limits
+            for specific users to allow them to save more CVs. This is useful
+            for premium users or special cases.
           </p>
         </div>
 
-        <div className="flex gap-4">
-          <Button
-            onClick={handleCheckOldCVs}
-            disabled={loading}
-            variant="outline"
-            className="flex-1"
-          >
-            {loading ? "Scanning..." : "Scan for Old CVs"}
-          </Button>
-          <Button
-            onClick={handleTruncateOldCVs}
-            disabled={loading || !oldCVsInfo || oldCVsInfo.totalOldCVs === 0}
-            variant="destructive"
-            className="flex-1"
-          >
-            {loading ? "Deleting..." : "Delete All Old CVs"}
-          </Button>
-        </div>
-
-        {oldCVsInfo && (
-          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <h3 className="text-sm font-semibold text-yellow-900 mb-2">
-              Scan Results
-            </h3>
-            <p className="text-sm text-yellow-800 mb-4">
-              Found <strong>{oldCVsInfo.totalOldCVs}</strong> old CVs across{" "}
-              <strong>{oldCVsInfo.usersWithOldCVs}</strong> users.
-            </p>
-            {oldCVsInfo.details.length > 0 && (
-              <div className="max-h-60 overflow-y-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Old CVs</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {oldCVsInfo.details.map((detail) => (
-                      <TableRow key={detail.userId}>
-                        <TableCell>{detail.email}</TableCell>
-                        <TableCell>{detail.oldCVCount}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </div>
-        )}
-
-        {migrationResult && (
-          <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-            <h3 className="text-sm font-semibold text-green-900 mb-2">
-              Migration Complete! ✅
-            </h3>
-            <p className="text-sm text-green-800 mb-4">
-              Successfully deleted{" "}
-              <strong>{migrationResult.totalDeleted}</strong> old CVs from{" "}
-              <strong>{migrationResult.usersAffected}</strong> users.
-            </p>
-            {migrationResult.details.length > 0 && (
-              <div className="max-h-60 overflow-y-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Deleted CVs</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {migrationResult.details.map((detail) => (
-                      <TableRow key={detail.userId}>
-                        <TableCell>{detail.email}</TableCell>
-                        <TableCell>{detail.deletedCount}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </div>
-        )}
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Email</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Current Limit</TableHead>
+              <TableHead>CVs Saved</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {users.map((user) => (
+              <TableRow key={user.userId}>
+                <TableCell className="font-medium">{user.email}</TableCell>
+                <TableCell>{user.name || "N/A"}</TableCell>
+                <TableCell>
+                  <Badge variant="outline">{user.cvLimit || 3} CVs</Badge>
+                </TableCell>
+                <TableCell>
+                  <span
+                    className={
+                      (user.cvCount || 0) >= (user.cvLimit || 3)
+                        ? "text-red-600 font-semibold"
+                        : "text-gray-600"
+                    }
+                  >
+                    {user.cvCount || 0}/{user.cvLimit || 3}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  {selectedUser === user.userId ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        min="1"
+                        max="100"
+                        value={newLimit}
+                        onChange={(e) =>
+                          setNewLimit(parseInt(e.target.value) || 3)
+                        }
+                        className="w-20 px-2 py-1 border rounded"
+                        disabled={loading}
+                      />
+                      <Button
+                        size="sm"
+                        onClick={() => handleSetLimit(user.userId, newLimit)}
+                        disabled={loading}
+                      >
+                        {loading ? "Saving..." : "Save"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedUser(null);
+                          setNewLimit(3);
+                        }}
+                        disabled={loading}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setSelectedUser(user.userId);
+                        setNewLimit(user.cvLimit || 3);
+                      }}
+                    >
+                      Set Limit
+                    </Button>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   );

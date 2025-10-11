@@ -4,17 +4,17 @@ import {
   createErrorResponse,
   createSuccessResponse,
 } from "@/lib/middleware/api-auth";
-import { DatabaseService } from "@/lib/services/database";
+import { AppwriteDatabaseService } from "@/lib/services/appwrite-database";
 import { tailorCv } from "@/ai/flows/cv-tailoring";
 import jsPDF from "jspdf";
 
 /**
  * API Endpoint: Generate Tailored CV PDF
  * POST /api/cv/generate-tailored
- * 
+ *
  * Input: { cv: string, jobDescription: string, masked: boolean }
  * Output: { pdf: string } - base64-encoded PDF of AI-tailored CV
- * 
+ *
  * Requires: Valid API key from licensed account
  */
 export async function POST(request: NextRequest) {
@@ -84,7 +84,11 @@ export async function POST(request: NextRequest) {
     // Add title
     pdf.setFontSize(16);
     pdf.setFont("helvetica", "bold");
-    pdf.text(masked ? "Tailored CV (Masked)" : "Tailored CV", margin, margin + 10);
+    pdf.text(
+      masked ? "Tailored CV (Masked)" : "Tailored CV",
+      margin,
+      margin + 10
+    );
 
     // Add tailored CV content
     pdf.setFontSize(10);
@@ -106,12 +110,10 @@ export async function POST(request: NextRequest) {
     const pdfBase64 = pdf.output("datauristring").split(",")[1];
 
     // Log API usage
-    const database = new DatabaseService(userId);
+    const database = new AppwriteDatabaseService(userId);
     await database.logApiUsage({
-      userId,
       endpoint: "/api/cv/generate-tailored",
       timestamp: new Date().toISOString(),
-      month: new Date().toISOString().substring(0, 7),
       success: true,
     });
 
@@ -121,12 +123,10 @@ export async function POST(request: NextRequest) {
 
     // Log failed API usage
     try {
-      const database = new DatabaseService(userId);
+      const database = new AppwriteDatabaseService(userId);
       await database.logApiUsage({
-        userId,
         endpoint: "/api/cv/generate-tailored",
         timestamp: new Date().toISOString(),
-        month: new Date().toISOString().substring(0, 7),
         success: false,
         errorMessage: error instanceof Error ? error.message : "Unknown error",
       });
@@ -180,14 +180,8 @@ function maskPersonalInfo(text: string): string {
     /https?:\/\/(www\.)?github\.com\/[^\s<>]+/gi,
     "[GitHub Hidden]"
   );
-  maskedText = maskedText.replace(
-    /github\.com\/[^\s<>]+/gi,
-    "[GitHub Hidden]"
-  );
-  maskedText = maskedText.replace(
-    /GitHub:\s*[^\s<>|]+/gi,
-    "GitHub: [Hidden]"
-  );
+  maskedText = maskedText.replace(/github\.com\/[^\s<>]+/gi, "[GitHub Hidden]");
+  maskedText = maskedText.replace(/GitHub:\s*[^\s<>|]+/gi, "GitHub: [Hidden]");
 
   // Mask general social media
   maskedText = maskedText.replace(
@@ -203,4 +197,3 @@ function maskPersonalInfo(text: string): string {
 
   return maskedText;
 }
-

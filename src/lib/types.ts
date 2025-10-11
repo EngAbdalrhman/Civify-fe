@@ -18,6 +18,9 @@ export interface UserProfile {
     count: number;
   };
   cvCount?: number;
+  cvLimit?: number; // Custom CV limit per user
+  apiUsageMonth?: string; // Current month for API usage tracking
+  apiUsageCount?: number; // API usage count for current month
 }
 
 // CV Data Types.
@@ -204,6 +207,7 @@ export interface LicenseKey {
   activatedBy?: string; // User ID who activated the license
   activatedAt?: string;
   isActive: boolean;
+  notes?: string; // Optional notes for the license
 }
 
 export interface ApiKey {
@@ -217,13 +221,11 @@ export interface ApiKey {
 }
 
 export interface ApiUsageLog {
-  id: string;
-  userId: string;
   endpoint: string;
   timestamp: string;
-  month: string; // Format: YYYY-MM
   success: boolean;
   errorMessage?: string;
+  ipAddress?: string; // Optional IP address
 }
 
 export interface AdminStats {

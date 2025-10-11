@@ -40,7 +40,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export default function CVViewPage({ params }: { params: { id: string } }) {
+export default function CVViewPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { user, isHydrated } = useAuth();
   const database = useDatabase();
   const router = useRouter();
@@ -55,27 +59,30 @@ export default function CVViewPage({ params }: { params: { id: string } }) {
   const [generatingCoverLetter, setGeneratingCoverLetter] = useState(false);
   const [coverLetter, setCoverLetter] = useState("");
   const [jobApplications, setJobApplications] = useState<JobApplication[]>([]);
+  const [cvId, setCvId] = useState<string | null>(null);
 
   // Refs for export functionality
   const cvContainerRef = useRef<HTMLDivElement>(null);
+
+  // Unwrap params
+  useEffect(() => {
+    params.then((p) => setCvId(p.id));
+  }, [params]);
 
   useEffect(() => {
     if (isHydrated && !user) {
       router.push("/login");
       return;
     }
-    if (database && params.id) {
-      Promise.all([
-        database.getCVData(params.id),
-        database.getAllJobApplications(),
-      ])
+    if (database && cvId) {
+      Promise.all([database.getCVById(cvId), database.getAllJobApplications()])
         .then(([cvData, jobApps]) => {
           setCv(cvData);
-          setJobApplications(jobApps.filter((app) => app.cvId === params.id));
+          setJobApplications(jobApps.filter((app: any) => app.cvId === cvId));
         })
         .finally(() => setLoading(false));
     }
-  }, [user, isHydrated, database, params.id, router]);
+  }, [user, isHydrated, database, cvId, router]);
 
   // Masking utility functions
   const maskEmail = (email: string): string => {

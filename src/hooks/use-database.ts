@@ -2,22 +2,23 @@
 
 import { useEffect, useMemo } from "react";
 import { useAuth } from "@/context/auth-context";
-import { DatabaseService } from "@/lib/services/database";
+import { AppwriteDatabaseService } from "@/lib/services/appwrite-database";
 
 export const useDatabase = () => {
   const { user } = useAuth();
 
   const databaseService = useMemo(() => {
     if (!user) return null;
-    return new DatabaseService(user.uid);
+    return new AppwriteDatabaseService(user.uid);
   }, [user]);
 
   useEffect(() => {
-    if (databaseService) {
-      // Initialize user data when database service is created
-      databaseService.initializeUserData().catch(console.error);
+    if (databaseService && user) {
+      // Initialize user profile when database service is created
+      // Pass Firebase user object to get email and displayName
+      databaseService.getUserProfile(user).catch(console.error);
     }
-  }, [databaseService]);
+  }, [databaseService, user]);
 
   return databaseService;
 };

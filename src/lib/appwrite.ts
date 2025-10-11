@@ -1,6 +1,6 @@
 "use client";
 
-import { Client, Storage, ID } from "appwrite";
+import { Client, Storage, Databases, ID } from "appwrite";
 
 // Initialize Appwrite client
 const client = new Client();
@@ -12,6 +12,7 @@ client
   .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID || "");
 
 export const storage = new Storage(client);
+export const databases = new Databases(client);
 export const CV_BUCKET_ID = process.env.NEXT_PUBLIC_APPWRITE_BUCKET_ID || "";
 
 /**
