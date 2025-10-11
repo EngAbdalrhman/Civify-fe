@@ -329,6 +329,7 @@ export default function AdminDashboard() {
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="licenses">License Keys</TabsTrigger>
             <TabsTrigger value="cv-limits">CV Limits</TabsTrigger>
+            <TabsTrigger value="api-limits">API Rate Limits</TabsTrigger>
           </TabsList>
 
           {/* Users Tab */}
@@ -497,6 +498,16 @@ export default function AdminDashboard() {
               onUpdate={loadAdminData}
             />
           </TabsContent>
+
+          {/* API Rate Limits Tab */}
+          <TabsContent value="api-limits">
+            <ApiRateLimitsTab
+              adminService={adminService}
+              users={users}
+              toast={toast}
+              onUpdate={loadAdminData}
+            />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
@@ -632,6 +643,162 @@ function CVLimitsTab({
                         setSelectedUser(user.userId);
                         setNewLimit(user.cvLimit || 3);
                       }}
+                    >
+                      Set Limit
+                    </Button>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+}
+
+// API Rate Limits Tab Component
+function ApiRateLimitsTab({
+  adminService,
+  users,
+  toast,
+  onUpdate,
+}: {
+  adminService: AppwriteAdminDatabaseService;
+  users: Array<UserProfile & { userId: string }>;
+  toast: any;
+  onUpdate: () => Promise<void>;
+}) {
+  const [loading, setLoading] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [newLimit, setNewLimit] = useState<number>(500);
+
+  const handleSetLimit = async (userId: string, limit: number) => {
+    setLoading(true);
+    try {
+      await adminService.setUserApiLimit(userId, limit);
+      toast({
+        title: "API Rate Limit Updated",
+        description: `User API rate limit has been set to ${limit} calls/month.`,
+      });
+      await onUpdate();
+      setSelectedUser(null);
+      setNewLimit(500);
+    } catch (error) {
+      console.error("Error setting API rate limit:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update API rate limit.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>API Rate Limits Management</CardTitle>
+        <CardDescription>
+          Set custom API rate limits for licensed users
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
+          <h3 className="text-sm font-semibold text-blue-900 mb-2">
+            About API Rate Limits
+          </h3>
+          <p className="text-sm text-blue-800">
+            By default, licensed users can make up to 500 API calls per month.
+            You can set custom limits for specific users to allow them more or
+            fewer API calls. This is useful for premium users or testing
+            purposes.
+          </p>
+        </div>
+
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Email</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>License Status</TableHead>
+              <TableHead>Current Limit</TableHead>
+              <TableHead>Usage This Month</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {users.map((user) => (
+              <TableRow key={user.userId}>
+                <TableCell className="font-medium">{user.email}</TableCell>
+                <TableCell>{user.name || "N/A"}</TableCell>
+                <TableCell>
+                  {user.isLicensed ? (
+                    <Badge className="bg-green-500">Licensed</Badge>
+                  ) : (
+                    <Badge variant="secondary">Not Licensed</Badge>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline">
+                    {user.apiRateLimit || 500} calls/month
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <span
+                    className={
+                      (user.apiUsageCount || 0) >= (user.apiRateLimit || 500)
+                        ? "text-red-600 font-semibold"
+                        : "text-gray-600"
+                    }
+                  >
+                    {user.apiUsageCount || 0}/{user.apiRateLimit || 500}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  {selectedUser === user.userId ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        min="0"
+                        max="10000"
+                        step="100"
+                        value={newLimit}
+                        onChange={(e) =>
+                          setNewLimit(parseInt(e.target.value) || 500)
+                        }
+                        className="w-24 px-2 py-1 border rounded"
+                        disabled={loading}
+                      />
+                      <Button
+                        size="sm"
+                        onClick={() => handleSetLimit(user.userId, newLimit)}
+                        disabled={loading}
+                      >
+                        {loading ? "Saving..." : "Save"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedUser(null);
+                          setNewLimit(500);
+                        }}
+                        disabled={loading}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setSelectedUser(user.userId);
+                        setNewLimit(user.apiRateLimit || 500);
+                      }}
+                      disabled={!user.isLicensed}
                     >
                       Set Limit
                     </Button>

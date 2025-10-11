@@ -94,11 +94,12 @@ export async function authenticateApiRequest(
         const currentMonth = new Date().toISOString().substring(0, 7);
         const apiUsageMonth = userDoc.apiUsageMonth;
         const apiUsageCount = userDoc.apiUsageCount || 0;
+        const apiRateLimit = userDoc.apiRateLimit || 500; // Custom or default limit
 
-        if (apiUsageMonth === currentMonth && apiUsageCount >= 500) {
+        if (apiUsageMonth === currentMonth && apiUsageCount >= apiRateLimit) {
           return {
             authenticated: false,
-            error: "API rate limit exceeded (500 calls/month)",
+            error: `API rate limit exceeded (${apiRateLimit} calls/month)`,
             status: 429,
           };
         }

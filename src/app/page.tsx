@@ -145,11 +145,11 @@ export default function Home() {
         <header className="flex items-center justify-between w-full mb-8">
           <div className="flex items-center gap-4">
             <AppLogo className="h-14 w-14" />
-            <div className="text-center">
+            <div>
               <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                AI-Refactor Pro
+                Civify
               </h1>
-              <p className="text-lg text-gray-600 mt-2">
+              <p className="text-sm text-gray-600 mt-2">
                 Transform your CV with AI-powered precision
               </p>
             </div>
@@ -188,7 +188,7 @@ export default function Home() {
         <div className="w-full max-w-5xl flex-grow">{renderStep()}</div>
 
         <footer className="mt-16 text-center text-sm text-gray-500">
-          <p>© 2025 AI-Refactor Pro • Powered by Speedy</p>
+          <p>© 2025 Civify • Powered by Speedy</p>
         </footer>
       </div>
     </main>

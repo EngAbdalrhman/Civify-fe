@@ -1,31 +1,11 @@
-import React from 'react';
+import React from "react";
 
 export function AppLogo({ className }: { className?: string }) {
   return (
-    <svg
+    <img
       className={className}
-      viewBox="0 0 100 100"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-label="AI-Refactor Pro Logo"
-    >
-      <defs>
-        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style={{ stopColor: 'hsl(var(--primary))', stopOpacity: 1 }} />
-          <stop offset="100%" style={{ stopColor: 'hsl(var(--accent))', stopOpacity: 1 }} />
-        </linearGradient>
-      </defs>
-      <circle cx="50" cy="50" r="48" fill="url(#logoGradient)" />
-      <text
-        x="50"
-        y="58"
-        fontFamily="Space Grotesk, sans-serif"
-        fontSize="32"
-        fill="white"
-        textAnchor="middle"
-        fontWeight="bold"
-      >
-        AI
-      </text>
-    </svg>
+      src="https://media.discordapp.net/attachments/1206671190605824121/1426643324814622852/icon.png?ex=68ebf8a2&is=68eaa722&hm=4fad0b06bd0d5822a7a5afc26df0e8339845d86fc6957e321070d8597068b299&=&format=webp&quality=lossless&width=64&height=64"
+      alt="Civify Logo"
+    />
   );
 }

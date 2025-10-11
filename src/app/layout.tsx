@@ -4,7 +4,7 @@ import { AuthProvider } from "@/context/auth-context";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AI-Refactor Pro",
+  title: "Civify",
   description: "AI-powered CV tailoring and cover letter generation.",
 };
 

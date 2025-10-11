@@ -227,13 +227,15 @@ export default function DashboardPage() {
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{cvs.length}/3</div>
+              <div className="text-2xl font-bold">
+                {cvs.length}/{userProfile?.cvLimit || 3}
+              </div>
               <p className="text-xs text-muted-foreground mt-1">
-                {cvs.length >= 3 ? (
+                {cvs.length >= (userProfile?.cvLimit || 3) ? (
                   <span className="text-red-500">Limit reached</span>
                 ) : (
                   <span className="text-green-500">
-                    {3 - cvs.length} slots available
+                    {(userProfile?.cvLimit || 3) - cvs.length} slots available
                   </span>
                 )}
               </p>

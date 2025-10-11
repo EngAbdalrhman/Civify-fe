@@ -18,9 +18,10 @@ export interface UserProfile {
     count: number;
   };
   cvCount?: number;
-  cvLimit?: number; // Custom CV limit per user
+  cvLimit?: number; // Custom CV limit per user (default: 3)
   apiUsageMonth?: string; // Current month for API usage tracking
   apiUsageCount?: number; // API usage count for current month
+  apiRateLimit?: number; // Custom API rate limit per month (default: 500)
 }
 
 // CV Data Types.

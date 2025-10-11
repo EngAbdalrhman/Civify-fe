@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -24,10 +30,18 @@ export default function ApiDocsPage() {
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
-  const CodeBlock = ({ code, language, id }: { code: string; language: string; id: string }) => (
+  const CodeBlock = ({
+    code,
+    language,
+    id,
+  }: {
+    code: string;
+    language: string;
+    id: string;
+  }) => (
     <div className="relative">
       <div className="absolute top-2 right-2 flex items-center gap-2">
-        <Badge variant="outline" className="text-xs">
+        <Badge variant="outline" className="text-xs text-white">
           {language}
         </Badge>
         <Button
@@ -85,8 +99,11 @@ export default function ApiDocsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-gray-700">
-              Include your API key in the <code className="bg-gray-100 px-2 py-1 rounded">Authorization</code> header
-              as a Bearer token:
+              Include your API key in the{" "}
+              <code className="bg-gray-100 px-2 py-1 rounded">
+                Authorization
+              </code>{" "}
+              header as a Bearer token:
             </p>
             <CodeBlock
               id="auth-header"
@@ -95,8 +112,8 @@ export default function ApiDocsPage() {
             />
             <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
               <p className="text-sm text-yellow-900">
-                <strong>Important:</strong> Keep your API key secure and never share it publicly.
-                Treat it like a password.
+                <strong>Important:</strong> Keep your API key secure and never
+                share it publicly. Treat it like a password.
               </p>
             </div>
           </CardContent>
@@ -104,8 +121,9 @@ export default function ApiDocsPage() {
 
         {/* API Endpoints */}
         <Tabs defaultValue="masked" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="masked">Generate Masked CV</TabsTrigger>
+            <TabsTrigger value="masked-pdf">Masked PDF</TabsTrigger>
             <TabsTrigger value="tailored">Generate Tailored CV</TabsTrigger>
           </TabsList>
 
@@ -162,7 +180,9 @@ Authorization: Bearer YOUR_API_KEY`}
 }`}
                   />
                   <p className="text-sm text-gray-600 mt-2">
-                    The <code className="bg-gray-100 px-2 py-1 rounded">pdf</code> field contains a base64-encoded PDF file.
+                    The{" "}
+                    <code className="bg-gray-100 px-2 py-1 rounded">pdf</code>{" "}
+                    field contains a base64-encoded PDF file.
                   </p>
                 </div>
 
@@ -183,7 +203,9 @@ Authorization: Bearer YOUR_API_KEY`}
 
                 {/* Example (JavaScript) */}
                 <div>
-                  <h3 className="text-lg font-semibold mb-3">Example (JavaScript)</h3>
+                  <h3 className="text-lg font-semibold mb-3">
+                    Example (JavaScript)
+                  </h3>
                   <CodeBlock
                     id="masked-js"
                     language="javascript"
@@ -213,6 +235,174 @@ a.click();`}
             </Card>
           </TabsContent>
 
+          {/* Masked PDF Endpoint */}
+          <TabsContent value="masked-pdf" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Code className="h-5 w-5" />
+                  POST /api/cv/generate-masked-pdf
+                </CardTitle>
+                <CardDescription>
+                  Generate a masked PDF CV from an existing PDF file with
+                  personal information redacted
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Request */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">Request</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="text-sm font-medium mb-2">Headers</h4>
+                      <CodeBlock
+                        id="masked-pdf-headers"
+                        language="HTTP"
+                        code={`Content-Type: application/json
+Authorization: Bearer YOUR_API_KEY`}
+                      />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium mb-2">Body</h4>
+                      <CodeBlock
+                        id="masked-pdf-body"
+                        language="JSON"
+                        code={`{
+  "cvPdf": "JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXS9QYXJlbnQgMiAwIFIvUmVzb3VyY2VzPDw+Pj4+CmVuZG9iago..."
+}`}
+                      />
+                      <p className="text-sm text-gray-600 mt-2">
+                        The{" "}
+                        <code className="bg-gray-100 px-2 py-1 rounded">
+                          cvPdf
+                        </code>{" "}
+                        field should contain a base64-encoded PDF file.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Response */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">Response</h3>
+                  <CodeBlock
+                    id="masked-pdf-response"
+                    language="JSON"
+                    code={`{
+  "success": true,
+  "maskedPdf": "JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXS9QYXJlbnQgMiAwIFIvUmVzb3VyY2VzPDw+Pj4+CmVuZG9iago...",
+  "message": "CV masked successfully"
+}`}
+                  />
+                  <p className="text-sm text-gray-600 mt-2">
+                    The{" "}
+                    <code className="bg-gray-100 px-2 py-1 rounded">
+                      maskedPdf
+                    </code>{" "}
+                    field contains a base64-encoded PDF file with personal
+                    information redacted.
+                  </p>
+                </div>
+
+                {/* Example */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">Example (cURL)</h3>
+                  <CodeBlock
+                    id="masked-pdf-curl"
+                    language="bash"
+                    code={`curl -X POST https://your-domain.com/api/cv/generate-masked-pdf \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer hicv_live_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" \\
+  -d '{
+    "cvPdf": "JVBERi0xLjQKJeLjz9MK..."
+  }'`}
+                  />
+                </div>
+
+                {/* Example (JavaScript) */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">
+                    Example (JavaScript)
+                  </h3>
+                  <CodeBlock
+                    id="masked-pdf-js"
+                    language="javascript"
+                    code={`// Read PDF file and convert to base64
+const fileInput = document.getElementById('pdfInput');
+const file = fileInput.files[0];
+const reader = new FileReader();
+
+reader.onload = async function(e) {
+  const base64Pdf = e.target.result.split(',')[1]; // Remove data URL prefix
+
+  const response = await fetch('https://your-domain.com/api/cv/generate-masked-pdf', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer hicv_live_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+    },
+    body: JSON.stringify({
+      cvPdf: base64Pdf
+    })
+  });
+
+  const data = await response.json();
+
+  // Download masked PDF
+  const pdfBlob = await fetch(\`data:application/pdf;base64,\${data.maskedPdf}\`).then(r => r.blob());
+  const url = URL.createObjectURL(pdfBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'masked-cv.pdf';
+  a.click();
+};
+
+reader.readAsDataURL(file);`}
+                  />
+                </div>
+
+                {/* Example (Python) */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">
+                    Example (Python)
+                  </h3>
+                  <CodeBlock
+                    id="masked-pdf-python"
+                    language="python"
+                    code={`import requests
+import base64
+
+# Read PDF file and encode to base64
+with open('cv.pdf', 'rb') as f:
+    pdf_bytes = f.read()
+    pdf_base64 = base64.b64encode(pdf_bytes).decode('utf-8')
+
+url = "https://your-domain.com/api/cv/generate-masked-pdf"
+headers = {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer hicv_live_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+}
+payload = {
+    "cvPdf": pdf_base64
+}
+
+response = requests.post(url, json=payload, headers=headers)
+data = response.json()
+
+# Save masked PDF
+if data.get('success'):
+    masked_pdf_bytes = base64.b64decode(data['maskedPdf'])
+    with open('masked-cv.pdf', 'wb') as f:
+        f.write(masked_pdf_bytes)
+    print("Masked PDF saved successfully!")
+else:
+    print("Error:", data.get('error'))`}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Tailored CV Endpoint */}
           <TabsContent value="tailored" className="space-y-6">
             <Card>
@@ -222,7 +412,8 @@ a.click();`}
                   POST /api/cv/generate-tailored
                 </CardTitle>
                 <CardDescription>
-                  Generate an AI-tailored PDF CV optimized for a specific job description
+                  Generate an AI-tailored PDF CV optimized for a specific job
+                  description
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -252,9 +443,21 @@ Authorization: Bearer YOUR_API_KEY`}
 }`}
                       />
                       <div className="mt-2 space-y-1 text-sm text-gray-600">
-                        <p><strong>cv</strong> (required): Your CV text content</p>
-                        <p><strong>jobDescription</strong> (required): The job description to tailor the CV for</p>
-                        <p><strong>masked</strong> (optional): Set to <code className="bg-gray-100 px-1 rounded">true</code> to mask personal information. Default: <code className="bg-gray-100 px-1 rounded">false</code></p>
+                        <p>
+                          <strong>cv</strong> (required): Your CV text content
+                        </p>
+                        <p>
+                          <strong>jobDescription</strong> (required): The job
+                          description to tailor the CV for
+                        </p>
+                        <p>
+                          <strong>masked</strong> (optional): Set to{" "}
+                          <code className="bg-gray-100 px-1 rounded">true</code>{" "}
+                          to mask personal information. Default:{" "}
+                          <code className="bg-gray-100 px-1 rounded">
+                            false
+                          </code>
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -293,7 +496,9 @@ Authorization: Bearer YOUR_API_KEY`}
 
                 {/* Example (Python) */}
                 <div>
-                  <h3 className="text-lg font-semibold mb-3">Example (Python)</h3>
+                  <h3 className="text-lg font-semibold mb-3">
+                    Example (Python)
+                  </h3>
                   <CodeBlock
                     id="tailored-python"
                     language="python"
@@ -335,9 +540,17 @@ with open("tailored-cv.pdf", "wb") as f:
           </CardHeader>
           <CardContent>
             <div className="space-y-2 text-sm">
-              <p>• <strong>500 API calls per month</strong> for licensed users</p>
+              <p>
+                • <strong>500 API calls per month</strong> for licensed users
+              </p>
               <p>• Rate limit resets on the 1st of each month</p>
-              <p>• Exceeding the limit will result in <code className="bg-gray-100 px-2 py-1 rounded">429 Too Many Requests</code> errors</p>
+              <p>
+                • Exceeding the limit will result in{" "}
+                <code className="bg-gray-100 px-2 py-1 rounded">
+                  429 Too Many Requests
+                </code>{" "}
+                errors
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -354,23 +567,33 @@ with open("tailored-cv.pdf", "wb") as f:
             <div className="space-y-4">
               <div className="border-l-4 border-red-500 pl-4">
                 <p className="font-semibold">401 Unauthorized</p>
-                <p className="text-sm text-gray-600">Missing or invalid API key</p>
+                <p className="text-sm text-gray-600">
+                  Missing or invalid API key
+                </p>
               </div>
               <div className="border-l-4 border-orange-500 pl-4">
                 <p className="font-semibold">403 Forbidden</p>
-                <p className="text-sm text-gray-600">License inactive or expired</p>
+                <p className="text-sm text-gray-600">
+                  License inactive or expired
+                </p>
               </div>
               <div className="border-l-4 border-yellow-500 pl-4">
                 <p className="font-semibold">429 Too Many Requests</p>
-                <p className="text-sm text-gray-600">Monthly API limit exceeded</p>
+                <p className="text-sm text-gray-600">
+                  Monthly API limit exceeded
+                </p>
               </div>
               <div className="border-l-4 border-blue-500 pl-4">
                 <p className="font-semibold">400 Bad Request</p>
-                <p className="text-sm text-gray-600">Invalid request body or missing required fields</p>
+                <p className="text-sm text-gray-600">
+                  Invalid request body or missing required fields
+                </p>
               </div>
               <div className="border-l-4 border-gray-500 pl-4">
                 <p className="font-semibold">500 Internal Server Error</p>
-                <p className="text-sm text-gray-600">Server error - please try again later</p>
+                <p className="text-sm text-gray-600">
+                  Server error - please try again later
+                </p>
               </div>
             </div>
           </CardContent>
@@ -379,4 +602,3 @@ with open("tailored-cv.pdf", "wb") as f:
     </div>
   );
 }
-
