@@ -1,24 +1,32 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { useDatabase } from "@/hooks/use-database";
 import { UserProfile } from "@/lib/types";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Loader2, 
-  Check, 
-  Zap, 
-  Crown, 
-  Rocket, 
+import {
+  Loader2,
+  Check,
+  Zap,
+  Crown,
+  Rocket,
   Infinity,
   FileText,
   Code,
   TrendingUp,
-  Shield
+  Shield,
+  ArrowLeft,
 } from "lucide-react";
 
 interface Plan {
@@ -127,6 +135,7 @@ const plans: Plan[] = [
 
 export default function PlansPage() {
   const { user } = useAuth();
+  const router = useRouter();
   const databaseService = useDatabase();
   const { toast } = useToast();
 
@@ -159,7 +168,8 @@ export default function PlansPage() {
   const handleSelectPlan = (planId: string) => {
     toast({
       title: "Coming Soon",
-      description: "Payment integration will be available soon. Please contact support to upgrade your plan.",
+      description:
+        "Payment integration will be available soon. Please contact support to upgrade your plan.",
     });
   };
 
@@ -175,6 +185,18 @@ export default function PlansPage() {
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">
+      {/* Back Button */}
+      <div className="mb-6">
+        <Button
+          variant="outline"
+          onClick={() => router.push("/dashboard")}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Dashboard
+        </Button>
+      </div>
+
       {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">
@@ -189,7 +211,8 @@ export default function PlansPage() {
       {profile && (
         <div className="text-center mb-8">
           <Badge className="bg-blue-100 text-blue-800 px-4 py-2 text-sm">
-            Current Plan: <span className="font-bold ml-1 capitalize">{currentPlan}</span>
+            Current Plan:{" "}
+            <span className="font-bold ml-1 capitalize">{currentPlan}</span>
           </Badge>
         </div>
       )}
@@ -198,7 +221,11 @@ export default function PlansPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         {plans.map((plan) => {
           const isCurrentPlan = currentPlan === plan.id;
-          const isPremiumOrHigher = ["premium", "enterprise", "lifetime"].includes(plan.id);
+          const isPremiumOrHigher = [
+            "premium",
+            "enterprise",
+            "lifetime",
+          ].includes(plan.id);
 
           return (
             <Card
@@ -221,12 +248,17 @@ export default function PlansPage() {
 
               <CardHeader className="text-center pb-4">
                 <div className="flex justify-center mb-4">
-                  <div className={`p-3 rounded-full ${
-                    plan.id === "free" ? "bg-gray-100 text-gray-600" :
-                    plan.id === "premium" ? "bg-blue-100 text-blue-600" :
-                    plan.id === "enterprise" ? "bg-purple-100 text-purple-600" :
-                    "bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-600"
-                  }`}>
+                  <div
+                    className={`p-3 rounded-full ${
+                      plan.id === "free"
+                        ? "bg-gray-100 text-gray-600"
+                        : plan.id === "premium"
+                        ? "bg-blue-100 text-blue-600"
+                        : plan.id === "enterprise"
+                        ? "bg-purple-100 text-purple-600"
+                        : "bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-600"
+                    }`}
+                  >
                     {plan.icon}
                   </div>
                 </div>
@@ -281,23 +313,37 @@ export default function PlansPage() {
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>Feature Comparison</CardTitle>
-          <CardDescription>Compare all features across different plans</CardDescription>
+          <CardDescription>
+            Compare all features across different plans
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Feature</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-700">Free</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-700">Premium</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-700">Enterprise</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-700">Lifetime</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">
+                    Feature
+                  </th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-700">
+                    Free
+                  </th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-700">
+                    Premium
+                  </th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-700">
+                    Enterprise
+                  </th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-700">
+                    Lifetime
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="border-b">
-                  <td className="py-3 px-4 text-gray-700">CV Generations/Month</td>
+                  <td className="py-3 px-4 text-gray-700">
+                    CV Generations/Month
+                  </td>
                   <td className="text-center py-3 px-4">5</td>
                   <td className="text-center py-3 px-4">50</td>
                   <td className="text-center py-3 px-4">Unlimited</td>
@@ -326,7 +372,9 @@ export default function PlansPage() {
                   <td className="text-center py-3 px-4">1000</td>
                 </tr>
                 <tr className="border-b">
-                  <td className="py-3 px-4 text-gray-700">AI-Powered Tailoring</td>
+                  <td className="py-3 px-4 text-gray-700">
+                    AI-Powered Tailoring
+                  </td>
                   <td className="text-center py-3 px-4">
                     <Check className="h-5 w-5 text-green-600 mx-auto" />
                   </td>
@@ -369,4 +417,3 @@ export default function PlansPage() {
     </div>
   );
 }
-
