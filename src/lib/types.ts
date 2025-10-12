@@ -18,10 +18,16 @@ export interface UserProfile {
     count: number;
   };
   cvCount?: number;
-  cvLimit?: number; // Custom CV limit per user (default: 3)
+  cvLimit?: number; // Custom CV limit per user (default: 3) - DEPRECATED
   apiUsageMonth?: string; // Current month for API usage tracking
   apiUsageCount?: number; // API usage count for current month
   apiRateLimit?: number; // Custom API rate limit per month (default: 500)
+  // UI CV Generation Limits
+  uiCvCount?: number; // UI CV generation count for current month
+  uiCvLimit?: number; // UI CV generation limit per month (default: 5)
+  uiCvMonth?: string; // Current month for UI CV tracking (YYYY-MM)
+  // Subscription Plan
+  plan?: "free" | "premium" | "enterprise" | "lifetime"; // Subscription plan type
 }
 
 // CV Data Types.

@@ -20,24 +20,29 @@ Create a new database in Appwrite Console and add the following collections:
 
 **Attributes:**
 
-| Attribute            | Type     | Size | Required | Default | Array |
-| -------------------- | -------- | ---- | -------- | ------- | ----- |
-| `email`              | Email    | 320  | Yes      | -       | No    |
-| `name`               | String   | 255  | No       | -       | No    |
-| `phone`              | String   | 50   | No       | -       | No    |
-| `summary`            | String   | 1000 | No       | -       | No    |
-| `experience`         | String   | 1000 | No       | -       | No    |
-| `education`          | String   | 1000 | No       | -       | No    |
-| `skills`             | String   | 1000 | No       | -       | No    |
-| `isAdmin`            | Boolean  | -    | No       | false   | No    |
-| `isLicensed`         | Boolean  | -    | No       | false   | No    |
-| `licenseKey`         | String   | 50   | No       | -       | No    |
-| `licenseActivatedAt` | DateTime | -    | No       | -       | No    |
-| `apiKeyHash`         | String   | 255  | No       | -       | No    |
-| `apiUsageMonth`      | String   | 10   | No       | -       | No    |
-| `apiUsageCount`      | Integer  | -    | No       | 0       | No    |
-| `cvCount`            | Integer  | -    | No       | 0       | No    |
-| `cvLimit`            | Integer  | -    | No       | 3       | No    |
+| Attribute            | Type     | Size | Required | Default | Array | Description                                          |
+| -------------------- | -------- | ---- | -------- | ------- | ----- | ---------------------------------------------------- |
+| `email`              | Email    | 320  | Yes      | -       | No    | User's email address                                 |
+| `name`               | String   | 255  | No       | -       | No    | User's full name (auto-filled from CV)               |
+| `phone`              | String   | 50   | No       | -       | No    | User's phone number (auto-filled from CV)            |
+| `summary`            | String   | 1000 | No       | -       | No    | Professional summary (auto-filled from CV)           |
+| `experience`         | String   | 1000 | No       | -       | No    | Work experience (auto-filled from CV)                |
+| `education`          | String   | 1000 | No       | -       | No    | Education details (auto-filled from CV)              |
+| `skills`             | String   | 1000 | No       | -       | No    | Skills list (auto-filled from CV)                    |
+| `isAdmin`            | Boolean  | -    | No       | false   | No    | Admin user flag                                      |
+| `isLicensed`         | Boolean  | -    | No       | false   | No    | License status for API access                        |
+| `licenseKey`         | String   | 50   | No       | -       | No    | License key for activation                           |
+| `licenseActivatedAt` | DateTime | -    | No       | -       | No    | License activation timestamp                         |
+| `apiKeyHash`         | String   | 255  | No       | -       | No    | Hashed API key for authentication                    |
+| `apiUsageMonth`      | String   | 10   | No       | -       | No    | Current month for API usage (YYYY-MM)                |
+| `apiUsageCount`      | Integer  | -    | No       | 0       | No    | API calls count for current month                    |
+| `apiRateLimit`       | Integer  | -    | No       | 500     | No    | API calls limit per month                            |
+| `cvCount`            | Integer  | -    | No       | 0       | No    | Legacy CV count (deprecated)                         |
+| `cvLimit`            | Integer  | -    | No       | 3       | No    | Legacy CV limit (deprecated)                         |
+| `uiCvCount`          | Integer  | -    | No       | 0       | No    | UI CV generation count for current month             |
+| `uiCvLimit`          | Integer  | -    | No       | 5       | No    | UI CV generation limit per month                     |
+| `uiCvMonth`          | String   | 10   | No       | -       | No    | Current month for UI CV tracking (YYYY-MM)           |
+| `plan`               | String   | 50   | No       | free    | No    | Subscription plan (free/premium/enterprise/lifetime) |
 
 **Note:**
 

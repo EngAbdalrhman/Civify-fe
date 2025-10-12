@@ -15,6 +15,8 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/auth-context";
+import { useDatabase } from "@/hooks/use-database";
 import type { FormData } from "@/app/page";
 import { User, Mail, Phone, FileText, Award, CheckCircle } from "lucide-react";
 
@@ -37,7 +39,10 @@ export default function Step2Profile({
 }: Step2ProfileProps) {
   const [localProfile, setLocalProfile] = useState(formData.profile);
   const [isAutoFilled, setIsAutoFilled] = useState(false);
+  const [updating, setUpdating] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const database = useDatabase();
 
   // Auto-fill from structured CV data
   useEffect(() => {
@@ -91,7 +96,7 @@ export default function Step2Profile({
     updateProfileData({ [field]: value });
   };
 
-  const handleProceed = () => {
+  const handleProceed = async () => {
     if (!localProfile.name || !localProfile.email) {
       toast({
         title: "Missing Information",
@@ -100,6 +105,68 @@ export default function Step2Profile({
       });
       return;
     }
+
+    // Update user profile in database if CV data is available
+    if (database && user && formData.structuredCvData) {
+      try {
+        setUpdating(true);
+
+        // Check if CV email matches user email
+        const cvEmail = formData.structuredCvData.personalInfo?.email;
+        const userEmail = user.email;
+
+        if (
+          cvEmail &&
+          userEmail &&
+          cvEmail.toLowerCase() !== userEmail.toLowerCase()
+        ) {
+          toast({
+            title: "Email Mismatch",
+            description:
+              "The email in your CV doesn't match your account email. Please upload your own CV.",
+            variant: "destructive",
+          });
+          setUpdating(false);
+          return;
+        }
+
+        // Update profile from CV data (only fills empty fields)
+        await database.updateProfileFromCV(
+          formData.structuredCvData,
+          userEmail || ""
+        );
+
+        toast({
+          title: "Profile Updated",
+          description: "Your profile has been updated with CV information.",
+        });
+      } catch (error) {
+        console.error("Error updating profile:", error);
+        const errorMessage =
+          error instanceof Error ? error.message : "Failed to update profile";
+
+        // If email mismatch error, don't proceed
+        if (errorMessage.includes("email")) {
+          toast({
+            title: "Error",
+            description: errorMessage,
+            variant: "destructive",
+          });
+          setUpdating(false);
+          return;
+        }
+
+        // For other errors, just warn but allow proceeding
+        toast({
+          title: "Warning",
+          description: "Could not update profile, but you can continue.",
+          variant: "default",
+        });
+      } finally {
+        setUpdating(false);
+      }
+    }
+
     nextStep();
   };
 
@@ -361,12 +428,13 @@ export default function Step2Profile({
                 size="lg"
                 className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-8"
                 disabled={
+                  updating ||
                   !localProfile.name ||
                   !localProfile.email ||
                   (!!localProfile.email && !isValidEmail(localProfile.email))
                 }
               >
-                Continue to Job Details
+                {updating ? "Updating Profile..." : "Continue to Job Details"}
               </Button>
             </div>
           </div>

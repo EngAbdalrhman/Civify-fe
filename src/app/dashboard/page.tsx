@@ -35,6 +35,7 @@ import {
   LogOut,
   Shield,
   Key,
+  TrendingUp,
 } from "lucide-react";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
@@ -167,6 +168,38 @@ export default function DashboardPage() {
               <ArrowLeft className="h-4 w-4" />
               Back to CV Builder
             </Button>
+
+            {/* Profile Button */}
+            <Button
+              variant="outline"
+              onClick={() => router.push("/dashboard/profile")}
+              className="flex items-center gap-2"
+            >
+              <User className="h-4 w-4" />
+              Profile
+            </Button>
+
+            {/* Plans Button */}
+            <Button
+              variant="outline"
+              onClick={() => router.push("/dashboard/plans")}
+              className="flex items-center gap-2 border-blue-500 text-blue-600 hover:bg-blue-50"
+            >
+              <TrendingUp className="h-4 w-4" />
+              Plans
+            </Button>
+
+            {/* API Logs Button for Licensed Users */}
+            {userProfile?.isLicensed && (
+              <Button
+                variant="outline"
+                onClick={() => router.push("/dashboard/api-logs")}
+                className="flex items-center gap-2 border-green-500 text-green-600 hover:bg-green-50"
+              >
+                <FileText className="h-4 w-4" />
+                API Logs
+              </Button>
+            )}
 
             {/* License/API Key Button for Licensed Users */}
             {userProfile?.isLicensed && (

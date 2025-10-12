@@ -280,6 +280,34 @@ export default function Step4Results({
       setLoading(true);
       setError(null);
       try {
+        // Check UI CV generation limit
+        if (database && user) {
+          const limitCheck = await database.checkAndUpdateUiCvLimit();
+
+          if (!limitCheck.canGenerate) {
+            const resetDate = limitCheck.resetsAt
+              ? new Date(limitCheck.resetsAt).toLocaleDateString()
+              : "next month";
+
+            setError(
+              `You've reached your monthly limit of ${limitCheck.limit} CV generations. Your limit will reset on ${resetDate}. Upgrade your plan for more generations.`
+            );
+            setLoading(false);
+            return;
+          }
+
+          // Show remaining count
+          if (limitCheck.remaining <= 2) {
+            toast({
+              title: "Usage Notice",
+              description: `You have ${limitCheck.remaining} CV generation${
+                limitCheck.remaining === 1 ? "" : "s"
+              } remaining this month.`,
+              variant: limitCheck.remaining === 0 ? "destructive" : "default",
+            });
+          }
+        }
+
         // Generate CV
         setGenerationStatus("cv");
 
