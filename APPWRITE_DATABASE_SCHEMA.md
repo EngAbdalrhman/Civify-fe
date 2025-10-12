@@ -28,7 +28,7 @@ Create a new database in Appwrite Console and add the following collections:
 | `summary`            | String   | 1000 | No       | -       | No    | Professional summary (auto-filled from CV)           |
 | `experience`         | String   | 1000 | No       | -       | No    | Work experience (auto-filled from CV)                |
 | `education`          | String   | 1000 | No       | -       | No    | Education details (auto-filled from CV)              |
-| `skills`             | String   | 1000 | No       | -       | No    | Skills list (auto-filled from CV)                    |
+| `skills`             | String   | 2000 | No       | -       | No    | Skills list (auto-filled from CV) - INCREASED SIZE   |
 | `isAdmin`            | Boolean  | -    | No       | false   | No    | Admin user flag                                      |
 | `isLicensed`         | Boolean  | -    | No       | false   | No    | License status for API access                        |
 | `licenseKey`         | String   | 50   | No       | -       | No    | License key for activation                           |
