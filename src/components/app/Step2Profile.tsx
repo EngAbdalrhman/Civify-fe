@@ -78,12 +78,6 @@ export default function Step2Profile({
       setLocalProfile(autoProfile);
       updateProfileData(autoProfile);
       setIsAutoFilled(true);
-
-      toast({
-        title: "Profile Auto-filled!",
-        description:
-          "Your information has been extracted from the CV. Please review and edit as needed.",
-      });
     }
   }, [formData.structuredCvData, updateProfileData, toast, isAutoFilled]);
 
@@ -97,14 +91,14 @@ export default function Step2Profile({
   };
 
   const handleProceed = async () => {
-    if (!localProfile.name || !localProfile.email) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in at least your name and email address.",
-        variant: "destructive",
-      });
-      return;
-    }
+    // if (!localProfile.name || !localProfile.email) {
+    // toast({
+    //   title: "Missing Information",
+    //   description: "Please fill in at least your name and email address.",
+    //   variant: "destructive",
+    // });
+    // return;
+    // }
 
     // Update user profile in database if CV data is available
     if (database && user && formData.structuredCvData) {
@@ -120,14 +114,14 @@ export default function Step2Profile({
           userEmail &&
           cvEmail.toLowerCase() !== userEmail.toLowerCase()
         ) {
-          toast({
-            title: "Email Mismatch",
-            description:
-              "The email in your CV doesn't match your account email. Please upload your own CV.",
-            variant: "destructive",
-          });
-          setUpdating(false);
-          return;
+          // toast({
+          //   title: "Email Mismatch",
+          //   description:
+          //     "The email in your CV doesn't match your account email. Please upload your own CV.",
+          //   variant: "destructive",
+          // });
+          // setUpdating(false);
+          // return;
         }
 
         // Update profile from CV data (only fills empty fields)
@@ -136,10 +130,10 @@ export default function Step2Profile({
           userEmail || ""
         );
 
-        toast({
-          title: "Profile Updated",
-          description: "Your profile has been updated with CV information.",
-        });
+        // toast({
+        //   title: "Profile Updated",
+        //   description: "Your profile has been updated with CV information.",
+        // });
       } catch (error) {
         console.error("Error updating profile:", error);
         const errorMessage =
@@ -157,11 +151,11 @@ export default function Step2Profile({
         }
 
         // For other errors, just warn but allow proceeding
-        toast({
-          title: "Warning",
-          description: "Could not update profile, but you can continue.",
-          variant: "default",
-        });
+        // toast({
+        //   title: "Warning",
+        //   description: "Could not update profile, but you can continue.",
+        //   variant: "default",
+        // });
       } finally {
         setUpdating(false);
       }

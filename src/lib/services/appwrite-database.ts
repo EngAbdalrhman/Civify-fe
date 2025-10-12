@@ -661,6 +661,36 @@ export class AppwriteDatabaseService {
   }
 
   /**
+   * Get API usage logs for the current user
+   */
+  async getApiUsageLogs(): Promise<any[]> {
+    try {
+      const response = await databases.listDocuments(
+        DATABASE_ID,
+        API_USAGE_LOGS_COLLECTION_ID,
+        [
+          Query.equal("users", [this.userId]),
+          Query.orderDesc("$createdAt"),
+          Query.limit(100),
+        ]
+      );
+
+      return response.documents.map((doc) => ({
+        $id: doc.$id,
+        endpoint: doc.endpoint,
+        method: doc.method,
+        statusCode: doc.statusCode,
+        responseTime: doc.responseTime,
+        timestamp: doc.$createdAt,
+        errorMessage: doc.errorMessage || null,
+      }));
+    } catch (error) {
+      console.error("Error getting API usage logs:", error);
+      return [];
+    }
+  }
+
+  /**
    * Check API rate limit
    */
   async checkApiRateLimit(): Promise<boolean> {

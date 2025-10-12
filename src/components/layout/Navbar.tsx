@@ -109,44 +109,36 @@ export function Navbar({ userProfile }: NavbarProps) {
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center gap-4">
-            <Button
-              variant="ghost"
-              onClick={() => router.push("/dashboard")}
-              className="text-gray-700 hover:text-gray-900"
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              Dashboard
-            </Button>
-
-            <Button
-              variant="ghost"
-              onClick={() => router.push("/dashboard/plans")}
-              className="text-gray-700 hover:text-gray-900"
-            >
-              <CreditCard className="h-4 w-4 mr-2" />
-              Plans
-            </Button>
-
+            {/* API Management Dropdown for Licensed Users */}
             {userProfile?.isLicensed && (
-              <>
-                <Button
-                  variant="ghost"
-                  onClick={() => router.push("/dashboard/api-keys")}
-                  className="text-gray-700 hover:text-gray-900"
-                >
-                  <Key className="h-4 w-4 mr-2" />
-                  API Keys
-                </Button>
-
-                <Button
-                  variant="ghost"
-                  onClick={() => router.push("/dashboard/api-logs")}
-                  className="text-gray-700 hover:text-gray-900"
-                >
-                  <FileText className="h-4 w-4 mr-2" />
-                  API Logs
-                </Button>
-              </>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="text-gray-700 hover:text-gray-900"
+                  >
+                    <Key className="h-4 w-4 mr-2" />
+                    API Management
+                    <ChevronDown className="h-4 w-4 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuItem
+                    onClick={() => router.push("/dashboard/api-keys")}
+                    className="cursor-pointer"
+                  >
+                    <Key className="mr-2 h-4 w-4" />
+                    <span>API Keys</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => router.push("/dashboard/api-logs")}
+                    className="cursor-pointer"
+                  >
+                    <FileText className="mr-2 h-4 w-4" />
+                    <span>API Logs</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
 
             {userProfile?.isAdmin && (
@@ -221,27 +213,6 @@ export function Navbar({ userProfile }: NavbarProps) {
                   <span>Plans & Billing</span>
                 </DropdownMenuItem>
 
-                {userProfile?.isLicensed && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => router.push("/dashboard/api-keys")}
-                      className="cursor-pointer"
-                    >
-                      <Key className="mr-2 h-4 w-4" />
-                      <span>API Keys</span>
-                    </DropdownMenuItem>
-
-                    <DropdownMenuItem
-                      onClick={() => router.push("/dashboard/api-logs")}
-                      className="cursor-pointer"
-                    >
-                      <FileText className="mr-2 h-4 w-4" />
-                      <span>API Logs</span>
-                    </DropdownMenuItem>
-                  </>
-                )}
-
                 {userProfile?.isAdmin && (
                   <>
                     <DropdownMenuSeparator />
@@ -272,4 +243,3 @@ export function Navbar({ userProfile }: NavbarProps) {
     </nav>
   );
 }
-
