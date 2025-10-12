@@ -54,6 +54,7 @@ export default function ApiKeysPage() {
   const [newApiKey, setNewApiKey] = useState<string | null>(null);
   const [showNewKey, setShowNewKey] = useState(false);
   const [apiUsage, setApiUsage] = useState(0);
+  const [apiLimit, setApiLimit] = useState(500);
   const [keyToDelete, setKeyToDelete] = useState<string | null>(null);
 
   useEffect(() => {
@@ -91,6 +92,7 @@ export default function ApiKeysPage() {
       setIsLicensed(true);
       setApiKeys(keys);
       setApiUsage(usage);
+      setApiLimit(profile.apiRateLimit || 500);
     } catch (error) {
       console.error("Error loading data:", error);
       toast({
@@ -188,7 +190,7 @@ export default function ApiKeysPage() {
   }
 
   const activeKeys = apiKeys.filter((k) => k.isActive);
-  const usagePercentage = (apiUsage / 500) * 100;
+  const usagePercentage = (apiUsage / apiLimit) * 100;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-8">
@@ -239,7 +241,9 @@ export default function ApiKeysPage() {
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold">{apiUsage} / 500</span>
+                <span className="text-2xl font-bold">
+                  {apiUsage} / {apiLimit}
+                </span>
                 <Badge
                   className={
                     usagePercentage >= 90
@@ -267,7 +271,7 @@ export default function ApiKeysPage() {
               </div>
 
               <p className="text-sm text-gray-600">
-                {500 - apiUsage} API calls remaining this month
+                {apiLimit - apiUsage} API calls remaining this month
               </p>
             </div>
           </CardContent>

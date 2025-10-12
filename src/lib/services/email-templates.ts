@@ -1,6 +1,6 @@
 /**
  * Email Templates
- * 
+ *
  * All email templates for HICv application
  */
 
@@ -91,7 +91,7 @@ export const emailTemplates = {
    * Welcome email for new users
    */
   welcome: (name: string): EmailTemplate => ({
-    subject: 'Welcome to HICv! 🎉',
+    subject: "Welcome to HICv! 🎉",
     html: emailLayout(`
       <h2>Welcome to HICv, ${name}!</h2>
       <p>Thank you for signing up. We're excited to help you create tailored CVs that stand out!</p>
@@ -109,7 +109,7 @@ export const emailTemplates = {
       
       <p>Need more? <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/plans">View our plans</a></p>
       
-      <p>Best regards,<br>The HICv Team</p>
+      <p>Best regards,<br>The Civify Team</p>
     `),
     text: `Welcome to HICv, ${name}!\n\nThank you for signing up. Your free plan includes 5 CV generations per month, AI-powered tailoring, and more.\n\nGet started: ${process.env.NEXT_PUBLIC_APP_URL}`,
   }),
@@ -118,29 +118,41 @@ export const emailTemplates = {
    * CV limit warning (2 or fewer remaining)
    */
   cvLimitWarning: (name: string, remaining: number): EmailTemplate => ({
-    subject: `⚠️ You have ${remaining} CV generation${remaining === 1 ? '' : 's'} remaining`,
+    subject: `⚠️ You have ${remaining} CV generation${
+      remaining === 1 ? "" : "s"
+    } remaining`,
     html: emailLayout(`
       <h2>Hi ${name},</h2>
-      <p>Just a friendly reminder that you have <strong>${remaining}</strong> CV generation${remaining === 1 ? '' : 's'} remaining this month.</p>
+      <p>Just a friendly reminder that you have <strong>${remaining}</strong> CV generation${
+      remaining === 1 ? "" : "s"
+    } remaining this month.</p>
       
       <div class="stats">
-        <p><strong>Remaining:</strong> ${remaining} generation${remaining === 1 ? '' : 's'}</p>
+        <p><strong>Remaining:</strong> ${remaining} generation${
+      remaining === 1 ? "" : "s"
+    }</p>
         <p><strong>Resets:</strong> 1st of next month</p>
       </div>
       
       <p>Want unlimited CV generations?</p>
-      <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/plans" class="button">Upgrade Your Plan</a>
+      <a href="${
+        process.env.NEXT_PUBLIC_APP_URL
+      }/dashboard/plans" class="button">Upgrade Your Plan</a>
       
-      <p>Best regards,<br>The HICv Team</p>
+      <p>Best regards,<br>The Civify Team</p>
     `),
-    text: `Hi ${name},\n\nYou have ${remaining} CV generation${remaining === 1 ? '' : 's'} remaining this month.\n\nUpgrade: ${process.env.NEXT_PUBLIC_APP_URL}/dashboard/plans`,
+    text: `Hi ${name},\n\nYou have ${remaining} CV generation${
+      remaining === 1 ? "" : "s"
+    } remaining this month.\n\nUpgrade: ${
+      process.env.NEXT_PUBLIC_APP_URL
+    }/dashboard/plans`,
   }),
 
   /**
    * CV limit reached
    */
   cvLimitReached: (name: string, resetDate: string): EmailTemplate => ({
-    subject: '🚫 Monthly CV Generation Limit Reached',
+    subject: "🚫 Monthly CV Generation Limit Reached",
     html: emailLayout(`
       <h2>Hi ${name},</h2>
       <p>You've reached your monthly CV generation limit.</p>
@@ -160,7 +172,7 @@ export const emailTemplates = {
         <li>Advanced features</li>
       </ul>
       
-      <p>Best regards,<br>The HICv Team</p>
+      <p>Best regards,<br>The Civify Team</p>
     `),
     text: `Hi ${name},\n\nYou've reached your monthly CV generation limit. It will reset on ${resetDate}.\n\nUpgrade for more: ${process.env.NEXT_PUBLIC_APP_URL}/dashboard/plans`,
   }),
@@ -168,21 +180,31 @@ export const emailTemplates = {
   /**
    * Plan upgrade confirmation
    */
-  planUpgrade: (name: string, plan: string, features: string[]): EmailTemplate => ({
-    subject: `🎉 Welcome to ${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan!`,
+  planUpgrade: (
+    name: string,
+    plan: string,
+    features: string[]
+  ): EmailTemplate => ({
+    subject: `🎉 Welcome to ${
+      plan.charAt(0).toUpperCase() + plan.slice(1)
+    } Plan!`,
     html: emailLayout(`
       <h2>Congratulations, ${name}!</h2>
-      <p>Your plan has been successfully upgraded to <strong>${plan.charAt(0).toUpperCase() + plan.slice(1)}</strong>.</p>
+      <p>Your plan has been successfully upgraded to <strong>${
+        plan.charAt(0).toUpperCase() + plan.slice(1)
+      }</strong>.</p>
       
       <h3>Your New Benefits:</h3>
       <ul>
-        ${features.map(f => `<li>✅ ${f}</li>`).join('')}
+        ${features.map((f) => `<li>✅ ${f}</li>`).join("")}
       </ul>
       
-      <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="button">Go to Dashboard</a>
+      <a href="${
+        process.env.NEXT_PUBLIC_APP_URL
+      }/dashboard" class="button">Go to Dashboard</a>
       
       <p>Thank you for your support!</p>
-      <p>Best regards,<br>The HICv Team</p>
+      <p>Best regards,<br>The Civify Team</p>
     `),
     text: `Congratulations, ${name}!\n\nYour plan has been upgraded to ${plan}.\n\nDashboard: ${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
   }),
@@ -191,7 +213,7 @@ export const emailTemplates = {
    * License activation
    */
   licenseActivated: (name: string, licenseKey: string): EmailTemplate => ({
-    subject: '🔑 License Activated Successfully',
+    subject: "🔑 License Activated Successfully",
     html: emailLayout(`
       <h2>Hi ${name},</h2>
       <p>Your license has been activated successfully!</p>
@@ -206,7 +228,7 @@ export const emailTemplates = {
       
       <p>View the <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/api-docs">API documentation</a> to get started.</p>
       
-      <p>Best regards,<br>The HICv Team</p>
+      <p>Best regards,<br>The Civify Team</p>
     `),
     text: `Hi ${name},\n\nYour license (${licenseKey}) has been activated!\n\nGenerate API key: ${process.env.NEXT_PUBLIC_APP_URL}/dashboard/api-keys`,
   }),
@@ -215,7 +237,7 @@ export const emailTemplates = {
    * API key generated
    */
   apiKeyGenerated: (name: string, apiKey: string): EmailTemplate => ({
-    subject: '🔐 New API Key Generated',
+    subject: "🔐 New API Key Generated",
     html: emailLayout(`
       <h2>Hi ${name},</h2>
       <p>A new API key has been generated for your account.</p>
@@ -229,7 +251,7 @@ export const emailTemplates = {
       
       <p>Keep your API key secure and never share it publicly.</p>
       
-      <p>Best regards,<br>The HICv Team</p>
+      <p>Best regards,<br>The Civify Team</p>
     `),
     text: `Hi ${name},\n\nNew API key generated: ${apiKey}\n\nIMPORTANT: Save this key securely. You won't see it again.\n\nAPI Docs: ${process.env.NEXT_PUBLIC_APP_URL}/dashboard/api-docs`,
   }),
@@ -237,7 +259,12 @@ export const emailTemplates = {
   /**
    * API quota warning
    */
-  apiQuotaWarning: (name: string, usage: number, limit: number, percentage: number): EmailTemplate => ({
+  apiQuotaWarning: (
+    name: string,
+    usage: number,
+    limit: number,
+    percentage: number
+  ): EmailTemplate => ({
     subject: `⚠️ API Quota Warning: ${percentage}% Used`,
     html: emailLayout(`
       <h2>Hi ${name},</h2>
@@ -251,24 +278,31 @@ export const emailTemplates = {
       </div>
       
       <p>Need more API calls?</p>
-      <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/plans" class="button">Upgrade Plan</a>
+      <a href="${
+        process.env.NEXT_PUBLIC_APP_URL
+      }/dashboard/plans" class="button">Upgrade Plan</a>
       
-      <p>Best regards,<br>The HICv Team</p>
+      <p>Best regards,<br>The Civify Team</p>
     `),
-    text: `Hi ${name},\n\nAPI usage: ${usage}/${limit} (${percentage}%)\nRemaining: ${limit - usage} calls\n\nUpgrade: ${process.env.NEXT_PUBLIC_APP_URL}/dashboard/plans`,
+    text: `Hi ${name},\n\nAPI usage: ${usage}/${limit} (${percentage}%)\nRemaining: ${
+      limit - usage
+    } calls\n\nUpgrade: ${process.env.NEXT_PUBLIC_APP_URL}/dashboard/plans`,
   }),
 
   /**
    * Monthly usage report
    */
-  monthlyReport: (name: string, stats: {
-    cvCount: number;
-    cvLimit: number;
-    apiUsage?: number;
-    apiLimit?: number;
-    plan: string;
-  }): EmailTemplate => ({
-    subject: '📊 Your Monthly HICv Report',
+  monthlyReport: (
+    name: string,
+    stats: {
+      cvCount: number;
+      cvLimit: number;
+      apiUsage?: number;
+      apiLimit?: number;
+      plan: string;
+    }
+  ): EmailTemplate => ({
+    subject: "📊 Your Monthly HICv Report",
     html: emailLayout(`
       <h2>Hi ${name},</h2>
       <p>Here's your monthly usage report:</p>
@@ -277,24 +311,39 @@ export const emailTemplates = {
         <h3>CV Generations</h3>
         <p><strong>Used:</strong> ${stats.cvCount} / ${stats.cvLimit}</p>
         
-        ${stats.apiUsage !== undefined ? `
+        ${
+          stats.apiUsage !== undefined
+            ? `
           <h3>API Calls</h3>
           <p><strong>Used:</strong> ${stats.apiUsage} / ${stats.apiLimit}</p>
-        ` : ''}
+        `
+            : ""
+        }
         
         <h3>Current Plan</h3>
-        <p><strong>${stats.plan.charAt(0).toUpperCase() + stats.plan.slice(1)}</strong></p>
+        <p><strong>${
+          stats.plan.charAt(0).toUpperCase() + stats.plan.slice(1)
+        }</strong></p>
       </div>
       
       <p>Want to do more?</p>
-      <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/plans" class="button">Upgrade Plan</a>
+      <a href="${
+        process.env.NEXT_PUBLIC_APP_URL
+      }/dashboard/plans" class="button">Upgrade Plan</a>
       
       <p>Thank you for using HICv!</p>
-      <p>Best regards,<br>The HICv Team</p>
+      <p>Best regards,<br>The Civify Team</p>
     `),
-    text: `Hi ${name},\n\nMonthly Report:\n- CV: ${stats.cvCount}/${stats.cvLimit}\n${stats.apiUsage !== undefined ? `- API: ${stats.apiUsage}/${stats.apiLimit}\n` : ''}- Plan: ${stats.plan}\n\nUpgrade: ${process.env.NEXT_PUBLIC_APP_URL}/dashboard/plans`,
+    text: `Hi ${name},\n\nMonthly Report:\n- CV: ${stats.cvCount}/${
+      stats.cvLimit
+    }\n${
+      stats.apiUsage !== undefined
+        ? `- API: ${stats.apiUsage}/${stats.apiLimit}\n`
+        : ""
+    }- Plan: ${stats.plan}\n\nUpgrade: ${
+      process.env.NEXT_PUBLIC_APP_URL
+    }/dashboard/plans`,
   }),
 };
 
 export default emailTemplates;
-
