@@ -681,8 +681,9 @@ export class AppwriteDatabaseService {
         method: doc.method,
         statusCode: doc.statusCode,
         responseTime: doc.responseTime,
-        timestamp: doc.$createdAt,
+        timestamp: doc.timestamp || doc.$createdAt,
         errorMessage: doc.errorMessage || null,
+        success: doc.success, // Use the success field from the database
       }));
     } catch (error) {
       console.error("Error getting API usage logs:", error);
@@ -847,17 +848,22 @@ export class AppwriteDatabaseService {
 
   /**
    * Save generated content (tailored CV, cover letter, etc.)
+   * Note: This is optional and only saves if a job application ID is provided
    */
   async saveGeneratedContent(
     content: Omit<GeneratedContent, "id" | "userId" | "createdAt">
-  ): Promise<string> {
+  ): Promise<string | null> {
     try {
       // For now, we'll store generated content in job applications
       // You can create a separate collection if needed
       const applicationId = content.jobApplicationId;
 
       if (!applicationId) {
-        throw new Error("Job application ID is required for generated content");
+        // If no job application ID, just skip saving (not an error)
+        console.log(
+          "No job application ID provided, skipping generated content save"
+        );
+        return null;
       }
 
       // Update the job application with the generated content
@@ -865,12 +871,17 @@ export class AppwriteDatabaseService {
         await this.updateJobApplication(applicationId, {
           coverLetter: content.content,
         });
+      } else if (content.type === "tailored_cv") {
+        await this.updateJobApplication(applicationId, {
+          tailoredCV: content.content,
+        });
       }
 
       return applicationId;
     } catch (error) {
       console.error("Error saving generated content:", error);
-      throw error;
+      // Don't throw error, just log it
+      return null;
     }
   }
 
