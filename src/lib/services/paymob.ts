@@ -1,6 +1,6 @@
 /**
  * Paymob Payment Service
- * 
+ *
  * IMPORTANT: This service is READY but DISABLED by default.
  * To enable:
  * 1. Create Paymob merchant account at https://paymob.com
@@ -9,13 +9,13 @@
  * 4. Set NEXT_PUBLIC_PAYMOB_ENABLED=true
  */
 
-import axios from 'axios';
+import axios from "axios";
 
-const PAYMOB_API_URL = 'https://accept.paymob.com/api';
+const PAYMOB_API_URL = "https://accept.paymob.com/api";
 
 // Check if Paymob is enabled
 export const isPaymobEnabled = () => {
-  return process.env.NEXT_PUBLIC_PAYMOB_ENABLED === 'true';
+  return process.env.NEXT_PUBLIC_PAYMOB_ENABLED === "true";
 };
 
 export interface PaymobPaymentData {
@@ -42,11 +42,11 @@ export class PaymobService {
   constructor(config?: PaymobConfig) {
     // Use provided config or load from environment
     this.config = config || {
-      apiKey: process.env.PAYMOB_API_KEY || '',
-      cardIntegrationId: process.env.PAYMOB_CARD_INTEGRATION_ID || '',
+      apiKey: process.env.PAYMOB_API_KEY || "",
+      cardIntegrationId: process.env.PAYMOB_CARD_INTEGRATION_ID || "",
       walletIntegrationId: process.env.PAYMOB_WALLET_INTEGRATION_ID,
-      iframeId: process.env.PAYMOB_IFRAME_ID || '',
-      hmacSecret: process.env.PAYMOB_HMAC_SECRET || '',
+      iframeId: process.env.PAYMOB_IFRAME_ID || "",
+      hmacSecret: process.env.PAYMOB_HMAC_SECRET || "",
     };
   }
 
@@ -72,27 +72,37 @@ export class PaymobService {
       });
       return response.data.token;
     } catch (error: any) {
-      console.error('Paymob auth error:', error.response?.data || error.message);
-      throw new Error('Failed to authenticate with Paymob');
+      console.error(
+        "Paymob auth error:",
+        error.response?.data || error.message
+      );
+      throw new Error("Failed to authenticate with Paymob");
     }
   }
 
   /**
    * Step 2: Create order
    */
-  async createOrder(authToken: string, amount: number, currency: string = 'EGP'): Promise<number> {
+  async createOrder(
+    authToken: string,
+    amount: number,
+    currency: string = "EGP"
+  ): Promise<number> {
     try {
       const response = await axios.post(`${PAYMOB_API_URL}/ecommerce/orders`, {
         auth_token: authToken,
-        delivery_needed: 'false',
+        delivery_needed: "false",
         amount_cents: amount,
         currency: currency,
         items: [],
       });
       return response.data.id;
     } catch (error: any) {
-      console.error('Paymob order error:', error.response?.data || error.message);
-      throw new Error('Failed to create Paymob order');
+      console.error(
+        "Paymob order error:",
+        error.response?.data || error.message
+      );
+      throw new Error("Failed to create Paymob order");
     }
   }
 
@@ -105,40 +115,46 @@ export class PaymobService {
     paymentData: PaymobPaymentData
   ): Promise<string> {
     try {
-      const nameParts = paymentData.userName.split(' ');
-      const firstName = nameParts[0] || 'User';
-      const lastName = nameParts.slice(1).join(' ') || 'Name';
+      const nameParts = paymentData.userName.split(" ");
+      const firstName = nameParts[0] || "User";
+      const lastName = nameParts.slice(1).join(" ") || "Name";
 
-      const response = await axios.post(`${PAYMOB_API_URL}/acceptance/payment_keys`, {
-        auth_token: authToken,
-        amount_cents: paymentData.amount,
-        expiration: 3600, // 1 hour
-        order_id: orderId,
-        billing_data: {
-          email: paymentData.userEmail,
-          first_name: firstName,
-          last_name: lastName,
-          phone_number: '+201000000000', // Default - can be collected from user
-          country: 'EG',
-          city: 'Cairo',
-          street: 'N/A',
-          building: 'N/A',
-          floor: 'N/A',
-          apartment: 'N/A',
-        },
-        currency: paymentData.currency,
-        integration_id: this.config.cardIntegrationId,
-        // Store metadata for webhook processing
-        metadata: {
-          userId: paymentData.userId,
-          planId: paymentData.planId,
-          planName: paymentData.planName,
-        },
-      });
+      const response = await axios.post(
+        `${PAYMOB_API_URL}/acceptance/payment_keys`,
+        {
+          auth_token: authToken,
+          amount_cents: paymentData.amount,
+          expiration: 3600, // 1 hour
+          order_id: orderId,
+          billing_data: {
+            email: paymentData.userEmail,
+            first_name: firstName,
+            last_name: lastName,
+            phone_number: "+201000000000", // Default - can be collected from user
+            country: "EG",
+            city: "Cairo",
+            street: "N/A",
+            building: "N/A",
+            floor: "N/A",
+            apartment: "N/A",
+          },
+          currency: paymentData.currency,
+          integration_id: this.config.cardIntegrationId,
+          // Store metadata for webhook processing
+          metadata: {
+            userId: paymentData.userId,
+            planId: paymentData.planId,
+            planName: paymentData.planName,
+          },
+        }
+      );
       return response.data.token;
     } catch (error: any) {
-      console.error('Paymob payment key error:', error.response?.data || error.message);
-      throw new Error('Failed to get Paymob payment key');
+      console.error(
+        "Paymob payment key error:",
+        error.response?.data || error.message
+      );
+      throw new Error("Failed to get Paymob payment key");
     }
   }
 
@@ -148,35 +164,43 @@ export class PaymobService {
   async createPaymentUrl(paymentData: PaymobPaymentData): Promise<string> {
     try {
       if (!this.isConfigured()) {
-        throw new Error('Paymob is not properly configured');
+        throw new Error("Paymob is not properly configured");
       }
 
       // Step 1: Get auth token
       const authToken = await this.getAuthToken();
 
       // Step 2: Create order
-      const orderId = await this.createOrder(authToken, paymentData.amount, paymentData.currency);
+      const orderId = await this.createOrder(
+        authToken,
+        paymentData.amount,
+        paymentData.currency
+      );
 
       // Step 3: Get payment key
-      const paymentKey = await this.getPaymentKey(authToken, orderId, paymentData);
+      const paymentKey = await this.getPaymentKey(
+        authToken,
+        orderId,
+        paymentData
+      );
 
       // Step 4: Return iframe URL
       return `https://accept.paymob.com/api/acceptance/iframes/${this.config.iframeId}?payment_token=${paymentKey}`;
     } catch (error: any) {
-      console.error('Paymob payment error:', error);
+      console.error("Paymob payment error:", error);
       throw error;
     }
   }
 
   /**
-   * Verify webhook signature (HMAC)
+   * Verify webhook signature (HMAC) Callback
    */
   verifyWebhook(data: any, receivedHmac: string): boolean {
     try {
-      const crypto = require('crypto');
+      const crypto = require("crypto");
 
       // Concatenate specific fields as per Paymob documentation
-      const concatenatedString = 
+      const concatenatedString =
         data.amount_cents +
         data.created_at +
         data.currency +
@@ -199,13 +223,13 @@ export class PaymobService {
         data.success;
 
       const calculatedHmac = crypto
-        .createHmac('sha512', this.config.hmacSecret)
+        .createHmac("sha512", this.config.hmacSecret)
         .update(concatenatedString)
-        .digest('hex');
+        .digest("hex");
 
       return calculatedHmac === receivedHmac;
     } catch (error) {
-      console.error('Paymob webhook verification error:', error);
+      console.error("Paymob webhook verification error:", error);
       return false;
     }
   }
@@ -225,15 +249,16 @@ export class PaymobService {
       const obj = data.obj || data;
 
       return {
-        success: obj.success === 'true' || obj.success === true,
-        userId: obj.order?.shipping_data?.extra_description || obj.metadata?.userId,
+        success: obj.success === "true" || obj.success === true,
+        userId:
+          obj.order?.shipping_data?.extra_description || obj.metadata?.userId,
         planId: obj.metadata?.planId,
         amount: obj.amount_cents,
         currency: obj.currency,
         transactionId: obj.id?.toString(),
       };
     } catch (error) {
-      console.error('Paymob webhook processing error:', error);
+      console.error("Paymob webhook processing error:", error);
       return { success: false };
     }
   }
@@ -250,4 +275,3 @@ export const getPaymobService = (): PaymobService => {
 };
 
 export default PaymobService;
-
