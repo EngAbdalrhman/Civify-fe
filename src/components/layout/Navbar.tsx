@@ -151,6 +151,18 @@ export function Navbar({ userProfile }: NavbarProps) {
                 Admin
               </Button>
             )}
+
+            {/* License Activation Button for Non-Licensed Users */}
+            {!userProfile?.isLicensed && (
+              <Button
+                variant="outline"
+                onClick={() => router.push("/dashboard/license")}
+                className="flex items-center gap-2 border-purple-500 text-purple-600 hover:bg-purple-50"
+              >
+                <Key className="h-4 w-4" />
+                Activate License
+              </Button>
+            )}
           </div>
 
           {/* User Menu */}
@@ -185,25 +197,19 @@ export function Navbar({ userProfile }: NavbarProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {userProfile?.name || "User"}
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {user.email}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem
+                <DropdownMenuLabel
                   onClick={() => router.push("/dashboard/profile")}
                   className="cursor-pointer"
                 >
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profile Settings</span>
-                </DropdownMenuItem>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      {userProfile?.name || user.email?.split("@")[0]}
+                    </p>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile Settings</span>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
 
                 <DropdownMenuItem
                   onClick={() => router.push("/dashboard/plans")}
