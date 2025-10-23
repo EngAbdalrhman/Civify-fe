@@ -201,12 +201,16 @@ export function Navbar({ userProfile }: NavbarProps) {
                   onClick={() => router.push("/dashboard/profile")}
                   className="cursor-pointer"
                 >
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {userProfile?.name || user.email?.split("@")[0]}
-                    </p>
+                  <div className="flex flex-row space-y-1 items-center">
                     <User className="mr-2 h-4 w-4" />
-                    <span>Profile Settings</span>
+                    <div className="flex flex-1 flex-col">
+                      <p className="text-sm font-medium leading-none">
+                        {userProfile?.name || user.email?.split("@")[0]}
+                      </p>
+                      <span className="text-sm font-medium">
+                        Profile Settings
+                      </span>
+                    </div>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -219,7 +223,7 @@ export function Navbar({ userProfile }: NavbarProps) {
                   <span>Plans & Billing</span>
                 </DropdownMenuItem>
 
-                {userProfile?.isAdmin && (
+                {/* {userProfile?.isAdmin && (
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
@@ -230,7 +234,7 @@ export function Navbar({ userProfile }: NavbarProps) {
                       <span>Admin Dashboard</span>
                     </DropdownMenuItem>
                   </>
-                )}
+                )} */}
 
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
