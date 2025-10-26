@@ -1,35 +1,100 @@
-# AI-Refactor Pro
+# Civify - AI-Powered CV/Resume Management Platform
 
-Transform your CV with AI-powered precision. A Next.js application that uses advanced AI to parse, analyze, and tailor your CV for specific job applications with 100% accuracy.
+Transform your CV with AI-powered precision. A comprehensive Next.js application that leverages advanced AI to parse, analyze, tailor, and manage your professional documents with 100% accuracy.
 
 ## 🚀 Features
 
 ### Enhanced CV Processing
 
-- **Smart PDF Parsing**: Extract text from PDF CVs with high accuracy
+- **Smart PDF Parsing**: Extract text from PDF CVs with high accuracy using advanced OCR
 - **AI-Powered Structure Analysis**: Parse CVs into structured data with detailed field mapping
 - **100% Accurate Field Extraction**: Automatically identify and extract personal info, experience, education, skills, and more
+- **Multi-format Support**: Handle both text-based and image-based PDFs
+- **Comprehensive Data Fields**: 15+ structured fields including personal info, work experience, education, skills, certifications, and projects
 
 ### Intelligent CV Tailoring
 
-- **Job-Specific Optimization**: Tailor your CV to match specific job descriptions
-- **Keyword Matching**: Automatically emphasize relevant skills and experience
+- **Job-Specific Optimization**: Tailor your CV to match specific job descriptions using AI analysis
+- **Keyword Matching**: Automatically emphasize relevant skills and experience based on job requirements
 - **Professional Formatting**: Generate clean, ATS-friendly CV layouts
 - **Multiple Export Formats**: Text-based PDF, image-based PDF, or plain text
+- **Experience Reordering**: Prioritize relevant experience based on job matching
+- **Skills Highlighting**: Emphasize job-relevant skills and technologies
+- **Cover Letter Generation**: AI-powered personalized cover letters
 
 ### Advanced AI Features
 
+- **Google Gemini AI Integration**: Powered by Google's latest AI models for superior CV processing
 - **Structured Data Processing**: Uses comprehensive CV parsing with 15+ data fields
 - **Smart Content Generation**: AI-powered professional summaries and descriptions
-- **Cover Letter Generation**: Personalized cover letters that complement your CV
-- **Real-time Validation**: Instant feedback and suggestions
+- **Real-time Validation**: Instant feedback and suggestions during CV creation
+- **Context-Aware Processing**: Understands relationships between different CV sections
+- **Multi-Provider AI Support**: Extensible architecture for multiple AI providers
+
+### User Management & Dashboard
+
+- **User Authentication**: Secure Firebase-based authentication with email verification
+- **Comprehensive Dashboard**: Manage CVs, track applications, and monitor usage
+- **Profile Management**: Auto-fill and edit personal information from CV parsing
+- **Usage Analytics**: Track CV generations, API calls, and subscription limits
+- **Job Application Tracking**: Monitor application status and progress
+- **CV Library**: Store and organize multiple CV versions
+
+### Subscription & Licensing System
+
+- **Flexible Plans**: Free, Premium, Enterprise, and Lifetime subscription tiers
+- **Usage Limits**: Monthly CV generation limits based on plan (5-9999+)
+- **API Access**: Licensed users get programmatic access to CV generation APIs
+- **License Management**: Admin-controlled license activation and management
+- **Payment Integration**: Paymob and PayPal payment gateway support with webhooks
+
+### API & Integration
+
+- **RESTful APIs**: Complete API suite for CV generation and management
+- **API Key Management**: Generate and manage API keys for licensed users
+- **Rate Limiting**: 500-1000 API calls per month based on plan
+- **Webhook Support**: Payment and notification webhooks
+- **Interactive Documentation**: Comprehensive API docs with examples
+- **Authentication**: Bearer token authentication for API access
+
+### Admin Features
+
+- **Admin Dashboard**: Full administrative control over users and licenses
+- **License Management**: Grant/revoke licenses and manage subscriptions
+- **System Monitoring**: User activity and system health monitoring
+- **Analytics**: Detailed usage statistics and reporting
 
 ### Modern UI/UX
 
 - **Beautiful Interface**: Modern gradient design with smooth animations
-- **Responsive Design**: Works perfectly on desktop and mobile
+- **Responsive Design**: Works perfectly on desktop and mobile devices
 - **Progress Tracking**: Clear multi-step process with visual progress indicators
 - **Interactive Elements**: Real-time keyword detection and skill highlighting
+- **Step-by-Step Workflow**: Guided 4-step process from upload to export
+
+### Database & Storage
+
+- **Appwrite Backend**: Cloud database for user data, CVs, and applications
+- **Firebase Integration**: Authentication and additional data storage
+- **Secure Data Handling**: Encrypted storage with proper access controls
+- **Real-time Updates**: Live data synchronization across devices
+
+### Export & Integration
+
+- **Multiple Formats**: PDF (text-based and image-based), plain text
+- **Professional Templates**: Clean, ATS-friendly layouts
+- **Download Management**: Unique filenames with timestamps to prevent conflicts
+- **Email Notifications**: Automated email templates for various events
+- **Push Notifications**: Real-time notifications for important updates
+
+### Security & Compliance
+
+- **Data Privacy**: Personal information masking for privacy protection
+- **Secure Authentication**: JWT tokens with refresh token rotation
+- **Role-Based Access**: Different permissions for users, licensed users, and admins
+- **API Security**: Rate limiting, authentication, and authorization
+- **Audit Logging**: Comprehensive logging of all user actions
+- **GDPR Compliance**: Proper data handling and user consent management
 
 ## 🛠️ Setup Instructions
 
