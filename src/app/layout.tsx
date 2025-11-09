@@ -1,20 +1,28 @@
 import type { Metadata } from "next";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/context/auth-context";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Civify",
+  title: "HICv",
   description: "AI-powered CV tailoring and cover letter generation.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
+  // Determine text direction based on locale
+  const dir = locale === "ar" ? "rtl" : "ltr";
+
   return (
-    <html lang="en" className="h-full">
+    <html lang={locale} dir={dir} className="h-full">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -31,10 +39,12 @@ export default function RootLayout({
         className="font-body antialiased h-full bg-gradient-to-br from-indigo-50 to-purple-100 dark:from-gray-900 dark:to-indigo-950"
         suppressHydrationWarning={true}
       >
-        <AuthProvider>
-          {children}
-          <Toaster />
-        </AuthProvider>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <AuthProvider>
+            {children}
+            <Toaster />
+          </AuthProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

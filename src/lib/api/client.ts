@@ -3,10 +3,21 @@
  * Axios-based HTTP client with interceptors for authentication and error handling
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
-import { API_URL, REQUEST_TIMEOUT, HTTP_STATUS, API_ERROR_CODES, CONTENT_TYPES } from './config';
-import { tokenManager } from './token-manager';
-import { ApiException, ApiError } from './types';
+import axios, {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  AxiosError,
+} from "axios";
+import {
+  API_URL,
+  REQUEST_TIMEOUT,
+  HTTP_STATUS,
+  API_ERROR_CODES,
+  CONTENT_TYPES,
+} from "./config";
+import { tokenManager } from "./token-manager";
+import { ApiException, ApiError } from "./types";
 
 /**
  * Create axios instance with default configuration
@@ -16,8 +27,8 @@ const createAxiosInstance = (): AxiosInstance => {
     baseURL: API_URL,
     timeout: REQUEST_TIMEOUT,
     headers: {
-      'Content-Type': CONTENT_TYPES.JSON,
-      'Accept': CONTENT_TYPES.JSON,
+      "Content-Type": CONTENT_TYPES.JSON,
+      Accept: CONTENT_TYPES.JSON,
     },
   });
 
@@ -39,14 +50,46 @@ class ApiClient {
   }
 
   /**
+   * Get current locale from browser or cookie
+   */
+  private getCurrentLocale(): string {
+    if (typeof window === "undefined") {
+      return "en"; // Default for SSR
+    }
+
+    // Try to get locale from cookie
+    const cookies = document.cookie.split(";");
+    const localeCookie = cookies.find((c) =>
+      c.trim().startsWith("NEXT_LOCALE=")
+    );
+    if (localeCookie) {
+      return localeCookie.split("=")[1];
+    }
+
+    // Try to get from pathname
+    const pathname = window.location.pathname;
+    const localeMatch = pathname.match(/^\/(en|ar)/);
+    if (localeMatch) {
+      return localeMatch[1];
+    }
+
+    // Default to English
+    return "en";
+  }
+
+  /**
    * Setup request and response interceptors
    */
   private setupInterceptors(): void {
-    // Request interceptor - Add auth token
+    // Request interceptor - Add auth token and locale
     this.axiosInstance.interceptors.request.use(
       async (config) => {
+        // Add Accept-Language header for i18n
+        const locale = this.getCurrentLocale();
+        config.headers["Accept-Language"] = locale;
+
         // Skip token for auth endpoints
-        if (this.isAuthEndpoint(config.url || '')) {
+        if (this.isAuthEndpoint(config.url || "")) {
           return config;
         }
 
@@ -62,7 +105,7 @@ class ApiClient {
               config.headers.Authorization = `Bearer ${newToken}`;
             }
           } catch (error) {
-            console.error('Token refresh failed:', error);
+            console.error("Token refresh failed:", error);
             // Continue with existing token
             if (accessToken) {
               config.headers.Authorization = `Bearer ${accessToken}`;
@@ -83,11 +126,16 @@ class ApiClient {
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       async (error: AxiosError) => {
-        const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+        const originalRequest = error.config as AxiosRequestConfig & {
+          _retry?: boolean;
+        };
 
         // Handle 401 Unauthorized - Token expired
-        if (error.response?.status === HTTP_STATUS.UNAUTHORIZED && !originalRequest._retry) {
-          if (this.isAuthEndpoint(originalRequest.url || '')) {
+        if (
+          error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
+          !originalRequest._retry
+        ) {
+          if (this.isAuthEndpoint(originalRequest.url || "")) {
             return Promise.reject(this.handleError(error));
           }
 
@@ -135,7 +183,7 @@ class ApiClient {
    * Check if URL is an auth endpoint
    */
   private isAuthEndpoint(url: string): boolean {
-    return url.includes('/auth/');
+    return url.includes("/auth/");
   }
 
   /**
@@ -147,19 +195,15 @@ class ApiClient {
     if (!refreshToken) {
       throw new ApiException(
         API_ERROR_CODES.UNAUTHORIZED,
-        'No refresh token available',
+        "No refresh token available",
         HTTP_STATUS.UNAUTHORIZED
       );
     }
 
     try {
-      const response = await axios.post(
-        `${API_URL}/auth/refresh`,
-        null,
-        {
-          params: { refreshToken },
-        }
-      );
+      const response = await axios.post(`${API_URL}/auth/refresh`, null, {
+        params: { refreshToken },
+      });
 
       const { accessToken, refreshToken: newRefreshToken } = response.data;
       tokenManager.setTokens(accessToken, newRefreshToken);
@@ -191,8 +235,8 @@ class ApiClient {
     this.refreshSubscribers = [];
     tokenManager.clearTokens();
     // Redirect to login if in browser
-    if (typeof window !== 'undefined') {
-      window.location.href = '/login';
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
     }
   }
 
@@ -213,14 +257,14 @@ class ApiClient {
       // Request made but no response
       return new ApiException(
         API_ERROR_CODES.NETWORK_ERROR,
-        'Network error - please check your connection',
+        "Network error - please check your connection",
         0
       );
     } else {
       // Error in request setup
       return new ApiException(
         API_ERROR_CODES.UNKNOWN_ERROR,
-        error.message || 'An unknown error occurred',
+        error.message || "An unknown error occurred",
         0
       );
     }
@@ -229,7 +273,10 @@ class ApiClient {
   /**
    * GET request
    */
-  public async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  public async get<T = any>(
+    url: string,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
     const response = await this.axiosInstance.get<T>(url, config);
     return response.data;
   }
@@ -237,7 +284,11 @@ class ApiClient {
   /**
    * POST request
    */
-  public async post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  public async post<T = any>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
     const response = await this.axiosInstance.post<T>(url, data, config);
     return response.data;
   }
@@ -245,7 +296,11 @@ class ApiClient {
   /**
    * PUT request
    */
-  public async put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  public async put<T = any>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
     const response = await this.axiosInstance.put<T>(url, data, config);
     return response.data;
   }
@@ -253,7 +308,11 @@ class ApiClient {
   /**
    * PATCH request
    */
-  public async patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  public async patch<T = any>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
     const response = await this.axiosInstance.patch<T>(url, data, config);
     return response.data;
   }
@@ -261,7 +320,10 @@ class ApiClient {
   /**
    * DELETE request
    */
-  public async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  public async delete<T = any>(
+    url: string,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
     const response = await this.axiosInstance.delete<T>(url, config);
     return response.data;
   }
@@ -269,12 +331,16 @@ class ApiClient {
   /**
    * Upload file with multipart/form-data
    */
-  public async upload<T = any>(url: string, formData: FormData, config?: AxiosRequestConfig): Promise<T> {
+  public async upload<T = any>(
+    url: string,
+    formData: FormData,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
     const response = await this.axiosInstance.post<T>(url, formData, {
       ...config,
       headers: {
         ...config?.headers,
-        'Content-Type': CONTENT_TYPES.FORM_DATA,
+        "Content-Type": CONTENT_TYPES.FORM_DATA,
       },
     });
     return response.data;
@@ -293,4 +359,3 @@ export const apiClient = new ApiClient();
 
 // Export class for testing
 export { ApiClient };
-

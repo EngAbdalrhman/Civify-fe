@@ -37,7 +37,7 @@ export interface User {
   id: number;
   username: string;
   email: string;
-  role: 'ROLE_USER' | 'ROLE_LICENSED_USER' | 'ROLE_ADMIN';
+  role: "ROLE_USER" | "ROLE_LICENSED_USER" | "ROLE_ADMIN";
   emailVerified: boolean;
   twoFactorEnabled: boolean;
   createdAt: string;
@@ -68,7 +68,7 @@ export interface UserSubscription {
   planId: number;
   startDate: string;
   endDate: string;
-  status: 'PENDING' | 'ACTIVE' | 'CANCELLED' | 'EXPIRED';
+  status: "PENDING" | "ACTIVE" | "CANCELLED" | "EXPIRED";
   paymentTransactionId?: string;
   autoRenew: boolean;
   currentCvCount: number;
@@ -87,7 +87,7 @@ export interface SubscriptionResponse {
   currentApiCount: number;
   startDate: string;
   endDate: string;
-  status: 'PENDING' | 'ACTIVE' | 'CANCELLED' | 'EXPIRED';
+  status: "PENDING" | "ACTIVE" | "CANCELLED" | "EXPIRED";
   paymentTransactionId?: string;
 }
 
@@ -105,6 +105,40 @@ export interface PriceCalculationResponse {
   totalPrice: string;
   promoCode?: string;
   isAnnual: boolean;
+}
+
+// ============================================================================
+// Admin - Plan Management Types
+// ============================================================================
+
+export interface PlanWithStats {
+  plan: SubscriptionPlan;
+  activeSubscriptionCount: number;
+}
+
+export interface CreatePlanRequest {
+  name: string;
+  description: string;
+  details: string;
+  cvLimit: number | null;
+  apiLimit: number | null;
+  watermark: boolean;
+  dashboard: boolean;
+  monthlyPrice: string;
+  annualPrice: string;
+  active?: boolean;
+}
+
+export interface UpdatePlanRequest {
+  name?: string;
+  description?: string;
+  details?: string;
+  cvLimit?: number | null;
+  apiLimit?: number | null;
+  watermark?: boolean;
+  dashboard?: boolean;
+  monthlyPrice?: string;
+  annualPrice?: string;
 }
 
 // ============================================================================
@@ -133,7 +167,7 @@ export interface PaymentTransaction {
   userId: number;
   orderId: string;
   paymentKey: string;
-  status: 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED';
+  status: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
   amount: string;
   currency: string;
   completedAt?: string;
@@ -173,7 +207,7 @@ export interface PageRequest {
   page?: number;
   size?: number;
   sortBy?: string;
-  sortDirection?: 'ASC' | 'DESC';
+  sortDirection?: "ASC" | "DESC";
 }
 
 export interface PageResponse<T> {
@@ -191,20 +225,20 @@ export interface PageResponse<T> {
 // ============================================================================
 
 export type FilterOperation =
-  | 'EQUAL'
-  | 'NOT_EQUAL'
-  | 'GREATER_THAN'
-  | 'LESS_THAN'
-  | 'GREATER_THAN_OR_EQUAL'
-  | 'LESS_THAN_OR_EQUAL'
-  | 'LIKE'
-  | 'MATCH'
-  | 'MATCH_EXACT'
-  | 'IN'
-  | 'NOT_IN'
-  | 'IS_NULL'
-  | 'IS_NOT_NULL'
-  | 'BETWEEN';
+  | "EQUAL"
+  | "NOT_EQUAL"
+  | "GREATER_THAN"
+  | "LESS_THAN"
+  | "GREATER_THAN_OR_EQUAL"
+  | "LESS_THAN_OR_EQUAL"
+  | "LIKE"
+  | "MATCH"
+  | "MATCH_EXACT"
+  | "IN"
+  | "NOT_IN"
+  | "IS_NULL"
+  | "IS_NOT_NULL"
+  | "BETWEEN";
 
 export interface Filter {
   fieldName: string;
@@ -216,7 +250,7 @@ export interface Filter {
 export interface FilterGroup {
   filters?: Filter[];
   groups?: FilterGroup[];
-  operation: 'AND' | 'OR';
+  operation: "AND" | "OR";
 }
 
 export interface FilterRequest extends PageRequest {
@@ -245,7 +279,6 @@ export class ApiException extends Error {
     public details?: any
   ) {
     super(message);
-    this.name = 'ApiException';
+    this.name = "ApiException";
   }
 }
-
