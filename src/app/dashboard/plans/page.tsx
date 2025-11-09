@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
-import { useDatabase } from "@/hooks/use-database";
-import { UserProfile } from "@/lib/types";
+import { subscriptionService, SubscriptionPlan } from "@/lib/api";
 import {
   Card,
   CardContent,
@@ -29,135 +28,64 @@ import {
   ArrowLeft,
 } from "lucide-react";
 
-interface Plan {
-  id: "free" | "premium" | "enterprise" | "lifetime";
-  name: string;
+interface PlanDisplay extends SubscriptionPlan {
   icon: React.ReactNode;
-  price: string;
-  period: string;
-  description: string;
-  features: string[];
-  uiCvLimit: number;
-  apiAccess: boolean;
-  apiLimit: number;
   popular?: boolean;
   badge?: string;
+  features: string[];
 }
-
-const plans: Plan[] = [
-  {
-    id: "free",
-    name: "Free",
-    icon: <FileText className="h-6 w-6" />,
-    price: "$0",
-    period: "forever",
-    description: "Perfect for trying out HICv",
-    features: [
-      "5 CV generations per month",
-      "AI-powered CV tailoring",
-      "Personal information masking",
-      "PDF export",
-      "Basic support",
-    ],
-    uiCvLimit: 5,
-    apiAccess: false,
-    apiLimit: 0,
-  },
-  {
-    id: "premium",
-    name: "Premium",
-    icon: <Zap className="h-6 w-6" />,
-    price: "$9.99",
-    period: "per month",
-    description: "For active job seekers",
-    features: [
-      "50 CV generations per month",
-      "AI-powered CV tailoring",
-      "Personal information masking",
-      "PDF export",
-      "Priority support",
-      "Advanced AI features",
-    ],
-    uiCvLimit: 50,
-    apiAccess: false,
-    apiLimit: 0,
-    popular: true,
-  },
-  {
-    id: "enterprise",
-    name: "Enterprise",
-    icon: <Crown className="h-6 w-6" />,
-    price: "$49.99",
-    period: "per month",
-    description: "For professionals and businesses",
-    features: [
-      "Unlimited CV generations",
-      "Full API access",
-      "500 API calls per month",
-      "AI-powered CV tailoring",
-      "Personal information masking",
-      "PDF export",
-      "Priority support",
-      "Advanced AI features",
-      "Custom integrations",
-    ],
-    uiCvLimit: 999999,
-    apiAccess: true,
-    apiLimit: 500,
-    badge: "Best Value",
-  },
-  {
-    id: "lifetime",
-    name: "Lifetime",
-    icon: <Infinity className="h-6 w-6" />,
-    price: "$299",
-    period: "one-time",
-    description: "Limited time offer - Pay once, use forever",
-    features: [
-      "Unlimited CV generations",
-      "Full API access",
-      "1000 API calls per month",
-      "AI-powered CV tailoring",
-      "Personal information masking",
-      "PDF export",
-      "Priority support",
-      "Advanced AI features",
-      "Custom integrations",
-      "Lifetime updates",
-      "No recurring fees",
-    ],
-    uiCvLimit: 999999,
-    apiAccess: true,
-    apiLimit: 1000,
-    badge: "Limited Time",
-  },
-];
 
 export default function PlansPage() {
   const { user } = useAuth();
   const router = useRouter();
-  const databaseService = useDatabase();
   const { toast } = useToast();
 
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [plans, setPlans] = useState<PlanDisplay[]>([]);
+  const [currentSubscription, setCurrentSubscription] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (databaseService) {
-      loadProfile();
+    if (!user) {
+      router.push("/login");
+      return;
     }
-  }, [databaseService]);
+    loadData();
+  }, [user]);
 
-  const loadProfile = async () => {
+  const loadData = async () => {
     try {
       setLoading(true);
-      const userProfile = await databaseService!.getUserProfile(user);
-      setProfile(userProfile);
-    } catch (error) {
-      console.error("Error loading profile:", error);
+
+      // Load plans from backend
+      const backendPlans = await subscriptionService.getAllPlans();
+
+      // Transform backend plans to display format
+      const displayPlans: PlanDisplay[] = backendPlans.map((plan) => ({
+        ...plan,
+        icon: getPlanIcon(plan.name),
+        features: getPlanFeatures(plan),
+        popular: plan.name.toLowerCase().includes("premium"),
+        badge: plan.name.toLowerCase().includes("lifetime")
+          ? "Limited Time"
+          : undefined,
+      }));
+
+      setPlans(displayPlans);
+
+      // Load current subscription
+      try {
+        const subscription =
+          await subscriptionService.getMyActiveSubscription();
+        setCurrentSubscription(subscription);
+      } catch (error) {
+        // No active subscription
+        setCurrentSubscription(null);
+      }
+    } catch (error: any) {
+      console.error("Error loading plans:", error);
       toast({
         title: "Error",
-        description: "Failed to load profile",
+        description: error.message || "Failed to load subscription plans",
         variant: "destructive",
       });
     } finally {
@@ -165,12 +93,60 @@ export default function PlansPage() {
     }
   };
 
-  const handleSelectPlan = (planId: string) => {
-    toast({
-      title: "Coming Soon",
-      description:
-        "Payment integration will be available soon. Please contact support to upgrade your plan.",
-    });
+  const handleSelectPlan = (planId: number) => {
+    router.push(`/dashboard/checkout?planId=${planId}`);
+  };
+
+  const getPlanIcon = (planName: string): React.ReactNode => {
+    const name = planName.toLowerCase();
+    if (name.includes("free") || name.includes("basic")) {
+      return <FileText className="h-6 w-6" />;
+    } else if (name.includes("premium") || name.includes("pro")) {
+      return <Zap className="h-6 w-6" />;
+    } else if (name.includes("enterprise") || name.includes("business")) {
+      return <Crown className="h-6 w-6" />;
+    } else if (name.includes("lifetime") || name.includes("unlimited")) {
+      return <Infinity className="h-6 w-6" />;
+    }
+    return <Rocket className="h-6 w-6" />;
+  };
+
+  const getPlanFeatures = (plan: SubscriptionPlan): string[] => {
+    const features: string[] = [];
+
+    // CV Limit
+    if (plan.cvLimit === null) {
+      features.push("Unlimited CV generations");
+    } else {
+      features.push(`${plan.cvLimit} CV generations per month`);
+    }
+
+    // API Access
+    if (plan.apiLimit !== null && plan.apiLimit > 0) {
+      features.push("Full API access");
+      features.push(`${plan.apiLimit} API calls per month`);
+    }
+
+    // Standard features
+    features.push("AI-powered CV tailoring");
+    features.push("Personal information masking");
+    features.push("PDF export");
+
+    // Watermark
+    if (!plan.watermark) {
+      features.push("No watermark");
+    }
+
+    // Dashboard access
+    if (plan.dashboard) {
+      features.push("Dashboard access");
+      features.push("Priority support");
+      features.push("Advanced AI features");
+    } else {
+      features.push("Basic support");
+    }
+
+    return features;
   };
 
   if (loading) {
@@ -181,7 +157,7 @@ export default function PlansPage() {
     );
   }
 
-  const currentPlan = profile?.plan || "free";
+  const currentPlanId = currentSubscription?.planId;
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">
@@ -208,11 +184,13 @@ export default function PlansPage() {
       </div>
 
       {/* Current Plan Badge */}
-      {profile && (
+      {currentSubscription && (
         <div className="text-center mb-8">
           <Badge className="bg-blue-100 text-blue-800 px-4 py-2 text-sm">
             Current Plan:{" "}
-            <span className="font-bold ml-1 capitalize">{currentPlan}</span>
+            <span className="font-bold ml-1 capitalize">
+              {plans.find((p) => p.id === currentPlanId)?.name || "Active"}
+            </span>
           </Badge>
         </div>
       )}
@@ -220,12 +198,8 @@ export default function PlansPage() {
       {/* Plans Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         {plans.map((plan) => {
-          const isCurrentPlan = currentPlan === plan.id;
-          const isPremiumOrHigher = [
-            "premium",
-            "enterprise",
-            "lifetime",
-          ].includes(plan.id);
+          const isCurrentPlan = currentPlanId === plan.id;
+          const isPremiumPlan = plan.dashboard;
 
           return (
             <Card
@@ -250,11 +224,11 @@ export default function PlansPage() {
                 <div className="flex justify-center mb-4">
                   <div
                     className={`p-3 rounded-full ${
-                      plan.id === "free"
+                      plan.name.toLowerCase().includes("free")
                         ? "bg-gray-100 text-gray-600"
-                        : plan.id === "premium"
+                        : plan.name.toLowerCase().includes("premium")
                         ? "bg-blue-100 text-blue-600"
-                        : plan.id === "enterprise"
+                        : plan.name.toLowerCase().includes("enterprise")
                         ? "bg-purple-100 text-purple-600"
                         : "bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-600"
                     }`}
@@ -264,8 +238,10 @@ export default function PlansPage() {
                 </div>
                 <CardTitle className="text-2xl mb-2">{plan.name}</CardTitle>
                 <div className="mb-2">
-                  <span className="text-4xl font-bold">{plan.price}</span>
-                  <span className="text-gray-600 ml-2">/ {plan.period}</span>
+                  <span className="text-4xl font-bold">
+                    ${parseFloat(plan.monthlyPrice).toFixed(2)}
+                  </span>
+                  <span className="text-gray-600 ml-2">/ month</span>
                 </div>
                 <CardDescription>{plan.description}</CardDescription>
               </CardHeader>
@@ -286,7 +262,7 @@ export default function PlansPage() {
                   className={`w-full ${
                     isCurrentPlan
                       ? "bg-green-600 hover:bg-green-600"
-                      : isPremiumOrHigher
+                      : isPremiumPlan
                       ? "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                       : "bg-gray-600 hover:bg-gray-700"
                   }`}
@@ -299,7 +275,7 @@ export default function PlansPage() {
                   ) : (
                     <>
                       <Rocket className="mr-2 h-4 w-4" />
-                      {plan.id === "free" ? "Downgrade" : "Upgrade"}
+                      Select Plan
                     </>
                   )}
                 </Button>
