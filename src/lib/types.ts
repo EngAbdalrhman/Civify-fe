@@ -7,11 +7,8 @@ export interface UserProfile {
   experience: string;
   education: string;
   skills: string;
-  // License management fields
+  // Admin and API fields
   isAdmin?: boolean;
-  isLicensed?: boolean;
-  licenseKey?: string;
-  licenseActivatedAt?: string;
   apiKeyHash?: string;
   apiUsage?: {
     month: string; // Format: YYYY-MM
@@ -205,16 +202,15 @@ export interface FormData {
   generateCoverLetter: boolean;
 }
 
-// License Management Types
-export interface LicenseKey {
+// Subscription Management Types (replacing license system)
+export interface Subscription {
   id: string;
-  key: string; // Format: HICV-XXXX-XXXX-XXXX
-  createdAt: string;
-  createdBy: string; // Admin user ID
-  activatedBy?: string; // User ID who activated the license
-  activatedAt?: string;
-  isActive: boolean;
-  notes?: string; // Optional notes for the license
+  userId: string;
+  planId: string;
+  status: "active" | "cancelled" | "expired";
+  startDate: string;
+  endDate?: string;
+  autoRenew: boolean;
 }
 
 export interface ApiKey {
@@ -237,10 +233,9 @@ export interface ApiUsageLog {
 
 export interface AdminStats {
   totalUsers: number;
-  licensedUsers: number;
+  subscribedUsers: number;
   totalCVs: number;
   totalApiCalls: number;
   apiCallsThisMonth: number;
-  activeLicenses: number;
-  unusedLicenses: number;
+  activeSubscriptions: number;
 }

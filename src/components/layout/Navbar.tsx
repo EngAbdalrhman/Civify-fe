@@ -34,7 +34,6 @@ interface NavbarProps {
   userProfile?: {
     name?: string;
     email?: string;
-    isLicensed?: boolean;
     isAdmin?: boolean;
     plan?: string;
   } | null;
@@ -109,37 +108,45 @@ export function Navbar({ userProfile }: NavbarProps) {
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center gap-4">
-            {/* API Management Dropdown for Licensed Users */}
-            {userProfile?.isLicensed && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="text-gray-700 hover:text-gray-900"
-                  >
-                    <Key className="h-4 w-4 mr-2" />
-                    API Management
-                    <ChevronDown className="h-4 w-4 ml-1" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <DropdownMenuItem
-                    onClick={() => router.push("/dashboard/api-keys")}
-                    className="cursor-pointer"
-                  >
-                    <Key className="mr-2 h-4 w-4" />
-                    <span>API Keys</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => router.push("/dashboard/api-logs")}
-                    className="cursor-pointer"
-                  >
-                    <FileText className="mr-2 h-4 w-4" />
-                    <span>API Logs</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+            {/* API Management Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="text-gray-700 hover:text-gray-900"
+                >
+                  <Key className="h-4 w-4 mr-2" />
+                  API Management
+                  <ChevronDown className="h-4 w-4 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem
+                  onClick={() => router.push("/dashboard/api-keys")}
+                  className="cursor-pointer"
+                >
+                  <Key className="mr-2 h-4 w-4" />
+                  <span>API Keys</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => router.push("/dashboard/api-logs")}
+                  className="cursor-pointer"
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  <span>API Logs</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Subscription Plans Button */}
+            <Button
+              variant="outline"
+              onClick={() => router.push("/dashboard/plans")}
+              className="flex items-center gap-2 border-purple-500 text-purple-600 hover:bg-purple-50"
+            >
+              <CreditCard className="h-4 w-4" />
+              Plans
+            </Button>
 
             {userProfile?.isAdmin && (
               <Button
@@ -149,18 +156,6 @@ export function Navbar({ userProfile }: NavbarProps) {
               >
                 <Shield className="h-4 w-4 mr-2" />
                 Admin
-              </Button>
-            )}
-
-            {/* License Activation Button for Non-Licensed Users */}
-            {!userProfile?.isLicensed && (
-              <Button
-                variant="outline"
-                onClick={() => router.push("/dashboard/license")}
-                className="flex items-center gap-2 border-purple-500 text-purple-600 hover:bg-purple-50"
-              >
-                <Key className="h-4 w-4" />
-                Activate License
               </Button>
             )}
           </div>

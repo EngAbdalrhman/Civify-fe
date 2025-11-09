@@ -28,7 +28,7 @@ import {
   CheckCircle,
   BarChart3,
 } from "lucide-react";
-import { generateApiKey, hashApiKey, maskApiKey } from "@/lib/utils/license";
+import { generateApiKey, hashApiKey, maskApiKey } from "@/lib/utils/api-keys";
 import { ApiKey } from "@/lib/types";
 import {
   AlertDialog,
@@ -49,7 +49,6 @@ export default function ApiKeysPage() {
   const { toast } = useToast();
 
   const [loading, setLoading] = useState(true);
-  const [isLicensed, setIsLicensed] = useState(false);
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [generating, setGenerating] = useState(false);
   const [newApiKey, setNewApiKey] = useState<string | null>(null);
@@ -80,17 +79,6 @@ export default function ApiKeysPage() {
         database.getApiUsageThisMonth(),
       ]);
 
-      if (!profile?.isLicensed) {
-        toast({
-          variant: "destructive",
-          title: "License Required",
-          description: "You need an active license to manage API keys.",
-        });
-        router.push("/dashboard/license");
-        return;
-      }
-
-      setIsLicensed(true);
       setApiKeys(keys);
       setApiUsage(usage);
       setApiLimit(profile.apiRateLimit || 500);
@@ -184,10 +172,6 @@ export default function ApiKeysPage() {
 
   if (loading) {
     return <Loader message="Loading API keys..." />;
-  }
-
-  if (!isLicensed) {
-    return null;
   }
 
   const activeKeys = apiKeys.filter((k) => k.isActive);

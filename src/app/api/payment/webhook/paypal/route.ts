@@ -1,44 +1,55 @@
 /**
  * PayPal Webhook Handler
- * 
+ *
  * Handles payment notifications from PayPal
- * 
+ *
  * IMPORTANT: This is READY but DISABLED by default.
  * Enable by setting NEXT_PUBLIC_PAYPAL_ENABLED=true
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getPayPalService } from '@/lib/services/paypal';
-import { databases, DATABASE_ID, USERS_COLLECTION_ID } from '@/lib/appwrite-server';
-import { getEmailService } from '@/lib/services/email';
-import { emailTemplates } from '@/lib/services/email-templates';
+import { NextRequest, NextResponse } from "next/server";
+import { getPayPalService } from "@/lib/services/paypal";
+import {
+  databases,
+  DATABASE_ID,
+  USERS_COLLECTION_ID,
+} from "@/lib/appwrite-server";
+import { getEmailService } from "@/lib/services/email";
+import { emailTemplates } from "@/lib/services/email-templates";
 
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
     const headers = {
-      'paypal-transmission-id': request.headers.get('paypal-transmission-id') || '',
-      'paypal-transmission-time': request.headers.get('paypal-transmission-time') || '',
-      'paypal-cert-url': request.headers.get('paypal-cert-url') || '',
-      'paypal-auth-algo': request.headers.get('paypal-auth-algo') || '',
-      'paypal-transmission-sig': request.headers.get('paypal-transmission-sig') || '',
+      "paypal-transmission-id":
+        request.headers.get("paypal-transmission-id") || "",
+      "paypal-transmission-time":
+        request.headers.get("paypal-transmission-time") || "",
+      "paypal-cert-url": request.headers.get("paypal-cert-url") || "",
+      "paypal-auth-algo": request.headers.get("paypal-auth-algo") || "",
+      "paypal-transmission-sig":
+        request.headers.get("paypal-transmission-sig") || "",
     };
 
-    console.log('PayPal webhook received:', {
+    console.log("PayPal webhook received:", {
       eventType: data.event_type,
-      hasHeaders: !!headers['paypal-transmission-id'],
+      hasHeaders: !!headers["paypal-transmission-id"],
     });
 
     // Verify webhook signature (optional but recommended)
     const webhookId = process.env.PAYPAL_WEBHOOK_ID;
     if (webhookId) {
       const paypalService = getPayPalService();
-      const isValid = await paypalService.verifyWebhookSignature(webhookId, headers, data);
+      const isValid = await paypalService.verifyWebhookSignature(
+        webhookId,
+        headers,
+        data
+      );
 
       if (!isValid) {
-        console.error('Invalid PayPal webhook signature');
+        console.error("Invalid PayPal webhook signature");
         return NextResponse.json(
-          { error: 'Invalid signature' },
+          { error: "Invalid signature" },
           { status: 401 }
         );
       }
@@ -48,7 +59,7 @@ export async function POST(request: NextRequest) {
     const paypalService = getPayPalService();
     const webhookData = paypalService.processWebhook(data);
 
-    console.log('PayPal webhook processed:', webhookData);
+    console.log("PayPal webhook processed:", webhookData);
 
     // Check if payment was completed
     if (webhookData.success && webhookData.userId && webhookData.planId) {
@@ -60,24 +71,24 @@ export async function POST(request: NextRequest) {
           webhookData.userId,
           {
             plan: webhookData.planId,
-            isLicensed: webhookData.planId === 'enterprise' || webhookData.planId === 'lifetime',
             // Update limits based on plan
             uiCvLimit:
-              webhookData.planId === 'premium'
+              webhookData.planId === "premium"
                 ? 50
-                : webhookData.planId === 'enterprise' || webhookData.planId === 'lifetime'
+                : webhookData.planId === "enterprise" ||
+                  webhookData.planId === "lifetime"
                 ? 999999
                 : 5,
             apiRateLimit:
-              webhookData.planId === 'enterprise'
+              webhookData.planId === "enterprise"
                 ? 500
-                : webhookData.planId === 'lifetime'
+                : webhookData.planId === "lifetime"
                 ? 1000
                 : 0,
           }
         );
 
-        console.log('User plan updated:', {
+        console.log("User plan updated:", {
           userId: webhookData.userId,
           plan: webhookData.planId,
         });
@@ -96,39 +107,43 @@ export async function POST(request: NextRequest) {
 
           await emailService.sendEmail({
             to: userDoc.email,
-            ...emailTemplates.planUpgrade(userDoc.name || 'User', webhookData.planId, planFeatures),
+            ...emailTemplates.planUpgrade(
+              userDoc.name || "User",
+              webhookData.planId,
+              planFeatures
+            ),
           });
 
-          console.log('Confirmation email sent to:', userDoc.email);
+          console.log("Confirmation email sent to:", userDoc.email);
         } catch (emailError) {
-          console.error('Failed to send confirmation email:', emailError);
+          console.error("Failed to send confirmation email:", emailError);
           // Don't fail the webhook if email fails
         }
 
         return NextResponse.json({
           success: true,
-          message: 'Payment processed successfully',
+          message: "Payment processed successfully",
         });
       } catch (dbError) {
-        console.error('Database update error:', dbError);
+        console.error("Database update error:", dbError);
         return NextResponse.json(
-          { error: 'Failed to update user plan' },
+          { error: "Failed to update user plan" },
           { status: 500 }
         );
       }
     }
 
     // Payment not successful or missing data
-    console.log('Payment not completed or missing data:', webhookData);
+    console.log("Payment not completed or missing data:", webhookData);
 
     return NextResponse.json({
       success: false,
-      message: 'Payment not completed',
+      message: "Payment not completed",
     });
   } catch (error: any) {
-    console.error('PayPal webhook error:', error);
+    console.error("PayPal webhook error:", error);
     return NextResponse.json(
-      { error: 'Webhook processing failed' },
+      { error: "Webhook processing failed" },
       { status: 500 }
     );
   }
@@ -138,33 +153,32 @@ export async function POST(request: NextRequest) {
 function getPlanFeatures(planId: string): string[] {
   const features: Record<string, string[]> = {
     premium: [
-      '50 CV generations per month',
-      'AI-powered CV tailoring',
-      'Personal information masking',
-      'Priority support',
-      'Advanced features',
+      "50 CV generations per month",
+      "AI-powered CV tailoring",
+      "Personal information masking",
+      "Priority support",
+      "Advanced features",
     ],
     enterprise: [
-      'Unlimited CV generations',
-      'Full API access (500 calls/month)',
-      'AI-powered CV tailoring',
-      'Personal information masking',
-      'Priority support',
-      'Advanced features',
-      'Dedicated account manager',
+      "Unlimited CV generations",
+      "Full API access (500 calls/month)",
+      "AI-powered CV tailoring",
+      "Personal information masking",
+      "Priority support",
+      "Advanced features",
+      "Dedicated account manager",
     ],
     lifetime: [
-      'Unlimited CV generations',
-      'Full API access (1000 calls/month)',
-      'AI-powered CV tailoring',
-      'Personal information masking',
-      'Priority support',
-      'Advanced features',
-      'Lifetime updates',
-      'No recurring fees',
+      "Unlimited CV generations",
+      "Full API access (1000 calls/month)",
+      "AI-powered CV tailoring",
+      "Personal information masking",
+      "Priority support",
+      "Advanced features",
+      "Lifetime updates",
+      "No recurring fees",
     ],
   };
 
   return features[planId] || [];
 }
-

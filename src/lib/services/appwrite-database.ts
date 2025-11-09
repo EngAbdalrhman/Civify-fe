@@ -17,8 +17,6 @@ const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!;
 const USERS_COLLECTION_ID =
   process.env.NEXT_PUBLIC_APPWRITE_USERS_COLLECTION_ID!;
 const CVS_COLLECTION_ID = process.env.NEXT_PUBLIC_APPWRITE_CVS_COLLECTION_ID!;
-const LICENSES_COLLECTION_ID =
-  process.env.NEXT_PUBLIC_APPWRITE_LICENSES_COLLECTION_ID!;
 const API_KEYS_COLLECTION_ID =
   process.env.NEXT_PUBLIC_APPWRITE_API_KEYS_COLLECTION_ID!;
 const API_USAGE_LOGS_COLLECTION_ID =
@@ -86,7 +84,6 @@ export class AppwriteDatabaseService {
               education: "",
               skills: "",
               isAdmin: isAdminUser,
-              isLicensed: false,
               cvCount: 0,
               cvLimit: isAdminUser ? 100 : DEFAULT_CV_LIMIT, // Give admin higher limit (deprecated)
               apiUsageCount: 0,
@@ -453,74 +450,6 @@ export class AppwriteDatabaseService {
       );
     } catch (error) {
       console.error("Error updating CV count:", error);
-    }
-  }
-
-  // ==================== LICENSE METHODS ====================
-
-  /**
-   * Activate license key
-   */
-  async activateLicense(licenseKey: string): Promise<boolean> {
-    try {
-      // Find license by key
-      const response = await databases.listDocuments(
-        DATABASE_ID,
-        LICENSES_COLLECTION_ID,
-        [Query.equal("key", licenseKey)]
-      );
-
-      if (response.documents.length === 0) {
-        throw new Error("Invalid license key");
-      }
-
-      const license = response.documents[0];
-
-      // Check if already activated
-      if (license.activatedBy) {
-        throw new Error("This license key has already been activated");
-      }
-
-      // Check if active
-      if (!license.isActive) {
-        throw new Error("This license key has been deactivated");
-      }
-
-      // Activate license
-      await databases.updateDocument(
-        DATABASE_ID,
-        LICENSES_COLLECTION_ID,
-        license.$id,
-        {
-          activatedBy: this.userId,
-          activatedAt: new Date().toISOString(),
-        }
-      );
-
-      // Update user profile
-      await this.updateUserProfile({
-        isLicensed: true,
-        licenseKey: licenseKey,
-        licenseActivatedAt: new Date().toISOString(),
-      });
-
-      return true;
-    } catch (error) {
-      console.error("Error activating license:", error);
-      throw error;
-    }
-  }
-
-  /**
-   * Check license status
-   */
-  async checkLicenseStatus(): Promise<boolean> {
-    try {
-      const profile = await this.getUserProfile();
-      return profile.isLicensed || false;
-    } catch (error) {
-      console.error("Error checking license status:", error);
-      return false;
     }
   }
 
@@ -897,9 +826,6 @@ export class AppwriteDatabaseService {
       education: doc.education || "",
       skills: doc.skills || "",
       isAdmin: doc.isAdmin || false,
-      isLicensed: doc.isLicensed || false,
-      licenseKey: doc.licenseKey,
-      licenseActivatedAt: doc.licenseActivatedAt,
       apiKeyHash: doc.apiKeyHash,
       apiUsage: doc.apiUsageMonth
         ? {

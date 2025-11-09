@@ -1,18 +1,14 @@
 "use client";
 
 import { databases } from "@/lib/appwrite";
-import { ID, Query } from "appwrite";
-import type { LicenseKey, UserProfile, AdminStats } from "@/lib/types";
+import { Query } from "appwrite";
+import type { UserProfile, AdminStats } from "@/lib/types";
 
 // Environment variables
 const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!;
 const USERS_COLLECTION_ID =
   process.env.NEXT_PUBLIC_APPWRITE_USERS_COLLECTION_ID!;
 const CVS_COLLECTION_ID = process.env.NEXT_PUBLIC_APPWRITE_CVS_COLLECTION_ID!;
-const LICENSES_COLLECTION_ID =
-  process.env.NEXT_PUBLIC_APPWRITE_LICENSES_COLLECTION_ID!;
-const API_KEYS_COLLECTION_ID =
-  process.env.NEXT_PUBLIC_APPWRITE_API_KEYS_COLLECTION_ID!;
 const API_USAGE_LOGS_COLLECTION_ID =
   process.env.NEXT_PUBLIC_APPWRITE_API_USAGE_LOGS_COLLECTION_ID!;
 
@@ -21,110 +17,6 @@ const API_USAGE_LOGS_COLLECTION_ID =
  * Admin-specific database operations
  */
 export class AppwriteAdminDatabaseService {
-  // ==================== LICENSE MANAGEMENT ====================
-
-  /**
-   * Create a new license key
-   */
-  async createLicenseKey(licenseKey: Omit<LicenseKey, "id">): Promise<string> {
-    try {
-      const doc = await databases.createDocument(
-        DATABASE_ID,
-        LICENSES_COLLECTION_ID,
-        ID.unique(),
-        {
-          key: licenseKey.key,
-          createdAt: licenseKey.createdAt, // Manual timestamp for admin tracking
-          createdBy: licenseKey.createdBy,
-          isActive: licenseKey.isActive,
-          notes: (licenseKey as any).notes || "",
-        }
-      );
-
-      return doc.$id;
-    } catch (error) {
-      console.error("Error creating license key:", error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get all license keys
-   */
-  async getAllLicenses(): Promise<LicenseKey[]> {
-    try {
-      const response = await databases.listDocuments(
-        DATABASE_ID,
-        LICENSES_COLLECTION_ID,
-        [Query.orderDesc("$createdAt"), Query.limit(1000)]
-      );
-
-      return response.documents.map((doc: any) => ({
-        id: doc.$id,
-        key: doc.key,
-        createdAt: doc.createdAt, // Manual field set by admin
-        createdBy: doc.createdBy,
-        activatedBy: doc.activatedBy,
-        activatedAt: doc.activatedAt,
-        isActive: doc.isActive,
-        notes: doc.notes,
-      }));
-    } catch (error) {
-      console.error("Error getting licenses:", error);
-      return [];
-    }
-  }
-
-  /**
-   * Revoke a license
-   */
-  async revokeLicense(licenseId: string): Promise<void> {
-    try {
-      await databases.updateDocument(
-        DATABASE_ID,
-        LICENSES_COLLECTION_ID,
-        licenseId,
-        { isActive: false }
-      );
-    } catch (error) {
-      console.error("Error revoking license:", error);
-      throw error;
-    }
-  }
-
-  /**
-   * Activate a license
-   */
-  async activateLicense(licenseId: string): Promise<void> {
-    try {
-      await databases.updateDocument(
-        DATABASE_ID,
-        LICENSES_COLLECTION_ID,
-        licenseId,
-        { isActive: true }
-      );
-    } catch (error) {
-      console.error("Error activating license:", error);
-      throw error;
-    }
-  }
-
-  /**
-   * Delete a license
-   */
-  async deleteLicense(licenseId: string): Promise<void> {
-    try {
-      await databases.deleteDocument(
-        DATABASE_ID,
-        LICENSES_COLLECTION_ID,
-        licenseId
-      );
-    } catch (error) {
-      console.error("Error deleting license:", error);
-      throw error;
-    }
-  }
-
   // ==================== USER MANAGEMENT ====================
 
   /**
@@ -148,9 +40,6 @@ export class AppwriteAdminDatabaseService {
         education: doc.education || "",
         skills: doc.skills || "",
         isAdmin: doc.isAdmin || false,
-        isLicensed: doc.isLicensed || false,
-        licenseKey: doc.licenseKey,
-        licenseActivatedAt: doc.licenseActivatedAt,
         apiKeyHash: doc.apiKeyHash,
         apiUsage: doc.apiUsageMonth
           ? {
@@ -187,9 +76,6 @@ export class AppwriteAdminDatabaseService {
         education: doc.education || "",
         skills: doc.skills || "",
         isAdmin: doc.isAdmin || false,
-        isLicensed: doc.isLicensed || false,
-        licenseKey: doc.licenseKey,
-        licenseActivatedAt: doc.licenseActivatedAt,
         apiKeyHash: doc.apiKeyHash,
         apiUsage: doc.apiUsageMonth
           ? {
@@ -206,50 +92,6 @@ export class AppwriteAdminDatabaseService {
     } catch (error) {
       console.error("Error getting user:", error);
       return null;
-    }
-  }
-
-  /**
-   * Grant license to user
-   */
-  async grantLicense(userId: string, licenseKey: string): Promise<void> {
-    try {
-      await databases.updateDocument(
-        DATABASE_ID,
-        USERS_COLLECTION_ID,
-        userId, // Document ID is the Firebase userId
-        {
-          isLicensed: true,
-          licenseKey: licenseKey,
-          licenseActivatedAt: new Date().toISOString(),
-          // $updatedAt is auto-generated by Appwrite
-        }
-      );
-    } catch (error) {
-      console.error("Error granting license:", error);
-      throw error;
-    }
-  }
-
-  /**
-   * Revoke license from user
-   */
-  async revokeLicenseFromUser(userId: string): Promise<void> {
-    try {
-      await databases.updateDocument(
-        DATABASE_ID,
-        USERS_COLLECTION_ID,
-        userId, // Document ID is the Firebase userId
-        {
-          isLicensed: false,
-          licenseKey: null,
-          licenseActivatedAt: null,
-          // $updatedAt is auto-generated by Appwrite
-        }
-      );
-    } catch (error) {
-      console.error("Error revoking license from user:", error);
-      throw error;
     }
   }
 
@@ -356,14 +198,11 @@ export class AppwriteAdminDatabaseService {
    */
   async getAdminStats(): Promise<AdminStats> {
     try {
-      const [users, cvs, licenses, apiLogs] = await Promise.all([
+      const [users, cvs, apiLogs] = await Promise.all([
         databases.listDocuments(DATABASE_ID, USERS_COLLECTION_ID, [
           Query.limit(10000),
         ]),
         databases.listDocuments(DATABASE_ID, CVS_COLLECTION_ID, [
-          Query.limit(10000),
-        ]),
-        databases.listDocuments(DATABASE_ID, LICENSES_COLLECTION_ID, [
           Query.limit(10000),
         ]),
         databases.listDocuments(DATABASE_ID, API_USAGE_LOGS_COLLECTION_ID, [
@@ -376,26 +215,21 @@ export class AppwriteAdminDatabaseService {
         (log: any) => log.month === currentMonth
       ).length;
 
-      const licensedUsers = users.documents.filter(
-        (user: any) => user.isLicensed
+      // Count users with active subscriptions (placeholder - will be replaced with backend subscription data)
+      const subscribedUsers = users.documents.filter(
+        (user: any) => user.plan && user.plan !== "free"
       ).length;
 
-      const activeLicenses = licenses.documents.filter(
-        (license: any) => license.isActive && license.activatedBy
-      ).length;
-
-      const unusedLicenses = licenses.documents.filter(
-        (license: any) => license.isActive && !license.activatedBy
-      ).length;
+      // Count active subscriptions (placeholder - will be replaced with backend subscription data)
+      const activeSubscriptions = subscribedUsers;
 
       return {
         totalUsers: users.total,
-        licensedUsers,
+        subscribedUsers,
         totalCVs: cvs.total,
         totalApiCalls: apiLogs.total,
         apiCallsThisMonth,
-        activeLicenses,
-        unusedLicenses,
+        activeSubscriptions,
       };
     } catch (error) {
       console.error("Error getting admin stats:", error);

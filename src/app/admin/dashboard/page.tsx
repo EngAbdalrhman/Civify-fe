@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { AppwriteAdminDatabaseService } from "@/lib/services/appwrite-admin-database";
-import { generateLicenseKey } from "@/lib/utils/license";
 import {
   Card,
   CardContent,
@@ -25,18 +24,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Loader } from "@/components/app/Loader";
-import {
-  Users,
-  Key,
-  BarChart3,
-  Shield,
-  Plus,
-  Trash2,
-  CheckCircle,
-  XCircle,
-  Copy,
-} from "lucide-react";
-import type { LicenseKey, UserProfile, AdminStats } from "@/lib/types";
+import { Users, BarChart3, Shield, CreditCard } from "lucide-react";
+import type { UserProfile, AdminStats } from "@/lib/types";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -45,7 +34,6 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [stats, setStats] = useState<AdminStats | null>(null);
-  const [licenses, setLicenses] = useState<LicenseKey[]>([]);
   const [users, setUsers] = useState<Array<UserProfile & { userId: string }>>(
     []
   );
@@ -95,14 +83,12 @@ export default function AdminDashboard() {
 
   const loadAdminData = async () => {
     try {
-      const [statsData, licensesData, usersData] = await Promise.all([
+      const [statsData, usersData] = await Promise.all([
         adminService.getAdminStats(),
-        adminService.getAllLicenses(),
         adminService.getAllUsers(),
       ]);
 
       setStats(statsData);
-      setLicenses(licensesData);
       setUsers(usersData);
     } catch (error) {
       console.error("Error loading admin data:", error);
@@ -110,125 +96,6 @@ export default function AdminDashboard() {
         variant: "destructive",
         title: "Error",
         description: "Failed to load admin data.",
-      });
-    }
-  };
-
-  const handleGenerateLicense = async () => {
-    try {
-      const key = generateLicenseKey();
-      const licenseId = await adminService.createLicenseKey({
-        key,
-        createdAt: new Date().toISOString(),
-        createdBy: user!.uid,
-        isActive: true,
-      });
-
-      toast({
-        title: "License Key Generated",
-        description: `New license key: ${key}`,
-      });
-
-      await loadAdminData();
-    } catch (error) {
-      console.error("Error generating license:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to generate license key.",
-      });
-    }
-  };
-
-  const handleCopyLicense = (key: string) => {
-    navigator.clipboard.writeText(key);
-    toast({
-      title: "Copied",
-      description: "License key copied to clipboard.",
-    });
-  };
-
-  const handleRevokeLicense = async (licenseId: string) => {
-    try {
-      await adminService.revokeLicense(licenseId);
-      toast({
-        title: "License Revoked",
-        description: "License key has been deactivated.",
-      });
-      await loadAdminData();
-    } catch (error) {
-      console.error("Error revoking license:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to revoke license.",
-      });
-    }
-  };
-
-  const handleDeleteLicense = async (licenseId: string) => {
-    try {
-      await adminService.deleteLicense(licenseId);
-      toast({
-        title: "License Deleted",
-        description: "License key has been permanently deleted.",
-      });
-      await loadAdminData();
-    } catch (error) {
-      console.error("Error deleting license:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete license.",
-      });
-    }
-  };
-
-  const handleGrantLicense = async (userId: string) => {
-    try {
-      // Generate a new license key
-      const licenseKey = generateLicenseKey();
-
-      // Create the license in the database
-      await adminService.createLicenseKey({
-        key: licenseKey,
-        createdAt: new Date().toISOString(),
-        createdBy: user?.uid || "",
-        isActive: true,
-      });
-
-      // Grant it to the user
-      await adminService.grantLicense(userId, licenseKey);
-
-      toast({
-        title: "License Granted",
-        description: `User has been granted license: ${licenseKey}`,
-      });
-      await loadAdminData();
-    } catch (error) {
-      console.error("Error granting license:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to grant license.",
-      });
-    }
-  };
-
-  const handleRevokeLicenseFromUser = async (userId: string) => {
-    try {
-      await adminService.revokeLicenseFromUser(userId);
-      toast({
-        title: "License Revoked",
-        description: "User license has been revoked.",
-      });
-      await loadAdminData();
-    } catch (error) {
-      console.error("Error revoking user license:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to revoke user license.",
       });
     }
   };
@@ -253,7 +120,7 @@ export default function AdminDashboard() {
                 Admin Dashboard
               </h1>
               <p className="text-gray-600 mt-2">
-                Manage users, licenses, and system statistics
+                Manage users, subscriptions, and system statistics
               </p>
             </div>
             <Button onClick={() => router.push("/")}>Back to App</Button>
@@ -273,7 +140,7 @@ export default function AdminDashboard() {
               <CardContent>
                 <div className="text-2xl font-bold">{stats.totalUsers}</div>
                 <p className="text-xs text-muted-foreground">
-                  {stats.licensedUsers} licensed
+                  {stats.subscribedUsers} subscribed
                 </p>
               </CardContent>
             </Card>
@@ -294,7 +161,7 @@ export default function AdminDashboard() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">API Calls</CardTitle>
-                <Key className="h-4 w-4 text-muted-foreground" />
+                <BarChart3 className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -309,14 +176,16 @@ export default function AdminDashboard() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  License Keys
+                  Subscriptions
                 </CardTitle>
-                <Shield className="h-4 w-4 text-muted-foreground" />
+                <CreditCard className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.activeLicenses}</div>
+                <div className="text-2xl font-bold">
+                  {stats.activeSubscriptions}
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  {stats.unusedLicenses} unused
+                  Active subscriptions
                 </p>
               </CardContent>
             </Card>
@@ -327,7 +196,6 @@ export default function AdminDashboard() {
         <Tabs defaultValue="users" className="space-y-4">
           <TabsList>
             <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="licenses">License Keys</TabsTrigger>
             <TabsTrigger value="cv-limits">CV Limits</TabsTrigger>
             <TabsTrigger value="api-limits">API Rate Limits</TabsTrigger>
           </TabsList>
@@ -338,7 +206,7 @@ export default function AdminDashboard() {
               <CardHeader>
                 <CardTitle>User Management</CardTitle>
                 <CardDescription>
-                  Manage user accounts and license status
+                  Manage user accounts and subscription status
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -347,9 +215,9 @@ export default function AdminDashboard() {
                     <TableRow>
                       <TableHead>Email</TableHead>
                       <TableHead>Name</TableHead>
-                      <TableHead>License Status</TableHead>
+                      <TableHead>Plan</TableHead>
                       <TableHead>CVs Saved</TableHead>
-                      <TableHead>Actions</TableHead>
+                      <TableHead>Admin</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -360,126 +228,25 @@ export default function AdminDashboard() {
                         </TableCell>
                         <TableCell>{user.name || "N/A"}</TableCell>
                         <TableCell>
-                          {user.isLicensed ? (
-                            <Badge className="bg-green-500">
-                              <CheckCircle className="h-3 w-3 mr-1" />
-                              Licensed
-                            </Badge>
+                          <Badge
+                            className={
+                              user.plan === "free"
+                                ? "bg-gray-500"
+                                : "bg-green-500"
+                            }
+                          >
+                            {user.plan || "free"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {user.cvCount || 0}/{user.cvLimit || 3}
+                        </TableCell>
+                        <TableCell>
+                          {user.isAdmin ? (
+                            <Badge className="bg-blue-500">Admin</Badge>
                           ) : (
-                            <Badge variant="secondary">
-                              <XCircle className="h-3 w-3 mr-1" />
-                              Unlicensed
-                            </Badge>
+                            <Badge variant="secondary">User</Badge>
                           )}
-                        </TableCell>
-                        <TableCell>{user.cvCount || 0}/3</TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            {user.isLicensed ? (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() =>
-                                  handleRevokeLicenseFromUser(user.userId)
-                                }
-                              >
-                                Revoke License
-                              </Button>
-                            ) : (
-                              <Button
-                                size="sm"
-                                onClick={() => handleGrantLicense(user.userId)}
-                              >
-                                Grant License
-                              </Button>
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* License Keys Tab */}
-          <TabsContent value="licenses">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>License Key Management</CardTitle>
-                    <CardDescription>
-                      Generate and manage license keys
-                    </CardDescription>
-                  </div>
-                  <Button onClick={handleGenerateLicense}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Generate New Key
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>License Key</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Created</TableHead>
-                      <TableHead>Activated By</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {licenses.map((license) => (
-                      <TableRow key={license.id}>
-                        <TableCell className="font-mono">
-                          <div className="flex items-center gap-2">
-                            {license.key}
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleCopyLicense(license.key)}
-                            >
-                              <Copy className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {license.activatedBy ? (
-                            <Badge className="bg-blue-500">Activated</Badge>
-                          ) : license.isActive ? (
-                            <Badge className="bg-green-500">Available</Badge>
-                          ) : (
-                            <Badge variant="destructive">Revoked</Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {new Date(license.createdAt).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>
-                          {license.activatedBy || "Not activated"}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            {!license.activatedBy && license.isActive && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleRevokeLicense(license.id)}
-                              >
-                                Revoke
-                              </Button>
-                            )}
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => handleDeleteLicense(license.id)}
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
-                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
