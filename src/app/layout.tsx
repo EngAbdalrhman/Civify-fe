@@ -3,6 +3,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/context/auth-context";
+import { ThemeProvider } from "@/lib/theme/theme-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -36,15 +37,17 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className="font-body antialiased h-full bg-gradient-to-br from-indigo-50 to-purple-100 dark:from-gray-900 dark:to-indigo-950"
+        className="font-body antialiased h-full bg-gradient-to-br from-indigo-50 to-purple-100 dark:from-gray-900 dark:to-indigo-950 vintage:from-amber-50 vintage:to-orange-100"
         suppressHydrationWarning={true}
       >
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <AuthProvider>
-            {children}
-            <Toaster />
-          </AuthProvider>
-        </NextIntlClientProvider>
+        <ThemeProvider defaultTheme="light" storageKey="hicv-theme">
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            <AuthProvider>
+              {children}
+              <Toaster />
+            </AuthProvider>
+          </NextIntlClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

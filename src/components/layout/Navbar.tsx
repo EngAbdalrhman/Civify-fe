@@ -218,19 +218,6 @@ export function Navbar({ userProfile }: NavbarProps) {
                   <span>Plans & Billing</span>
                 </DropdownMenuItem>
 
-                {/* {userProfile?.isAdmin && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => router.push("/admin/dashboard")}
-                      className="cursor-pointer text-orange-600"
-                    >
-                      <Shield className="mr-2 h-4 w-4" />
-                      <span>Admin Dashboard</span>
-                    </DropdownMenuItem>
-                  </>
-                )} */}
-
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleSignOut}
