@@ -1,0 +1,119 @@
+{
+  "app": {
+    "name": "HICv",
+    "description": "إنشاء السيرة الذاتية ورسائل التغطية بالذكاء الاصطناعي"
+  },
+  "common": {
+    "success": "نجح",
+    "error": "خطأ",
+    "warning": "تحذير",
+    "info": "معلومات",
+    "created": "تم الإنشاء بنجاح",
+    "updated": "تم التحديث بنجاح",
+    "deleted": "تم الحذف بنجاح",
+    "notfound": "غير موجود",
+    "unauthorized": "وصول غير مصرح به",
+    "forbidden": "تم رفض الوصول",
+    "badrequest": "طلب غير صالح",
+    "internalerror": "خطأ داخلي في الخادم",
+    "loading": "جاري التحميل...",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "create": "إنشاء",
+    "update": "تحديث",
+    "confirm": "تأكيد",
+    "yes": "نعم",
+    "no": "لا",
+    "close": "إغلاق",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "search": "بحث",
+    "filter": "تصفية",
+    "sort": "ترتيب",
+    "actions": "الإجراءات",
+    "settings": "الإعدادات"
+  },
+  "language": {
+    "title": "اللغة",
+    "english": "الإنجليزية",
+    "arabic": "العربية",
+    "switchTo": "التبديل إلى {language}"
+  },
+  "theme": {
+    "title": "المظهر",
+    "light": "فاتح",
+    "dark": "داكن",
+    "vintage": "كلاسيكي",
+    "switchTo": "التبديل إلى {theme}"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "register": "التسجيل",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "rememberMe": "تذكرني",
+    "loginSuccess": "تم تسجيل الدخول بنجاح",
+    "logoutSuccess": "تم تسجيل الخروج بنجاح",
+    "loginError": "فشل تسجيل الدخول",
+    "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "welcome": "مرحباً بعودتك",
+    "overview": "نظرة عامة",
+    "statistics": "الإحصائيات"
+  },
+  "admin": {
+    "dashboard": {
+      "title": "لوحة تحكم المسؤول"
+    },
+    "plans": {
+      "title": "خطط الاشتراك",
+      "create": "إنشاء خطة",
+      "edit": "تعديل الخطة",
+      "delete": "حذف الخطة",
+      "planName": "اسم الخطة",
+      "price": "السعر",
+      "features": "الميزات",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "activate": "تفعيل",
+      "deactivate": "إلغاء التفعيل",
+      "created": "تم إنشاء الخطة بنجاح",
+      "updated": "تم تحديث الخطة بنجاح",
+      "deleted": "تم حذف الخطة بنجاح",
+      "activated": "تم تفعيل الخطة بنجاح",
+      "deactivated": "تم إلغاء تفعيل الخطة بنجاح",
+      "activeSubscriptions": "الاشتراكات النشطة",
+      "cannotDelete": "لا يمكن حذف خطة بها اشتراكات نشطة",
+      "confirmDelete": "هل أنت متأكد من حذف هذه الخطة؟"
+    }
+  },
+  "errors": {
+    "network": "خطأ في الشبكة. يرجى التحقق من اتصالك.",
+    "timeout": "انتهت مهلة الطلب. يرجى المحاولة مرة أخرى.",
+    "unknown": "حدث خطأ غير متوقع.",
+    "validation": {
+      "required": "{field} مطلوب",
+      "min": "{field} يجب أن يكون على الأقل {min} أحرف",
+      "max": "{field} يجب ألا يتجاوز {max} أحرف",
+      "email": "يرجى إدخال عنوان بريد إلكتروني صالح",
+      "number": "{field} يجب أن يكون رقماً",
+      "positive": "{field} يجب أن يكون رقماً موجباً"
+    }
+  },
+  "validation": {
+    "required": "هذا الحقل مطلوب",
+    "email": "يرجى إدخال بريد إلكتروني صالح",
+    "minLength": "الحد الأدنى {min} أحرف مطلوبة",
+    "maxLength": "الحد الأقصى {max} أحرف مسموح",
+    "number": "يجب أن يكون رقماً",
+    "positive": "يجب أن يكون رقماً موجباً"
+  }
+}
+

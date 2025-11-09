@@ -1,7 +1,6 @@
 "use client";
 
-import { useLocale } from "next-intl";
-import { useRouter, usePathname } from "next/navigation";
+import { useLocale } from "@/lib/i18n/locale-provider";
 import { useTheme } from "@/lib/theme/theme-provider";
 import { useTranslate } from "@/lib/i18n/translate";
 import { Button } from "@/components/ui/button";
@@ -16,11 +15,19 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
-import { Settings, Languages, Palette, Sun, Moon, Clock, Check } from "lucide-react";
+import {
+  Settings,
+  Languages,
+  Palette,
+  Sun,
+  Moon,
+  Clock,
+  Check,
+} from "lucide-react";
 
 const locales = [
-  { code: "en", name: "English", nativeName: "English" },
-  { code: "ar", name: "Arabic", nativeName: "العربية" },
+  { code: "en" as const, name: "English", nativeName: "English" },
+  { code: "ar" as const, name: "Arabic", nativeName: "العربية" },
 ];
 
 const themes = [
@@ -31,19 +38,11 @@ const themes = [
 
 export function SettingsMenu() {
   const translate = useTranslate();
-  const locale = useLocale();
-  const router = useRouter();
-  const pathname = usePathname();
+  const { locale, setLocale } = useLocale();
   const { theme, setTheme } = useTheme();
 
-  const switchLocale = (newLocale: string) => {
-    const pathnameWithoutLocale = pathname.replace(/^\/(en|ar)/, "");
-    const newPath =
-      newLocale === "en"
-        ? pathnameWithoutLocale || "/"
-        : `/${newLocale}${pathnameWithoutLocale || "/"}`;
-    router.push(newPath);
-    router.refresh();
+  const switchLocale = (newLocale: "en" | "ar") => {
+    setLocale(newLocale);
   };
 
   return (
@@ -96,7 +95,9 @@ export function SettingsMenu() {
                   <Icon className="mr-2 h-4 w-4" />
                   <span className="flex items-center justify-between w-full">
                     <span>{translate(themeOption.labelKey)}</span>
-                    {theme === themeOption.value && <Check className="h-4 w-4" />}
+                    {theme === themeOption.value && (
+                      <Check className="h-4 w-4" />
+                    )}
                   </span>
                 </DropdownMenuItem>
               );
@@ -107,4 +108,3 @@ export function SettingsMenu() {
     </DropdownMenu>
   );
 }
-

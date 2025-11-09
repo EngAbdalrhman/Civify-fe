@@ -29,6 +29,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { SettingsMenu } from "../SettingsMenu";
 
 interface NavbarProps {
   userProfile?: {
@@ -217,6 +218,8 @@ export function Navbar({ userProfile }: NavbarProps) {
                   <CreditCard className="mr-2 h-4 w-4" />
                   <span>Plans & Billing</span>
                 </DropdownMenuItem>
+
+                <SettingsMenu />
 
                 <DropdownMenuSeparator />
                 <DropdownMenuItem

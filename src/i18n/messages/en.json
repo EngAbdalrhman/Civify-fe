@@ -1,0 +1,119 @@
+{
+  "app": {
+    "name": "HICv",
+    "description": "AI-powered CV tailoring and cover letter generation"
+  },
+  "common": {
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Information",
+    "created": "Created successfully",
+    "updated": "Updated successfully",
+    "deleted": "Deleted successfully",
+    "notfound": "Not found",
+    "unauthorized": "Unauthorized access",
+    "forbidden": "Access denied",
+    "badrequest": "Invalid request",
+    "internalerror": "Internal server error",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "actions": "Actions",
+    "settings": "Settings"
+  },
+  "language": {
+    "title": "Language",
+    "english": "English",
+    "arabic": "Arabic",
+    "switchTo": "Switch to {language}"
+  },
+  "theme": {
+    "title": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "vintage": "Vintage",
+    "switchTo": "Switch to {theme}"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "rememberMe": "Remember Me",
+    "loginSuccess": "Logged in successfully",
+    "logoutSuccess": "Logged out successfully",
+    "loginError": "Login failed",
+    "invalidCredentials": "Invalid email or password"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "overview": "Overview",
+    "statistics": "Statistics"
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Admin Dashboard"
+    },
+    "plans": {
+      "title": "Subscription Plans",
+      "create": "Create Plan",
+      "edit": "Edit Plan",
+      "delete": "Delete Plan",
+      "planName": "Plan Name",
+      "price": "Price",
+      "features": "Features",
+      "active": "Active",
+      "inactive": "Inactive",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "created": "Plan created successfully",
+      "updated": "Plan updated successfully",
+      "deleted": "Plan deleted successfully",
+      "activated": "Plan activated successfully",
+      "deactivated": "Plan deactivated successfully",
+      "activeSubscriptions": "Active Subscriptions",
+      "cannotDelete": "Cannot delete plan with active subscriptions",
+      "confirmDelete": "Are you sure you want to delete this plan?"
+    }
+  },
+  "errors": {
+    "network": "Network error. Please check your connection.",
+    "timeout": "Request timed out. Please try again.",
+    "unknown": "An unexpected error occurred.",
+    "validation": {
+      "required": "{field} is required",
+      "min": "{field} must be at least {min} characters",
+      "max": "{field} must not exceed {max} characters",
+      "email": "Please enter a valid email address",
+      "number": "{field} must be a number",
+      "positive": "{field} must be a positive number"
+    }
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email",
+    "minLength": "Minimum {min} characters required",
+    "maxLength": "Maximum {max} characters allowed",
+    "number": "Must be a number",
+    "positive": "Must be a positive number"
+  }
+}
+

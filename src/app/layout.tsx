@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/context/auth-context";
 import { ThemeProvider } from "@/lib/theme/theme-provider";
+import { LocaleProvider } from "@/lib/i18n/locale-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -11,19 +10,13 @@ export const metadata: Metadata = {
   description: "AI-powered CV tailoring and cover letter generation.",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = await getLocale();
-  const messages = await getMessages();
-
-  // Determine text direction based on locale
-  const dir = locale === "ar" ? "rtl" : "ltr";
-
   return (
-    <html lang={locale} dir={dir} className="h-full">
+    <html lang="en" dir="ltr" className="h-full" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -41,12 +34,12 @@ export default async function RootLayout({
         suppressHydrationWarning={true}
       >
         <ThemeProvider defaultTheme="light" storageKey="hicv-theme">
-          <NextIntlClientProvider locale={locale} messages={messages}>
+          <LocaleProvider defaultLocale="en">
             <AuthProvider>
               {children}
               <Toaster />
             </AuthProvider>
-          </NextIntlClientProvider>
+          </LocaleProvider>
         </ThemeProvider>
       </body>
     </html>

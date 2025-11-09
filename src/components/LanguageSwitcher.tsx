@@ -1,7 +1,7 @@
 "use client";
 
-import { useLocale, useTranslations } from "next-intl";
-import { useRouter, usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useLocale } from "@/lib/i18n/locale-provider";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,27 +12,16 @@ import {
 import { Languages } from "lucide-react";
 
 const locales = [
-  { code: "en", name: "English", nativeName: "English" },
-  { code: "ar", name: "Arabic", nativeName: "العربية" },
+  { code: "en" as const, name: "English", nativeName: "English" },
+  { code: "ar" as const, name: "Arabic", nativeName: "العربية" },
 ];
 
 export function LanguageSwitcher() {
   const t = useTranslations("language");
-  const locale = useLocale();
-  const router = useRouter();
-  const pathname = usePathname();
+  const { locale, setLocale } = useLocale();
 
-  const switchLocale = (newLocale: string) => {
-    // Remove the current locale from the pathname if it exists
-    const pathnameWithoutLocale = pathname.replace(/^\/(en|ar)/, "");
-    
-    // Build the new path with the new locale
-    const newPath = newLocale === "en" 
-      ? pathnameWithoutLocale || "/" 
-      : `/${newLocale}${pathnameWithoutLocale || "/"}`;
-    
-    router.push(newPath);
-    router.refresh();
+  const switchLocale = (newLocale: "en" | "ar") => {
+    setLocale(newLocale);
   };
 
   const currentLocale = locales.find((l) => l.code === locale);
@@ -64,4 +53,3 @@ export function LanguageSwitcher() {
     </DropdownMenu>
   );
 }
-
