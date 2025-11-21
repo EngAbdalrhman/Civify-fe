@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "HICv",
+    "name": "Civify",
     "description": "AI-powered CV tailoring and cover letter generation"
   },
   "common": {
@@ -116,4 +116,3 @@
     "positive": "Must be a positive number"
   }
 }
-
