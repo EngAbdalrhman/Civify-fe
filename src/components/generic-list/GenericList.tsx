@@ -14,7 +14,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   ChevronLeft,
   ChevronRight,
@@ -29,6 +28,7 @@ import {
 } from 'lucide-react';
 import { ColumnDef, ActionDef, FilterState, SortState, PaginationState } from './types';
 import { cn } from '@/lib/utils';
+import { ColumnFilter } from './ColumnFilter';
 
 interface GenericListProps<T = any> {
   data: T[];
@@ -41,6 +41,7 @@ interface GenericListProps<T = any> {
   onSortChange?: (sort: SortState) => void;
   onPageChange?: (page: number) => void;
   onRefresh?: () => void;
+  locale?: string; // e.g., 'en', 'ar'
 }
 
 export function GenericList<T extends { id?: string | number } = any>({
@@ -54,13 +55,14 @@ export function GenericList<T extends { id?: string | number } = any>({
   onSortChange,
   onPageChange,
   onRefresh,
+  locale = 'en',
 }: GenericListProps<T>) {
   const [filters, setFilters] = useState<FilterState>({});
   const [sort, setSort] = useState<SortState | null>(null);
 
-  const handleFilterChange = (key: string, value: string) => {
+  const handleFilterChange = (key: string, value: any) => {
     const newFilters = { ...filters };
-    if (value) {
+    if (value !== undefined && value !== '' && value !== null) {
       newFilters[key] = value;
     } else {
       delete newFilters[key];
@@ -84,9 +86,7 @@ export function GenericList<T extends { id?: string | number } = any>({
     if (newSort) {
       onSortChange?.(newSort);
     } else {
-      // If sort is cleared, you might want to notify with a default or empty sort
-      // For now, we'll just pass a default or handle it in the parent
-      onSortChange?.({ field: '', direction: 'ASC' }); // Or handle clearing differently
+      onSortChange?.({ field: '', direction: 'ASC' });
     }
   };
 
@@ -101,12 +101,33 @@ export function GenericList<T extends { id?: string | number } = any>({
     return key.split('.').reduce((o, k) => (o || {})[k], obj);
   };
 
-  const formatValue = (item: T, column: ColumnDef<T>) => {
-    if (column.render) {
-      return column.render(getNestedValue(item, column.key), item);
+  const getLocalizedValue = (item: T, key: string) => {
+    // Try to find localized key first
+    // e.g., if key is 'name' and locale is 'ar', try 'nameAr'
+    // if key is 'category.name', try 'category.nameAr'
+    
+    const parts = key.split('.');
+    const lastPart = parts.pop();
+    if (!lastPart) return getNestedValue(item, key);
+
+    const localizedKey = `${lastPart}${locale.charAt(0).toUpperCase() + locale.slice(1)}`;
+    const localizedPath = [...parts, localizedKey].join('.');
+    
+    const localizedValue = getNestedValue(item, localizedPath);
+    
+    if (localizedValue !== undefined && localizedValue !== null) {
+      return localizedValue;
     }
 
-    const value = getNestedValue(item, column.key);
+    return getNestedValue(item, key);
+  };
+
+  const formatValue = (item: T, column: ColumnDef<T>) => {
+    if (column.render) {
+      return column.render(getLocalizedValue(item, column.key), item);
+    }
+
+    const value = getLocalizedValue(item, column.key);
 
     if (value === null || value === undefined) {
       return '-';
@@ -121,14 +142,14 @@ export function GenericList<T extends { id?: string | number } = any>({
         return (
           <span
             className={cn(
-              'px-2 py-1 rounded-full text-xs font-medium',
+              'px-2.5 py-0.5 rounded-full text-xs font-medium border',
               String(value).toLowerCase().includes('active') ||
                 String(value).toLowerCase().includes('verified')
-                ? 'bg-green-100 text-green-800'
+                ? 'bg-green-50 text-green-700 border-green-200'
                 : String(value).toLowerCase().includes('inactive') ||
                   String(value).toLowerCase().includes('deleted')
-                ? 'bg-red-100 text-red-800'
-                : 'bg-gray-100 text-gray-800'
+                ? 'bg-red-50 text-red-700 border-red-200'
+                : 'bg-gray-50 text-gray-700 border-gray-200'
             )}
           >
             {String(value)}
@@ -139,7 +160,7 @@ export function GenericList<T extends { id?: string | number } = any>({
           <img
             src={String(value)}
             alt="Avatar"
-            className="w-8 h-8 rounded-full object-cover"
+            className="w-8 h-8 rounded-full object-cover border border-border"
           />
         );
       default:
@@ -151,39 +172,39 @@ export function GenericList<T extends { id?: string | number } = any>({
   const menuActions = actions.filter((a) => a.showInMenu);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-1">
       {/* Header Actions */}
       <div className="flex justify-end gap-2">
-        <Button variant="outline" size="sm" onClick={handleReset}>
-          <RotateCcw className="w-4 h-4 mr-2" />
+        <Button variant="outline" size="sm" onClick={handleReset} className="h-8">
+          <RotateCcw className="w-3.5 h-3.5 mr-2" />
           Reset Filters
         </Button>
         {onRefresh && (
-          <Button variant="outline" size="sm" onClick={onRefresh}>
-            <RefreshCw className="w-4 h-4 mr-2" />
+          <Button variant="outline" size="sm" onClick={onRefresh} className="h-8">
+            <RefreshCw className="w-3.5 h-3.5 mr-2" />
             Refresh
           </Button>
         )}
       </div>
 
       {/* Table */}
-      <div className="rounded-md border">
+      <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden">
         <Table>
-          <TableHeader>
-            <TableRow>
+          <TableHeader className="bg-muted/50">
+            <TableRow className="hover:bg-transparent">
               {columns.map((column) => (
-                <TableHead key={column.key}>
-                  <div className="flex flex-col gap-2 py-2">
+                <TableHead key={column.key} className="h-12">
+                  <div className="flex items-center justify-between gap-2">
                     <div
                       className={cn(
-                        'flex items-center gap-1 cursor-pointer select-none',
-                        column.sortable && 'hover:text-primary'
+                        'flex items-center gap-1.5 cursor-pointer select-none text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors',
+                        !column.sortable && 'cursor-default'
                       )}
                       onClick={() => column.sortable && handleSortChange(column.key)}
                     >
                       {column.label}
                       {column.sortable && (
-                        <span className="text-muted-foreground">
+                        <span className="text-muted-foreground/70">
                           {sort?.field === column.key ? (
                             sort.direction === 'ASC' ? (
                               <ArrowUp className="w-3 h-3" />
@@ -191,25 +212,22 @@ export function GenericList<T extends { id?: string | number } = any>({
                               <ArrowDown className="w-3 h-3" />
                             )
                           ) : (
-                            <ArrowUpDown className="w-3 h-3 opacity-50" />
+                            <ArrowUpDown className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity" />
                           )}
                         </span>
                       )}
                     </div>
                     {column.filterable && (
-                      <Input
-                        placeholder={`Filter ${column.label}...`}
-                        value={filters[column.key] || ''}
-                        onChange={(e) =>
-                          handleFilterChange(column.key, e.target.value)
-                        }
-                        className="h-8 text-xs"
+                      <ColumnFilter
+                        column={column}
+                        value={filters[column.key]}
+                        onChange={(val) => handleFilterChange(column.key, val)}
                       />
                     )}
                   </div>
                 </TableHead>
               ))}
-              {actions.length > 0 && <TableHead className="w-[100px]">Actions</TableHead>}
+              {actions.length > 0 && <TableHead className="w-[100px] text-right">Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -217,37 +235,45 @@ export function GenericList<T extends { id?: string | number } = any>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length + (actions.length > 0 ? 1 : 0)}
-                  className="h-24 text-center"
+                  className="h-32 text-center"
                 >
-                  Loading...
+                  <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                    <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                    <span className="text-sm">Loading data...</span>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={columns.length + (actions.length > 0 ? 1 : 0)}
-                  className="h-24 text-center"
+                  className="h-32 text-center"
                 >
-                  {emptyMessage}
+                  <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                    <span className="text-sm">{emptyMessage}</span>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
               data.map((item, index) => (
-                <TableRow key={item.id || index}>
+                <TableRow 
+                  key={item.id || index}
+                  className="hover:bg-muted/50 transition-colors"
+                >
                   {columns.map((column) => (
-                    <TableCell key={column.key}>
+                    <TableCell key={column.key} className="py-3">
                       {formatValue(item, column)}
                     </TableCell>
                   ))}
                   {actions.length > 0 && (
-                    <TableCell>
-                      <div className="flex items-center gap-1">
+                    <TableCell className="text-right py-3">
+                      <div className="flex items-center justify-end gap-1">
                         {directActions.map((action, i) => (
                           <Button
                             key={i}
                             variant={action.variant || 'ghost'}
                             size="icon"
-                            className="h-8 w-8"
+                            className="h-8 w-8 text-muted-foreground hover:text-foreground"
                             onClick={() => action.onClick(item)}
                             title={action.label}
                           >
@@ -257,15 +283,19 @@ export function GenericList<T extends { id?: string | number } = any>({
                         {menuActions.length > 0 && (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
                                 <MoreVertical className="w-4 h-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
+                            <DropdownMenuContent align="end" className="w-40">
                               {menuActions.map((action, i) => (
                                 <DropdownMenuItem
                                   key={i}
                                   onClick={() => action.onClick(item)}
+                                  className={cn(
+                                    "cursor-pointer",
+                                    action.variant === 'destructive' && "text-red-600 focus:text-red-600 focus:bg-red-50"
+                                  )}
                                 >
                                   {action.icon && (
                                     <span className="mr-2 w-4 h-4 flex items-center justify-center">
@@ -292,9 +322,9 @@ export function GenericList<T extends { id?: string | number } = any>({
       {meta && (
         <div className="flex items-center justify-between px-2">
           <div className="text-sm text-muted-foreground">
-            Showing {meta.page * meta.size + 1} to{' '}
-            {Math.min((meta.page + 1) * meta.size, meta.totalElements)} of{' '}
-            {meta.totalElements} entries
+            Showing <span className="font-medium text-foreground">{meta.page * meta.size + 1}</span> to{' '}
+            <span className="font-medium text-foreground">{Math.min((meta.page + 1) * meta.size, meta.totalElements)}</span> of{' '}
+            <span className="font-medium text-foreground">{meta.totalElements}</span> entries
           </div>
           <div className="flex items-center space-x-2">
             <Button
@@ -315,7 +345,7 @@ export function GenericList<T extends { id?: string | number } = any>({
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <div className="text-sm font-medium">
+            <div className="text-sm font-medium px-2">
               Page {meta.page + 1} of {meta.totalPages}
             </div>
             <Button

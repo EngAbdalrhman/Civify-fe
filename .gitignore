@@ -45,4 +45,3 @@ firebase-debug.log
 firestore-debug.log
 
 !.env.example
-src/app/test-generic-list/page.tsx
