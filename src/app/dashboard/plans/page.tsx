@@ -10,6 +10,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,17 +23,21 @@ import {
   Rocket,
   Infinity,
   FileText,
-  Code,
-  TrendingUp,
-  Shield,
   ArrowLeft,
+  Star,
+  ShieldCheck,
+  Sparkles,
 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { motion } from "framer-motion";
 
 interface PlanDisplay extends SubscriptionPlan {
   icon: React.ReactNode;
   popular?: boolean;
   badge?: string;
   features: string[];
+  color: string;
+  buttonVariant: "default" | "outline" | "secondary" | "ghost" | "link";
 }
 
 export default function PlansPage() {
@@ -43,12 +48,10 @@ export default function PlansPage() {
   const [plans, setPlans] = useState<PlanDisplay[]>([]);
   const [currentSubscription, setCurrentSubscription] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isAnnual, setIsAnnual] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      router.push("/login");
-      return;
-    }
+    // Auth check removed for public access
     loadData();
   }, [user]);
 
@@ -58,28 +61,68 @@ export default function PlansPage() {
 
       // Load plans from backend
       const backendPlans = await subscriptionService.getAllPlans();
+      console.log("Fetched plans:", backendPlans);
 
       // Transform backend plans to display format
-      const displayPlans: PlanDisplay[] = backendPlans.map((plan) => ({
-        ...plan,
-        icon: getPlanIcon(plan.name),
-        features: getPlanFeatures(plan),
-        popular: plan.name.toLowerCase().includes("premium"),
-        badge: plan.name.toLowerCase().includes("lifetime")
-          ? "Limited Time"
-          : undefined,
-      }));
+      const displayPlans: PlanDisplay[] = backendPlans.map((plan) => {
+        const name = plan.name.toLowerCase();
+        let icon = <Rocket className="h-6 w-6" />;
+        let color = "bg-blue-500";
+        let popular = false;
+        let badge = undefined;
+        let buttonVariant: "default" | "outline" | "secondary" = "outline";
 
-      setPlans(displayPlans);
+        if (name.includes("free") || name.includes("basic")) {
+          icon = <FileText className="h-6 w-6" />;
+          color = "bg-gray-500";
+          buttonVariant = "outline";
+        } else if (name.includes("premium") || name.includes("pro")) {
+          icon = <Zap className="h-6 w-6" />;
+          color = "bg-blue-600";
+          popular = true;
+          badge = "Most Popular";
+          buttonVariant = "default";
+        } else if (name.includes("enterprise") || name.includes("business")) {
+          icon = <Crown className="h-6 w-6" />;
+          color = "bg-purple-600";
+          buttonVariant = "outline";
+        } else if (name.includes("lifetime") || name.includes("unlimited")) {
+          icon = <Infinity className="h-6 w-6" />;
+          color = "bg-amber-500";
+          badge = "Best Value";
+          buttonVariant = "outline";
+        }
 
-      // Load current subscription
-      try {
-        const subscription =
-          await subscriptionService.getMyActiveSubscription();
-        setCurrentSubscription(subscription);
-      } catch (error) {
-        // No active subscription
-        setCurrentSubscription(null);
+        return {
+          ...plan,
+          icon,
+          features: getPlanFeatures(plan),
+          popular,
+          badge,
+          color,
+          buttonVariant,
+        };
+      });
+
+      // Sort plans: Free -> Premium -> Enterprise -> Lifetime
+      const sortedPlans = displayPlans.sort((a, b) => {
+        const order = ["free", "premium", "enterprise", "lifetime"];
+        const aIndex = order.findIndex((o) => a.name.toLowerCase().includes(o));
+        const bIndex = order.findIndex((o) => b.name.toLowerCase().includes(o));
+        return (aIndex === -1 ? 99 : aIndex) - (bIndex === -1 ? 99 : bIndex);
+      });
+
+      setPlans(sortedPlans);
+
+      // Load current subscription if user is logged in
+      if (user) {
+        try {
+          const subscription = await subscriptionService.getMyActiveSubscription();
+          setCurrentSubscription(subscription);
+        } catch (error) {
+          // No active subscription
+          setCurrentSubscription(null);
+        }
       }
     } catch (error: any) {
       console.error("Error loading plans:", error);
@@ -95,20 +138,6 @@ export default function PlansPage() {
 
   const handleSelectPlan = (planId: number) => {
     router.push(`/dashboard/checkout?planId=${planId}`);
-  };
-
-  const getPlanIcon = (planName: string): React.ReactNode => {
-    const name = planName.toLowerCase();
-    if (name.includes("free") || name.includes("basic")) {
-      return <FileText className="h-6 w-6" />;
-    } else if (name.includes("premium") || name.includes("pro")) {
-      return <Zap className="h-6 w-6" />;
-    } else if (name.includes("enterprise") || name.includes("business")) {
-      return <Crown className="h-6 w-6" />;
-    } else if (name.includes("lifetime") || name.includes("unlimited")) {
-      return <Infinity className="h-6 w-6" />;
-    }
-    return <Rocket className="h-6 w-6" />;
   };
 
   const getPlanFeatures = (plan: SubscriptionPlan): string[] => {
@@ -151,7 +180,7 @@ export default function PlansPage() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className="flex h-screen items-center justify-center bg-gray-50">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
     );
@@ -160,235 +189,192 @@ export default function PlansPage() {
   const currentPlanId = currentSubscription?.planId;
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-7xl">
-      {/* Back Button */}
-      <div className="mb-6">
-        <Button
-          variant="outline"
-          onClick={() => router.push("/dashboard")}
-          className="flex items-center gap-2"
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      {/* Header Section */}
+      <div className="text-center max-w-3xl mx-auto mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Dashboard
-        </Button>
-      </div>
+          <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl mb-4">
+            Find the Perfect Plan for <span className="text-blue-600">You</span>
+          </h1>
+          <p className="text-xl text-gray-500 mb-8">
+            Simple, transparent pricing. Upgrade, downgrade, or cancel anytime.
+          </p>
 
-      {/* Header */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          Choose Your Plan
-        </h1>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Select the perfect plan for your needs. Upgrade or downgrade anytime.
-        </p>
-      </div>
-
-      {/* Current Plan Badge */}
-      {currentSubscription && (
-        <div className="text-center mb-8">
-          <Badge className="bg-blue-100 text-blue-800 px-4 py-2 text-sm">
-            Current Plan:{" "}
-            <span className="font-bold ml-1 capitalize">
-              {plans.find((p) => p.id === currentPlanId)?.name || "Active"}
-            </span>
-          </Badge>
-        </div>
-      )}
-
-      {/* Plans Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        {plans.map((plan) => {
-          const isCurrentPlan = currentPlanId === plan.id;
-          const isPremiumPlan = plan.dashboard;
-
-          return (
-            <Card
-              key={plan.id}
-              className={`relative ${
-                plan.popular
-                  ? "border-2 border-blue-500 shadow-lg"
-                  : isCurrentPlan
-                  ? "border-2 border-green-500"
-                  : ""
+          {/* Billing Toggle */}
+          <div className="flex items-center justify-center gap-4 bg-white p-1 rounded-full inline-flex shadow-sm border border-gray-200">
+            <button
+              onClick={() => setIsAnnual(false)}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                !isAnnual
+                  ? "bg-white text-gray-900 shadow-sm border border-gray-200"
+                  : "text-gray-500 hover:text-gray-900"
               }`}
             >
-              {plan.badge && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-                    {plan.badge}
-                  </Badge>
-                </div>
-              )}
-
-              <CardHeader className="text-center pb-4">
-                <div className="flex justify-center mb-4">
-                  <div
-                    className={`p-3 rounded-full ${
-                      plan.name.toLowerCase().includes("free")
-                        ? "bg-gray-100 text-gray-600"
-                        : plan.name.toLowerCase().includes("premium")
-                        ? "bg-blue-100 text-blue-600"
-                        : plan.name.toLowerCase().includes("enterprise")
-                        ? "bg-purple-100 text-purple-600"
-                        : "bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-600"
-                    }`}
-                  >
-                    {plan.icon}
-                  </div>
-                </div>
-                <CardTitle className="text-2xl mb-2">{plan.name}</CardTitle>
-                <div className="mb-2">
-                  <span className="text-4xl font-bold">
-                    ${parseFloat(plan.monthlyPrice).toFixed(2)}
-                  </span>
-                  <span className="text-gray-600 ml-2">/ month</span>
-                </div>
-                <CardDescription>{plan.description}</CardDescription>
-              </CardHeader>
-
-              <CardContent>
-                <ul className="space-y-3 mb-6">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-gray-700">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <Button
-                  onClick={() => handleSelectPlan(plan.id)}
-                  disabled={isCurrentPlan}
-                  className={`w-full ${
-                    isCurrentPlan
-                      ? "bg-green-600 hover:bg-green-600"
-                      : isPremiumPlan
-                      ? "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                      : "bg-gray-600 hover:bg-gray-700"
-                  }`}
-                >
-                  {isCurrentPlan ? (
-                    <>
-                      <Check className="mr-2 h-4 w-4" />
-                      Current Plan
-                    </>
-                  ) : (
-                    <>
-                      <Rocket className="mr-2 h-4 w-4" />
-                      Select Plan
-                    </>
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
-          );
-        })}
+              Monthly
+            </button>
+            <button
+              onClick={() => setIsAnnual(true)}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
+                isAnnual
+                  ? "bg-white text-gray-900 shadow-sm border border-gray-200"
+                  : "text-gray-500 hover:text-gray-900"
+              }`}
+            >
+              Yearly <span className="text-xs text-green-600 font-bold">(Save 20%)</span>
+            </button>
+          </div>
+        </motion.div>
       </div>
 
-      {/* Features Comparison */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Feature Comparison</CardTitle>
-          <CardDescription>
-            Compare all features across different plans
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">
-                    Feature
-                  </th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-700">
-                    Free
-                  </th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-700">
-                    Premium
-                  </th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-700">
-                    Enterprise
-                  </th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-700">
-                    Lifetime
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b">
-                  <td className="py-3 px-4 text-gray-700">
-                    CV Generations/Month
-                  </td>
-                  <td className="text-center py-3 px-4">5</td>
-                  <td className="text-center py-3 px-4">50</td>
-                  <td className="text-center py-3 px-4">Unlimited</td>
-                  <td className="text-center py-3 px-4">Unlimited</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="py-3 px-4 text-gray-700">API Access</td>
-                  <td className="text-center py-3 px-4">
-                    <span className="text-red-600">✗</span>
-                  </td>
-                  <td className="text-center py-3 px-4">
-                    <span className="text-red-600">✗</span>
-                  </td>
-                  <td className="text-center py-3 px-4">
-                    <Check className="h-5 w-5 text-green-600 mx-auto" />
-                  </td>
-                  <td className="text-center py-3 px-4">
-                    <Check className="h-5 w-5 text-green-600 mx-auto" />
-                  </td>
-                </tr>
-                <tr className="border-b">
-                  <td className="py-3 px-4 text-gray-700">API Calls/Month</td>
-                  <td className="text-center py-3 px-4">-</td>
-                  <td className="text-center py-3 px-4">-</td>
-                  <td className="text-center py-3 px-4">500</td>
-                  <td className="text-center py-3 px-4">1000</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="py-3 px-4 text-gray-700">
-                    AI-Powered Tailoring
-                  </td>
-                  <td className="text-center py-3 px-4">
-                    <Check className="h-5 w-5 text-green-600 mx-auto" />
-                  </td>
-                  <td className="text-center py-3 px-4">
-                    <Check className="h-5 w-5 text-green-600 mx-auto" />
-                  </td>
-                  <td className="text-center py-3 px-4">
-                    <Check className="h-5 w-5 text-green-600 mx-auto" />
-                  </td>
-                  <td className="text-center py-3 px-4">
-                    <Check className="h-5 w-5 text-green-600 mx-auto" />
-                  </td>
-                </tr>
-                <tr className="border-b">
-                  <td className="py-3 px-4 text-gray-700">Priority Support</td>
-                  <td className="text-center py-3 px-4">
-                    <span className="text-red-600">✗</span>
-                  </td>
-                  <td className="text-center py-3 px-4">
-                    <Check className="h-5 w-5 text-green-600 mx-auto" />
-                  </td>
-                  <td className="text-center py-3 px-4">
-                    <Check className="h-5 w-5 text-green-600 mx-auto" />
-                  </td>
-                  <td className="text-center py-3 px-4">
-                    <Check className="h-5 w-5 text-green-600 mx-auto" />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Plans Grid */}
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {plans.map((plan, index) => {
+            const isCurrentPlan = currentPlanId === plan.id;
+            const price = isAnnual ? plan.annualPrice : plan.monthlyPrice;
+            const formattedPrice = parseFloat(price).toFixed(0);
 
-      {/* FAQ or Additional Info */}
-      <div className="text-center text-gray-600">
-        <p className="mb-2">Need help choosing a plan?</p>
-        <Button variant="outline">Contact Support</Button>
+            return (
+              <motion.div
+                key={plan.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className={`relative flex flex-col ${
+                  plan.popular ? "lg:-mt-4 lg:mb-4 z-10" : ""
+                }`}
+              >
+                <Card
+                  className={`flex-1 flex flex-col h-full transition-all duration-300 hover:shadow-xl ${
+                    plan.popular
+                      ? "border-2 border-blue-500 shadow-lg scale-105"
+                      : "border border-gray-200 hover:border-blue-300"
+                  }`}
+                >
+                  {plan.badge && (
+                    <div className="absolute -top-4 left-0 right-0 flex justify-center">
+                      <Badge
+                        className={`${
+                          plan.popular ? "bg-blue-600" : "bg-green-100 text-green-800"
+                        } px-4 py-1 text-sm font-medium rounded-full uppercase tracking-wide shadow-sm`}
+                      >
+                        {plan.badge}
+                      </Badge>
+                    </div>
+                  )}
+
+                  <CardHeader className="text-center pt-8 pb-4">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      {plan.name}
+                    </h3>
+                    <p className="text-sm text-gray-500 mb-6 h-10">
+                      {plan.description}
+                    </p>
+                    <div className="flex items-baseline justify-center text-gray-900">
+                      <span className="text-5xl font-extrabold tracking-tight">
+                        ${formattedPrice}
+                      </span>
+                      <span className="ml-1 text-xl font-medium text-gray-500">
+                        {plan.name.toLowerCase().includes("lifetime")
+                          ? "one-time"
+                          : isAnnual
+                          ? "/year"
+                          : "/mo"}
+                      </span>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="flex-1">
+                    <div className="mt-6">
+                      <Button
+                        onClick={() => handleSelectPlan(plan.id)}
+                        disabled={isCurrentPlan}
+                        className={`w-full py-6 text-lg font-semibold rounded-xl transition-all ${
+                          plan.popular
+                            ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg"
+                            : "bg-gray-100 hover:bg-gray-200 text-gray-900"
+                        }`}
+                      >
+                        {isCurrentPlan
+                          ? "Current Plan"
+                          : plan.name.toLowerCase().includes("lifetime")
+                          ? "Get Lifetime Access"
+                          : plan.popular
+                          ? "Choose Premium"
+                          : `Sign Up for ${plan.name}`}
+                      </Button>
+                    </div>
+
+                    <ul className="mt-8 space-y-4">
+                      {plan.features.map((feature, i) => (
+                        <li key={i} className="flex items-start">
+                          <div className="flex-shrink-0">
+                            <Check className="h-5 w-5 text-green-500" />
+                          </div>
+                          <p className="ml-3 text-sm text-gray-700">{feature}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* FAQ Section */}
+      <div className="max-w-3xl mx-auto mt-24">
+        <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+          Frequently Asked Questions
+        </h2>
+        <div className="space-y-4">
+          {[
+            {
+              q: "What payment methods do you accept?",
+              a: "We accept all major credit cards (Visa, Mastercard) and Fawaterak for local payments.",
+            },
+            {
+              q: "Can I cancel my subscription at any time?",
+              a: "Yes, you can cancel your subscription at any time. Your access will continue until the end of your current billing period.",
+            },
+            {
+              q: "What is the difference between CV generations and parsing?",
+              a: "CV generation creates a new CV from scratch or template. Parsing extracts data from an existing CV to populate your profile.",
+            },
+            {
+              q: "Do you offer refunds?",
+              a: "We offer a 14-day money-back guarantee if you are not satisfied with our service.",
+            },
+          ].map((faq, i) => (
+            <Card key={i} className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+              <CardHeader className="cursor-pointer">
+                <CardTitle className="text-lg font-medium text-gray-900 flex justify-between items-center">
+                  {faq.q}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">{faq.a}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer Info */}
+      <div className="text-center mt-16 text-gray-500 text-sm">
+        <p>Prices are in USD. Local taxes may apply.</p>
+        <div className="mt-4 flex justify-center gap-4">
+          <a href="#" className="hover:text-gray-900">Terms of Service</a>
+          <span>•</span>
+          <a href="#" className="hover:text-gray-900">Privacy Policy</a>
+          <span>•</span>
+          <a href="#" className="hover:text-gray-900">Contact Support</a>
+        </div>
       </div>
     </div>
   );

@@ -8,10 +8,10 @@ export const API_BASE_URL =
   process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:8077/apis";
 
 // API Version
-export const API_VERSION = "v1";
+export const API_VERSION = "";
 
 // Full base URL with version
-export const API_URL = `${API_BASE_URL}/${API_VERSION}`;
+export const API_URL = API_VERSION ? `${API_BASE_URL}/${API_VERSION}` : API_BASE_URL;
 
 /**
  * API Endpoints

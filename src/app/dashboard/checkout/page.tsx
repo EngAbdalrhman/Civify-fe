@@ -30,6 +30,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 function CheckoutContent() {
   const { user } = useAuth();
@@ -44,12 +45,14 @@ function CheckoutContent() {
   const [processing, setProcessing] = useState(false);
   const [isAnnual, setIsAnnual] = useState(false);
   const [promoCode, setPromoCode] = useState("");
+  const [gateways, setGateways] = useState<string[]>([]);
+  const [selectedGateway, setSelectedGateway] = useState<string>("");
 
   useEffect(() => {
-    if (!user) {
-      router.push("/login");
-      return;
-    }
+    // if (!user) {
+    //   router.push("/login");
+    //   return;
+    // }
 
     if (!planId) {
       toast({
@@ -61,19 +64,28 @@ function CheckoutContent() {
       return;
     }
 
-    loadPlan();
+    loadData();
   }, [planId, user]);
 
-  const loadPlan = async () => {
+  const loadData = async () => {
     try {
       setLoading(true);
-      const planData = await subscriptionService.getPlanById(Number(planId));
+      const [planData, enabledGateways] = await Promise.all([
+        subscriptionService.getPlanById(Number(planId)),
+        paymentService.getEnabledGateways(),
+      ]);
+      
       setPlan(planData);
+      setGateways(enabledGateways);
+      
+      if (enabledGateways.length > 0) {
+        setSelectedGateway(enabledGateways[0]);
+      }
     } catch (error: any) {
-      console.error("Error loading plan:", error);
+      console.error("Error loading data:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to load plan details",
+        description: error.message || "Failed to load checkout details",
         variant: "destructive",
       });
       router.push("/dashboard/plans");
@@ -98,6 +110,14 @@ function CheckoutContent() {
 
   const handleCheckout = async () => {
     if (!plan) return;
+    if (!selectedGateway) {
+      toast({
+        title: "Error",
+        description: "Please select a payment method",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       setProcessing(true);
@@ -106,11 +126,16 @@ function CheckoutContent() {
       const paymentResponse = await paymentService.initiatePayment(
         plan.id,
         isAnnual,
-        promoCode || undefined
+        promoCode || undefined,
+        selectedGateway
       );
 
-      // Redirect to Paymob payment page
-      window.location.href = paymentResponse.paymentUrl;
+      // Redirect to payment page (Fawaterak or Paymob)
+      if (paymentResponse.paymentUrl) {
+        window.location.href = paymentResponse.paymentUrl;
+      } else {
+        throw new Error("Payment URL not received");
+      }
     } catch (error: any) {
       console.error("Error initiating payment:", error);
       toast({
@@ -137,181 +162,190 @@ function CheckoutContent() {
   const price = calculatePrice();
   const savings = calculateSavings();
 
-  return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
-      {/* Back Button */}
-      <div className="mb-6">
-        <Button
-          variant="outline"
-          onClick={() => router.push("/dashboard/plans")}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Plans
-        </Button>
-      </div>
+  // Helper to get features list (similar to plans page)
+  const getPlanFeatures = (plan: SubscriptionPlan): string[] => {
+    const features: string[] = [];
+    if (plan.cvLimit === null) features.push("Unlimited CV generations");
+    else features.push(`${plan.cvLimit} CV generations per month`);
+    
+    if (plan.apiLimit !== null && plan.apiLimit > 0) {
+      features.push("Full API access");
+      features.push(`${plan.apiLimit} API calls per month`);
+    }
+    
+    features.push("AI-powered CV tailoring");
+    features.push("Personal information masking");
+    features.push("PDF export");
+    
+    if (!plan.watermark) features.push("No watermark");
+    
+    if (plan.dashboard) {
+      features.push("Dashboard access");
+      features.push("Priority support");
+      features.push("Advanced AI features");
+    } else {
+      features.push("Basic support");
+    }
+    return features;
+  };
 
+  const features = getPlanFeatures(plan);
+
+  return (
+    <div className="container mx-auto py-12 px-4 max-w-6xl">
       {/* Header */}
-      <div className="text-center mb-8">
+      <div className="mb-10">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Complete Your Purchase
+          Confirm Your Subscription
         </h1>
         <p className="text-gray-600">
-          You're one step away from unlocking premium features
+          Review the details of your selected plan below before proceeding to payment.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Plan Summary */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Plan Summary</CardTitle>
-            <CardDescription>Review your selected plan</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <h3 className="text-2xl font-bold text-gray-900">{plan.name}</h3>
-              <p className="text-gray-600 mt-1">{plan.description}</p>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-3">
-              <h4 className="font-semibold text-gray-900">Features:</h4>
-              <ul className="space-y-2">
-                {plan.cvLimit === null ? (
-                  <li className="flex items-start gap-2">
-                    <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>Unlimited CV generations</span>
-                  </li>
-                ) : (
-                  <li className="flex items-start gap-2">
-                    <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>{plan.cvLimit} CV generations per month</span>
-                  </li>
-                )}
-
-                {plan.apiLimit !== null && plan.apiLimit > 0 && (
-                  <>
-                    <li className="flex items-start gap-2">
-                      <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Full API access</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>{plan.apiLimit} API calls per month</span>
-                    </li>
-                  </>
-                )}
-
-                {!plan.watermark && (
-                  <li className="flex items-start gap-2">
-                    <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>No watermark</span>
-                  </li>
-                )}
-
-                {plan.dashboard && (
-                  <li className="flex items-start gap-2">
-                    <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>Dashboard access</span>
-                  </li>
-                )}
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Payment Details */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Payment Details</CardTitle>
-            <CardDescription>Choose your billing cycle</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Billing Cycle Toggle */}
-            {plan.annualPrice && parseFloat(plan.annualPrice) > 0 && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex-1">
-                    <Label htmlFor="annual-billing" className="text-base font-medium">
-                      Annual Billing
-                    </Label>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Save ${savings} per year
-                    </p>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column: Plan Summary (Takes up 2 cols on large screens) */}
+        <div className="lg:col-span-2">
+          <Card className="h-full border-none shadow-sm bg-white">
+            <CardContent className="p-8">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h2>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-4xl font-bold text-gray-900">${price}</span>
+                    <span className="text-gray-500">/{isAnnual ? "year" : "month"}</span>
                   </div>
-                  <Switch
-                    id="annual-billing"
-                    checked={isAnnual}
-                    onCheckedChange={setIsAnnual}
-                  />
+                  <p className="text-gray-500 mt-2">{plan.description}</p>
+                </div>
+                {plan.name.toLowerCase().includes("premium") && (
+                  <Badge className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1">
+                    Most Popular
+                  </Badge>
+                )}
+              </div>
+
+              <Separator className="my-6" />
+
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-4">What's included:</h3>
+                <ul className="space-y-3">
+                  {features.map((feature, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <div className="mt-1 rounded-full bg-green-100 p-1">
+                        <Check className="h-3 w-3 text-green-600" />
+                      </div>
+                      <span className="text-gray-600">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right Column: Order Summary */}
+        <div className="lg:col-span-1">
+          <Card className="border-none shadow-sm bg-gray-50/50">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-bold">Order Summary</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Plan</span>
+                  <span className="font-medium text-gray-900">{plan.name}</span>
+                </div>
+                
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-600">Billing Cycle</span>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-sm ${!isAnnual ? "font-medium text-gray-900" : "text-gray-500"}`}>Monthly</span>
+                    <Switch
+                      checked={isAnnual}
+                      onCheckedChange={setIsAnnual}
+                      className="data-[state=checked]:bg-blue-600"
+                    />
+                    <span className={`text-sm ${isAnnual ? "font-medium text-gray-900" : "text-gray-500"}`}>Annual</span>
+                  </div>
+                </div>
+
+                {/* Gateway Selection */}
+                {gateways.length > 1 && (
+                   <div className="pt-2">
+                    <span className="text-sm text-gray-600 block mb-2">Payment Method</span>
+                    <RadioGroup
+                      value={selectedGateway}
+                      onValueChange={setSelectedGateway}
+                      className="flex flex-col gap-2"
+                    >
+                      {gateways.map((gateway) => (
+                        <div key={gateway} className="flex items-center space-x-2">
+                          <RadioGroupItem value={gateway} id={gateway} />
+                          <Label htmlFor={gateway} className="capitalize cursor-pointer text-sm">
+                            {gateway}
+                          </Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                   </div>
+                )}
+
+                {/* Promo Code */}
+                <div className="pt-2">
+                   <Input
+                    placeholder="Promo Code"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value)}
+                    className="bg-white"
+                   />
+                </div>
+
+                <Separator />
+
+                <div className="flex justify-between items-baseline">
+                  <span className="text-gray-600">Total Due Today</span>
+                  <span className="text-2xl font-bold text-gray-900">${price}</span>
                 </div>
               </div>
-            )}
 
-            {/* Promo Code */}
-            <div className="space-y-2">
-              <Label htmlFor="promo-code">Promo Code (Optional)</Label>
-              <Input
-                id="promo-code"
-                placeholder="Enter promo code"
-                value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value)}
-              />
-            </div>
+              <Button
+                onClick={handleCheckout}
+                disabled={processing}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12 text-lg font-medium"
+              >
+                {processing ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  "Confirm & Proceed to Payment"
+                )}
+              </Button>
 
-            <Separator />
-
-            {/* Price Breakdown */}
-            <div className="space-y-3">
-              <div className="flex justify-between text-gray-600">
-                <span>{isAnnual ? "Annual" : "Monthly"} Price:</span>
-                <span>${price}</span>
+              <div className="text-center">
+                <Button
+                  variant="link"
+                  onClick={() => router.push("/dashboard/plans")}
+                  className="text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Change Plan
+                </Button>
               </div>
 
-              {isAnnual && parseFloat(savings) > 0 && (
-                <div className="flex justify-between text-green-600">
-                  <span>Annual Savings:</span>
-                  <span>-${savings}</span>
+              <div className="flex items-center justify-center gap-4 text-xs text-gray-500 mt-4">
+                <div className="flex items-center gap-1">
+                  <Lock className="h-3 w-3" />
+                  <span>Secure SSL Payment</span>
                 </div>
-              )}
-
-              <Separator />
-
-              <div className="flex justify-between text-lg font-bold">
-                <span>Total:</span>
-                <span>${price}</span>
+                <div className="flex items-center gap-1">
+                  <Shield className="h-3 w-3" />
+                  <span>30-Day Guarantee</span>
+                </div>
               </div>
-            </div>
-
-            {/* Checkout Button */}
-            <Button
-              onClick={handleCheckout}
-              disabled={processing}
-              className="w-full"
-              size="lg"
-            >
-              {processing ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                <>
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  Proceed to Payment
-                </>
-              )}
-            </Button>
-
-            {/* Security Badge */}
-            <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
-              <Lock className="h-4 w-4" />
-              <span>Secure payment powered by Paymob</span>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

@@ -7,20 +7,31 @@ import {
   useState,
   ReactNode,
 } from "react";
-import { User, onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/lib/firebase";
 import { Loader2 } from "lucide-react";
+import { tokenManager } from "@/lib/api/token-manager";
+
+interface User {
+  id: number;
+  email: string;
+  username: string;
+  role: string;
+  [key: string]: any;
+}
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   isHydrated: boolean;
+  login: (token: string, refreshToken: string) => void;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   isHydrated: false,
+  login: () => {},
+  logout: () => {},
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -29,16 +40,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    // Mark as hydrated on client-side
     setIsHydrated(true);
-
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
+    checkAuth();
   }, []);
+
+  const checkAuth = () => {
+    if (tokenManager.isAuthenticated()) {
+      const userData = tokenManager.decodeToken(tokenManager.getAccessToken()!);
+      if (userData) {
+        // Map JWT claims to User object
+        // JWT usually has 'sub' as username/email, 'userId' as id
+        setUser({
+          id: userData.userId || userData.id,
+          email: userData.email || userData.sub,
+          username: userData.sub,
+          role: userData.role,
+          ...userData
+        });
+      }
+    } else {
+      setUser(null);
+    }
+    setLoading(false);
+  };
+
+  const login = (token: string, refreshToken: string) => {
+    tokenManager.setTokens(token, refreshToken);
+    checkAuth();
+  };
+
+  const logout = () => {
+    tokenManager.clearTokens();
+    setUser(null);
+    window.location.href = '/auth/login';
+  };
 
   // Show loading only after hydration to prevent hydration mismatch
   if (!isHydrated || loading) {
@@ -50,7 +85,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, isHydrated }}>
+    <AuthContext.Provider value={{ user, loading, isHydrated, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

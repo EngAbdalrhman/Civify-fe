@@ -21,34 +21,45 @@ class PaymentService {
   async initiatePayment(
     planId: number,
     isAnnual: boolean = false,
-    promoCode?: string
-  ): Promise<PaymentInitiationResponse> {
-    const response = await apiClient.post<{ paymentKey: string; message: string }>(
-      API_ENDPOINTS.PAYMENTS.INITIATE,
-      null,
-      {
-        params: {
-          planId,
-          isAnnual,
-          ...(promoCode && { promoCode }),
-        },
-      }
+    promoCode?: string,
+    gateway?: string
+  ): Promise<{
+    paymentKey: string;
+    paymentUrl: string;
+    orderId: string;
+    subscriptionId: number;
+    amount: string;
+    currency: string;
+    message: string;
+  }> {
+    const params = new URLSearchParams({
+      planId: planId.toString(),
+      isAnnual: isAnnual.toString(),
+    });
+
+    if (promoCode) {
+      params.append('promoCode', promoCode);
+    }
+
+    if (gateway) {
+      params.append('gateway', gateway);
+    }
+
+    const response = await apiClient.post<PaymentInitiationResponse>(
+      `${API_ENDPOINTS.PAYMENTS.INITIATE}?${params.toString()}`
     );
 
-    // Extract payment key and construct Paymob iframe URL
-    const paymentKey = response.paymentKey;
-    const iframeId = process.env.NEXT_PUBLIC_PAYMOB_IFRAME_ID || '';
-    const paymentUrl = `https://accept.paymob.com/api/acceptance/iframes/${iframeId}?payment_token=${paymentKey}`;
+    return response;
+  }
 
-    return {
-      paymentKey,
-      orderId: '', // Will be populated by backend
-      subscriptionId: 0, // Will be populated by backend
-      amount: '0', // Will be populated by backend
-      currency: 'EGP',
-      paymentUrl,
-      message: response.message || 'Payment initiated successfully',
-    };
+  /**
+   * Get enabled payment gateways
+   */
+  async getEnabledGateways(): Promise<string[]> {
+    const response = await apiClient.get<{ enabledGateways: string[] }>(
+      '/payments/config'
+    );
+    return response.enabledGateways;
   }
 
   /**
@@ -58,14 +69,6 @@ class PaymentService {
     return await apiClient.get<PaymentTransaction>(
       API_ENDPOINTS.PAYMENTS.VERIFY(transactionId)
     );
-  }
-
-  /**
-   * Get Paymob iframe URL
-   */
-  getPaymobIframeUrl(paymentKey: string): string {
-    const iframeId = process.env.NEXT_PUBLIC_PAYMOB_IFRAME_ID || '';
-    return `https://accept.paymob.com/api/acceptance/iframes/${iframeId}?payment_token=${paymentKey}`;
   }
 
   /**
@@ -207,4 +210,3 @@ export const paymentService = new PaymentService();
 
 // Export class for testing
 export { PaymentService };
-
