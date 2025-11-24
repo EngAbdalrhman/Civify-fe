@@ -7,6 +7,10 @@ const FINAL_BASE_URL = `${API_ROOT_URL.replace("/apis", "")}/apis`;
  * API Client with automatic locale header injection
  * This client automatically adds the Accept-Language header based on the current locale
  */
+import { STORAGE_KEYS } from "./api/config";
+
+// ... imports
+
 class ApiClient {
   private instance: AxiosInstance;
 
@@ -18,6 +22,7 @@ class ApiClient {
       headers: {
         "Content-Type": "application/json",
       },
+      withCredentials: true, // Ensure cookies are sent with every request
     });
 
     // Request interceptor to add Accept-Language header
@@ -33,8 +38,7 @@ class ApiClient {
         config.headers["Accept-Language"] = locale;
 
         // Add Authorization header if token exists
-        // NOTE: Make sure "authToken" matches STORAGE_KEYS.ACCESS_TOKEN if used elsewhere
-        const token = localStorage.getItem("authToken");
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
@@ -52,40 +56,42 @@ class ApiClient {
       async (error: AxiosError) => {
         // Handle 401 Unauthorized - token expired
         if (error.response?.status === 401) {
-          // Try to refresh token
-          const refreshToken = localStorage.getItem("refreshToken");
-          if (refreshToken) {
-            try {
-              // CRITICAL FIX: Manually constructed URL for refresh must also include the '/apis' prefix
-              const response = await axios.post(
-                `${FINAL_BASE_URL}/auth/refresh`, // Ensure it uses the correct BASE_URL + /apis
-                null,
-                {
-                  params: { refreshToken },
-                }
-              );
-              const { accessToken: token, refreshToken: newRefreshToken } = response.data;
-              localStorage.setItem("authToken", token);
-              if (newRefreshToken) {
-                localStorage.setItem("refreshToken", newRefreshToken);
-              }
+          // Avoid infinite loop if the refresh endpoint itself returns 401
+          if (error.config?.url?.includes("/refresh-token")) {
+             localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+             localStorage.removeItem(STORAGE_KEYS.USER_DATA);
+             window.location.href = "/login";
+             return Promise.reject(error);
+          }
 
-              // Retry the original request
-              if (error.config) {
-                // Ensure the retried request uses the new token
-                error.config.headers.Authorization = `Bearer ${token}`; 
-                return this.instance.request(error.config);
-              }
-            } catch (refreshError) {
-              // Refresh failed, logout user
-              localStorage.removeItem("authToken");
-              localStorage.removeItem("refreshToken");
+          // Try to refresh token (relying on HttpOnly cookie)
+          try {
+             // Use the filter-based refresh endpoint
+             const response = await axios.post(
+                `${FINAL_BASE_URL}/refresh-token`,
+                null,
+                { withCredentials: true } // Ensure cookies are sent
+             );
+             
+             // Extract new access token from header
+             const authHeader = response.headers["authorization"];
+             if (authHeader && authHeader.startsWith("Bearer ")) {
+                const token = authHeader.substring(7);
+                localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
+                
+                // Retry original request
+                if (error.config) {
+                    error.config.headers.Authorization = `Bearer ${token}`;
+                    return this.instance.request(error.config);
+                }
+             } else {
+                throw new Error("No token in refresh response");
+             }
+          } catch (refreshError) {
+              // Refresh failed, logout
+              localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+              localStorage.removeItem(STORAGE_KEYS.USER_DATA);
               window.location.href = "/login";
-            }
-          } else {
-            // No refresh token, redirect to login
-            localStorage.removeItem("authToken");
-            window.location.href = "/login";
           }
         }
 

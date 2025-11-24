@@ -55,7 +55,7 @@ class AuthService {
       password: data.password
     };
 
-    const response = await apiClient.post("/generate-token", payload);
+    const response = await apiClient.getAxiosInstance().post("/generate-token", payload);
     
     // Extract token from Authorization header
     const authHeader = response.headers["authorization"];
@@ -72,7 +72,7 @@ class AuthService {
    */
   async register(data: any): Promise<any> {
     const response = await apiClient.post("/auth/register", data);
-    return response.data;
+    return response;
   }
 
   /**
@@ -96,7 +96,7 @@ class AuthService {
   async refreshToken(): Promise<string | null> {
     try {
       // The refresh token is in an HttpOnly cookie, so we just make the request
-      const response = await apiClient.post("/refresh-token");
+      const response = await apiClient.getAxiosInstance().post("/refresh-token");
       
       const authHeader = response.headers["authorization"];
       if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -115,8 +115,8 @@ class AuthService {
    * Get current user profile
    */
   async getCurrentUser(): Promise<User> {
-    const response = await apiClient.get<User>("/users/me");
-    return response.data;
+    const response = await apiClient.get<User>("v1/users/me");
+    return response;
   }
 
   /**
