@@ -1,4 +1,5 @@
 import { apiClient } from "../api-client";
+import { STORAGE_KEYS } from "../api/config";
 
 export interface User {
   id: number;
@@ -16,39 +17,71 @@ export interface AuthResponse {
 }
 
 class AuthService {
-  private readonly TOKEN_KEY = "authToken";
-  private readonly REFRESH_TOKEN_KEY = "refreshToken";
+ 
+  private readonly EMAIL_REGEX = new RegExp(
+    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/
+  );
 
   /**
-   * Login with email and password
+   * Helper function to check if a string matches the email pattern.
+   * @param input The string to validate.
+   * @returns boolean
    */
-  async login(data: any): Promise<AuthResponse> {
-    const response = await apiClient.post<AuthResponse>("/auth/login", data);
-    this.setTokens(response.accessToken, response.refreshToken);
-    return response;
+  private isEmail(input: string): boolean {
+    if (!input) return false;
+    return this.EMAIL_REGEX.test(input);
+  }
+
+
+  /**
+   * Login with email/username and password
+   */
+  async login(data: any): Promise<void> {
+    // Backend expects 'username' field even if it's an email
+    if (this.isEmail(data.username)) {
+      data.email = data.username;
+      data.username = null;
+    }
+
+    const identifier = data.email || data.username;
+
+    if (!identifier) {
+      throw new Error("Username or email identifier is required.");
+    }
+    
+    // The backend expects a unified field (like 'username') regardless of whether it's an email or username.
+    const payload = {
+      username: identifier, // Send the detected identifier (email or username)
+      password: data.password
+    };
+
+    const response = await apiClient.post("/generate-token", payload);
+    
+    // Extract token from Authorization header
+    const authHeader = response.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.substring(7);
+      this.setAccessToken(token);
+    } else {
+      throw new Error("No access token received");
+    }
   }
 
   /**
    * Register new user
    */
-  async register(data: any): Promise<AuthResponse> {
-    const response = await apiClient.post<AuthResponse>("/auth/register", data);
-    // Note: Registration might not return tokens immediately if verification is required
-    // Adjust based on actual backend response
-    return response;
+  async register(data: any): Promise<any> {
+    const response = await apiClient.post("/auth/register", data);
+    return response.data;
   }
 
   /**
    * Logout user
    */
   async logout(): Promise<void> {
-    const refreshToken = this.getRefreshToken();
     try {
-      if (refreshToken) {
-        await apiClient.post("/auth/logout", null, {
-          params: { refreshToken },
-        });
-      }
+        // Optional: Call backend to clear cookies if needed, though usually client-side clear is enough for JWT
+        // await apiClient.post("/auth/logout"); 
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
@@ -61,15 +94,17 @@ class AuthService {
    * Refresh access token
    */
   async refreshToken(): Promise<string | null> {
-    const refreshToken = this.getRefreshToken();
-    if (!refreshToken) return null;
-
     try {
-      const response = await apiClient.post<AuthResponse>("/auth/refresh", null, {
-        params: { refreshToken },
-      });
-      this.setTokens(response.accessToken, response.refreshToken);
-      return response.accessToken;
+      // The refresh token is in an HttpOnly cookie, so we just make the request
+      const response = await apiClient.post("/refresh-token");
+      
+      const authHeader = response.headers["authorization"];
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        const token = authHeader.substring(7);
+        this.setAccessToken(token);
+        return token;
+      }
+      return null;
     } catch (error) {
       this.clearTokens();
       return null;
@@ -80,50 +115,36 @@ class AuthService {
    * Get current user profile
    */
   async getCurrentUser(): Promise<User> {
-    return apiClient.get<User>("/users/me");
+    const response = await apiClient.get<User>("/users/me");
+    return response.data;
   }
 
   /**
    * Initiate Google OAuth2 Login
    */
   loginWithGoogle() {
-    // Redirect to backend OAuth2 endpoint
-    // The backend will handle the handshake with Google and redirect back to frontend
-    // with tokens (usually in URL query params or set in cookies if we were using cookies)
-    // Since we are using tokens, we expect the backend to redirect to a frontend callback page
-    // with tokens in the URL, e.g., /auth/callback?token=...&refreshToken=...
-    // OR, if the backend sets cookies, we might need to extract them.
-    // Given the plan is Token-based, let's assume the backend redirects with query params.
     window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/google`;
   }
 
   // Token Management
 
-  setTokens(accessToken: string, refreshToken: string) {
+  setAccessToken(accessToken: string) {
     if (typeof window !== "undefined") {
-      localStorage.setItem(this.TOKEN_KEY, accessToken);
-      localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
+      localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
     }
   }
 
   getAccessToken(): string | null {
     if (typeof window !== "undefined") {
-      return localStorage.getItem(this.TOKEN_KEY);
-    }
-    return null;
-  }
-
-  getRefreshToken(): string | null {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem(this.REFRESH_TOKEN_KEY);
+      return localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     }
     return null;
   }
 
   clearTokens() {
     if (typeof window !== "undefined") {
-      localStorage.removeItem(this.TOKEN_KEY);
-      localStorage.removeItem(this.REFRESH_TOKEN_KEY);
+      localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+      localStorage.removeItem(STORAGE_KEYS.USER_DATA);
     }
   }
 

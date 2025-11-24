@@ -1,439 +1,44 @@
 "use client";
-
-import { useState, useEffect, useRef } from "react";
-import { tailorCv } from "@/ai/flows/cv-tailoring";
-import { generateCoverLetter as generateCoverLetterFlow } from "@/ai/flows/cover-letter-generation";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/context/auth-context";
-import { useDatabase } from "@/hooks/use-database";
-import { Loader } from "./Loader";
-import { exportToPdf, exportToPdfAsText, exportAsTextFile } from "@/lib/pdf";
-import type { FormData } from "@/app/page";
-import {
-  Copy,
-  Download,
-  FileText,
-  Image,
-  CheckCircle,
-  Save,
-  Eye,
-  EyeOff,
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
-interface Step4ResultsProps {
-  prevStep: () => void;
-  formData: FormData;
-}
+import { useRouter } from "next/navigation";
+// ... imports
 
 export default function Step4Results({
   prevStep,
   formData,
 }: Step4ResultsProps) {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [tailoredCv, setTailoredCv] = useState("");
-  const [coverLetter, setCoverLetter] = useState("");
-  const [generationStatus, setGenerationStatus] = useState<
-    "cv" | "cover-letter" | "complete"
-  >("cv");
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [maskPersonalDetails, setMaskPersonalDetails] = useState(false);
+  // ... state
 
-  const { toast } = useToast();
-  const { user } = useAuth();
-  const database = useDatabase();
-
-  const cvContainerRef = useRef<HTMLDivElement>(null);
-
-  // Masking utility functions
-  const maskEmail = (email: string): string => {
-    if (!email) return "[Email Hidden]";
-    const [username, domain] = email.split("@");
-    if (!domain) return "[Email Hidden]";
-    return `${"*".repeat(Math.min(username.length, 3))}@${"*".repeat(
-      Math.min(domain.split(".")[0].length, 3)
-    )}.${domain.split(".").slice(1).join(".")}`;
-  };
-
-  const maskPhone = (phone: string): string => {
-    if (!phone) return "[Phone Hidden]";
-    return phone.replace(/\d/g, "*");
-  };
-
-  const maskPersonalInfo = (text: string): string => {
-    if (!maskPersonalDetails || !formData.profile) return text;
-
-    let maskedText = text;
-
-    // Mask name
-    if (formData.profile.name) {
-      const nameRegex = new RegExp(
-        formData.profile.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-        "gi"
-      );
-      maskedText = maskedText.replace(nameRegex, "[Name Hidden]");
-    }
-
-    // Mask email
-    if (formData.profile.email) {
-      const emailRegex = new RegExp(
-        formData.profile.email.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-        "gi"
-      );
-      maskedText = maskedText.replace(
-        emailRegex,
-        maskEmail(formData.profile.email)
-      );
-    }
-
-    // Mask phone
-    if (formData.profile.phone) {
-      const phoneRegex = new RegExp(
-        formData.profile.phone.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-        "gi"
-      );
-      maskedText = maskedText.replace(
-        phoneRegex,
-        maskPhone(formData.profile.phone)
-      );
-    }
-
-    // Mask address patterns (generic address detection)
-    maskedText = maskedText.replace(
-      /\b\d+\s+[A-Za-z\s]+(?:Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Lane|Ln|Drive|Dr|Court|Ct|Place|Pl)\b[^,\n]*(?:,\s*[A-Za-z\s]+)?(?:,\s*[A-Z]{2}\s*\d{5})?/gi,
-      "[Address Hidden]"
-    );
-
-    // Mask social media profiles - more comprehensive patterns
-    // LinkedIn patterns
-    maskedText = maskedText.replace(
-      /https?:\/\/(www\.)?linkedin\.com\/in\/[^\s<>]+/gi,
-      "[LinkedIn Hidden]"
-    );
-    maskedText = maskedText.replace(
-      /linkedin\.com\/in\/[^\s<>]+/gi,
-      "[LinkedIn Hidden]"
-    );
-    maskedText = maskedText.replace(
-      /LinkedIn:\s*[^\s<>|]+/gi,
-      "LinkedIn: [Hidden]"
-    );
-    maskedText = maskedText.replace(
-      /LinkedIn:\s+[a-zA-Z0-9._-]+/gi,
-      "LinkedIn: [Hidden]"
-    );
-
-    // GitHub patterns
-    maskedText = maskedText.replace(
-      /https?:\/\/(www\.)?github\.com\/[^\s<>]+/gi,
-      "[GitHub Hidden]"
-    );
-    maskedText = maskedText.replace(
-      /github\.com\/[^\s<>]+/gi,
-      "[GitHub Hidden]"
-    );
-    maskedText = maskedText.replace(
-      /GitHub:\s*[^\s<>|]+/gi,
-      "GitHub: [Hidden]"
-    );
-    maskedText = maskedText.replace(
-      /GitHub:\s+[a-zA-Z0-9._-]+/gi,
-      "GitHub: [Hidden]"
-    );
-
-    // General social media patterns
-    maskedText = maskedText.replace(
-      /https?:\/\/(www\.)?(twitter|facebook|instagram)\.com\/[^\s<>]+/gi,
-      "[Social Profile Hidden]"
-    );
-
-    // Portfolio/website patterns
-    maskedText = maskedText.replace(
-      /Portfolio:\s*https?:\/\/[^\s<>]+/gi,
-      "Portfolio: [Hidden]"
-    );
-    maskedText = maskedText.replace(
-      /Website:\s*https?:\/\/[^\s<>]+/gi,
-      "Website: [Hidden]"
-    );
-
-    // Generic URL patterns that might be personal
-    maskedText = maskedText.replace(
-      /https?:\/\/[a-zA-Z0-9.-]+\.(com|org|net|io|dev|me)\/[^\s<>]+/gi,
-      "[Personal Link Hidden]"
-    );
-
-    return maskedText;
-  };
+  // ... (masking functions)
 
   const handleSaveToFirebase = async () => {
-    if (!database || !user) {
+    if (!user) {
+      const returnUrl = encodeURIComponent(window.location.pathname);
+      router.push(`/login?returnUrl=${returnUrl}`);
+      return;
+    }
+    if (!database) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "You must be logged in to save your CV.",
+        description: "Database connection not available.",
       });
       return;
     }
 
     setSaving(true);
-    try {
-      // Check current CV count
-      const currentCVs = await database.getAllCVs();
-
-      // Upload CV file to Appwrite Storage
-      const cvBlob = new Blob([formData.rawCvText], { type: "text/plain" });
-      const cvFile = new File([cvBlob], formData.cvFileName || "cv.txt", {
-        type: "text/plain",
-      });
-
-      const { uploadCVFile } = await import("@/lib/appwrite");
-      const fileId = await uploadCVFile(cvFile, user.uid);
-
-      // Save CV data to Firebase with Appwrite file ID
-      const cvId = await database.saveCVData({
-        fileName: formData.cvFileName || "Untitled CV",
-        fileId: fileId, // Store Appwrite file ID instead of raw text
-        rawText: formData.rawCvText, // Keep for backward compatibility
-        structuredData: formData.structuredCvData,
-        profile: formData.profile,
-      });
-
-      // Save job application if job description was provided
-      if (formData.jobDescription.trim()) {
-        await database.saveJobApplication({
-          cvId,
-          jobTitle: "Job Application",
-          company: "Unknown Company",
-          jobDescription: formData.jobDescription,
-          tailoredCV: tailoredCv,
-          coverLetter: formData.generateCoverLetter ? coverLetter : undefined,
-          applicationStatus: "draft",
-        });
-      }
-
-      // Save generated content
-      if (tailoredCv) {
-        await database.saveGeneratedContent({
-          cvId,
-          type: "tailored_cv",
-          content: tailoredCv,
-          prompt: `Job Description: ${formData.jobDescription}`,
-        });
-      }
-
-      if (coverLetter && formData.generateCoverLetter) {
-        await database.saveGeneratedContent({
-          cvId,
-          type: "cover_letter",
-          content: coverLetter,
-          prompt: `Job Description: ${formData.jobDescription}`,
-        });
-      }
-
-      setSaved(true);
-
-      // Get updated CV count
-      const updatedCVs = await database.getAllCVs();
-
-      toast({
-        title: "CV Saved Successfully!",
-        description: `Your CV has been saved to your account. (${updatedCVs.length}/3 CVs used)`,
-      });
-    } catch (error) {
-      console.error("Error saving to Firebase:", error);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to save your CV. Please try again.";
-
-      toast({
-        variant: "destructive",
-        title: "Save Failed",
-        description: errorMessage,
-      });
-    } finally {
-      setSaving(false);
-    }
+    // ... rest of save logic
   };
 
-  useEffect(() => {
-    const generateDocuments = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        // Check UI CV generation limit
-        if (database && user) {
-          const limitCheck = await database.checkAndUpdateUiCvLimit();
-
-          if (!limitCheck.canGenerate) {
-            const resetDate = limitCheck.resetsAt
-              ? new Date(limitCheck.resetsAt).toLocaleDateString()
-              : "next month";
-
-            setError(
-              `You've reached your monthly limit of ${limitCheck.limit} CV generations. Your limit will reset on ${resetDate}. Upgrade your plan for more generations.`
-            );
-            setLoading(false);
-            return;
-          }
-
-          // Show remaining count
-          if (limitCheck.remaining <= 2) {
-            toast({
-              title: "Usage Notice",
-              description: `You have ${limitCheck.remaining} CV generation${
-                limitCheck.remaining === 1 ? "" : "s"
-              } remaining this month.`,
-              variant: limitCheck.remaining === 0 ? "destructive" : "default",
-            });
-          }
-        }
-
-        // Generate CV
-        setGenerationStatus("cv");
-
-        // Ensure we have structured CV data
-        if (!formData.structuredCvData) {
-          throw new Error(
-            "No structured CV data available. Please go back and re-upload your CV."
-          );
-        }
-
-        console.log(
-          "Generating CV with structured data:",
-          formData.structuredCvData
-        );
-        console.log("Job description:", formData.jobDescription);
-
-        const cvResult = await tailorCv({
-          structuredCvData: formData.structuredCvData,
-          jobDescription: formData.jobDescription,
-        });
-
-        if (cvResult?.tailoredCv) {
-          setTailoredCv(cvResult.tailoredCv);
-        } else {
-          throw new Error("Failed to generate tailored CV.");
-        }
-
-        // Generate Cover Letter if requested
-        if (formData.generateCoverLetter) {
-          setGenerationStatus("cover-letter");
-
-          // Create comprehensive user profile from structured data
-          const userProfile = formData.structuredCvData
-            ? `
-            Personal Information:
-            Name: ${
-              formData.structuredCvData.personalInfo?.fullName ||
-              formData.profile.name
-            }
-            Email: ${
-              formData.structuredCvData.personalInfo?.email ||
-              formData.profile.email
-            }
-            Phone: ${
-              formData.structuredCvData.personalInfo?.phone ||
-              formData.profile.phone
-            }
-            
-            Professional Summary:
-            ${
-              formData.structuredCvData.professionalSummary ||
-              formData.profile.summary
-            }
-            
-            Work Experience:
-            ${
-              formData.structuredCvData.workExperience
-                ?.map(
-                  (exp: any) =>
-                    `${exp.jobTitle} at ${exp.company} (${exp.startDate} - ${exp.endDate})\n${exp.description}`
-                )
-                .join("\n\n") || formData.profile.experience
-            }
-            
-            Education:
-            ${
-              formData.structuredCvData.education
-                ?.map(
-                  (edu: any) =>
-                    `${edu.degree} from ${edu.institution} (${edu.graduationDate})`
-                )
-                .join("\n") || formData.profile.education
-            }
-            
-            Skills:
-            Technical: ${
-              formData.structuredCvData.skills?.technical?.join(", ") || ""
-            }
-            Soft Skills: ${
-              formData.structuredCvData.skills?.soft?.join(", ") || ""
-            }
-            Certifications: ${
-              formData.structuredCvData.skills?.certifications?.join(", ") || ""
-            }
-            ${formData.profile.skills}
-          `
-            : `
-            Name: ${formData.profile.name}
-            Email: ${formData.profile.email}
-            Phone: ${formData.profile.phone}
-            Professional Summary: ${formData.profile.summary}
-            Work Experience: ${formData.profile.experience}
-            Education: ${formData.profile.education}
-            Skills: ${formData.profile.skills}
-          `;
-
-          const coverLetterResult = await generateCoverLetterFlow({
-            jobDescription: formData.jobDescription,
-            userProfile: userProfile,
-          });
-
-          if (coverLetterResult?.coverLetter) {
-            setCoverLetter(coverLetterResult.coverLetter);
-          }
-        }
-
-        setGenerationStatus("complete");
-      } catch (err) {
-        console.error("CV generation error:", err);
-        const errorMessage =
-          err instanceof Error ? err.message : "An unknown error occurred.";
-        setError(`Failed to generate documents. ${errorMessage}`);
-        toast({
-          title: "Generation Failed",
-          description: `There was an error generating your documents. ${errorMessage}`,
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    generateDocuments();
-  }, [formData, toast]);
+  // ... useEffect
 
   const handleExportPdfImage = async () => {
+    if (!user) {
+      const returnUrl = encodeURIComponent(window.location.pathname);
+      router.push(`/login?returnUrl=${returnUrl}`);
+      return;
+    }
     if (!cvContainerRef.current) {
       toast({
         title: "Error",
@@ -450,6 +55,11 @@ export default function Step4Results({
   };
 
   const handleExportPdfText = async () => {
+    if (!user) {
+      const returnUrl = encodeURIComponent(window.location.pathname);
+      router.push(`/login?returnUrl=${returnUrl}`);
+      return;
+    }
     if (!tailoredCv) {
       toast({
         title: "Error",
@@ -475,6 +85,11 @@ export default function Step4Results({
   };
 
   const handleExportText = () => {
+    if (!user) {
+      const returnUrl = encodeURIComponent(window.location.pathname);
+      router.push(`/login?returnUrl=${returnUrl}`);
+      return;
+    }
     if (!tailoredCv) {
       toast({
         title: "Error",

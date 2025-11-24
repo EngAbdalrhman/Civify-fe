@@ -137,6 +137,11 @@ export default function PlansPage() {
   };
 
   const handleSelectPlan = (planId: number) => {
+    if (!user) {
+      const returnUrl = encodeURIComponent(`/dashboard/checkout?planId=${planId}`);
+      router.push(`/login?returnUrl=${returnUrl}`);
+      return;
+    }
     router.push(`/dashboard/checkout?planId=${planId}`);
   };
 

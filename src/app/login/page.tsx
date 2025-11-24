@@ -88,7 +88,9 @@ export default function LoginPage() {
           title: "Signed In",
           description: "You have successfully signed in.",
         });
-        router.push("/admin/dashboard");
+        
+        const returnUrl = searchParams.get("returnUrl");
+        router.push(returnUrl || "/admin/dashboard");
       }
     } catch (error: any) {
       console.error(error);
@@ -119,9 +121,10 @@ export default function LoginPage() {
   // Only redirect after hydration to prevent infinite loops
   useEffect(() => {
     if (user) {
-      router.push("/admin/dashboard");
+      const returnUrl = searchParams.get("returnUrl");
+      router.push(returnUrl || "/admin/dashboard");
     }
-  }, [user, router]);
+  }, [user, router, searchParams]);
 
   if (user) {
     return null;

@@ -71,7 +71,8 @@ export default function CVViewPage({
 
   useEffect(() => {
     if (isHydrated && !user) {
-      router.push("/login");
+      const returnUrl = encodeURIComponent(window.location.pathname);
+      router.push(`/login?returnUrl=${returnUrl}`);
       return;
     }
     if (database && cvId) {

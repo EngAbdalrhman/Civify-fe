@@ -1,5 +1,8 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosError } from "axios";
 
+const API_ROOT_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8077";
+const FINAL_BASE_URL = `${API_ROOT_URL.replace("/apis", "")}/apis`;
+
 /**
  * API Client with automatic locale header injection
  * This client automatically adds the Accept-Language header based on the current locale
@@ -9,7 +12,8 @@ class ApiClient {
 
   constructor() {
     this.instance = axios.create({
-      baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8077/api",
+      // Use the consistently defined base URL
+      baseURL: FINAL_BASE_URL, 
       timeout: 30000,
       headers: {
         "Content-Type": "application/json",
@@ -29,6 +33,7 @@ class ApiClient {
         config.headers["Accept-Language"] = locale;
 
         // Add Authorization header if token exists
+        // NOTE: Make sure "authToken" matches STORAGE_KEYS.ACCESS_TOKEN if used elsewhere
         const token = localStorage.getItem("authToken");
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
@@ -51,8 +56,9 @@ class ApiClient {
           const refreshToken = localStorage.getItem("refreshToken");
           if (refreshToken) {
             try {
+              // CRITICAL FIX: Manually constructed URL for refresh must also include the '/apis' prefix
               const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+                `${FINAL_BASE_URL}/auth/refresh`, // Ensure it uses the correct BASE_URL + /apis
                 null,
                 {
                   params: { refreshToken },
@@ -66,7 +72,8 @@ class ApiClient {
 
               // Retry the original request
               if (error.config) {
-                error.config.headers.Authorization = `Bearer ${token}`;
+                // Ensure the retried request uses the new token
+                error.config.headers.Authorization = `Bearer ${token}`; 
                 return this.instance.request(error.config);
               }
             } catch (refreshError) {
@@ -92,7 +99,8 @@ class ApiClient {
    */
   async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.instance.get<T>(url, config);
-    return response.data;
+    // Note: The caller expects response.data, which is handled here.
+    return response.data; 
   }
 
   /**
@@ -152,4 +160,3 @@ export const apiClient = new ApiClient();
 
 // Export the class for custom instances if needed
 export default ApiClient;
-

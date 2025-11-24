@@ -115,12 +115,12 @@ export const TOKEN_REFRESH_THRESHOLD = 5 * 60 * 1000; // 5 minutes
 /**
  * Storage keys for tokens
  */
-// TODO be renamed
 export const STORAGE_KEYS = {
-  ACCESS_TOKEN: "hicv_access_token",
-  REFRESH_TOKEN: "hicv_refresh_token",
-  TOKEN_EXPIRY: "hicv_token_expiry",
-  USER_DATA: "hicv_user_data",
+  ACCESS_TOKEN: "access_token",
+  REFRESH_TOKEN: "refresh_token",
+  USER_DATA: "user_data",
+  THEME: "theme",
+  LANGUAGE: "language",
 } as const;
 
 /**

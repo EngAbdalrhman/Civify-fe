@@ -54,21 +54,8 @@ export default function Home() {
     initialFormData
   );
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (isHydrated && !user && !hasRedirected.current) {
-      hasRedirected.current = true;
-      router.push("/login");
-    }
-  }, [user, isHydrated, router]);
-
   // Don't render anything until hydrated
   if (!isHydrated) {
-    return null;
-  }
-
-  // Don't render if no user (will redirect)
-  if (!user) {
     return null;
   }
 
@@ -156,28 +143,42 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => router.push("/dashboard")}
-              className="flex items-center gap-2"
-            >
-              <LayoutDashboard className="h-4 w-4" />
-              Dashboard
-            </Button>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <User className="h-4 w-4" />
-              <span>{user?.email}</span>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleSignOut}
-              className="flex items-center gap-2"
-            >
-              <LogOut className="h-4 w-4" />
-              Sign Out
-            </Button>
+            {user ? (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => router.push("/dashboard")}
+                  className="flex items-center gap-2"
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  Dashboard
+                </Button>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <User className="h-4 w-4" />
+                  <span>{user.email}</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => router.push("/login")}
+                className="flex items-center gap-2"
+              >
+                <User className="h-4 w-4" />
+                Sign In
+              </Button>
+            )}
           </div>
         </header>
 
