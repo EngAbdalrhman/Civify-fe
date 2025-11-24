@@ -32,54 +32,54 @@ export const API_ENDPOINTS = {
 
   // User Management
   USERS: {
-    ME: "/users/me",
-    ALL: "/users",
-    BY_ID: (id: string | number) => `/users/${id}`,
+    ME: "v1/users/me",
+    ALL: "v1/users",
+    BY_ID: (id: string | number) => `v1/users/${id}`,
   },
 
   // Subscription Management
   SUBSCRIPTIONS: {
-    PLANS: "/subscriptions/plans",
-    PLAN_BY_ID: (id: string | number) => `/subscriptions/plans/${id}`,
-    MY_SUBSCRIPTION: "/subscriptions/my-subscription",
-    MY_SUBSCRIPTIONS: "/subscriptions/my-subscriptions",
-    CANCEL: (id: string | number) => `/subscriptions/cancel/${id}`,
-    RENEW: (id: string | number) => `/subscriptions/renew/${id}`,
+    PLANS: "v1/subscriptions/plans",
+    PLAN_BY_ID: (id: string | number) => `v1/subscriptions/plans/${id}`,
+    MY_SUBSCRIPTION: "v1/subscriptions/my-subscription",
+    MY_SUBSCRIPTIONS: "v1/subscriptions/my-subscriptions",
+    CANCEL: (id: string | number) => `v1/subscriptions/cancel/${id}`,
+    RENEW: (id: string | number) => `v1/subscriptions/renew/${id}`,
   },
 
   // Payment Processing
   PAYMENTS: {
-    INITIATE: "/payments/initiate",
-    WEBHOOK: "/payments/webhook",
-    VERIFY: (transactionId: string) => `/payments/verify/${transactionId}`,
+    INITIATE: "v1/payments/initiate",
+    WEBHOOK: "v1/payments/webhook",
+    VERIFY: (transactionId: string) => `v1/payments/verify/${transactionId}`,
   },
 
   // CV Management
   CVS: {
-    UPLOAD: "/cvs/upload",
-    TAILOR: (id: string | number) => `/cvs/${id}/tailor`,
-    BY_ID: (id: string | number) => `/cvs/${id}`,
-    ALL: "/cvs",
+    UPLOAD: "v1/cvs/upload",
+    TAILOR: (id: string | number) => `v1/cvs/${id}/tailor`,
+    BY_ID: (id: string | number) => `v1/cvs/${id}`,
+    ALL: "v1/cvs",
   },
 
   // API Usage Logs
   LOGS: {
-    FILTER: "/logs/filter",
-    MY_LOGS: "/logs/my-logs",
-    BY_USER: (userId: string | number) => `/logs/user/${userId}`,
-    BY_ENDPOINT: "/logs/endpoint",
+    FILTER: "v1/logs/filter",
+    MY_LOGS: "v1/logs/my-logs",
+    BY_USER: (userId: string | number) => `v1/logs/user/${userId}`,
+    BY_ENDPOINT: "v1/logs/endpoint",
   },
 
   // Admin - Plan Management
   ADMIN: {
     PLANS: {
-      ALL: "/admin/plans",
-      BY_ID: (id: string | number) => `/admin/plans/${id}`,
-      CREATE: "/admin/plans",
-      UPDATE: (id: string | number) => `/admin/plans/${id}`,
-      ACTIVATE: (id: string | number) => `/admin/plans/${id}/activate`,
-      DEACTIVATE: (id: string | number) => `/admin/plans/${id}/deactivate`,
-      DELETE: (id: string | number) => `/admin/plans/${id}`,
+      ALL: "v1/admin/plans",
+      BY_ID: (id: string | number) => `v1/admin/plans/${id}`,
+      CREATE: "v1/admin/plans",
+      UPDATE: (id: string | number) => `v1/admin/plans/${id}`,
+      ACTIVATE: (id: string | number) => `v1/admin/plans/${id}/activate`,
+      DEACTIVATE: (id: string | number) => `v1/admin/plans/${id}/deactivate`,
+      DELETE: (id: string | number) => `v1/admin/plans/${id}`,
     },
   },
 } as const;
@@ -115,6 +115,7 @@ export const TOKEN_REFRESH_THRESHOLD = 5 * 60 * 1000; // 5 minutes
 /**
  * Storage keys for tokens
  */
+// TODO be renamed
 export const STORAGE_KEYS = {
   ACCESS_TOKEN: "hicv_access_token",
   REFRESH_TOKEN: "hicv_refresh_token",

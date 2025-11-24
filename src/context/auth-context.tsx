@@ -8,30 +8,22 @@ import {
   ReactNode,
 } from "react";
 import { Loader2 } from "lucide-react";
-import { tokenManager } from "@/lib/api/token-manager";
-
-interface User {
-  id: number;
-  email: string;
-  username: string;
-  role: string;
-  [key: string]: any;
-}
+import { authService, User } from "@/lib/services/auth.service";
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   isHydrated: boolean;
-  login: (token: string, refreshToken: string) => void;
-  logout: () => void;
+  login: (data: any) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   isHydrated: false,
-  login: () => {},
-  logout: () => {},
+  login: async () => {},
+  logout: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -44,19 +36,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     checkAuth();
   }, []);
 
-  const checkAuth = () => {
-    if (tokenManager.isAuthenticated()) {
-      const userData = tokenManager.decodeToken(tokenManager.getAccessToken()!);
-      if (userData) {
-        // Map JWT claims to User object
-        // JWT usually has 'sub' as username/email, 'userId' as id
-        setUser({
-          id: userData.userId || userData.id,
-          email: userData.email || userData.sub,
-          username: userData.sub,
-          role: userData.role,
-          ...userData
-        });
+  const checkAuth = async () => {
+    if (authService.isAuthenticated()) {
+      try {
+        const userData = await authService.getCurrentUser();
+        setUser(userData);
+      } catch (error) {
+        console.error("Failed to fetch user profile:", error);
+        setUser(null);
+        // Optional: clear tokens if invalid
+        // authService.clearTokens();
       }
     } else {
       setUser(null);
@@ -64,19 +53,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setLoading(false);
   };
 
-  const login = (token: string, refreshToken: string) => {
-    tokenManager.setTokens(token, refreshToken);
-    checkAuth();
+  const login = async (data: any) => {
+    try {
+      await authService.login(data);
+      await checkAuth();
+    } catch (error) {
+      throw error;
+    }
   };
 
-  const logout = () => {
-    tokenManager.clearTokens();
+  const logout = async () => {
+    await authService.logout();
     setUser(null);
-    window.location.href = '/auth/login';
   };
 
   // Show loading only after hydration to prevent hydration mismatch
-  if (!isHydrated || loading) {
+  if (!isHydrated) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />

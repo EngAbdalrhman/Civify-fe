@@ -1,13 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from "firebase/auth";
-import { auth } from "@/lib/firebase";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -29,9 +22,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
+import { authService } from "@/lib/services/auth.service";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address."),
@@ -43,9 +37,22 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const { toast } = useToast();
   const router = useRouter();
-  const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const { user, login } = useAuth();
   const [loading, setLoading] = useState(false);
   const [isSigningUp, setIsSigningUp] = useState(false);
+
+  // Check for error in URL (e.g. from OAuth failure)
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error === "oauth_failed") {
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: "Google sign-in failed. Please try again.",
+      });
+    }
+  }, [searchParams, toast]);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -59,55 +66,60 @@ export default function LoginPage() {
     setLoading(true);
     try {
       if (isSigningUp) {
-        await createUserWithEmailAndPassword(auth, data.email, data.password);
+        // Register flow
+        await authService.register({
+          email: data.email,
+          password: data.password,
+          username: data.email, // Default username to email
+        });
         toast({
           title: "Account Created",
-          description: "You have successfully signed up.",
+          description: "Please check your email to verify your account.",
         });
+        // Switch to login mode or auto-login if backend returns tokens
+        setIsSigningUp(false);
       } else {
-        await signInWithEmailAndPassword(auth, data.email, data.password);
+        // Login flow
+        await login({
+          email: data.email,
+          password: data.password,
+        });
         toast({
           title: "Signed In",
           description: "You have successfully signed in.",
         });
+        router.push("/admin/dashboard");
       }
-      router.push("/");
     } catch (error: any) {
+      console.error(error);
       toast({
         variant: "destructive",
         title: "Authentication Failed",
-        description: error.message,
+        description: error.response?.data?.message || "Invalid credentials or server error.",
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignIn = () => {
     setLoading(true);
     try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-      toast({
-        title: "Signed In",
-        description: "You have successfully signed in with Google.",
-      });
-      router.push("/");
-    } catch (error: any) {
+      authService.loginWithGoogle();
+    } catch (error) {
+      setLoading(false);
       toast({
         variant: "destructive",
-        title: "Google Sign-In Failed",
-        description: error.message,
+        title: "Error",
+        description: "Could not initiate Google login.",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
   // Only redirect after hydration to prevent infinite loops
   useEffect(() => {
     if (user) {
-      router.push("/");
+      router.push("/admin/dashboard");
     }
   }, [user, router]);
 

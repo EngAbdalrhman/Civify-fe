@@ -9,7 +9,7 @@ class ApiClient {
 
   constructor() {
     this.instance = axios.create({
-      baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api",
+      baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8077/api",
       timeout: 30000,
       headers: {
         "Content-Type": "application/json",
@@ -53,10 +53,16 @@ class ApiClient {
             try {
               const response = await axios.post(
                 `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
-                { refreshToken }
+                null,
+                {
+                  params: { refreshToken },
+                }
               );
-              const { token } = response.data;
+              const { accessToken: token, refreshToken: newRefreshToken } = response.data;
               localStorage.setItem("authToken", token);
+              if (newRefreshToken) {
+                localStorage.setItem("refreshToken", newRefreshToken);
+              }
 
               // Retry the original request
               if (error.config) {
