@@ -16,8 +16,6 @@ const locales = [
   { code: "ar" as const, name: "Arabic", nativeName: "العربية" },
 ];
 
-console.log("Test")
-
 export function LanguageSwitcher() {
   const t = useTranslations("language");
   const { locale, setLocale } = useLocale();
