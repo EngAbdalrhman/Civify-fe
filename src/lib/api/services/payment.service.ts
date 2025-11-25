@@ -139,6 +139,34 @@ class PaymentService {
   }
 
   /**
+   * Parse Fawaterak callback parameters
+   * Fawaterak sends callback data as query parameters
+   */
+  parseFawaterakCallback(searchParams: URLSearchParams): {
+    success: boolean;
+    transactionId?: string;
+    orderId?: string;
+    invoiceKey?: string;
+    status?: string;
+    error?: string;
+  } {
+    const status = searchParams.get('invoice_status') || searchParams.get('status');
+    const success = status === 'paid';
+    const orderId = searchParams.get('invoice_id') || undefined;
+    const invoiceKey = searchParams.get('invoice_key') || searchParams.get('payment_key') || undefined;
+    const error = !success ? (searchParams.get('error') || `Payment ${status}`) : undefined;
+
+    return {
+      success,
+      transactionId: invoiceKey, // Use invoice_key as transaction ID
+      orderId,
+      invoiceKey,
+      status: status || undefined,
+      error,
+    };
+  }
+
+  /**
    * Validate Paymob HMAC signature
    * This is used to verify that the callback is genuinely from Paymob
    */

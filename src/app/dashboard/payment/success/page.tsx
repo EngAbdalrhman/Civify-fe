@@ -39,37 +39,69 @@ function PaymentSuccessContent() {
   }, [user]);
 
   const verifyPayment = async () => {
-    try {
-      setVerifying(true);
+    const MAX_RETRIES = 5;
+    const RETRY_DELAY = 2000; // 2 seconds
 
-      // Parse Paymob callback parameters
-      const callbackData = paymentService.parsePaymobCallback(searchParams);
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        setVerifying(true);
 
-      if (!callbackData.success || !callbackData.transactionId) {
-        throw new Error("Invalid payment callback data");
+        // Detect gateway from URL params or use default
+        const gateway = searchParams.get("gateway") || "fawaterak";
+
+        let callbackData;
+        if (gateway === "paymob") {
+          callbackData = paymentService.parsePaymobCallback(searchParams);
+        } else if (gateway === "fawaterak") {
+          callbackData = paymentService.parseFawaterakCallback(searchParams);
+        } else {
+          throw new Error("Unknown payment gateway");
+        }
+
+        if (!callbackData.success || !callbackData.transactionId) {
+          throw new Error(
+            callbackData.error || "Invalid payment callback data"
+          );
+        }
+
+        // Verify payment with backend
+        const transaction = await paymentService.handlePaymentSuccess(
+          callbackData.transactionId
+        );
+
+        // Success!
+        setVerified(true);
+
+        toast({
+          title: "Payment Successful!",
+          description: "Your subscription has been activated.",
+        });
+        return;
+      } catch (error: any) {
+        if (attempt < MAX_RETRIES - 1) {
+          // Wait before retrying
+          console.log(
+            `Payment verification attempt ${attempt + 1} failed, retrying...`
+          );
+          await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+          continue;
+        }
+
+        // Final attempt failed
+        console.error("Payment verification error:", error);
+        toast({
+          title: "Verification Error",
+          description:
+            error.message ||
+            "Failed to verify payment. Please contact support.",
+          variant: "destructive",
+        });
+        setVerified(false);
+      } finally {
+        if (attempt === MAX_RETRIES - 1) {
+          setVerifying(false);
+        }
       }
-
-      // Verify payment with backend
-      const transaction = await paymentService.handlePaymentSuccess(
-        callbackData.transactionId
-      );
-
-      setVerified(true);
-
-      toast({
-        title: "Payment Successful!",
-        description: "Your subscription has been activated.",
-      });
-    } catch (error: any) {
-      console.error("Payment verification error:", error);
-      toast({
-        title: "Verification Error",
-        description: error.message || "Failed to verify payment. Please contact support.",
-        variant: "destructive",
-      });
-      setVerified(false);
-    } finally {
-      setVerifying(false);
     }
   };
 
