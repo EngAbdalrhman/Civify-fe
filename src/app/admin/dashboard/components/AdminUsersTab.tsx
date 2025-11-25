@@ -118,7 +118,7 @@ export function AdminUsersTab() {
       filterOperation: FilterOperation.MATCH,
     },
     {
-      key: "plan",
+      key: "subscriptions.plan.name",
       label: "Plan",
       type: "text",
       filterable: true,
@@ -242,12 +242,16 @@ export function AdminUsersTab() {
     field: string;
     direction: "ASC" | "DESC";
   }) => {
-    const sortCriteria: SortCriteria[] = [
-      {
-        fieldName: sort.field,
-        direction: sort.direction,
-      },
-    ];
+    let sortCriteria: SortCriteria[] = [];
+    
+    if (sort.field) {
+      sortCriteria = [
+        {
+          fieldName: sort.field,
+          direction: sort.direction,
+        },
+      ];
+    }
 
     loadUsers({
       filters: currentFilters,
@@ -279,6 +283,7 @@ export function AdminUsersTab() {
         onSortChange={handleSortChange}
         onPageChange={handlePageChange}
         onRefresh={() => loadUsers()}
+        defaultSort={{ field: 'id', direction: 'DESC' }}
       />
     </div>
   );

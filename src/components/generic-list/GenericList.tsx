@@ -42,6 +42,7 @@ interface GenericListProps<T = any> {
   onPageChange?: (page: number) => void;
   onRefresh?: () => void;
   locale?: string; // e.g., 'en', 'ar'
+  defaultSort?: SortState;
 }
 
 export function GenericList<T extends { id?: string | number } = any>({
@@ -56,9 +57,10 @@ export function GenericList<T extends { id?: string | number } = any>({
   onPageChange,
   onRefresh,
   locale = 'en',
+  defaultSort,
 }: GenericListProps<T>) {
   const [filters, setFilters] = useState<FilterState>({});
-  const [sort, setSort] = useState<SortState | null>(null);
+  const [sort, setSort] = useState<SortState | null>(defaultSort || null);
 
   const handleFilterChange = (key: string, value: any) => {
     const newFilters = { ...filters };
@@ -86,15 +88,27 @@ export function GenericList<T extends { id?: string | number } = any>({
     if (newSort) {
       onSortChange?.(newSort);
     } else {
-      onSortChange?.({ field: '', direction: 'ASC' });
+      // If toggled off, revert to default sort if exists, or empty
+      if (defaultSort) {
+        setSort(defaultSort);
+        onSortChange?.(defaultSort);
+      } else {
+        onSortChange?.({ field: '', direction: 'ASC' });
+      }
     }
   };
 
   const handleReset = () => {
     setFilters({});
-    setSort(null);
-    onFilterChange?.({});
-    onSortChange?.({ field: '', direction: 'ASC' });
+    if (defaultSort) {
+      setSort(defaultSort);
+      onFilterChange?.({});
+      onSortChange?.(defaultSort);
+    } else {
+      setSort(null);
+      onFilterChange?.({});
+      onSortChange?.({ field: '', direction: 'ASC' });
+    }
   };
 
   const getNestedValue = (obj: any, key: string) => {
