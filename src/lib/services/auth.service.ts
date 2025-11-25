@@ -131,6 +131,10 @@ class AuthService {
   setAccessToken(accessToken: string) {
     if (typeof window !== "undefined") {
       localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+      // Also update tokenManager for compatibility with API client
+      const { tokenManager } = require("@/lib/api/token-manager");
+      const expiresIn = 3600; // 1 hour default
+      tokenManager.setTokens(accessToken, this.getRefreshToken() || "", expiresIn);
     }
   }
 
@@ -144,6 +148,13 @@ class AuthService {
   setRefreshToken(refreshToken: string) {
     if (typeof window !== "undefined") {
       localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+      // Also update tokenManager for compatibility with API client
+      const { tokenManager } = require("@/lib/api/token-manager");
+      const accessToken = this.getAccessToken();
+      if (accessToken) {
+        const expiresIn = 3600; // 1 hour default
+        tokenManager.setTokens(accessToken, refreshToken, expiresIn);
+      }
     }
   }
 
@@ -159,6 +170,9 @@ class AuthService {
       localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
       localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
       localStorage.removeItem(STORAGE_KEYS.USER_DATA);
+      // Also clear tokenManager
+      const { tokenManager } = require("@/lib/api/token-manager");
+      tokenManager.clearTokens();
     }
   }
 
@@ -168,3 +182,4 @@ class AuthService {
 }
 
 export const authService = new AuthService();
+

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { authService } from "@/lib/services/auth.service";
@@ -12,19 +12,25 @@ export default function AuthCallbackPage() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const { refreshUser } = useAuth();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
+    // Prevent multiple executions
+    if (isProcessing) return;
+
     const handleCallback = async () => {
       const accessToken = searchParams.get("accessToken");
       const refreshToken = searchParams.get("refreshToken");
 
       if (accessToken) {
+        setIsProcessing(true);
         try {
-          // Store both tokens
-          authService.setAccessToken(accessToken);
+          // Store refresh token first, then access token
+          // This ensures tokenManager gets both tokens when setAccessToken is called
           if (refreshToken) {
             authService.setRefreshToken(refreshToken);
           }
+          authService.setAccessToken(accessToken);
 
           // Fetch and set user data
           await refreshUser();
@@ -58,7 +64,8 @@ export default function AuthCallbackPage() {
     };
 
     handleCallback();
-  }, [router, searchParams, toast, refreshUser]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run only once on mount
 
   return (
     <div className="flex h-screen w-full items-center justify-center">
