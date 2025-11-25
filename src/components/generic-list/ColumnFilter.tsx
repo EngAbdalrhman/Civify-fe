@@ -23,11 +23,31 @@ interface ColumnFilterProps {
 
 export function ColumnFilter({ column, value, onChange }: ColumnFilterProps) {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [localValue, setLocalValue] = React.useState<any>(value);
+
+  // Sync local value when prop changes or popover opens
+  React.useEffect(() => {
+    if (isOpen) {
+      setLocalValue(value);
+    }
+  }, [isOpen, value]);
+
+  const handleApply = () => {
+    onChange(localValue);
+    setIsOpen(false);
+  };
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setLocalValue(undefined);
     onChange(undefined);
     setIsOpen(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleApply();
+    }
   };
 
   const isActive = value !== undefined && value !== '' && value !== null;
@@ -68,8 +88,8 @@ export function ColumnFilter({ column, value, onChange }: ColumnFilterProps) {
           <div className="grid gap-2">
             {column.filterType === 'dropdown' && column.filterOptions ? (
               <Select
-                value={value ? String(value) : undefined}
-                onValueChange={onChange}
+                value={localValue ? String(localValue) : undefined}
+                onValueChange={setLocalValue}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select option" />
@@ -86,9 +106,9 @@ export function ColumnFilter({ column, value, onChange }: ColumnFilterProps) {
               <div className="flex flex-col gap-2">
                 <Calendar
                   mode="single"
-                  selected={value ? new Date(value) : undefined}
+                  selected={localValue ? new Date(localValue) : undefined}
                   onSelect={(date) =>
-                    onChange(date ? format(date, 'yyyy-MM-dd') : undefined)
+                    setLocalValue(date ? format(date, 'yyyy-MM-dd') : undefined)
                   }
                   initialFocus
                 />
@@ -97,17 +117,25 @@ export function ColumnFilter({ column, value, onChange }: ColumnFilterProps) {
               <Input
                 type="number"
                 placeholder={`Filter ${column.label}...`}
-                value={value || ''}
-                onChange={(e) => onChange(e.target.value)}
+                value={localValue || ''}
+                onChange={(e) => setLocalValue(e.target.value)}
+                onKeyDown={handleKeyDown}
               />
             ) : (
               // Default to text
               <Input
                 placeholder={`Filter ${column.label}...`}
-                value={value || ''}
-                onChange={(e) => onChange(e.target.value)}
+                value={localValue || ''}
+                onChange={(e) => setLocalValue(e.target.value)}
+                onKeyDown={handleKeyDown}
               />
             )}
+          </div>
+          
+          <div className="flex justify-end pt-2">
+            <Button size="sm" onClick={handleApply}>
+              Apply Filter
+            </Button>
           </div>
         </div>
       </PopoverContent>

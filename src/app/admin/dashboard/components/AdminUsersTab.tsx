@@ -228,6 +228,7 @@ export function AdminUsersTab() {
         };
       });
 
+    console.log("Sending filter criteria:", filterCriteria);
     setCurrentFilters(filterCriteria);
     loadUsers({
       filters: filterCriteria,
