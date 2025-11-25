@@ -25,11 +25,10 @@ import {
   Shield,
   ChevronDown,
 } from "lucide-react";
-import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { SettingsMenu } from "../SettingsMenu";
+import { authService } from "@/lib/api";
 
 interface NavbarProps {
   userProfile?: {
@@ -49,7 +48,8 @@ export function Navbar({ userProfile }: NavbarProps) {
   const handleSignOut = async () => {
     try {
       setIsLoading(true);
-      await signOut(auth);
+      // TODO check logout center logic
+      authService.logout();
       router.push("/login");
       toast({
         title: "Signed out successfully",

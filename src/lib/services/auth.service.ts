@@ -141,9 +141,23 @@ class AuthService {
     return null;
   }
 
+  setRefreshToken(refreshToken: string) {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+    }
+  }
+
+  getRefreshToken(): string | null {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+    }
+    return null;
+  }
+
   clearTokens() {
     if (typeof window !== "undefined") {
       localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+      localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
       localStorage.removeItem(STORAGE_KEYS.USER_DATA);
     }
   }

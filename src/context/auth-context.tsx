@@ -16,6 +16,7 @@ interface AuthContextType {
   isHydrated: boolean;
   login: (data: any) => Promise<void>;
   logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -24,6 +25,7 @@ const AuthContext = createContext<AuthContextType>({
   isHydrated: false,
   login: async () => {},
   logout: async () => {},
+  refreshUser: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -77,7 +79,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, isHydrated, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, isHydrated, login, logout, refreshUser: checkAuth }}>
       {children}
     </AuthContext.Provider>
   );

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth } from "@/context/auth-context";
 import { authService } from "@/lib/services/auth.service";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -10,29 +11,54 @@ export default function AuthCallbackPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
+  const { refreshUser } = useAuth();
 
   useEffect(() => {
-    const accessToken = searchParams.get("accessToken");
-    const refreshToken = searchParams.get("refreshToken");
+    const handleCallback = async () => {
+      const accessToken = searchParams.get("accessToken");
+      const refreshToken = searchParams.get("refreshToken");
 
-    if (accessToken) {
-      // Store access token
-      authService.setAccessToken(accessToken);
-      // Refresh token is handled by HttpOnly cookie set by backend
-      
-      toast({
-        title: "Successfully logged in",
-        description: "Welcome back!",
-      });
-      
-      // Redirect to dashboard
-      router.push("/admin/dashboard");
-    } else {
-      // Handle error or missing tokens
-      console.error("Missing tokens in callback URL");
-      router.push("/login?error=oauth_failed");
-    }
-  }, [router, searchParams, toast]);
+      if (accessToken) {
+        try {
+          // Store both tokens
+          authService.setAccessToken(accessToken);
+          if (refreshToken) {
+            authService.setRefreshToken(refreshToken);
+          }
+
+          // Fetch and set user data
+          await refreshUser();
+
+          toast({
+            title: "Successfully logged in",
+            description: "Welcome back!",
+          });
+
+          // Redirect to dashboard
+          router.push("/dashboard");
+        } catch (error) {
+          console.error("Error during OAuth callback:", error);
+          toast({
+            variant: "destructive",
+            title: "Login Failed",
+            description: "Failed to complete login. Please try again.",
+          });
+          router.push("/login?error=oauth_failed");
+        }
+      } else {
+        // Handle error or missing tokens
+        console.error("Missing tokens in callback URL");
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: "No authentication tokens received.",
+        });
+        router.push("/login?error=oauth_failed");
+      }
+    };
+
+    handleCallback();
+  }, [router, searchParams, toast, refreshUser]);
 
   return (
     <div className="flex h-screen w-full items-center justify-center">
