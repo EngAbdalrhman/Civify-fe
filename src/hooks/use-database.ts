@@ -1,24 +1,40 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import { useAuth } from "@/context/auth-context";
-import { AppwriteDatabaseService } from "@/lib/services/appwrite-database";
+import { useMemo } from "react";
+import { userService } from "@/lib/api/services/user.service";
+import { cvService } from "@/lib/api/services/cv.service";
+import { jobApplicationService } from "@/lib/api/services/job-application.service";
 
 export const useDatabase = () => {
-  const { user } = useAuth();
+  const services = useMemo(() => {
+    return {
+      // User Profile
+      getUserProfile: () => userService.getProfile(),
+      updateUserProfile: (data: any) => userService.updateProfile(data),
+      
+      // CVs
+      getAllCVs: () => cvService.getAllCVs(),
+      getCVById: (id: string) => cvService.getCV(id),
+      saveCVData: (data: any) => cvService.createCV(data),
+      deleteCVData: (id: string) => cvService.deleteCV(id),
+      updateCV: (id: string, data: any) => cvService.updateCV(id, data),
 
-  const databaseService = useMemo(() => {
-    if (!user) return null;
-    return new AppwriteDatabaseService(user.uid);
-  }, [user]);
+      // Job Applications
+      getAllJobApplications: () => jobApplicationService.getAllApplications(),
+      getJobApplicationById: (id: string) => jobApplicationService.getApplication(id),
+      saveJobApplication: (data: any) => jobApplicationService.createApplication(data),
+      updateJobApplication: (id: string, data: any) => jobApplicationService.updateApplication(id, data),
+      deleteJobApplication: (id: string) => jobApplicationService.deleteApplication(id),
 
-  useEffect(() => {
-    if (databaseService && user) {
-      // Initialize user profile when database service is created
-      // Pass Firebase user object to get email and displayName
-      databaseService.getUserProfile(user).catch(console.error);
-    }
-  }, [databaseService, user]);
+      // API Keys (if needed here, or use userService directly)
+      getApiKeys: () => userService.getApiKeys(),
+      saveApiKey: (name: string) => userService.createApiKey(name),
+      deactivateApiKey: (id: string) => userService.revokeApiKey(id),
+      
+      // API Usage
+      getApiUsageLogs: () => userService.getApiUsage(),
+    };
+  }, []);
 
-  return databaseService;
+  return services;
 };

@@ -33,8 +33,11 @@ export const API_ENDPOINTS = {
   // User Management
   USERS: {
     ME: "v1/users/me",
+    PROFILE: "v1/users/me",
     ALL: "v1/users",
     BY_ID: (id: string | number) => `v1/users/${id}`,
+    API_KEYS: "v1/users/api-keys",
+    API_USAGE: "v1/users/api-usage",
   },
 
   // Subscription Management
@@ -60,6 +63,15 @@ export const API_ENDPOINTS = {
     TAILOR: (id: string | number) => `v1/cvs/${id}/tailor`,
     BY_ID: (id: string | number) => `v1/cvs/${id}`,
     ALL: "v1/cvs",
+    LIST: "v1/cvs",
+    BASE: "v1/cvs",
+  },
+
+  // Job Applications
+  JOB_APPLICATIONS: {
+    BASE: "v1/job-applications",
+    LIST: "v1/job-applications",
+    BY_ID: (id: string | number) => `v1/job-applications/${id}`,
   },
 
   // API Usage Logs
@@ -72,6 +84,8 @@ export const API_ENDPOINTS = {
 
   // Admin - Plan Management
   ADMIN: {
+    STATS: "v1/admin/stats",
+    USERS: "v1/admin/users",
     PLANS: {
       ALL: "v1/admin/plans",
       BY_ID: (id: string | number) => `v1/admin/plans/${id}`,

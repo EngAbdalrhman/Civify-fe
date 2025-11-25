@@ -57,7 +57,7 @@ class PaymentService {
    */
   async getEnabledGateways(): Promise<string[]> {
     const response = await apiClient.get<{ enabledGateways: string[] }>(
-      '/payments/config'
+      'v1/payments/config'
     );
     return response.enabledGateways;
   }

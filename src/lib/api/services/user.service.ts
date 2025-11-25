@@ -1,48 +1,49 @@
-/**
- * User Service
- * Handles all user-related API calls
- */
-
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../config';
-import { User } from '../types';
+import { UserProfile, ApiKey, ApiUsageLog } from '@/lib/types';
 
-/**
- * User Service Class
- */
-class UserService {
+export class UserService {
   /**
-   * Get current user profile
+   * Get user profile
    */
-  async getCurrentUser(): Promise<User> {
-    return await apiClient.get<User>(API_ENDPOINTS.USERS.ME);
+  async getProfile(): Promise<UserProfile> {
+    return await apiClient.get<UserProfile>(API_ENDPOINTS.USERS.PROFILE);
   }
 
   /**
-   * Get all users (admin/licensed users only)
+   * Update user profile
    */
-  async getAllUsers(): Promise<User[]> {
-    return await apiClient.get<User[]>(API_ENDPOINTS.USERS.ALL);
+  async updateProfile(data: Partial<UserProfile>): Promise<UserProfile> {
+    return await apiClient.patch<UserProfile>(API_ENDPOINTS.USERS.PROFILE, data);
   }
 
   /**
-   * Get user by ID (admin/licensed users only)
+   * Get API keys
    */
-  async getUserById(userId: number): Promise<User> {
-    return await apiClient.get<User>(API_ENDPOINTS.USERS.BY_ID(userId));
+  async getApiKeys(): Promise<ApiKey[]> {
+    return await apiClient.get<ApiKey[]>(API_ENDPOINTS.USERS.API_KEYS);
   }
 
   /**
-   * Update current user profile
+   * Create API key
    */
-  async updateProfile(data: Partial<User>): Promise<User> {
-    return await apiClient.put<User>(API_ENDPOINTS.USERS.ME, data);
+  async createApiKey(name: string): Promise<ApiKey> {
+    return await apiClient.post<ApiKey>(API_ENDPOINTS.USERS.API_KEYS, { name });
+  }
+
+  /**
+   * Revoke API key
+   */
+  async revokeApiKey(keyId: string): Promise<void> {
+    await apiClient.delete(`${API_ENDPOINTS.USERS.API_KEYS}/${keyId}`);
+  }
+
+  /**
+   * Get API usage logs
+   */
+  async getApiUsage(): Promise<ApiUsageLog[]> {
+    return await apiClient.get<ApiUsageLog[]>(API_ENDPOINTS.USERS.API_USAGE);
   }
 }
 
-// Export singleton instance
 export const userService = new UserService();
-
-// Export class for testing
-export { UserService };
-

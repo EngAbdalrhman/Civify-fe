@@ -123,7 +123,7 @@ class AuthService {
    * Initiate Google OAuth2 Login
    */
   loginWithGoogle() {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/google`;
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/apis/oauth2/authorization/google`;
   }
 
   // Token Management

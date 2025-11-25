@@ -86,22 +86,23 @@ export default function AdminPlansPage() {
         setIsAdmin(true);
         await loadPlans();
       } else {
-        // Check database for admin flag
-        const { AppwriteDatabaseService } = await import(
-          "@/lib/services/appwrite-database"
-        );
-        const db = new AppwriteDatabaseService(user.uid);
-        const profile = await db.getUserProfile();
+        try {
+          const { userService } = await import("@/lib/api");
+          const profile = await userService.getProfile();
 
-        if (profile?.isAdmin) {
-          setIsAdmin(true);
-          await loadPlans();
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Access Denied",
-            description: "You do not have admin privileges.",
-          });
+          if (profile?.isAdmin) {
+            setIsAdmin(true);
+            await loadPlans();
+          } else {
+            toast({
+              variant: "destructive",
+              title: "Access Denied",
+              description: "You do not have admin privileges.",
+            });
+            router.push("/");
+          }
+        } catch (error) {
+          console.error("Error checking admin status:", error);
           router.push("/");
         }
       }

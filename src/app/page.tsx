@@ -13,8 +13,7 @@ import Step3JobDetails from "@/components/app/Step3JobDetails";
 import Step4Results from "@/components/app/Step4Results";
 import { Button } from "@/components/ui/button";
 import { LogOut, User, LayoutDashboard } from "lucide-react";
-import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { authService } from "@/lib/api";
 
 const steps = [
   "Upload CV",
@@ -73,7 +72,8 @@ export default function Home() {
 
   const handleSignOut = async () => {
     try {
-      await signOut(auth);
+      // clear sessions
+       await authService.logout();
       router.push("/login");
     } catch (error) {
       console.error("Error signing out:", error);

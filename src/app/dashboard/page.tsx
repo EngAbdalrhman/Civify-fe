@@ -44,13 +44,10 @@ export default function DashboardPage() {
       return;
     }
 
-    if (database) {
-      loadData();
-    }
-  }, [user, isHydrated, database, router]);
+    loadData();
+  }, [user, isHydrated, router]);
 
   const loadData = async () => {
-    if (!database) return;
 
     try {
       setLoading(true);
@@ -82,7 +79,6 @@ export default function DashboardPage() {
   };
 
   const handleDeleteCV = async (cvId: string) => {
-    if (!database) return;
 
     try {
       await database.deleteCVData(cvId);

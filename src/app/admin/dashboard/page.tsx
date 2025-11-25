@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
-import { AppwriteAdminDatabaseService } from "@/lib/services/appwrite-admin-database";
+import { userService } from "@/lib/api";
 import {
   Card,
   CardContent,
@@ -26,6 +26,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader } from "@/components/app/Loader";
 import { Users, BarChart3, Shield, CreditCard } from "lucide-react";
 import type { UserProfile, AdminStats } from "@/lib/types";
+import { adminService, AdminService } from "@/lib/api/services/admin.service";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -37,7 +38,6 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<Array<UserProfile & { userId: string }>>(
     []
   );
-  const [adminService] = useState(() => new AppwriteAdminDatabaseService());
 
   // Check if user is admin
   useEffect(() => {
@@ -55,22 +55,21 @@ export default function AdminDashboard() {
         setIsAdmin(true);
         await loadAdminData();
       } else {
-        // Check database for admin flag
-        const { AppwriteDatabaseService } = await import(
-          "@/lib/services/appwrite-database"
-        );
-        const db = new AppwriteDatabaseService(user.uid);
-        const profile = await db.getUserProfile();
-
-        if (profile?.isAdmin) {
-          setIsAdmin(true);
-          await loadAdminData();
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Access Denied",
-            description: "You do not have admin privileges.",
-          });
+        try {
+          const profile = await userService.getProfile();
+          if (profile?.isAdmin) {
+            setIsAdmin(true);
+            await loadAdminData();
+          } else {
+            toast({
+              variant: "destructive",
+              title: "Access Denied",
+              description: "You do not have admin privileges.",
+            });
+            router.push("/");
+          }
+        } catch (error) {
+          console.error("Error checking admin status:", error);
           router.push("/");
         }
       }
@@ -84,12 +83,17 @@ export default function AdminDashboard() {
   const loadAdminData = async () => {
     try {
       const [statsData, usersData] = await Promise.all([
-        adminService.getAdminStats(),
-        adminService.getAllUsers(),
+        adminService.getStats(),
+        adminService.getUsers(),
       ]);
 
       setStats(statsData);
-      setUsers(usersData);
+      // Ensure usersData has userId property (backend might return id or userId)
+      const mappedUsers = usersData.map((u: any) => ({
+        ...u,
+        userId: u.userId || u.id,
+      }));
+      setUsers(mappedUsers);
     } catch (error) {
       console.error("Error loading admin data:", error);
       toast({
@@ -288,7 +292,7 @@ function CVLimitsTab({
   toast,
   onUpdate,
 }: {
-  adminService: AppwriteAdminDatabaseService;
+  adminService: AdminService;
   users: Array<UserProfile & { userId: string }>;
   toast: any;
   onUpdate: () => Promise<void>;
@@ -431,7 +435,7 @@ function ApiRateLimitsTab({
   toast,
   onUpdate,
 }: {
-  adminService: AppwriteAdminDatabaseService;
+  adminService: AdminService;
   users: Array<UserProfile & { userId: string }>;
   toast: any;
   onUpdate: () => Promise<void>;
@@ -489,7 +493,7 @@ function ApiRateLimitsTab({
             <TableRow>
               <TableHead>Email</TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>License Status</TableHead>
+              {/* <TableHead>License Status</TableHead> */}
               <TableHead>Current Limit</TableHead>
               <TableHead>Usage This Month</TableHead>
               <TableHead>Actions</TableHead>
@@ -500,13 +504,6 @@ function ApiRateLimitsTab({
               <TableRow key={user.userId}>
                 <TableCell className="font-medium">{user.email}</TableCell>
                 <TableCell>{user.name || "N/A"}</TableCell>
-                <TableCell>
-                  {user.isLicensed ? (
-                    <Badge className="bg-green-500">Licensed</Badge>
-                  ) : (
-                    <Badge variant="secondary">Not Licensed</Badge>
-                  )}
-                </TableCell>
                 <TableCell>
                   <Badge variant="outline">
                     {user.apiRateLimit || 500} calls/month
@@ -565,7 +562,7 @@ function ApiRateLimitsTab({
                         setSelectedUser(user.userId);
                         setNewLimit(user.apiRateLimit || 500);
                       }}
-                      disabled={!user.isLicensed}
+                      // disabled={!user?.isLicensed}
                     >
                       Set Limit
                     </Button>
