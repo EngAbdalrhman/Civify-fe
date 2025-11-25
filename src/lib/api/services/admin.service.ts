@@ -1,6 +1,43 @@
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../config';
-import { AdminStats, UserProfile } from '@/lib/types';
+import { AdminStats, UserProfile, ApiResponse } from '@/lib/types';
+import { FilterOperation } from '@/components/generic-list/types';
+
+// Filter request types (matching backend InputDataModel)
+export interface FilterCriteria {
+  fieldName: string;
+  operation: FilterOperation;
+  value: any;
+  value2?: any;
+}
+
+export interface SortCriteria {
+  fieldName: string;
+  direction: 'ASC' | 'DESC';
+}
+
+export interface FilterGroup {
+  operation: 'AND' | 'OR' | 'NOT';
+  filters: FilterCriteria[];
+  groups?: FilterGroup[];
+}
+
+export interface InputDataModel {
+  filters: FilterCriteria[];
+  filterGroups?: FilterGroup[];
+  operation?: 'AND' | 'OR' | 'NOT';
+  sorts?: SortCriteria[];
+  page: number;
+  size: number;
+}
+
+export interface PagedResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
 
 export class AdminService {
   /**
@@ -11,10 +48,20 @@ export class AdminService {
   }
 
   /**
-   * Get all users (admin)
+   * Get all users (admin) - Simple method without filtering
    */
   async getUsers(): Promise<UserProfile[]> {
     return await apiClient.get<UserProfile[]>(API_ENDPOINTS.ADMIN.USERS);
+  }
+
+  /**
+   * Filter users with advanced criteria (admin)
+   */
+  async filterUsers(inputData: InputDataModel): Promise<ApiResponse<PagedResponse<UserProfile>>> {
+    return await apiClient.post<ApiResponse<PagedResponse<UserProfile>>>(
+      `${API_ENDPOINTS.ADMIN.USERS}/filter`,
+      inputData
+    );
   }
 
   /**

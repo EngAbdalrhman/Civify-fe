@@ -30,13 +30,10 @@ import { Badge } from "@/components/ui/badge";
 import { SettingsMenu } from "../SettingsMenu";
 import { authService } from "@/lib/api";
 
+import { UserProfile } from "@/lib/types";
+
 interface NavbarProps {
-  userProfile?: {
-    name?: string;
-    email?: string;
-    isAdmin?: boolean;
-    plan?: string;
-  } | null;
+  userProfile?: UserProfile | null;
 }
 
 export function Navbar({ userProfile }: NavbarProps) {
@@ -149,7 +146,7 @@ export function Navbar({ userProfile }: NavbarProps) {
               Plans
             </Button>
 
-            {userProfile?.isAdmin && (
+            {(userProfile?.isAdmin || userProfile?.role === 'ROLE_ADMIN') && (
               <Button
                 variant="ghost"
                 onClick={() => router.push("/admin/dashboard")}

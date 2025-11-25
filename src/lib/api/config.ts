@@ -95,6 +95,11 @@ export const API_ENDPOINTS = {
       DEACTIVATE: (id: string | number) => `v1/admin/plans/${id}/deactivate`,
       DELETE: (id: string | number) => `v1/admin/plans/${id}`,
     },
+    AUDIT: {
+      ALL: "v1/admin/audit",
+      SEARCH: "v1/admin/audit/search",
+      BY_ENTITY: (entityType: string, entityId: string) => `v1/admin/audit/${entityType}/${entityId}`,
+    },
   },
 } as const;
 

@@ -210,52 +210,57 @@ export default function AdminDashboard() {
               <CardHeader>
                 <CardTitle>User Management</CardTitle>
                 <CardDescription>
-                  Manage user accounts and subscription status
+                  View and manage user accounts with advanced filtering capabilities
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Plan</TableHead>
-                      <TableHead>CVs Saved</TableHead>
-                      <TableHead>Admin</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {users.map((user) => (
-                      <TableRow key={user.userId}>
-                        <TableCell className="font-medium">
-                          {user.email}
-                        </TableCell>
-                        <TableCell>{user.name || "N/A"}</TableCell>
-                        <TableCell>
-                          <Badge
-                            className={
-                              user.plan === "free"
-                                ? "bg-gray-500"
-                                : "bg-green-500"
-                            }
-                          >
-                            {user.plan || "free"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {user.cvCount || 0}/{user.cvLimit || 3}
-                        </TableCell>
-                        <TableCell>
-                          {user.isAdmin ? (
-                            <Badge className="bg-blue-500">Admin</Badge>
-                          ) : (
-                            <Badge variant="secondary">User</Badge>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border">
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-semibold">Advanced User Management</h3>
+                    <p className="text-sm text-muted-foreground max-w-2xl">
+                      Access the full user management interface with advanced filtering, sorting, 
+                      and search capabilities. Filter users by email, name, plan, role, and more.
+                    </p>
+                    <div className="flex gap-4 mt-4">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Users className="h-4 w-4 text-blue-600" />
+                        <span className="font-medium">{stats?.totalUsers || 0} Total Users</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <CreditCard className="h-4 w-4 text-green-600" />
+                        <span className="font-medium">{stats?.subscribedUsers || 0} Subscribed</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Button 
+                    size="lg"
+                    onClick={() => router.push('/admin/users')}
+                    className="gap-2"
+                  >
+                    <Users className="h-4 w-4" />
+                    Manage Users
+                  </Button>
+                </div>
+
+                {/* Quick Stats */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
+                  <div className="p-4 border rounded-lg bg-white">
+                    <div className="text-2xl font-bold text-blue-600">{stats?.totalUsers || 0}</div>
+                    <div className="text-sm text-muted-foreground">Total Users</div>
+                  </div>
+                  <div className="p-4 border rounded-lg bg-white">
+                    <div className="text-2xl font-bold text-green-600">{stats?.subscribedUsers || 0}</div>
+                    <div className="text-sm text-muted-foreground">Subscribed</div>
+                  </div>
+                  <div className="p-4 border rounded-lg bg-white">
+                    <div className="text-2xl font-bold text-purple-600">{stats?.activeSubscriptions || 0}</div>
+                    <div className="text-sm text-muted-foreground">Active Plans</div>
+                  </div>
+                  <div className="p-4 border rounded-lg bg-white">
+                    <div className="text-2xl font-bold text-orange-600">{stats?.totalCVs || 0}</div>
+                    <div className="text-sm text-muted-foreground">Total CVs</div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

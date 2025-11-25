@@ -9,6 +9,7 @@ export interface UserProfile {
   skills: string;
   // Admin and API fields
   isAdmin?: boolean;
+  role?: string;
   apiKeyHash?: string;
   apiUsage?: {
     month: string; // Format: YYYY-MM
