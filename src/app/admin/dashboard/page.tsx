@@ -27,6 +27,7 @@ import { Loader } from "@/components/app/Loader";
 import { Users, BarChart3, Shield, CreditCard } from "lucide-react";
 import type { UserProfile, AdminStats } from "@/lib/types";
 import { adminService, AdminService } from "@/lib/api/services/admin.service";
+import { AdminUsersTab } from "./components/AdminUsersTab";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -82,18 +83,8 @@ export default function AdminDashboard() {
 
   const loadAdminData = async () => {
     try {
-      const [statsData, usersData] = await Promise.all([
-        adminService.getStats(),
-        adminService.getUsers(),
-      ]);
-
+      const statsData = await adminService.getStats();
       setStats(statsData);
-      // Ensure usersData has userId property (backend might return id or userId)
-      const mappedUsers = usersData.map((u: any) => ({
-        ...u,
-        userId: u.userId || u.id,
-      }));
-      setUsers(mappedUsers);
     } catch (error) {
       console.error("Error loading admin data:", error);
       toast({
@@ -213,54 +204,8 @@ export default function AdminDashboard() {
                   View and manage user accounts with advanced filtering capabilities
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border">
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">Advanced User Management</h3>
-                    <p className="text-sm text-muted-foreground max-w-2xl">
-                      Access the full user management interface with advanced filtering, sorting, 
-                      and search capabilities. Filter users by email, name, plan, role, and more.
-                    </p>
-                    <div className="flex gap-4 mt-4">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Users className="h-4 w-4 text-blue-600" />
-                        <span className="font-medium">{stats?.totalUsers || 0} Total Users</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <CreditCard className="h-4 w-4 text-green-600" />
-                        <span className="font-medium">{stats?.subscribedUsers || 0} Subscribed</span>
-                      </div>
-                    </div>
-                  </div>
-                  <Button 
-                    size="lg"
-                    onClick={() => router.push('/admin/users')}
-                    className="gap-2"
-                  >
-                    <Users className="h-4 w-4" />
-                    Manage Users
-                  </Button>
-                </div>
-
-                {/* Quick Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
-                  <div className="p-4 border rounded-lg bg-white">
-                    <div className="text-2xl font-bold text-blue-600">{stats?.totalUsers || 0}</div>
-                    <div className="text-sm text-muted-foreground">Total Users</div>
-                  </div>
-                  <div className="p-4 border rounded-lg bg-white">
-                    <div className="text-2xl font-bold text-green-600">{stats?.subscribedUsers || 0}</div>
-                    <div className="text-sm text-muted-foreground">Subscribed</div>
-                  </div>
-                  <div className="p-4 border rounded-lg bg-white">
-                    <div className="text-2xl font-bold text-purple-600">{stats?.activeSubscriptions || 0}</div>
-                    <div className="text-sm text-muted-foreground">Active Plans</div>
-                  </div>
-                  <div className="p-4 border rounded-lg bg-white">
-                    <div className="text-2xl font-bold text-orange-600">{stats?.totalCVs || 0}</div>
-                    <div className="text-sm text-muted-foreground">Total CVs</div>
-                  </div>
-                </div>
+              <CardContent>
+                <AdminUsersTab />
               </CardContent>
             </Card>
           </TabsContent>

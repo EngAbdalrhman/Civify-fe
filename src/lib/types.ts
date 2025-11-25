@@ -188,6 +188,7 @@ export interface UserSettings {
 // API Response Types
 export interface ApiResponse<T> {
   success: boolean;
+  status?: string; // For API responses that use "status": "success"
   data?: T;
   error?: string;
   message?: string;
