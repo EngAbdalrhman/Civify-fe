@@ -20,16 +20,11 @@ export default function AuthCallbackPage() {
 
     const handleCallback = async () => {
       const accessToken = searchParams.get("accessToken");
-      const refreshToken = searchParams.get("refreshToken");
 
       if (accessToken) {
         setIsProcessing(true);
         try {
-          // Store refresh token first, then access token
-          // This ensures tokenManager gets both tokens when setAccessToken is called
-          if (refreshToken) {
-            authService.setRefreshToken(refreshToken);
-          }
+          // Store access token (refresh token is in HttpOnly cookie set by backend)
           authService.setAccessToken(accessToken);
 
           // Fetch and set user data
@@ -52,12 +47,12 @@ export default function AuthCallbackPage() {
           router.push("/login?error=oauth_failed");
         }
       } else {
-        // Handle error or missing tokens
-        console.error("Missing tokens in callback URL");
+        // Handle error or missing access token
+        console.error("Missing access token in callback URL");
         toast({
           variant: "destructive",
           title: "Login Failed",
-          description: "No authentication tokens received.",
+          description: "No authentication token received.",
         });
         router.push("/login?error=oauth_failed");
       }

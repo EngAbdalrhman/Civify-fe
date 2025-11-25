@@ -90,7 +90,7 @@ export default function LoginPage() {
         });
         
         const returnUrl = searchParams.get("returnUrl");
-        router.push(returnUrl || "/admin/dashboard");
+        router.push(returnUrl || "/dashboard");
       }
     } catch (error: any) {
       console.error(error);
@@ -122,7 +122,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (user) {
       const returnUrl = searchParams.get("returnUrl");
-      router.push(returnUrl || "/admin/dashboard");
+      router.push(returnUrl || "/dashboard");
     }
   }, [user, router, searchParams]);
 

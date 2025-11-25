@@ -51,13 +51,9 @@ export default function DashboardPage() {
 
     try {
       setLoading(true);
-      const [cvsData, jobAppsData, profile] = await Promise.all([
-        database.getAllCVs(),
-        database.getAllJobApplications(),
-        database.getUserProfile(),
-      ]);
-      setCvs(cvsData);
-      setJobApplications(jobAppsData);
+      
+      // Load user profile first
+      const profile = await database.getUserProfile();
       setUserProfile(profile);
 
       // Check if user is admin
@@ -66,12 +62,30 @@ export default function DashboardPage() {
       const isUserAdmin =
         user?.email === adminEmail || profile?.isAdmin === true;
       setIsAdmin(isUserAdmin);
+
+      // Try to load CVs and job applications (these endpoints might not exist yet)
+      try {
+        const cvsData = await database.getAllCVs();
+        setCvs(cvsData);
+      } catch (error: any) {
+        console.warn("CVs endpoint not available yet:", error);
+        setCvs([]);
+      }
+
+      try {
+        const jobAppsData = await database.getAllJobApplications();
+        setJobApplications(jobAppsData);
+      } catch (error: any) {
+        console.warn("Job applications endpoint not available yet:", error);
+        setJobApplications([]);
+      }
+
     } catch (error) {
       console.error("Error loading data:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to load your data.",
+        description: "Failed to load your profile data.",
       });
     } finally {
       setLoading(false);
