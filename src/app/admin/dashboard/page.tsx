@@ -29,6 +29,7 @@ import type { UserProfile, AdminStats } from "@/lib/types";
 import { adminService, AdminService } from "@/lib/api/services/admin.service";
 import { AdminUsersTab } from "./components/AdminUsersTab";
 import { AdminPlansTab } from "./components/AdminPlansTab";
+import { AdminPromoCodesTab } from "./components/AdminPromoCodesTab";
 
 export default function AdminDashboard() {
   const { user, loading: authLoading } = useAuth();
@@ -195,6 +196,7 @@ export default function AdminDashboard() {
           <TabsList>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="plans">Plans</TabsTrigger>
+            <TabsTrigger value="promocodes">Promo Codes</TabsTrigger> {/* Added Promo Codes tab trigger */}
             <TabsTrigger value="cv-limits">CV Limits</TabsTrigger>
             <TabsTrigger value="api-limits">API Rate Limits</TabsTrigger>
           </TabsList>
@@ -225,6 +227,21 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <AdminPlansTab />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Promo Codes Tab */}
+          <TabsContent value="promocodes">
+            <Card>
+              <CardHeader>
+                <CardTitle>Promo Code Management</CardTitle>
+                <CardDescription>
+                  Manage promotional codes and discounts
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AdminPromoCodesTab />
               </CardContent>
             </Card>
           </TabsContent>

@@ -84,6 +84,7 @@ export const API_ENDPOINTS = {
 
   // Admin - Plan Management
   ADMIN: {
+    BASE: "v1/admin",
     STATS: "v1/admin/stats",
     USERS: "v1/admin/users",
     PLANS: {

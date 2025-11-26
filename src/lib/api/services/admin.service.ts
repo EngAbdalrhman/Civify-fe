@@ -133,12 +133,41 @@ export class AdminService {
   /**
    * Update user limits (admin)
    */
-  async updateUserLimits(userId: string, cvLimit?: number, apiLimit?: number): Promise<ApiResponse<UserProfile>> {
+  async updateUserLimits(
+    userId: string,
+    cvLimit?: number,
+    apiLimit?: number
+  ): Promise<ApiResponse<any>> {
     const params = new URLSearchParams();
-    if (cvLimit !== undefined) params.append('cvLimit', cvLimit.toString());
-    if (apiLimit !== undefined) params.append('apiLimit', apiLimit.toString());
-    
-    return await apiClient.put<ApiResponse<UserProfile>>(`${API_ENDPOINTS.ADMIN.USERS}/${userId}/limits?${params.toString()}`, {});
+    if (cvLimit !== undefined) params.append("cvLimit", cvLimit.toString());
+    if (apiLimit !== undefined) params.append("apiLimit", apiLimit.toString());
+
+    const response = await apiClient.put<ApiResponse<any>>(
+      `${API_ENDPOINTS.ADMIN.USERS}/${userId}/limits?${params.toString()}`,
+      {}
+    );
+    return response;
+  }
+
+  // Promo Code Management
+  async filterPromoCodes(data: InputDataModel): Promise<ApiResponse<PagedResponse<any>>> {
+    return apiClient.post(`${API_ENDPOINTS.ADMIN.BASE}/promocodes/filter`, data);
+  }
+
+  async createPromoCode(data: any): Promise<ApiResponse<any>> {
+    return apiClient.post(`${API_ENDPOINTS.ADMIN.BASE}/promocodes`, data);
+  }
+
+  async updatePromoCode(id: number, data: any): Promise<ApiResponse<any>> {
+    return apiClient.put(`${API_ENDPOINTS.ADMIN.BASE}/promocodes/${id}`, data);
+  }
+
+  async deactivatePromoCode(id: number): Promise<ApiResponse<any>> {
+    return apiClient.post(`${API_ENDPOINTS.ADMIN.BASE}/promocodes/${id}/deactivate`, {});
+  }
+
+  async deletePromoCode(id: number): Promise<ApiResponse<any>> {
+    return apiClient.delete(`${API_ENDPOINTS.ADMIN.BASE}/promocodes/${id}`);
   }
 }
 
