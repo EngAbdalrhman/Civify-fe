@@ -218,7 +218,7 @@ export interface Subscription {
 export interface ApiKey {
   id: string;
   userId: string;
-  key: string; // The actual API key (only shown once)
+  keyPreview: string;
   keyHash: string; // SHA-256 hash for verification
   createdAt: string;
   lastUsedAt?: string;

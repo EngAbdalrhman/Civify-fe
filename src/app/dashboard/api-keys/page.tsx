@@ -27,8 +27,9 @@ import {
   AlertCircle,
   CheckCircle,
   BarChart3,
+  Check,
 } from "lucide-react";
-import { generateApiKey, hashApiKey, maskApiKey } from "@/lib/utils/api-keys";
+import { maskApiKey } from "@/lib/utils/api-keys";
 import { ApiKey } from "@/lib/types";
 import {
   AlertDialog,
@@ -56,6 +57,7 @@ export default function ApiKeysPage() {
   const [apiUsage, setApiUsage] = useState(0);
   const [apiLimit, setApiLimit] = useState(500);
   const [keyToDelete, setKeyToDelete] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (isHydrated && !user) {
@@ -87,7 +89,7 @@ export default function ApiKeysPage() {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to load API keys.",
+        description: "Failed to load API keys and usage data.",
       });
     } finally {
       setLoading(false);
@@ -99,20 +101,9 @@ export default function ApiKeysPage() {
 
     setGenerating(true);
     try {
-      const apiKey = generateApiKey();
-      const keyHash = await hashApiKey(apiKey);
-
-      const newKey: ApiKey = {
-        id: `key_${Date.now()}`,
-        userId: user!.uid,
-        key: apiKey,
-        keyHash: keyHash,
-        createdAt: new Date().toISOString(),
-        isActive: true,
-      };
-
-      await database.saveApiKey(newKey);
-      setNewApiKey(apiKey);
+      const response = await database.saveApiKey();
+      
+      setNewApiKey(response.key);
       setShowNewKey(true);
 
       toast({
@@ -147,11 +138,13 @@ export default function ApiKeysPage() {
 
     try {
       await database.deactivateApiKey(keyId);
+      setKeyToDelete(null);
+
       toast({
         title: "API Key Revoked",
-        description:
-          "The API key has been deactivated and can no longer be used.",
+        description: "The API key has been successfully revoked.",
       });
+
       await loadData();
     } catch (error) {
       console.error("Error revoking API key:", error);
@@ -160,14 +153,32 @@ export default function ApiKeysPage() {
         title: "Revocation Failed",
         description: "Failed to revoke API key. Please try again.",
       });
-    } finally {
-      setKeyToDelete(null);
     }
   };
 
   const handleCloseNewKeyDialog = () => {
     setShowNewKey(false);
     setNewApiKey(null);
+    setCopied(false);
+  };
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      toast({
+        title: "Copied!",
+        description: "API key copied to clipboard.",
+      });
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy:", error);
+      toast({
+        variant: "destructive",
+        title: "Copy Failed",
+        description: "Failed to copy to clipboard.",
+      });
+    }
   };
 
   if (loading) {
@@ -292,12 +303,12 @@ export default function ApiKeysPage() {
                     No API Keys Yet
                   </h3>
                   <p className="text-gray-500 mb-4">
-                    Generate your first API key to start using the HICv API
+                    Generate your first API key to start using the Civify API
                   </p>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {activeKeys.map((key) => (
+                  {activeKeys.map((key: ApiKey) => (
                     <div
                       key={key.id}
                       className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors"
@@ -305,7 +316,7 @@ export default function ApiKeysPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <p className="font-mono text-sm text-gray-700">
-                            {maskApiKey(key.key)}
+                            {maskApiKey(key?.keyPreview)}
                           </p>
                           <Badge className="bg-green-500">Active</Badge>
                         </div>
@@ -347,7 +358,7 @@ export default function ApiKeysPage() {
                   <CheckCircle className="h-5 w-5 text-green-500" />
                   API Key Generated Successfully!
                 </AlertDialogTitle>
-                <AlertDialogDescription className="space-y-4">
+                <div className="space-y-4 pt-2">
                   <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <p className="text-sm font-semibold text-yellow-900 mb-2 flex items-center gap-2">
                       <AlertCircle className="h-4 w-4" />
@@ -370,13 +381,17 @@ export default function ApiKeysPage() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => newApiKey && handleCopyApiKey(newApiKey)}
+                        onClick={() => copyToClipboard(newApiKey)}
                       >
-                        <Copy className="h-4 w-4" />
+                        {copied ? (
+                          <Check className="h-4 w-4" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
                       </Button>
                     </div>
                   </div>
-                </AlertDialogDescription>
+                </div>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogAction onClick={handleCloseNewKeyDialog}>

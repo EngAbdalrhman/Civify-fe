@@ -27,8 +27,8 @@ export class UserService {
   /**
    * Create API key
    */
-  async createApiKey(name: string): Promise<ApiKey> {
-    return await apiClient.post<ApiKey>(API_ENDPOINTS.USERS.API_KEYS, { name });
+  async createApiKey(): Promise<{ key: string }> {
+    return await apiClient.post<{ key: string }>(API_ENDPOINTS.USERS.API_KEYS);
   }
 
   /**
@@ -42,7 +42,25 @@ export class UserService {
    * Get API usage logs
    */
   async getApiUsage(): Promise<ApiUsageLog[]> {
-    return await apiClient.get<ApiUsageLog[]>(API_ENDPOINTS.USERS.API_USAGE);
+    // TODO: Implement backend endpoint for API usage logs
+    // return await apiClient.get<ApiUsageLog[]>(API_ENDPOINTS.USERS.API_USAGE);
+    return [];
+  }
+
+  /**
+   * Get API usage count for this month
+   */
+  async getApiUsageThisMonth(): Promise<number> {
+    const logs = await this.getApiUsage();
+    // Simple client-side calculation for now, ideally backend should provide this
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    
+    return logs.filter(log => {
+      const logDate = new Date(log.timestamp);
+      return logDate.getMonth() === currentMonth && logDate.getFullYear() === currentYear;
+    }).length;
   }
 }
 

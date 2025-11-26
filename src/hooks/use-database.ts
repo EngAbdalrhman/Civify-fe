@@ -28,11 +28,12 @@ export const useDatabase = () => {
 
       // API Keys (if needed here, or use userService directly)
       getApiKeys: () => userService.getApiKeys(),
-      saveApiKey: (name: string) => userService.createApiKey(name),
+      saveApiKey: () => userService.createApiKey(),
       deactivateApiKey: (id: string) => userService.revokeApiKey(id),
       
       // API Usage
       getApiUsageLogs: () => userService.getApiUsage(),
+      getApiUsageThisMonth: () => userService.getApiUsageThisMonth(),
     };
   }, []);
 

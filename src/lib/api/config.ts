@@ -36,7 +36,7 @@ export const API_ENDPOINTS = {
     PROFILE: "v1/users/me",
     ALL: "v1/users",
     BY_ID: (id: string | number) => `v1/users/${id}`,
-    API_KEYS: "v1/users/api-keys",
+    API_KEYS: "api-keys",
     API_USAGE: "v1/users/api-usage",
   },
 
