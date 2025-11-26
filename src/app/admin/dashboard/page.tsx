@@ -31,7 +31,7 @@ import { AdminUsersTab } from "./components/AdminUsersTab";
 import { AdminPlansTab } from "./components/AdminPlansTab";
 
 export default function AdminDashboard() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -44,6 +44,8 @@ export default function AdminDashboard() {
   // Check if user is admin
   useEffect(() => {
     const checkAdminStatus = async () => {
+      if (authLoading) return;
+
       if (!user) {
         router.push("/login");
         return;
@@ -80,7 +82,7 @@ export default function AdminDashboard() {
     };
 
     checkAdminStatus();
-  }, [user, router, toast]);
+  }, [user, authLoading, router, toast]);
 
   const loadAdminData = async () => {
     try {
@@ -96,7 +98,7 @@ export default function AdminDashboard() {
     }
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return <Loader message="Loading admin dashboard..." />;
   }
 

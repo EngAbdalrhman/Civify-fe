@@ -27,7 +27,7 @@ import { FileText, Plus, Edit, Trash2, Download, Eye } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 
 export default function DashboardPage() {
-  const { user, isHydrated } = useAuth();
+  const { user, isHydrated, loading: authLoading } = useAuth();
   const router = useRouter();
   const database = useDatabase();
   const { toast } = useToast();
@@ -39,13 +39,15 @@ export default function DashboardPage() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    if (isHydrated && !user) {
+    if (isHydrated && !authLoading && !user) {
       router.push("/login");
       return;
     }
 
-    loadData();
-  }, [user, isHydrated, router]);
+    if (user) {
+      loadData();
+    }
+  }, [user, isHydrated, authLoading, router]);
 
   const loadData = async () => {
 
