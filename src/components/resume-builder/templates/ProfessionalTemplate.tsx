@@ -44,14 +44,44 @@ const ProfessionalTemplate: React.FC<TemplateProps> = ({ data }) => {
               <div className="space-y-4 mt-4">
                 {section.type === 'skills' ? (
                    <div className="flex flex-wrap gap-x-4 gap-y-2 justify-center">
-                      {section.items.map((item) => (
-                        <div key={item.id} className="flex items-center gap-2">
-                          <span className="font-bold text-gray-800">{item.title}</span>
-                          {item.subtitle && (
-                             <span className="text-xs text-gray-500 uppercase tracking-wider">({item.subtitle})</span>
-                          )}
-                        </div>
-                      ))}
+                      {section.items.map((item) => {
+                         const style = section.style || 'text'; // Default to text for Professional
+                         let level = 3;
+                         if (item.subtitle === 'Beginner') level = 2;
+                         if (item.subtitle === 'Intermediate') level = 3;
+                         if (item.subtitle === 'Advanced') level = 4;
+                         if (item.subtitle === 'Expert') level = 5;
+
+                         return (
+                           <div key={item.id} className="flex items-center gap-2">
+                             <span className="font-bold text-gray-800">{item.title}</span>
+                             
+                             {style === 'dots' && (
+                               <div className="flex gap-1">
+                                 {[1, 2, 3, 4, 5].map((i) => (
+                                   <div
+                                     key={i}
+                                     className={`h-1.5 w-1.5 rounded-full ${i <= level ? 'bg-gray-800' : 'bg-gray-300'}`}
+                                   />
+                                 ))}
+                               </div>
+                             )}
+
+                             {style === 'bar' && (
+                               <div className="w-16 h-1.5 bg-gray-300 rounded-full overflow-hidden">
+                                 <div 
+                                   className="h-full bg-gray-800" 
+                                   style={{ width: `${(level / 5) * 100}%` }} 
+                                 />
+                               </div>
+                             )}
+
+                             {style === 'text' && item.subtitle && (
+                                <span className="text-xs text-gray-500 uppercase tracking-wider">({item.subtitle})</span>
+                             )}
+                           </div>
+                         );
+                      })}
                    </div>
                 ) : (
                   section.items.map((item) => (

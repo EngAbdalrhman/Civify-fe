@@ -35,12 +35,46 @@ const MinimalTemplate: React.FC<TemplateProps> = ({ data }) => {
                <h3 className="font-bold text-gray-800 uppercase text-xs tracking-wider mb-3 border-b border-gray-300 pb-1">
                  {section.title}
                </h3>
-               <div className="flex flex-wrap gap-2">
-                 {section.items.map(item => (
-                   <span key={item.id} className="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs font-medium">
-                     {item.title}
-                   </span>
-                 ))}
+               <div className="space-y-3">
+                 {section.items.map(item => {
+                    const style = section.style || 'text'; // Default to text/tags for Minimal
+                    let level = 3;
+                    if (item.subtitle === 'Beginner') level = 2;
+                    if (item.subtitle === 'Intermediate') level = 3;
+                    if (item.subtitle === 'Advanced') level = 4;
+                    if (item.subtitle === 'Expert') level = 5;
+
+                    return (
+                      <div key={item.id} className="flex flex-col">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-sm font-medium text-gray-700">{item.title}</span>
+                          {style === 'text' && (
+                             <span className="text-[10px] text-gray-500 uppercase">{item.subtitle}</span>
+                          )}
+                        </div>
+
+                        {style === 'dots' && (
+                          <div className="flex gap-1">
+                            {[1, 2, 3, 4, 5].map((i) => (
+                              <div
+                                key={i}
+                                className={`h-1.5 w-1.5 rounded-full ${i <= level ? 'bg-gray-600' : 'bg-gray-200'}`}
+                              />
+                            ))}
+                          </div>
+                        )}
+
+                        {style === 'bar' && (
+                          <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-gray-600" 
+                              style={{ width: `${(level / 5) * 100}%` }} 
+                            />
+                          </div>
+                        )}
+                      </div>
+                    );
+                 })}
                </div>
              </div>
            ))}

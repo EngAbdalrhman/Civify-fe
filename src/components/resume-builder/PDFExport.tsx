@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, PDFDownloadLink, Font } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Font, pdf } from '@react-pdf/renderer';
 import { ResumeData } from '@/types/resume';
 import { Button } from '@/components/ui/button';
 import { Download, Loader2 } from 'lucide-react';
@@ -182,10 +182,30 @@ const ResumeDocument: React.FC<{ data: ResumeData }> = ({ data }) => {
 
 const PDFExport: React.FC<{ data: ResumeData }> = ({ data }) => {
   const [isClient, setIsClient] = React.useState(false);
+  const [isGenerating, setIsGenerating] = React.useState(false);
 
   React.useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const handleExport = async () => {
+    try {
+      setIsGenerating(true);
+      const blob = await pdf(<ResumeDocument data={data} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${data.personalInfo.fullName || 'resume'}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('PDF Generation failed:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   if (!isClient) {
     return (
@@ -197,31 +217,14 @@ const PDFExport: React.FC<{ data: ResumeData }> = ({ data }) => {
   }
 
   return (
-    <PDFDownloadLink
-      document={<ResumeDocument data={data} />}
-      fileName={`${data.personalInfo.fullName || 'resume'}.pdf`}
-    >
-      {({ blob, url, loading, error }) => {
-        if (error) {
-            console.error("PDF Generation Error:", error);
-            return (
-                <Button variant="destructive">
-                    Error Generating PDF
-                </Button>
-            );
-        }
-        return (
-            <Button disabled={loading}>
-            {loading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-                <Download className="mr-2 h-4 w-4" />
-            )}
-            {loading ? 'Generating PDF...' : 'Export PDF'}
-            </Button>
-        );
-      }}
-    </PDFDownloadLink>
+    <Button onClick={handleExport} disabled={isGenerating}>
+      {isGenerating ? (
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+      ) : (
+        <Download className="mr-2 h-4 w-4" />
+      )}
+      {isGenerating ? 'Generating...' : 'Export PDF'}
+    </Button>
   );
 };
 

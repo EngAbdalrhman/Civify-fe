@@ -7,7 +7,13 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Loader2, Save, Download, LayoutTemplate } from 'lucide-react';
 import ResumeForm from './ResumeForm';
 import ResumePreview from './ResumePreview';
-import PDFExport from './PDFExport';
+
+import dynamic from 'next/dynamic';
+
+const PDFExport = dynamic(() => import('./PDFExport'), { 
+  ssr: false,
+  loading: () => <Button disabled variant="outline">Loading Export...</Button>
+});
 import {
   Select,
   SelectContent,

@@ -71,12 +71,25 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const result = Array.from(prev.sections);
       const [removed] = result.splice(startIndex, 1);
       result.splice(endIndex, 0, removed);
-      return { ...prev, sections: result };
+      
+      // Update order property for all sections
+      const updatedSections = result.map((section, index) => ({
+        ...section,
+        order: index + 1
+      }));
+      
+      return { ...prev, sections: updatedSections };
     });
   }, []);
 
   const saveResume = useCallback(async () => {
-    if (!resume) return;
+    console.log('Attempting to save resume...');
+    if (!resume) {
+        console.error('Save failed: Resume object is null');
+        toast({ title: 'Error', description: 'Cannot save: Resume not loaded.', variant: 'destructive' });
+        return;
+    }
+    console.log('Saving resume with ID:', resume.id);
     setIsSaving(true);
     try {
       // Assuming backend API is at /api/resumes
