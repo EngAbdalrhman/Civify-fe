@@ -96,13 +96,17 @@ class AuthService {
   async refreshToken(): Promise<string | null> {
     try {
       // The refresh token is in an HttpOnly cookie, so we just make the request
-      const response = await apiClient.getAxiosInstance().post("/refresh-token");
+      // We use empty body as backend checks cookie if param is missing
+      const response = await apiClient.getAxiosInstance().post("/auth/refresh", {});
       
-      const authHeader = response.headers["authorization"];
-      if (authHeader && authHeader.startsWith("Bearer ")) {
-        const token = authHeader.substring(7);
-        this.setAccessToken(token);
-        return token;
+      const { accessToken, refreshToken } = response.data;
+      
+      if (accessToken) {
+        this.setAccessToken(accessToken);
+        if (refreshToken) {
+            this.setRefreshToken(refreshToken);
+        }
+        return accessToken;
       }
       return null;
     } catch (error) {

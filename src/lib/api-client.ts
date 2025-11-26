@@ -66,10 +66,10 @@ class ApiClient {
 
           // Try to refresh token (relying on HttpOnly cookie)
           try {
-             // Use the filter-based refresh endpoint
+             // Use the correct backend endpoint
              const response = await axios.post(
-                `${FINAL_BASE_URL}/refresh-token`,
-                null,
+                `${FINAL_BASE_URL}/auth/refresh`,
+                {}, // Empty body
                 { withCredentials: true } // Ensure cookies are sent
              );
              

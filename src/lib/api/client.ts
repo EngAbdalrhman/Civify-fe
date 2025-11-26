@@ -192,21 +192,31 @@ class ApiClient {
   private async refreshAccessToken(): Promise<void> {
     const refreshToken = tokenManager.getRefreshToken();
 
-    if (!refreshToken) {
-      throw new ApiException(
-        API_ERROR_CODES.UNAUTHORIZED,
-        "No refresh token available",
-        HTTP_STATUS.UNAUTHORIZED
-      );
-    }
-
+    // If we have a refresh token in storage, use it (as param)
+    // If not, we try to use the HttpOnly cookie (by sending request with credentials)
+    
     try {
-      const response = await axios.post(`${API_URL}/auth/refresh`, null, {
-        params: { refreshToken },
-      });
+      const config: AxiosRequestConfig = {
+        withCredentials: true
+      };
+
+      // If we have a token, send it as param (backward compatibility)
+      if (refreshToken) {
+        config.params = { refreshToken };
+      }
+
+      const response = await axios.post(`${API_URL}/auth/refresh`, {}, config);
 
       const { accessToken, refreshToken: newRefreshToken } = response.data;
-      tokenManager.setTokens(accessToken, newRefreshToken);
+      
+      // Update token manager
+      // If newRefreshToken is null (backend might rely on cookie), we might need to keep the old one or just rely on cookie
+      // But usually backend returns new pair.
+      if (accessToken) {
+         // If backend returned a new refresh token, use it. Otherwise keep existing if we had one.
+         const rtToSave = newRefreshToken || refreshToken || "";
+         tokenManager.setTokens(accessToken, rtToSave);
+      }
     } catch (error) {
       tokenManager.clearTokens();
       throw error;
