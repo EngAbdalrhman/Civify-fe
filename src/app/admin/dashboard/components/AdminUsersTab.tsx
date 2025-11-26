@@ -15,8 +15,19 @@ import {
 } from "@/lib/api/services/admin.service";
 import type { UserProfile } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, Edit, CreditCard, KeyRound, Shield } from "lucide-react";
+import { Eye, Edit, Settings, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 // Extended user type for table display
 interface UserTableRow extends UserProfile {
@@ -25,6 +36,8 @@ interface UserTableRow extends UserProfile {
   createdAt?: string;
   lastLogin?: string;
   role?: string;
+  cvLimit?: number;
+  apiRateLimit?: number;
 }
 
 export function AdminUsersTab() {
@@ -39,6 +52,8 @@ export function AdminUsersTab() {
   });
 
   const [currentFilters, setCurrentFilters] = useState<FilterCriteria[]>([]);
+  const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserTableRow | null>(null);
 
   const loadUsers = async (filterInput?: InputDataModel) => {
     setLoading(true);
@@ -88,6 +103,31 @@ export function AdminUsersTab() {
     loadUsers();
   }, []);
 
+  const handleUpdateLimits = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!selectedUser || !selectedUser.userId) return;
+
+    const formData = new FormData(e.currentTarget);
+    const cvLimit = formData.get("cvLimit") ? Number(formData.get("cvLimit")) : undefined;
+    const apiLimit = formData.get("apiLimit") ? Number(formData.get("apiLimit")) : undefined;
+
+    try {
+      await adminService.updateUserLimits(selectedUser.userId, cvLimit, apiLimit);
+      toast({
+        title: "Success",
+        description: "User limits updated successfully",
+      });
+      setIsLimitModalOpen(false);
+      loadUsers();
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update user limits",
+      });
+    }
+  };
+
   // Column definitions
   const columns: ColumnDef<UserTableRow>[] = [
     {
@@ -99,9 +139,9 @@ export function AdminUsersTab() {
       filterType: "text",
       filterOperation: FilterOperation.EQUAL,
     },
-    {
-      key: "email",
-      label: "Email",
+     {
+      key: "username", // Changed from name to username as per API response
+      label: "Username",
       type: "text",
       sortable: true,
       filterable: true,
@@ -109,8 +149,8 @@ export function AdminUsersTab() {
       filterOperation: FilterOperation.MATCH,
     },
     {
-      key: "username", // Changed from name to username as per API response
-      label: "Username",
+      key: "email",
+      label: "Email",
       type: "text",
       sortable: true,
       filterable: true,
@@ -174,43 +214,19 @@ export function AdminUsersTab() {
       onClick: (item) => {
         toast({
           title: "View Details",
-          description: `Viewing details for ${item.email}`,
+          description: `Viewing details for ${item.username}`,
         });
       },
     },
     {
-      label: "Edit User",
-      icon: <Edit className="w-4 h-4" />,
+      label: "Set Limits",
+      icon: <Settings className="w-4 h-4" />,
       onClick: (item) => {
-        toast({
-          title: "Edit User",
-          description: `Editing ${item.email}`,
-        });
+        setSelectedUser(item);
+        setIsLimitModalOpen(true);
       },
-      showInMenu: true,
     },
-    {
-      label: "Set CV Limit",
-      icon: <CreditCard className="w-4 h-4" />,
-      onClick: (item) => {
-        toast({
-          title: "Set CV Limit",
-          description: `Setting CV limit for ${item.email}`,
-        });
-      },
-      showInMenu: true,
-    },
-    {
-      label: "Set API Limit",
-      icon: <KeyRound className="w-4 h-4" />,
-      onClick: (item) => {
-        toast({
-          title: "Set API Limit",
-          description: `Setting API limit for ${item.email}`,
-        });
-      },
-      showInMenu: true,
-    },
+    
   ];
 
   // Handle filter changes from GenericList
@@ -285,6 +301,56 @@ export function AdminUsersTab() {
         onRefresh={() => loadUsers()}
         defaultSort={{ field: 'id', direction: 'DESC' }}
       />
+
+      {/* Set Limits Modal */}
+      <Dialog open={isLimitModalOpen} onOpenChange={setIsLimitModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Set User Limits</DialogTitle>
+            <DialogDescription>
+              Configure custom limits for {selectedUser?.email}. Leave blank to use plan defaults.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedUser && (
+            <form onSubmit={handleUpdateLimits}>
+              <div className="grid gap-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="cvLimit">CV Limit</Label>
+                  <Input 
+                    id="cvLimit" 
+                    name="cvLimit" 
+                    type="number" 
+                    min="0" 
+                    placeholder="Plan Default" 
+                    defaultValue={selectedUser.cvLimit} 
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Maximum number of CVs the user can create.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="apiLimit">API Rate Limit</Label>
+                  <Input 
+                    id="apiLimit" 
+                    name="apiLimit" 
+                    type="number" 
+                    min="0" 
+                    placeholder="Plan Default" 
+                    defaultValue={selectedUser.apiRateLimit} 
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Maximum API calls per month.
+                  </p>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsLimitModalOpen(false)}>Cancel</Button>
+                <Button type="submit">Save Limits</Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

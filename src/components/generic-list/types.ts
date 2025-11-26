@@ -56,7 +56,7 @@ export interface ColumnDef<T = any> {
 
 export interface ActionDef<T = any> {
   label: string;
-  icon?: ReactNode;
+  icon?: ReactNode | ((item: T) => ReactNode);
   onClick: (item: T) => void;
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
   showInMenu?: boolean;

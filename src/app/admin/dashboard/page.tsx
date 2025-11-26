@@ -28,6 +28,7 @@ import { Users, BarChart3, Shield, CreditCard } from "lucide-react";
 import type { UserProfile, AdminStats } from "@/lib/types";
 import { adminService, AdminService } from "@/lib/api/services/admin.service";
 import { AdminUsersTab } from "./components/AdminUsersTab";
+import { AdminPlansTab } from "./components/AdminPlansTab";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -191,6 +192,7 @@ export default function AdminDashboard() {
         <Tabs defaultValue="users" className="space-y-4">
           <TabsList>
             <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="plans">Plans</TabsTrigger>
             <TabsTrigger value="cv-limits">CV Limits</TabsTrigger>
             <TabsTrigger value="api-limits">API Rate Limits</TabsTrigger>
           </TabsList>
@@ -206,6 +208,21 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <AdminUsersTab />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Plans Tab */}
+          <TabsContent value="plans">
+            <Card>
+              <CardHeader>
+                <CardTitle>Plan Management</CardTitle>
+                <CardDescription>
+                  Manage subscription plans, pricing, and features
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AdminPlansTab />
               </CardContent>
             </Card>
           </TabsContent>
@@ -254,7 +271,7 @@ function CVLimitsTab({
   const handleSetLimit = async (userId: string, limit: number) => {
     setLoading(true);
     try {
-      await adminService.setUserCVLimit(userId, limit);
+      await adminService.updateUserLimits(userId, limit, undefined);
       toast({
         title: "CV Limit Updated",
         description: `User CV limit has been set to ${limit}.`,
@@ -397,7 +414,7 @@ function ApiRateLimitsTab({
   const handleSetLimit = async (userId: string, limit: number) => {
     setLoading(true);
     try {
-      await adminService.setUserApiLimit(userId, limit);
+      await adminService.updateUserLimits(userId, undefined, limit);
       toast({
         title: "API Rate Limit Updated",
         description: `User API rate limit has been set to ${limit} calls/month.`,

@@ -291,7 +291,7 @@ export function GenericList<T extends { id?: string | number } = any>({
                             onClick={() => action.onClick(item)}
                             title={action.label}
                           >
-                            {action.icon}
+                            {typeof action.icon === 'function' ? action.icon(item) : action.icon}
                           </Button>
                         ))}
                         {menuActions.length > 0 && (
@@ -313,7 +313,7 @@ export function GenericList<T extends { id?: string | number } = any>({
                                 >
                                   {action.icon && (
                                     <span className="mr-2 w-4 h-4 flex items-center justify-center">
-                                      {action.icon}
+                                      {typeof action.icon === 'function' ? action.icon(item) : action.icon}
                                     </span>
                                   )}
                                   {action.label}
