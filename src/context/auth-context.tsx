@@ -38,16 +38,89 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     checkAuth();
   }, []);
 
+  // Listen for storage changes from other tabs (cross-tab sync)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      // Import STORAGE_KEYS
+      const STORAGE_KEYS = {
+        ACCESS_TOKEN: "access_token",
+        REFRESH_TOKEN: "refresh_token",
+        USER_DATA: "user_data",
+      };
+      
+      if (e.key === STORAGE_KEYS.ACCESS_TOKEN) {
+        if (!e.newValue) {
+          // Token cleared in another tab - logout this tab too
+          console.log("Access token cleared in another tab, logging out...");
+          setUser(null);
+        } else {
+          // Token updated in another tab - refresh user
+          console.log("Access token updated in another tab, refreshing user...");
+          checkAuth();
+        }
+      }
+    };
+    
+    if (typeof window !== "undefined") {
+      window.addEventListener('storage', handleStorageChange);
+      return () => window.removeEventListener('storage', handleStorageChange);
+    }
+  }, []);
+
   const checkAuth = async () => {
+    const accessToken = authService.getAccessToken();
+    
+    // If no access token but we might have refresh token in cookie, try to refresh
+    if (!accessToken) {
+      try {
+        const newToken = await authService.refreshToken();
+        if (newToken) {
+          // Successfully refreshed, now get user data
+          try {
+            const userData = await authService.getCurrentUser();
+            setUser(userData);
+            setLoading(false);
+            return;
+          } catch (error) {
+            console.error("Failed to fetch user after refresh:", error);
+          }
+        }
+      } catch (error) {
+        console.error("Token refresh failed on mount:", error);
+      }
+      // If refresh failed, continue to set user as null
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+    
+    // We have an access token, try to get user
     if (authService.isAuthenticated()) {
       try {
         const userData = await authService.getCurrentUser();
         setUser(userData);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Failed to fetch user profile:", error);
-        setUser(null);
-        // Optional: clear tokens if invalid
-        // authService.clearTokens();
+        
+        // If 401, token might be expired - try refresh once
+        if (error?.response?.status === 401) {
+          try {
+            const newToken = await authService.refreshToken();
+            if (newToken) {
+              // Retry with refreshed token
+              const userData = await authService.getCurrentUser();
+              setUser(userData);
+              setLoading(false);
+              return;
+            }
+          } catch (refreshError) {
+            console.error("Refresh failed after 401:", refreshError);
+            setUser(null);
+            authService.clearTokens();
+          }
+        } else {
+          setUser(null);
+        }
       }
     } else {
       setUser(null);

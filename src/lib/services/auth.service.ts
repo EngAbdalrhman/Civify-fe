@@ -76,17 +76,34 @@ class AuthService {
   }
 
   /**
-   * Logout user
+   * Logout user - Clears tokens from localStorage AND cookies
    */
   async logout(): Promise<void> {
     try {
-        // Optional: Call backend to clear cookies if needed, though usually client-side clear is enough for JWT
+        // Optional: Call backend to blacklist tokens
         // await apiClient.post("/auth/logout"); 
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
+      // Clear localStorage
       this.clearTokens();
+      
+      // Clear cookies (delete refresh token cookie)
+      this.clearCookies();
+      
       window.location.href = "/login";
+    }
+  }
+
+  /**
+   * Clear authentication cookies
+   */
+  private clearCookies(): void {
+    if (typeof document !== "undefined") {
+      // Delete refresh token cookie by setting it to expire immediately
+      document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      // Also try with specific path
+      document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/apis;";
     }
   }
 

@@ -44,12 +44,12 @@ import {
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 
 export default function ApiKeysPage() {
-  const { user, isHydrated } = useAuth();
+  const { user, isHydrated, loading: authLoading } = useAuth();
   const router = useRouter();
   const database = useDatabase();
   const { toast } = useToast();
 
-  const [loading, setLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [generating, setGenerating] = useState(false);
   const [newApiKey, setNewApiKey] = useState<string | null>(null);
@@ -60,21 +60,26 @@ export default function ApiKeysPage() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    if (isHydrated && !user) {
+    // Don't redirect while loading auth state
+    if (authLoading) return;
+
+    // Only redirect if auth check is complete and no user
+    if (!user) {
       router.push("/login");
       return;
     }
 
-    if (database) {
+    // Load data only when we have a user and database
+    if (database && user) {
       loadData();
     }
-  }, [user, isHydrated, database, router]);
+  }, [user, authLoading, database, router]);
 
   const loadData = async () => {
     if (!database) return;
 
     try {
-      setLoading(true);
+      setDataLoading(true);
       const [profile, keys, usage] = await Promise.all([
         database.getUserProfile(),
         database.getApiKeys(),
@@ -92,7 +97,7 @@ export default function ApiKeysPage() {
         description: "Failed to load API keys and usage data.",
       });
     } finally {
-      setLoading(false);
+      setDataLoading(false);
     }
   };
 
@@ -181,8 +186,17 @@ export default function ApiKeysPage() {
     }
   };
 
-  if (loading) {
-    return <Loader message="Loading API keys..." />;
+  if (dataLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading API keys...</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
   }
 
   const activeKeys = apiKeys.filter((k) => k.isActive);

@@ -57,9 +57,14 @@ class ApiClient {
         // Handle 401 Unauthorized - token expired
         if (error.response?.status === 401) {
           // Avoid infinite loop if the refresh endpoint itself returns 401
-          if (error.config?.url?.includes("/refresh-token")) {
+          if (error.config?.url?.includes("/auth/refresh")) {
              localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+             localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
              localStorage.removeItem(STORAGE_KEYS.USER_DATA);
+             
+             // Clear cookies
+             document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+             
              window.location.href = "/login";
              return Promise.reject(error);
           }
@@ -73,24 +78,40 @@ class ApiClient {
                 { withCredentials: true } // Ensure cookies are sent
              );
              
-             // Extract new access token from header
-             const authHeader = response.headers["authorization"];
-             if (authHeader && authHeader.startsWith("Bearer ")) {
-                const token = authHeader.substring(7);
-                localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
+             // Parse JSON body (backend returns {accessToken, refreshToken})
+             const { accessToken, refreshToken } = response.data;
+             
+             if (accessToken) {
+                // Update localStorage
+                localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+                if (refreshToken) {
+                   localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+                }
+                
+                // Also update tokenManager for consistency
+                const { tokenManager } = require("@/lib/api/token-manager");
+                tokenManager.setTokens(accessToken, refreshToken || "", 900000); // 15 min in ms
                 
                 // Retry original request
                 if (error.config) {
-                    error.config.headers.Authorization = `Bearer ${token}`;
+                    error.config.headers.Authorization = `Bearer ${accessToken}`;
                     return this.instance.request(error.config);
                 }
              } else {
-                throw new Error("No token in refresh response");
+                throw new Error("No access token in refresh response");
              }
           } catch (refreshError) {
               // Refresh failed, logout
+              console.error("Token refresh failed:", refreshError);
+              
+              // Clear localStorage
               localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+              localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
               localStorage.removeItem(STORAGE_KEYS.USER_DATA);
+              
+              // Clear cookies
+              document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+              
               window.location.href = "/login";
           }
         }
