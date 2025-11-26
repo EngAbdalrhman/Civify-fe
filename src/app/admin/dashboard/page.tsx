@@ -52,17 +52,13 @@ export default function AdminDashboard() {
         return;
       }
 
-      // Check if user email is admin email or has isAdmin flag
-      const adminEmail =
-        process.env.NEXT_PUBLIC_ADMIN_EMAIL || "amabdo30@gmail.com";
-
-      if (user.email === adminEmail) {
+      if (user.role === "ROLE_ADMIN") {
         setIsAdmin(true);
         await loadAdminData();
       } else {
         try {
           const profile = await userService.getProfile();
-          if (profile?.isAdmin) {
+          if (profile?.role === "ROLE_ADMIN") {
             setIsAdmin(true);
             await loadAdminData();
           } else {

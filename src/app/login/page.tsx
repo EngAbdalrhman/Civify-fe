@@ -84,10 +84,6 @@ export default function LoginPage() {
           email: data.email,
           password: data.password,
         });
-        toast({
-          title: "Signed In",
-          description: "You have successfully signed in.",
-        });
         
         const returnUrl = searchParams.get("returnUrl");
         router.push(returnUrl || "/dashboard");
