@@ -2,8 +2,9 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Resume, ResumeData, initialResumeData } from '@/types/resume';
-import axios from 'axios';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
+import { apiClient } from '@/lib/api-client';
 
 interface ResumeContextType {
   resume: Resume | null;
@@ -82,48 +83,50 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     });
   }, []);
 
+  const router = useRouter();
+
   const saveResume = useCallback(async () => {
     console.log('Attempting to save resume...');
-    if (!resume) {
-        console.error('Save failed: Resume object is null');
-        toast({ title: 'Error', description: 'Cannot save: Resume not loaded.', variant: 'destructive' });
-        return;
-    }
-    console.log('Saving resume with ID:', resume.id);
     setIsSaving(true);
     try {
-      // Assuming backend API is at /api/resumes
-      // We need to use the full URL if it's on a different port, but for now assuming proxy or same origin
-      // Or using the environment variable for API URL
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-      await axios.put(`${apiUrl}/api/resumes/${resume.id}`, {
-        title: resume.title,
-        data: resumeData,
-      }, {
-        withCredentials: true // Important for session/cookie auth
-      });
-      toast({ title: 'Saved', description: 'Resume saved successfully.' });
+      if (resume) {
+        // Update existing resume
+        console.log('Updating resume with ID:', resume.id);
+        await apiClient.put(`/v1/resumes/${resume.id}`, {
+          title: resume.title,
+          data: resumeData,
+        });
+        toast({ title: 'Saved', description: 'Resume saved successfully.' });
+      } else {
+        // Create new resume
+        console.log('Creating new resume...');
+        const title = resumeData.personalInfo.fullName || 'Untitled Resume';
+        const response = await apiClient.post(`/v1/resumes`, {
+          title,
+          data: resumeData,
+        });
+        
+        setResume(response);
+        // Optionally update URL to the new ID
+        if (response.id) {
+            router.push(`/resume/builder/${response.id}`);
+        }
+        toast({ title: 'Saved', description: 'Resume created successfully.' });
+      }
     } catch (error: any) {
       console.error('Error saving resume:', error);
-      if (axios.isAxiosError(error)) {
-        console.error('Response data:', error.response?.data);
-        console.error('Response status:', error.response?.status);
-      }
-      toast({ title: 'Error', description: `Failed to save resume: ${error.message}`, variant: 'destructive' });
+      toast({ title: 'Error', description: `Failed to save resume: ${error?.message || 'Unknown error'}`, variant: 'destructive' });
     } finally {
       setIsSaving(false);
     }
-  }, [resume, resumeData, toast]);
+  }, [resume, resumeData, toast, router]);
 
   const loadResume = useCallback(async (id: string) => {
     setIsLoading(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-      const response = await axios.get(`${apiUrl}/api/resumes/${id}`, {
-         withCredentials: true
-      });
-      setResume(response.data);
-      setResumeData(response.data.data || initialResumeData);
+      const response = await apiClient.get(`/v1/resumes/${id}`);
+      setResume(response);
+      setResumeData(response.data || initialResumeData);
     } catch (error) {
       console.error('Error loading resume:', error);
       toast({ title: 'Error', description: 'Failed to load resume.', variant: 'destructive' });
@@ -135,16 +138,13 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const createResume = useCallback(async (title: string) => {
     setIsLoading(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-      const response = await axios.post(`${apiUrl}/api/resumes`, {
+      const response = await apiClient.post(`/v1/resumes`, {
         title,
         data: initialResumeData,
-      }, {
-         withCredentials: true
       });
-      setResume(response.data);
-      setResumeData(response.data.data);
-      return response.data.id;
+      setResume(response);
+      setResumeData(response.data);
+      return response.id;
     } catch (error) {
       console.error('Error creating resume:', error);
       toast({ title: 'Error', description: 'Failed to create resume.', variant: 'destructive' });
