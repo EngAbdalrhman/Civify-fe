@@ -6,16 +6,16 @@ import { ResumeData } from '@/types/resume';
 import { Button } from '@/components/ui/button';
 import { Download, Loader2 } from 'lucide-react';
 
-// Register fonts
-Font.register({
-  family: 'Inter',
-  src: 'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.ttf',
-});
+// Register fonts - using standard fonts for now to avoid network issues
+// Font.register({
+//   family: 'Inter',
+//   src: 'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.ttf',
+// });
 
 const styles = StyleSheet.create({
   page: {
     padding: 30,
-    fontFamily: 'Inter',
+    fontFamily: 'Helvetica',
     fontSize: 11,
     lineHeight: 1.5,
   },
@@ -111,16 +111,68 @@ const ResumeDocument: React.FC<{ data: ResumeData }> = ({ data }) => {
           .map((section) => (
             <View key={section.id} style={styles.section}>
               <Text style={styles.sectionTitle}>{section.title}</Text>
-              {section.items.map((item) => (
-                <View key={item.id} style={styles.item}>
-                  <View style={styles.itemHeader}>
-                    <Text style={styles.itemTitle}>{item.title}</Text>
-                    <Text style={styles.date}>{item.date}</Text>
-                  </View>
-                  {item.subtitle && <Text style={styles.itemSubtitle}>{item.subtitle}</Text>}
-                  {item.description && <Text style={styles.description}>{item.description}</Text>}
+              {section.type === 'skills' ? (
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                  {section.items.map((item) => {
+                     const style = section.style || 'dots';
+                     let level = 3;
+                     if (item.subtitle === 'Beginner') level = 2;
+                     if (item.subtitle === 'Intermediate') level = 3;
+                     if (item.subtitle === 'Advanced') level = 4;
+                     if (item.subtitle === 'Expert') level = 5;
+
+                     return (
+                      <View key={item.id} style={{ flexDirection: 'row', alignItems: 'center', width: '45%', marginBottom: 4 }}>
+                        <Text style={{ fontWeight: 'bold', fontSize: 10, flex: 1 }}>{item.title}</Text>
+                        
+                        {style === 'dots' && (
+                           <View style={{ flexDirection: 'row', gap: 2 }}>
+                             {[1, 2, 3, 4, 5].map((i) => (
+                               <View
+                                 key={i}
+                                 style={{
+                                   width: 6,
+                                   height: 6,
+                                   borderRadius: 3,
+                                   backgroundColor: i <= level ? '#1f2937' : '#e5e7eb'
+                                 }}
+                               />
+                             ))}
+                           </View>
+                        )}
+
+                        {style === 'bar' && (
+                           <View style={{ width: 60, height: 4, backgroundColor: '#e5e7eb', borderRadius: 2 }}>
+                             <View 
+                               style={{ 
+                                 width: `${(level / 5) * 100}%`, 
+                                 height: '100%', 
+                                 backgroundColor: '#1f2937', 
+                                 borderRadius: 2 
+                               }} 
+                             />
+                           </View>
+                        )}
+
+                        {style === 'text' && (
+                           <Text style={{ fontSize: 9, color: '#6b7280' }}>{item.subtitle}</Text>
+                        )}
+                      </View>
+                     );
+                  })}
                 </View>
-              ))}
+              ) : (
+                section.items.map((item) => (
+                  <View key={item.id} style={styles.item}>
+                    <View style={styles.itemHeader}>
+                      <Text style={styles.itemTitle}>{item.title}</Text>
+                      <Text style={styles.date}>{item.date}</Text>
+                    </View>
+                    {item.subtitle && <Text style={styles.itemSubtitle}>{item.subtitle}</Text>}
+                    {item.description && <Text style={styles.description}>{item.description}</Text>}
+                  </View>
+                ))
+              )}
             </View>
           ))}
       </Page>
@@ -129,21 +181,46 @@ const ResumeDocument: React.FC<{ data: ResumeData }> = ({ data }) => {
 };
 
 const PDFExport: React.FC<{ data: ResumeData }> = ({ data }) => {
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return (
+      <Button disabled>
+        <Download className="mr-2 h-4 w-4" />
+        Export PDF
+      </Button>
+    );
+  }
+
   return (
     <PDFDownloadLink
       document={<ResumeDocument data={data} />}
       fileName={`${data.personalInfo.fullName || 'resume'}.pdf`}
     >
-      {({ blob, url, loading, error }) => (
-        <Button disabled={loading}>
-          {loading ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Download className="mr-2 h-4 w-4" />
-          )}
-          {loading ? 'Generating PDF...' : 'Export PDF'}
-        </Button>
-      )}
+      {({ blob, url, loading, error }) => {
+        if (error) {
+            console.error("PDF Generation Error:", error);
+            return (
+                <Button variant="destructive">
+                    Error Generating PDF
+                </Button>
+            );
+        }
+        return (
+            <Button disabled={loading}>
+            {loading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+                <Download className="mr-2 h-4 w-4" />
+            )}
+            {loading ? 'Generating PDF...' : 'Export PDF'}
+            </Button>
+        );
+      }}
     </PDFDownloadLink>
   );
 };

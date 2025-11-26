@@ -10,13 +10,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Trash2, Plus, GripVertical } from 'lucide-react';
+import DatePicker from './DatePicker';
+import SkillsForm from './SkillsForm';
 
 interface SectionFormProps {
   section: ResumeSection;
 }
 
 const SectionForm: React.FC<SectionFormProps> = ({ section }) => {
-  const { updateSection } = useResume();
+  const { updateSection, reorderSections, resumeData } = useResume();
+  const [isEditingTitle, setIsEditingTitle] = React.useState(false);
+  const [editedTitle, setEditedTitle] = React.useState(section.title);
 
   const handleAddItem = () => {
     const newItem: SectionItem = {
@@ -48,13 +52,64 @@ const SectionForm: React.FC<SectionFormProps> = ({ section }) => {
     });
   };
 
+  const handleSaveTitle = () => {
+    updateSection(section.id, { title: editedTitle });
+    setIsEditingTitle(false);
+  };
+
+  const handleMoveUp = () => {
+    const index = resumeData.sections.findIndex(s => s.id === section.id);
+    if (index > 0) {
+      reorderSections(index, index - 1);
+    }
+  };
+
+  const handleMoveDown = () => {
+    const index = resumeData.sections.findIndex(s => s.id === section.id);
+    if (index < resumeData.sections.length - 1) {
+      reorderSections(index, index + 1);
+    }
+  };
+
+  if (section.type === 'skills') {
+    return <SkillsForm section={section} />;
+  }
+
   return (
     <Card className="mb-6">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>{section.title}</CardTitle>
-        <Button variant="outline" size="sm" onClick={handleAddItem}>
-          <Plus className="mr-2 h-4 w-4" /> Add Item
-        </Button>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <div className="flex items-center gap-2">
+          {isEditingTitle ? (
+            <div className="flex items-center gap-2">
+              <Input 
+                value={editedTitle} 
+                onChange={(e) => setEditedTitle(e.target.value)}
+                className="h-8 w-[200px]"
+              />
+              <Button size="sm" onClick={handleSaveTitle}>Save</Button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-base font-semibold">{section.title}</CardTitle>
+              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setIsEditingTitle(true)}>
+                <GripVertical className="h-4 w-4 text-gray-400" />
+              </Button>
+            </div>
+          )}
+        </div>
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleMoveUp}>
+            <span className="sr-only">Move Up</span>
+            ↑
+          </Button>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleMoveDown}>
+            <span className="sr-only">Move Down</span>
+            ↓
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleAddItem}>
+            <Plus className="mr-2 h-4 w-4" /> Add Item
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <Accordion type="single" collapsible className="w-full">
@@ -92,10 +147,9 @@ const SectionForm: React.FC<SectionFormProps> = ({ section }) => {
                   <div className="grid grid-cols-2 gap-4">
                      <div className="space-y-2">
                       <Label>Date Range</Label>
-                      <Input
+                      <DatePicker
                         value={item.date}
-                        onChange={(e) => handleItemChange(item.id, 'date', e.target.value)}
-                        placeholder="Jan 2020 - Present"
+                        onChange={(value) => handleItemChange(item.id, 'date', value)}
                       />
                     </div>
                      <div className="space-y-2">

@@ -90,9 +90,13 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         withCredentials: true // Important for session/cookie auth
       });
       toast({ title: 'Saved', description: 'Resume saved successfully.' });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving resume:', error);
-      toast({ title: 'Error', description: 'Failed to save resume.', variant: 'destructive' });
+      if (axios.isAxiosError(error)) {
+        console.error('Response data:', error.response?.data);
+        console.error('Response status:', error.response?.status);
+      }
+      toast({ title: 'Error', description: `Failed to save resume: ${error.message}`, variant: 'destructive' });
     } finally {
       setIsSaving(false);
     }

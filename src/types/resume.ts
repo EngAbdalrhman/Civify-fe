@@ -21,6 +21,7 @@ export interface SectionItem {
   location: string;
   tags: string[];
   isVisible: boolean;
+  style?: 'dots' | 'bar' | 'text';
 }
 
 export interface ResumeSection {

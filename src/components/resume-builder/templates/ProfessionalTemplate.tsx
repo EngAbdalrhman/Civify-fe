@@ -42,29 +42,42 @@ const ProfessionalTemplate: React.FC<TemplateProps> = ({ data }) => {
               </h2>
               
               <div className="space-y-4 mt-4">
-                {section.items.map((item) => (
-                  <div key={item.id} className="mb-4">
-                    <div className="flex justify-between items-baseline">
-                      <h3 className="font-bold text-gray-800 text-lg">{item.title}</h3>
-                      <span className="text-sm font-medium text-gray-600 italic">{item.date}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center mb-1">
-                       {item.subtitle && (
-                        <p className="text-gray-700 font-semibold">{item.subtitle}</p>
-                      )}
-                      {item.location && (
-                        <span className="text-xs text-gray-500">{item.location}</span>
-                      )}
-                    </div>
+                {section.type === 'skills' ? (
+                   <div className="flex flex-wrap gap-x-4 gap-y-2 justify-center">
+                      {section.items.map((item) => (
+                        <div key={item.id} className="flex items-center gap-2">
+                          <span className="font-bold text-gray-800">{item.title}</span>
+                          {item.subtitle && (
+                             <span className="text-xs text-gray-500 uppercase tracking-wider">({item.subtitle})</span>
+                          )}
+                        </div>
+                      ))}
+                   </div>
+                ) : (
+                  section.items.map((item) => (
+                    <div key={item.id} className="mb-4">
+                      <div className="flex justify-between items-baseline">
+                        <h3 className="font-bold text-gray-800 text-lg">{item.title}</h3>
+                        <span className="text-sm font-medium text-gray-600 italic">{item.date}</span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center mb-1">
+                         {item.subtitle && (
+                          <p className="text-gray-700 font-semibold">{item.subtitle}</p>
+                        )}
+                        {item.location && (
+                          <span className="text-xs text-gray-500">{item.location}</span>
+                        )}
+                      </div>
 
-                    {item.description && (
-                      <p className="text-sm text-gray-700 mt-1 leading-relaxed text-justify">
-                        {item.description}
-                      </p>
-                    )}
-                  </div>
-                ))}
+                      {item.description && (
+                        <p className="text-sm text-gray-700 mt-1 leading-relaxed text-justify">
+                          {item.description}
+                        </p>
+                      )}
+                    </div>
+                  ))
+                )}
               </div>
             </section>
           ))}
