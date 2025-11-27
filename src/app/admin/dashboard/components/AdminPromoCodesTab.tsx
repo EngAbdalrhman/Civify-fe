@@ -317,10 +317,7 @@ export function AdminPromoCodesTab() {
       label: "Deactivate",
       icon: <XCircle className="w-4 h-4 text-orange-500" />,
       onClick: handleDeactivate,
-      // Only show if active
-      // Note: GenericList doesn't support conditional actions per row yet, 
-      // but we can handle it in the click handler or update GenericList later.
-      // For now, we show it always but it's harmless if already inactive.
+      condition: (item) => item.active,
     },
     {
       label: "Delete",

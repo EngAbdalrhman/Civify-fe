@@ -282,7 +282,9 @@ export function GenericList<T extends { id?: string | number } = any>({
                   {actions.length > 0 && (
                     <TableCell className="text-right py-3">
                       <div className="flex items-center justify-end gap-1">
-                        {directActions.map((action, i) => (
+                        {directActions
+                          .filter(action => !action.condition || action.condition(item))
+                          .map((action, i) => (
                           <Button
                             key={i}
                             variant={action.variant || 'ghost'}
@@ -294,7 +296,7 @@ export function GenericList<T extends { id?: string | number } = any>({
                             {typeof action.icon === 'function' ? action.icon(item) : action.icon}
                           </Button>
                         ))}
-                        {menuActions.length > 0 && (
+                        {menuActions.some(action => !action.condition || action.condition(item)) && (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
@@ -302,7 +304,9 @@ export function GenericList<T extends { id?: string | number } = any>({
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-40">
-                              {menuActions.map((action, i) => (
+                              {menuActions
+                                .filter(action => !action.condition || action.condition(item))
+                                .map((action, i) => (
                                 <DropdownMenuItem
                                   key={i}
                                   onClick={() => action.onClick(item)}

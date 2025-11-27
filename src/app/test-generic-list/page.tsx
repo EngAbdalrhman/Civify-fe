@@ -151,13 +151,15 @@ export default function TestGenericListPage() {
       icon: <Edit className="w-4 h-4" />,
       onClick: (item) => alert(`Edit ${item.name}`),
       showInMenu: true,
+      condition: (item) => item.status === 'Active',
     },
     {
       label: 'Delete',
       icon: <Trash className="w-4 h-4 text-red-500" />,
       onClick: (item) => alert(`Delete ${item.name}`),
       showInMenu: true,
-      variant: 'destructive'
+      variant: 'destructive',
+      condition: (item) => item.status === 'Banned',
     },
   ];
 

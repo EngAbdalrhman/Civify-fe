@@ -60,6 +60,7 @@ export interface ActionDef<T = any> {
   onClick: (item: T) => void;
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
   showInMenu?: boolean;
+  condition?: (item: T) => boolean;
 }
 
 export interface FilterState {
