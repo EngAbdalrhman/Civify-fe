@@ -24,6 +24,10 @@ const serverClient = createServerClient();
 export const serverDatabases = new Databases(serverClient);
 export const serverStorage = new Storage(serverClient);
 
+// Alias exports for backward compatibility
+export const databases = serverDatabases;
+export const storage = serverStorage;
+
 // Export Query and ID for convenience
 export { Query, ID };
 
