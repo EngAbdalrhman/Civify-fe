@@ -4,7 +4,7 @@ export function AppLogo({ className }: { className?: string }) {
   return (
     <img
       className={className}
-      src="https://egypt-tech.static.domains/318317bf909630d4f634a53a96518810.png"
+      src="https://ik.imagekit.io/civify/icon.png?updatedAt=1761505214339"
       width="36px"
       height="36px"
       alt="Civify Logo"
