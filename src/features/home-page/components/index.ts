@@ -1,0 +1,12 @@
+export { HeroSection } from "./HeroSection";
+export { HowItWorksSection } from "./HowItWorksSection";
+export { FeaturesSection } from "./FeaturesSection";
+export { BeforeAfterSection } from "./BeforeAfterSection";
+export { TemplatesSection } from "./TemplatesSection";
+export { RolePersonalizationSection } from "./RolePersonalizationSection";
+export { TestimonialsSection } from "./TestimonialsSection";
+export { PricingSection } from "./PricingSection";
+export { FAQSection } from "./FAQSection";
+export { IntegrationsSection } from "./IntegrationsSection";
+export { BlogPreviewSection } from "./BlogPreviewSection";
+export { CTASection } from "./CTASection";

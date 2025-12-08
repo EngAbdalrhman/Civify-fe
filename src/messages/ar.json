@@ -1,0 +1,193 @@
+{
+  "common": {
+    "appName": "سيفيفاي",
+    "welcome": "مرحباً",
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجح",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "create": "إنشاء",
+    "update": "تحديث",
+    "search": "بحث",
+    "filter": "تصفية",
+    "export": "تصدير",
+    "import": "استيراد",
+    "download": "تحميل",
+    "upload": "رفع",
+    "submit": "إرسال",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "close": "إغلاق",
+    "confirm": "تأكيد",
+    "yes": "نعم",
+    "no": "لا"
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "dashboard": "لوحة التحكم",
+    "analytics": "التحليلات",
+    "settings": "الإعدادات",
+    "upload": "رفع السيرة الذاتية",
+    "plans": "الخطط",
+    "admin": "الإدارة",
+    "users": "المستخدمون",
+    "promos": "العروض الترويجية",
+    "stats": "الإحصائيات",
+    "apiUsage": "استخدام API",
+    "logout": "تسجيل الخروج",
+    "language": {
+      "switch": "تغيير اللغة"
+    }
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "signup": "إنشاء حساب",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "rememberMe": "تذكرني",
+    "noAccount": "ليس لديك حساب؟",
+    "hasAccount": "لديك حساب بالفعل؟",
+    "loginWithGoogle": "تسجيل الدخول بواسطة جوجل",
+    "signupWithGoogle": "إنشاء حساب بواسطة جوجل"
+  },
+  "dashboard": {
+    "personalPage": {
+      "title": "الصفحة الشخصية",
+      "profile": "الملف الشخصي",
+      "cvs": "سيرتي الذاتية",
+      "recent": "النشاط الأخير"
+    },
+    "analytics": {
+      "title": "التحليلات",
+      "overview": "نظرة عامة",
+      "cvViews": "مشاهدات السيرة الذاتية",
+      "downloads": "التحميلات",
+      "performance": "الأداء"
+    },
+    "settings": {
+      "title": "الإعدادات",
+      "account": "إعدادات الحساب",
+      "preferences": "التفضيلات",
+      "notifications": "الإشعارات",
+      "security": "الأمان"
+    }
+  },
+  "upload": {
+    "title": "رفع السيرة الذاتية",
+    "dragDrop": "اسحب وأفلت سيرتك الذاتية هنا",
+    "or": "أو",
+    "browse": "تصفح الملفات",
+    "supportedFormats": "الصيغ المدعومة: PDF, DOC, DOCX",
+    "maxSize": "الحد الأقصى لحجم الملف: 5 ميجابايت",
+    "processing": "جاري معالجة سيرتك الذاتية...",
+    "success": "تم رفع السيرة الذاتية بنجاح!"
+  },
+  "plans": {
+    "title": "اختر خطتك",
+    "free": "مجاني",
+    "pro": "احترافي",
+    "enterprise": "للمؤسسات",
+    "monthly": "شهري",
+    "yearly": "سنوي",
+    "selectPlan": "اختر الخطة",
+    "currentPlan": "الخطة الحالية",
+    "upgrade": "ترقية",
+    "features": "المميزات"
+  },
+  "subscription": {
+    "confirm": {
+      "title": "تأكيد الاشتراك",
+      "plan": "الخطة",
+      "price": "السعر",
+      "billingCycle": "دورة الفوترة",
+      "paymentMethod": "طريقة الدفع",
+      "confirmPayment": "تأكيد الدفع"
+    },
+    "success": {
+      "title": "تم الدفع بنجاح!",
+      "message": "تم تفعيل اشتراكك",
+      "goToDashboard": "الذهاب إلى لوحة التحكم",
+      "viewReceipt": "عرض الإيصال"
+    }
+  },
+  "admin": {
+    "users": {
+      "title": "إدارة المستخدمين",
+      "totalUsers": "إجمالي المستخدمين",
+      "activeUsers": "المستخدمون النشطون",
+      "newUsers": "مستخدمون جدد"
+    },
+    "plans": {
+      "title": "إدارة الخطط",
+      "createPlan": "إنشاء خطة",
+      "editPlan": "تعديل الخطة"
+    },
+    "promos": {
+      "title": "إدارة العروض الترويجية",
+      "createPromo": "إنشاء عرض ترويجي",
+      "code": "رمز العرض",
+      "discount": "الخصم",
+      "expiryDate": "تاريخ الانتهاء"
+    },
+    "stats": {
+      "title": "الإحصائيات",
+      "revenue": "الإيرادات",
+      "conversions": "التحويلات",
+      "growth": "النمو"
+    },
+    "apiUsage": {
+      "title": "استخدام API",
+      "requests": "الطلبات",
+      "limit": "الحد الأقصى",
+      "remaining": "المتبقي"
+    }
+  },
+  "footer": {
+    "product": {
+      "title": "المنتج",
+      "overview": "نظرة عامة",
+      "pricing": "الأسعار",
+      "marketplace": "السوق",
+      "features": "المميزات",
+      "integrations": "التكاملات"
+    },
+    "company": {
+      "title": "الشركة",
+      "about": "عن الشركة",
+      "team": "الفريق",
+      "blog": "المدونة",
+      "careers": "الوظائف",
+      "contact": "اتصل بنا",
+      "privacy": "الخصوصية"
+    },
+    "resources": {
+      "title": "الموارد",
+      "help": "المساعدة",
+      "sales": "المبيعات",
+      "advertise": "الإعلان"
+    },
+    "social": {
+      "title": "التواصل الاجتماعي",
+      "twitter": "تويتر",
+      "instagram": "إنستغرام",
+      "linkedin": "لينكد إن"
+    },
+    "newsletter": {
+      "title": "اشترك في نشرتنا الإخبارية",
+      "description": "احصل على آخر التحديثات والأخبار في بريدك الإلكتروني",
+      "placeholder": "أدخل بريدك الإلكتروني",
+      "subscribe": "اشترك"
+    },
+    "followUs": "تابعنا",
+    "mobileApp": "تطبيق الجوال",
+    "downloadOn": "حمّل من",
+    "getItOn": "احصل عليه من",
+    "copyright": "© {year} Civify.com. جميع الحقوق محفوظة."
+  }
+}

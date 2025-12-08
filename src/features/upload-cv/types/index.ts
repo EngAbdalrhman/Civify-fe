@@ -1,0 +1,2 @@
+// Upload CV types
+export {};

@@ -1,0 +1,193 @@
+{
+  "common": {
+    "appName": "Civify",
+    "welcome": "Welcome",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "download": "Download",
+    "upload": "Upload",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "upload": "Upload CV",
+    "plans": "Plans",
+    "admin": "Admin",
+    "users": "Users",
+    "promos": "Promotions",
+    "stats": "Statistics",
+    "apiUsage": "API Usage",
+    "logout": "Logout",
+    "language": {
+      "switch": "Switch Language"
+    }
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "rememberMe": "Remember Me",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "loginWithGoogle": "Login with Google",
+    "signupWithGoogle": "Sign up with Google"
+  },
+  "dashboard": {
+    "personalPage": {
+      "title": "Personal Page",
+      "profile": "Profile",
+      "cvs": "My CVs",
+      "recent": "Recent Activity"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "overview": "Overview",
+      "cvViews": "CV Views",
+      "downloads": "Downloads",
+      "performance": "Performance"
+    },
+    "settings": {
+      "title": "Settings",
+      "account": "Account Settings",
+      "preferences": "Preferences",
+      "notifications": "Notifications",
+      "security": "Security"
+    }
+  },
+  "upload": {
+    "title": "Upload CV",
+    "dragDrop": "Drag and drop your CV here",
+    "or": "or",
+    "browse": "Browse Files",
+    "supportedFormats": "Supported formats: PDF, DOC, DOCX",
+    "maxSize": "Maximum file size: 5MB",
+    "processing": "Processing your CV...",
+    "success": "CV uploaded successfully!"
+  },
+  "plans": {
+    "title": "Choose Your Plan",
+    "free": "Free",
+    "pro": "Pro",
+    "enterprise": "Enterprise",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "selectPlan": "Select Plan",
+    "currentPlan": "Current Plan",
+    "upgrade": "Upgrade",
+    "features": "Features"
+  },
+  "subscription": {
+    "confirm": {
+      "title": "Confirm Subscription",
+      "plan": "Plan",
+      "price": "Price",
+      "billingCycle": "Billing Cycle",
+      "paymentMethod": "Payment Method",
+      "confirmPayment": "Confirm Payment"
+    },
+    "success": {
+      "title": "Payment Successful!",
+      "message": "Your subscription has been activated",
+      "goToDashboard": "Go to Dashboard",
+      "viewReceipt": "View Receipt"
+    }
+  },
+  "admin": {
+    "users": {
+      "title": "User Management",
+      "totalUsers": "Total Users",
+      "activeUsers": "Active Users",
+      "newUsers": "New Users"
+    },
+    "plans": {
+      "title": "Plan Management",
+      "createPlan": "Create Plan",
+      "editPlan": "Edit Plan"
+    },
+    "promos": {
+      "title": "Promotion Management",
+      "createPromo": "Create Promotion",
+      "code": "Promo Code",
+      "discount": "Discount",
+      "expiryDate": "Expiry Date"
+    },
+    "stats": {
+      "title": "Statistics",
+      "revenue": "Revenue",
+      "conversions": "Conversions",
+      "growth": "Growth"
+    },
+    "apiUsage": {
+      "title": "API Usage",
+      "requests": "Requests",
+      "limit": "Limit",
+      "remaining": "Remaining"
+    }
+  },
+  "footer": {
+    "product": {
+      "title": "Product",
+      "overview": "Overview",
+      "pricing": "Pricing",
+      "marketplace": "Marketplace",
+      "features": "Features",
+      "integrations": "Integrations"
+    },
+    "company": {
+      "title": "Company",
+      "about": "About",
+      "team": "Team",
+      "blog": "Blog",
+      "careers": "Careers",
+      "contact": "Contact",
+      "privacy": "Privacy"
+    },
+    "resources": {
+      "title": "Resources",
+      "help": "Help",
+      "sales": "Sales",
+      "advertise": "Advertise"
+    },
+    "social": {
+      "title": "Social",
+      "twitter": "Twitter",
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn"
+    },
+    "newsletter": {
+      "title": "Subscribe to our Newsletter",
+      "description": "Get the latest updates and news delivered to your inbox",
+      "placeholder": "Enter your email",
+      "subscribe": "Subscribe"
+    },
+    "followUs": "Follow us",
+    "mobileApp": "Mobile App",
+    "downloadOn": "Download on the",
+    "getItOn": "Get it on",
+    "copyright": "© {year} Civify.com. All rights reserved."
+  }
+}
