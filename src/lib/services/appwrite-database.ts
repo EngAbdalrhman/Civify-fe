@@ -146,16 +146,6 @@ export class AppwriteDatabaseService {
       // Get current profile
       const currentProfile = await this.getUserProfile();
 
-      // Check if CV email matches user email
-      const cvEmail = cvData.personalInfo?.email?.toLowerCase();
-      const currentEmail = userEmail.toLowerCase();
-
-      if (cvEmail && cvEmail !== currentEmail) {
-        throw new Error(
-          "CV email does not match your account email. Please upload your own CV."
-        );
-      }
-
       // Prepare update data - only fill empty fields
       const updateData: Partial<UserProfile> = {};
 
