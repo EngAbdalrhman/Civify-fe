@@ -6,7 +6,7 @@
   publish = ".next"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "18"
 
 # Use the Essential Next.js Plugin
 [[plugins]]
