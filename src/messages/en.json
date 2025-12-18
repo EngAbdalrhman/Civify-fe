@@ -196,6 +196,7 @@
     "mobileApp": "Mobile App",
     "downloadOn": "Download on the",
     "getItOn": "Get it on",
-    "copyright": "© {year} Civify.com. All rights reserved."
+    "copyright": "© {year} Civify.com. All rights reserved.",
+    "poweredBy": "Powered by Technolabs"
   }
 }

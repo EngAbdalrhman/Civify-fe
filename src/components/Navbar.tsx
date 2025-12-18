@@ -11,11 +11,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import Image from "next/image";
 
 const navigationItems = [
   {
@@ -64,10 +61,13 @@ export function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <div className="flex items-center">
-              <div className="h-8 w-8 rounded-md bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
-                <span className="text-white font-bold text-lg">C</span>
-              </div>
-              <span className="ml-2 text-xl font-bold">Civify</span>
+              <Image
+                src="/civify-logo-2.png"
+                alt="Civify Logo"
+                width={150}
+                height={32}
+                className="object-contain"
+              />
             </div>
           </Link>
 
@@ -114,7 +114,10 @@ export function Navbar() {
             <Button variant="ghost" asChild>
               <Link href="/login">Sign in</Link>
             </Button>
-            <Button asChild className="bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90">
+            <Button
+              asChild
+              className="bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+            >
               <Link href="/signup">Start for free</Link>
             </Button>
           </div>
@@ -169,7 +172,10 @@ export function Navbar() {
                       Sign in
                     </Link>
                   </Button>
-                  <Button asChild className="w-full bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90">
+                  <Button
+                    asChild
+                    className="w-full bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                  >
                     <Link href="/signup" onClick={() => setIsOpen(false)}>
                       Start for free
                     </Link>
