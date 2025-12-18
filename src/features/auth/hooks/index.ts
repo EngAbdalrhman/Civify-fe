@@ -1,2 +1,2 @@
 // Auth hooks
-export {};
+export * from "./useSignup";

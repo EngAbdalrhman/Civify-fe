@@ -46,6 +46,7 @@
   "auth": {
     "login": "تسجيل الدخول",
     "signup": "إنشاء حساب",
+    "username": "اسم المستخدم",
     "email": "البريد الإلكتروني",
     "password": "كلمة المرور",
     "confirmPassword": "تأكيد كلمة المرور",
@@ -54,7 +55,14 @@
     "noAccount": "ليس لديك حساب؟",
     "hasAccount": "لديك حساب بالفعل؟",
     "loginWithGoogle": "تسجيل الدخول بواسطة جوجل",
-    "signupWithGoogle": "إنشاء حساب بواسطة جوجل"
+    "signupWithGoogle": "إنشاء حساب بواسطة جوجل",
+    "usernameMin": "اسم المستخدم يجب أن يتكون من 3 أحرف على الأقل",
+    "passwordMin": "كلمة المرور يجب أن تتكون من 8 أحرف على الأقل",
+    "confirmPasswordMin": "تأكيد كلمة المرور يجب أن يتكون من 8 أحرف على الأقل",
+    "passwordsMatch": "كلمات المرور غير متطابقة",
+    "subtitle": "أنشئ حسابك للبدء",
+    "terms": "أوافق على الشروط والأحكام",
+    "orContinueWith": "أو تابع بواسطة"
   },
   "dashboard": {
     "personalPage": {

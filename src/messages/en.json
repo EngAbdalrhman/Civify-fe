@@ -46,6 +46,7 @@
   "auth": {
     "login": "Login",
     "signup": "Sign Up",
+    "username": "Username",
     "email": "Email",
     "password": "Password",
     "confirmPassword": "Confirm Password",
@@ -54,7 +55,14 @@
     "noAccount": "Don't have an account?",
     "hasAccount": "Already have an account?",
     "loginWithGoogle": "Login with Google",
-    "signupWithGoogle": "Sign up with Google"
+    "signupWithGoogle": "Sign up with Google",
+    "usernameMin": "Username must be at least 3 characters long",
+    "passwordMin": "Password must be at least 8 characters long",
+    "confirmPasswordMin": "Confirm Password must be at least 8 characters long",
+    "passwordsMatch": "Passwords do not match",
+    "subtitle": "Create your account to get started",
+    "terms": "I accept the terms and conditions",
+    "orContinueWith": "Or continue with"
   },
   "dashboard": {
     "personalPage": {

@@ -1,11 +1,15 @@
-import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
+import axios, {
+  type AxiosInstance,
+  type InternalAxiosRequestConfig,
+} from "axios";
+import { toast } from "sonner";
 
 // Create axios instance with default config
 const apiClient: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || '/api',
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
   timeout: 30000,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -13,12 +17,13 @@ const apiClient: AxiosInstance = axios.create({
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // Get token from localStorage or cookies
-    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-    
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    
+
     return config;
   },
   (error) => {
@@ -33,16 +38,22 @@ apiClient.interceptors.response.use(
     // Handle 401 Unauthorized
     if (error.response?.status === 401) {
       // Clear auth token
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('auth_token');
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("auth_token");
         // Redirect to login
-        window.location.href = '/login';
+        window.location.href = "/login";
       }
     }
-    
+
     // Handle other errors
-    const errorMessage = error.response?.data?.message || error.message || 'An error occurred';
-    
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "An error occurred. Please try again.";
+
+    // Show error toast
+    toast.error(errorMessage);
+
     return Promise.reject({
       status: error.response?.status,
       message: errorMessage,

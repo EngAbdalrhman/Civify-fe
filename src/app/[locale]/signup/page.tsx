@@ -1,73 +1,111 @@
-import { useTranslations } from 'next-intl';
-import { Button } from '@/components/ui/button';
-import { Link } from '@/i18n/routing';
+"use client";
+import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+import { Link, useRouter } from "@/i18n/routing";
+import { SubmitHandler } from "react-hook-form";
+import { useSignup, SignupSchemaType } from "@/features/auth/hooks";
 
 export default function SignupPage() {
-  const t = useTranslations('auth');
+  const t = useTranslations("auth");
+  const router = useRouter();
+  const { form, signup, isSignupPending, isSignupSuccess } = useSignup();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = form;
+
+  const onSubmit: SubmitHandler<SignupSchemaType> = (data) => {
+    signup(data);
+  };
+
+  if (isSignupSuccess) {
+    router.push("/app");
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center p-8">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
-          <h1 className="text-3xl font-bold">{t('signup')}</h1>
-          <p className="text-muted-foreground mt-2">
-            Create your account to get started
-          </p>
+          <h1 className="text-3xl font-bold">{t("signup")}</h1>
+          <p className="text-muted-foreground mt-2">{t("subtitle")}</p>
         </div>
 
-        <div className="rounded-lg border p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">First Name</label>
-              <input 
-                type="text" 
-                className="w-full rounded-md border px-3 py-2"
-                placeholder="John"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Last Name</label>
-              <input 
-                type="text" 
-                className="w-full rounded-md border px-3 py-2"
-                placeholder="Doe"
-              />
-            </div>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="rounded-lg border p-6 space-y-4"
+        >
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t("username")}</label>
+            <input
+              type="text"
+              {...register("username")}
+              className="w-full rounded-md border px-3 py-2"
+              placeholder={t("username")}
+            />
+            {errors.username && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.username.message}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">{t('email')}</label>
-            <input 
-              type="email" 
+            <label className="text-sm font-medium">{t("email")}</label>
+            <input
+              type="email"
+              {...register("email")}
               className="w-full rounded-md border px-3 py-2"
               placeholder="your@email.com"
             />
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.email.message}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">{t('password')}</label>
-            <input 
-              type="password" 
+            <label className="text-sm font-medium">{t("password")}</label>
+            <input
+              type="password"
+              {...register("password")}
               className="w-full rounded-md border px-3 py-2"
               placeholder="••••••••"
             />
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.password.message}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">{t('confirmPassword')}</label>
-            <input 
-              type="password" 
+            <label className="text-sm font-medium">
+              {t("confirmPassword")}
+            </label>
+            <input
+              type="password"
+              {...register("confirmPassword")}
               className="w-full rounded-md border px-3 py-2"
               placeholder="••••••••"
             />
+            {errors.confirmPassword && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.confirmPassword.message}
+              </p>
+            )}
           </div>
 
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" />
-            I accept the terms and conditions
+            {t("terms")}
           </label>
 
-          <Button className="w-full">{t('signup')}</Button>
+          <Button className="w-full" disabled={isSignupPending}>
+            {t("signup")}
+          </Button>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -75,20 +113,20 @@ export default function SignupPage() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-background px-2 text-muted-foreground">
-                Or continue with
+                {t("orContinueWith")}
               </span>
             </div>
           </div>
 
           <Button variant="outline" className="w-full">
-            {t('signupWithGoogle')}
+            {t("signupWithGoogle")}
           </Button>
-        </div>
+        </form>
 
         <p className="text-center text-sm">
-          {t('hasAccount')}{' '}
+          {t("hasAccount")}{" "}
           <Link href="/login" className="text-primary hover:underline">
-            {t('login')}
+            {t("login")}
           </Link>
         </p>
       </div>
