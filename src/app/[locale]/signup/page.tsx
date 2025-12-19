@@ -24,6 +24,12 @@ export default function SignupPage() {
     router.push("/app");
   }
 
+  const handleGoogleSignup = () => {
+    // Redirect to backend Google OAuth endpoint
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8077/apis';
+    window.location.href = `${backendUrl}/oauth2/authorization/google`;
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center p-8">
       <div className="w-full max-w-md space-y-6">
@@ -118,7 +124,12 @@ export default function SignupPage() {
             </div>
           </div>
 
-          <Button variant="outline" className="w-full">
+          <Button 
+            type="button"
+            variant="outline" 
+            className="w-full"
+            onClick={handleGoogleSignup}
+          >
             {t("signupWithGoogle")}
           </Button>
         </form>

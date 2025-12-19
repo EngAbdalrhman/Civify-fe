@@ -6,8 +6,9 @@ import { toast } from "sonner";
 
 // Create axios instance with default config
 const apiClient: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   timeout: 30000,
+  withCredentials: true, // Enable sending cookies with requests
   headers: {
     "Content-Type": "application/json",
   },
@@ -31,9 +32,20 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Response interceptor for handling errors
+// Response interceptor for handling errors and extracting tokens
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Extract token from Authorization header if present (for login responses)
+    const authHeader = response.headers["authorization"];
+    if (authHeader && typeof window !== "undefined") {
+      // Remove 'Bearer ' prefix if present
+      const token = authHeader.startsWith("Bearer ")
+        ? authHeader.substring(7)
+        : authHeader;
+      localStorage.setItem("auth_token", token);
+    }
+    return response;
+  },
   (error) => {
     // Handle 401 Unauthorized
     if (error.response?.status === 401) {
