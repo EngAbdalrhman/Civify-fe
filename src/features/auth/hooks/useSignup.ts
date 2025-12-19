@@ -32,7 +32,7 @@ export const useSignup = () => {
     isSuccess: isSignupSuccess,
   } = useMutation({
     mutationFn: async (data: SignupSchemaType) => {
-      const response = await apiClient.post("/auth/signup", data);
+      const response = await apiClient.post("/auth/register", data);
       return response.data;
     },
   });
