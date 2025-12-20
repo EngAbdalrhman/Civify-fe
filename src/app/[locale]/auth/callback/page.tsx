@@ -9,9 +9,12 @@ export default function AuthCallbackPage() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Extract accessToken from query parameters
+    // Extract parameters from query
     const accessToken = searchParams.get("accessToken");
+    const verified = searchParams.get("verified");
+    const error = searchParams.get("error");
 
+    // Handle OAuth2 callback (Google login)
     if (accessToken) {
       // Store token in localStorage
       localStorage.setItem("auth_token", accessToken);
@@ -23,8 +26,31 @@ export default function AuthCallbackPage() {
       setTimeout(() => {
         router.push("/app");
       }, 1000);
-    } else {
-      // No token found - OAuth failed or was cancelled
+    } 
+    // Handle email verification callback
+    else if (verified === "true") {
+      // Email verified successfully
+      toast.success("Email verified successfully! You can now login.");
+      
+      // Redirect to login page
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
+    } 
+    else if (verified === "false" || error) {
+      // Email verification failed
+      const errorMessage = error === "invalid_token" 
+        ? "Invalid or expired verification token. Please try again." 
+        : "Email verification failed. Please try again.";
+      toast.error(errorMessage);
+      
+      // Redirect to login page
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
+    } 
+    else {
+      // No token or verification status found - callback failed
       toast.error("Authentication failed. Please try again.");
       
       // Redirect to login
