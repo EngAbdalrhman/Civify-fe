@@ -64,6 +64,7 @@ export const useLogin = () => {
     mutationFn: async (email: string) => {
       const response = await apiClient.post("/auth/resend-verification", null, {
         params: { email },
+        timeout: 60000, // 60 second timeout for email sending
       });
       return response.data;
     },
