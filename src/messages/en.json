@@ -56,13 +56,17 @@
     "hasAccount": "Already have an account?",
     "loginWithGoogle": "Login with Google",
     "signupWithGoogle": "Sign up with Google",
+    "invalidEmail": "Please enter a valid email address",
+    "passwordRequired": "Password is required",
     "usernameMin": "Username must be at least 3 characters long",
     "passwordMin": "Password must be at least 8 characters long",
     "confirmPasswordMin": "Confirm Password must be at least 8 characters long",
     "passwordsMatch": "Passwords do not match",
     "subtitle": "Create your account to get started",
     "terms": "I accept the terms and conditions",
-    "orContinueWith": "Or continue with"
+    "orContinueWith": "Or continue with",
+    "emailNotVerified": "Please verify your email before logging in.",
+    "verificationSentAutomatically": "Verification email sent automatically! Please check your inbox."
   },
   "dashboard": {
     "personalPage": {

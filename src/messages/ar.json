@@ -56,13 +56,17 @@
     "hasAccount": "لديك حساب بالفعل؟",
     "loginWithGoogle": "تسجيل الدخول بواسطة جوجل",
     "signupWithGoogle": "إنشاء حساب بواسطة جوجل",
+    "invalidEmail": "يرجى إدخال عنوان بريد إلكتروني صحيح",
+    "passwordRequired": "كلمة المرور مطلوبة",
     "usernameMin": "اسم المستخدم يجب أن يتكون من 3 أحرف على الأقل",
     "passwordMin": "كلمة المرور يجب أن تتكون من 8 أحرف على الأقل",
     "confirmPasswordMin": "تأكيد كلمة المرور يجب أن يتكون من 8 أحرف على الأقل",
     "passwordsMatch": "كلمات المرور غير متطابقة",
     "subtitle": "أنشئ حسابك للبدء",
     "terms": "أوافق على الشروط والأحكام",
-    "orContinueWith": "أو تابع بواسطة"
+    "orContinueWith": "أو تابع بواسطة",
+    "emailNotVerified": "يرجى التحقق من بريدك الإلكتروني قبل تسجيل الدخول.",
+    "verificationSentAutomatically": "تم إرسال رسالة التحقق تلقائياً! يرجى التحقق من صندوق الوارد."
   },
   "dashboard": {
     "personalPage": {

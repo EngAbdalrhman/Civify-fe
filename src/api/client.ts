@@ -49,11 +49,17 @@ apiClient.interceptors.response.use(
   (error) => {
     // Handle 401 Unauthorized
     if (error.response?.status === 401) {
-      // Clear auth token
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("auth_token");
-        // Redirect to login
-        window.location.href = "/login";
+      const errorCode = error.response?.data?.errorCode;
+      
+      // Skip redirect if error is about email verification (let component handle it)
+      if (errorCode === 'AUTH_001') {
+        // Do nothing, let component handle email verification flow
+      } else {
+        // Clear auth token and redirect for other 401 errors
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("auth_token");
+          window.location.href = "/login";
+        }
       }
     }
 
@@ -69,6 +75,7 @@ apiClient.interceptors.response.use(
     return Promise.reject({
       status: error.response?.status,
       message: errorMessage,
+      errorCode: error.response?.data?.errorCode,
       data: error.response?.data,
     });
   }
