@@ -1,2 +1,170 @@
-// Upload CV types
-export {};
+// CV Upload and Tailoring Types
+
+export interface PersonalInfo {
+  fullName: string;
+  email: string;
+  phone: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  summary?: string;
+  jobTitle?: string;
+  linkedin?: string;
+  website?: string;
+  github?: string;
+}
+
+export interface SectionItem {
+  id: string;
+  title: string;
+  subtitle?: string;
+  date?: string;
+  description?: string;
+  location?: string;
+  tags?: string[];
+  isVisible?: boolean;
+}
+
+export interface ResumeSection {
+  id: string;
+  title: string;
+  type: 'experience' | 'education' | 'skills' | 'languages' | 'certifications' | 'projects' | 'custom';
+  items: SectionItem[];
+  isVisible?: boolean;
+  order?: number;
+  style?: string;
+}
+
+export interface ResumeMetadata {
+  templateId?: string;
+  primaryColor?: string;
+  fontFamily?: string;
+  language?: string;
+}
+
+export interface ResumeData {
+  personalInfo: PersonalInfo;
+  sections: ResumeSection[];
+  metadata?: ResumeMetadata;
+}
+
+// API Response Types
+export interface CvParseResponse {
+  success: boolean;
+  message?: string;
+  resumeData: ResumeData;
+  resumeId?: string;
+  detectedLanguage?: string;
+  processingMethod?: string;
+  confidence?: number;
+  processingTimeMs?: number;
+}
+
+export interface AtsScore {
+  overall: number;
+  keywordMatch: number;
+  skillsMatch: number;
+  missingKeywords?: string[];
+  suggestions?: string[];
+}
+
+export interface InterviewQuestion {
+  question: string;
+  hint?: string;
+  category?: string;
+}
+
+export interface InterviewPrep {
+  questions: InterviewQuestion[];
+}
+
+export interface RoadmapStep {
+  step: string;
+  timeframe?: string;
+}
+
+export interface Roadmap {
+  skillGaps?: string[];
+  steps: RoadmapStep[];
+}
+
+export interface CvTailorResponse {
+  tailoredCv: ResumeData;
+  atsScore: AtsScore;
+  interviewPrep?: InterviewPrep;
+  roadmap?: Roadmap;
+  coverLetter?: string;
+  processingTimeMs?: number;
+}
+
+export interface CvTailorRequest {
+  resumeData: ResumeData;
+  jobDescription: string;
+  jobTitle?: string;
+  companyName?: string;
+  generateCoverLetter?: boolean;
+  includeInterviewQuestions?: boolean;
+  includeRoadmap?: boolean;
+}
+
+// Empty resume template for manual entry
+export const emptyResumeData: ResumeData = {
+  personalInfo: {
+    fullName: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    country: '',
+    summary: '',
+    jobTitle: '',
+    linkedin: '',
+    website: '',
+    github: '',
+  },
+  sections: [
+    {
+      id: 'exp-1',
+      title: 'Work Experience',
+      type: 'experience',
+      items: [],
+      isVisible: true,
+      order: 0,
+    },
+    {
+      id: 'edu-1',
+      title: 'Education',
+      type: 'education',
+      items: [],
+      isVisible: true,
+      order: 1,
+    },
+    {
+      id: 'skills-1',
+      title: 'Skills',
+      type: 'skills',
+      items: [],
+      isVisible: true,
+      order: 2,
+    },
+  ],
+  metadata: {
+    templateId: 'modern',
+    primaryColor: '#000000',
+    fontFamily: 'Inter',
+    language: 'en',
+  },
+};
+
+// PII fields for masking (frontend knows these)
+export const PII_FIELDS = [
+  'personalInfo.fullName',
+  'personalInfo.email',
+  'personalInfo.phone',
+  'personalInfo.address',
+  'personalInfo.city',
+  'personalInfo.country',
+  'personalInfo.linkedin',
+  'personalInfo.github',
+  'personalInfo.website',
+] as const;
