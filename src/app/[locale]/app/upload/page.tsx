@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { 
   UploadCloud, 
@@ -18,7 +18,15 @@ import {
   Sparkles,
   MessageSquare,
   Map,
-  FileEdit
+  FileEdit,
+  Mail,
+  Phone,
+  Linkedin,
+  Github,
+  Globe,
+  MapPin,
+  RefreshCw,
+  Settings
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -64,7 +72,6 @@ export default function UploadPage() {
     const file = event.target.files?.[0];
     if (!file) return;
     
-    // Validate file type
     const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
     if (!validTypes.includes(file.type)) {
       toast.error('Please upload a PDF or DOCX file');
@@ -147,7 +154,7 @@ export default function UploadPage() {
   }, []);
 
   // Update section item
-  const updateSectionItem = useCallback((sectionId: string, itemId: string, field: string, value: string) => {
+  const updateSectionItem = useCallback((sectionId: string, itemId: string, field: string, value: string | string[]) => {
     setResumeData(prev => {
       if (!prev) return null;
       return {
@@ -202,20 +209,51 @@ export default function UploadPage() {
     return !!(personalInfo.fullName && personalInfo.email);
   }, [resumeData]);
 
+  // Get section type for rendering
+  const getSectionType = (section: ResumeSection): 'skills' | 'languages' | 'default' => {
+    const type = section.type.toLowerCase();
+    if (type === 'skills') return 'skills';
+    if (type === 'languages') return 'languages';
+    return 'default';
+  };
+
+  // Check if there are additional features to show in tabs
+  const hasAdditionalFeatures = useMemo(() => {
+    if (!tailorResponse) return false;
+    return !!(
+      tailorResponse.coverLetter ||
+      tailorResponse.interviewPrep?.questions?.length ||
+      tailorResponse.roadmap?.steps?.length
+    );
+  }, [tailorResponse]);
+
   const steps = [
     { id: 1, title: 'Upload CV', icon: UploadCloud },
     { id: 2, title: 'Review Data', icon: FileText },
-    { id: 3, title: 'Job Details', icon: Sparkles },
+    { id: 3, title: 'Generate', icon: Sparkles },
     { id: 4, title: 'Result', icon: CheckCircle2 },
   ];
 
+  // Get score color
+  const getScoreColor = (score: number) => {
+    if (score >= 70) return 'text-green-600';
+    if (score >= 40) return 'text-yellow-600';
+    return 'text-red-600';
+  };
+
+  const getScoreBarColor = (score: number) => {
+    if (score >= 70) return 'bg-green-500';
+    if (score >= 40) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
   return (
-    <div className='max-w-5xl mx-auto space-y-6 pb-12'>
+    <div className='max-w-7xl mx-auto space-y-6 pb-12'>
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Build Your ATS-Friendly CV</h1>
         <p className="text-muted-foreground mt-2">
-          Upload your current CV or start from scratch, and let AI tailor it to your dream job.
+          Upload your current CV, review the extracted data, and let AI tailor it to your dream job.
         </p>
       </div>
 
@@ -386,82 +424,105 @@ export default function UploadPage() {
           </Card>
 
           {/* Dynamic Sections */}
-          {resumeData.sections.map((section) => (
-            <Card key={section.id}>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="capitalize">{section.title}</CardTitle>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => addSectionItem(section.id)}
-                >
-                  <Plus className="h-4 w-4 mr-1" /> Add
-                </Button>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {section.items.length === 0 && (
-                  <p className="text-sm text-muted-foreground text-center py-4">
-                    No items yet. Click "Add" to add your {section.type}.
-                  </p>
-                )}
-                {section.items.map((item, index) => (
-                  <div key={item.id} className="border rounded-lg p-4 space-y-3 relative">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="absolute top-2 right-2 h-6 w-6 text-destructive"
-                      onClick={() => removeSectionItem(section.id, item.id)}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                    
-                    {section.type === 'skills' ? (
-                      <div className="space-y-2">
-                        <Input 
-                          value={item.title} 
-                          onChange={(e) => updateSectionItem(section.id, item.id, 'title', e.target.value)}
-                          placeholder="Skill name (e.g., JavaScript, React)"
-                        />
-                      </div>
-                    ) : (
-                      <>
+          {resumeData.sections.map((section) => {
+            const sectionType = getSectionType(section);
+            
+            return (
+              <Card key={section.id}>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="capitalize">{section.title}</CardTitle>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => addSectionItem(section.id)}
+                  >
+                    <Plus className="h-4 w-4 mr-1" /> Add
+                  </Button>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {section.items.length === 0 && (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      No items yet. Click "Add" to add your {section.type}.
+                    </p>
+                  )}
+                  {section.items.map((item) => (
+                    <div key={item.id} className="border rounded-lg p-4 space-y-3 relative">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="absolute top-2 right-2 h-6 w-6 text-destructive"
+                        onClick={() => removeSectionItem(section.id, item.id)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                      
+                      {sectionType === 'skills' ? (
+                        <div className="space-y-2">
+                          <Label>Skills (comma-separated)</Label>
+                          <Input 
+                            value={(item.tags || []).join(', ')} 
+                            onChange={(e) => updateSectionItem(
+                              section.id, 
+                              item.id, 
+                              'tags', 
+                              e.target.value.split(',').map(s => s.trim()).filter(Boolean)
+                            )}
+                            placeholder="JavaScript, React, TypeScript, Node.js"
+                          />
+                        </div>
+                      ) : sectionType === 'languages' ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <Input 
                             value={item.title} 
                             onChange={(e) => updateSectionItem(section.id, item.id, 'title', e.target.value)}
-                            placeholder={section.type === 'experience' ? 'Company Name' : 'Institution'}
+                            placeholder="Language (e.g., English)"
                           />
                           <Input 
                             value={item.subtitle || ''} 
                             onChange={(e) => updateSectionItem(section.id, item.id, 'subtitle', e.target.value)}
-                            placeholder={section.type === 'experience' ? 'Job Title' : 'Degree'}
+                            placeholder="Level (e.g., Native, Fluent)"
                           />
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <Input 
-                            value={item.date || ''} 
-                            onChange={(e) => updateSectionItem(section.id, item.id, 'date', e.target.value)}
-                            placeholder="2020 - Present"
+                      ) : (
+                        <>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <Input 
+                              value={item.title} 
+                              onChange={(e) => updateSectionItem(section.id, item.id, 'title', e.target.value)}
+                              placeholder={section.type === 'experience' ? 'Job Title' : section.type === 'projects' ? 'Project Name' : 'Title'}
+                            />
+                            <Input 
+                              value={item.subtitle || ''} 
+                              onChange={(e) => updateSectionItem(section.id, item.id, 'subtitle', e.target.value)}
+                              placeholder={section.type === 'experience' ? 'Company' : section.type === 'education' ? 'Institution' : 'Subtitle'}
+                            />
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <Input 
+                              value={item.date || ''} 
+                              onChange={(e) => updateSectionItem(section.id, item.id, 'date', e.target.value)}
+                              placeholder="2020 - Present"
+                            />
+                            <Input 
+                              value={item.location || ''} 
+                              onChange={(e) => updateSectionItem(section.id, item.id, 'location', e.target.value)}
+                              placeholder="City, Country"
+                            />
+                          </div>
+                          <Textarea 
+                            value={item.description || ''} 
+                            onChange={(e) => updateSectionItem(section.id, item.id, 'description', e.target.value)}
+                            placeholder="Describe your responsibilities and achievements..."
+                            rows={2}
                           />
-                          <Input 
-                            value={item.location || ''} 
-                            onChange={(e) => updateSectionItem(section.id, item.id, 'location', e.target.value)}
-                            placeholder="City, Country"
-                          />
-                        </div>
-                        <Textarea 
-                          value={item.description || ''} 
-                          onChange={(e) => updateSectionItem(section.id, item.id, 'description', e.target.value)}
-                          placeholder="Describe your responsibilities and achievements..."
-                          rows={2}
-                        />
-                      </>
-                    )}
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          ))}
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            );
+          })}
 
           <div className="flex justify-between gap-3">
             <Button variant="outline" onClick={() => setCurrentStep(1)}>
@@ -471,7 +532,7 @@ export default function UploadPage() {
               onClick={() => setCurrentStep(3)} 
               disabled={!isResumeValid()}
             >
-              Continue to Job Details <ArrowRight className="ml-2 h-4 w-4" />
+              Continue to Generate <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -579,223 +640,394 @@ export default function UploadPage() {
         </div>
       )}
 
-      {/* Step 4: Result */}
+      {/* Step 4: Result - Original Layout */}
       {currentStep === 4 && tailorResponse && (
-        <div className="max-w-6xl mx-auto">
-          <Tabs defaultValue="preview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 max-w-md mx-auto">
-              <TabsTrigger value="preview">Preview</TabsTrigger>
-              <TabsTrigger value="ats">ATS Score</TabsTrigger>
-              {tailorResponse.interviewPrep && <TabsTrigger value="interview">Interview</TabsTrigger>}
-              {tailorResponse.roadmap && <TabsTrigger value="roadmap">Roadmap</TabsTrigger>}
-            </TabsList>
-
-            {/* Preview Tab */}
-            <TabsContent value="preview" className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <Switch checked={maskPII} onCheckedChange={setMaskPII} />
-                    <Label className="flex items-center gap-1">
-                      {maskPII ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      Mask Personal Info
-                    </Label>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline">
-                    <Download className="mr-2 h-4 w-4" /> Download PDF
-                  </Button>
-                </div>
-              </div>
-
-              {/* CV Preview */}
-              <div className="bg-white dark:bg-zinc-900 rounded-lg border shadow-lg p-8 sm:p-12 min-h-[600px]">
-                <div className="max-w-[800px] mx-auto space-y-6 text-black dark:text-white">
-                  <header className="border-b pb-4">
-                    <h1 className="text-3xl font-bold">
-                      {getDisplayValue('personalInfo.fullName', tailorResponse.tailoredCv.personalInfo.fullName)}
-                    </h1>
-                    <div className="text-sm text-gray-600 dark:text-gray-400 mt-2 flex flex-wrap gap-3">
-                      {tailorResponse.tailoredCv.personalInfo.email && (
-                        <span>{getDisplayValue('personalInfo.email', tailorResponse.tailoredCv.personalInfo.email)}</span>
-                      )}
-                      {tailorResponse.tailoredCv.personalInfo.phone && (
-                        <span>• {getDisplayValue('personalInfo.phone', tailorResponse.tailoredCv.personalInfo.phone)}</span>
-                      )}
-                    </div>
-                  </header>
-
-                  {tailorResponse.tailoredCv.personalInfo.summary && (
-                    <section>
-                      <h2 className="text-lg font-bold uppercase border-b-2 border-gray-900 dark:border-gray-100 pb-1 mb-2">
-                        Professional Summary
-                      </h2>
-                      <p className="text-sm">{tailorResponse.tailoredCv.personalInfo.summary}</p>
-                    </section>
-                  )}
-
-                  {tailorResponse.tailoredCv.sections.map((section) => (
-                    section.items.length > 0 && (
-                      <section key={section.id}>
-                        <h2 className="text-lg font-bold uppercase border-b-2 border-gray-900 dark:border-gray-100 pb-1 mb-3">
-                          {section.title}
-                        </h2>
-                        <div className="space-y-3">
-                          {section.items.map((item) => (
-                            <div key={item.id}>
-                              {section.type === 'skills' ? (
-                                <span className="inline-block px-2 py-1 bg-gray-100 dark:bg-gray-800 text-sm rounded mr-2 mb-2">
-                                  {item.title}
-                                </span>
-                              ) : (
-                                <div>
-                                  <div className="flex justify-between">
-                                    <h3 className="font-semibold">{item.subtitle || item.title}</h3>
-                                    <span className="text-sm text-gray-500">{item.date}</span>
-                                  </div>
-                                  {item.subtitle && <div className="text-gray-600 dark:text-gray-400">{item.title}</div>}
-                                  {item.description && <p className="text-sm mt-1">{item.description}</p>}
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </section>
-                    )
-                  ))}
-                </div>
-              </div>
-
-              {/* Cover Letter */}
-              {tailorResponse.coverLetter && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <FileText className="h-5 w-5" />
-                      Cover Letter
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <pre className="whitespace-pre-wrap font-sans text-sm">{tailorResponse.coverLetter}</pre>
-                  </CardContent>
-                </Card>
-              )}
-            </TabsContent>
-
-            {/* ATS Score Tab */}
-            <TabsContent value="ats" className="space-y-4">
+        <div className="space-y-6">
+          {/* Main Layout: Sidebar + Preview + Tips */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Left Sidebar */}
+            <div className="lg:col-span-1 space-y-4">
+              {/* Status Card */}
               <Card>
-                <CardContent className="p-6 space-y-6">
-                  <div className="text-center">
-                    <div className="text-5xl font-bold text-primary">{tailorResponse.atsScore.overall}%</div>
-                    <p className="text-muted-foreground mt-1">ATS Match Score</p>
+                <CardContent className="pt-6 space-y-4">
+                  <div className="flex items-center gap-2 text-green-600">
+                    <CheckCircle2 className="h-5 w-5" />
+                    <span className="font-semibold">CV Generated!</span>
                   </div>
+                  <p className="text-sm text-muted-foreground">
+                    Your AI-optimized CV is ready. Review the result or regenerate if needed.
+                  </p>
                   
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-muted rounded-lg text-center">
-                      <div className="text-2xl font-semibold">{tailorResponse.atsScore.keywordMatch}%</div>
-                      <p className="text-sm text-muted-foreground">Keyword Match</p>
+                  <div className="space-y-2">
+                    <Button className="w-full" size="sm">
+                      <Download className="mr-2 h-4 w-4" /> Download PDF
+                    </Button>
+                    <Button variant="outline" className="w-full" size="sm">
+                      <Download className="mr-2 h-4 w-4" /> Download DOCX
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Refine Options */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">Refine Result</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start" 
+                    size="sm"
+                    onClick={() => setCurrentStep(2)}
+                  >
+                    <Edit2 className="mr-2 h-4 w-4" /> Edit Sections
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start" 
+                    size="sm"
+                    onClick={() => setCurrentStep(3)}
+                  >
+                    <RefreshCw className="mr-2 h-4 w-4" /> Regenerate Variant
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* ATS Score */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">AI Impact Score</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-baseline gap-2">
+                      <span className={`text-4xl font-bold ${getScoreColor(tailorResponse.atsScore.overall)}`}>
+                        {tailorResponse.atsScore.overall}%
+                      </span>
+                      <span className="text-sm text-muted-foreground">Match Rate</span>
                     </div>
-                    <div className="p-4 bg-muted rounded-lg text-center">
-                      <div className="text-2xl font-semibold">{tailorResponse.atsScore.skillsMatch}%</div>
-                      <p className="text-sm text-muted-foreground">Skills Match</p>
+                    <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full transition-all ${getScoreBarColor(tailorResponse.atsScore.overall)}`}
+                        style={{ width: `${tailorResponse.atsScore.overall}%` }}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 mt-3 text-sm">
+                      <div>
+                        <p className="text-muted-foreground">Keywords</p>
+                        <p className="font-semibold">{tailorResponse.atsScore.keywordMatch}%</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Skills</p>
+                        <p className="font-semibold">{tailorResponse.atsScore.skillsMatch}%</p>
+                      </div>
                     </div>
                   </div>
 
+                  {/* Missing Keywords */}
                   {tailorResponse.atsScore.missingKeywords && tailorResponse.atsScore.missingKeywords.length > 0 && (
                     <div>
-                      <h4 className="font-semibold mb-2">Missing Keywords</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {tailorResponse.atsScore.missingKeywords.map((keyword, i) => (
-                          <span key={i} className="px-2 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-sm rounded">
+                      <p className="text-sm font-medium mb-2">Missing Keywords</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {tailorResponse.atsScore.missingKeywords.slice(0, 10).map((keyword, i) => (
+                          <span 
+                            key={i} 
+                            className="px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-xs rounded"
+                          >
                             {keyword}
                           </span>
                         ))}
                       </div>
                     </div>
                   )}
-
-                  {tailorResponse.atsScore.suggestions && tailorResponse.atsScore.suggestions.length > 0 && (
-                    <div>
-                      <h4 className="font-semibold mb-2">Suggestions</h4>
-                      <ul className="list-disc list-inside space-y-1">
-                        {tailorResponse.atsScore.suggestions.map((suggestion, i) => (
-                          <li key={i} className="text-sm">{suggestion}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
-            </TabsContent>
+            </div>
 
-            {/* Interview Tab */}
-            {tailorResponse.interviewPrep && (
-              <TabsContent value="interview" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <MessageSquare className="h-5 w-5" />
-                      Interview Preparation
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {tailorResponse.interviewPrep.questions.map((q, i) => (
-                      <div key={i} className="p-4 bg-muted rounded-lg space-y-2">
-                        <div className="flex items-start justify-between">
-                          <p className="font-medium">Q{i + 1}: {q.question}</p>
-                          {q.category && (
-                            <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded capitalize">
-                              {q.category}
-                            </span>
+            {/* Main Preview */}
+            <div className="lg:col-span-3">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-base">Preview</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Switch checked={maskPII} onCheckedChange={setMaskPII} id="mask-pii" />
+                    <Label htmlFor="mask-pii" className="text-sm flex items-center gap-1">
+                      {maskPII ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                      Mask Personal Info
+                    </Label>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {/* CV Preview Document */}
+                  <div className="bg-white rounded-lg border shadow-sm p-6 sm:p-8 min-h-[700px] text-black">
+                    <div className="max-w-[700px] mx-auto space-y-5">
+                      {/* Header */}
+                      <header className="border-b pb-4">
+                        <h1 className="text-2xl font-bold text-gray-900">
+                          {getDisplayValue('personalInfo.fullName', tailorResponse.tailoredCv.personalInfo.fullName)}
+                        </h1>
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-sm text-gray-600">
+                          {tailorResponse.tailoredCv.personalInfo.email && (
+                            <span>{getDisplayValue('personalInfo.email', tailorResponse.tailoredCv.personalInfo.email)}</span>
+                          )}
+                          {tailorResponse.tailoredCv.personalInfo.phone && (
+                            <>
+                              <span>•</span>
+                              <span>{getDisplayValue('personalInfo.phone', tailorResponse.tailoredCv.personalInfo.phone)}</span>
+                            </>
+                          )}
+                          {(tailorResponse.tailoredCv.personalInfo.city || tailorResponse.tailoredCv.personalInfo.country) && (
+                            <>
+                              <span>•</span>
+                              <span>{[tailorResponse.tailoredCv.personalInfo.city, tailorResponse.tailoredCv.personalInfo.country].filter(Boolean).join(', ')}</span>
+                            </>
                           )}
                         </div>
-                        {q.hint && (
-                          <p className="text-sm text-muted-foreground">
-                            <strong>Hint:</strong> {q.hint}
-                          </p>
+                        {/* Social Links */}
+                        {(tailorResponse.tailoredCv.personalInfo.linkedin || 
+                          tailorResponse.tailoredCv.personalInfo.github || 
+                          tailorResponse.tailoredCv.personalInfo.website) && (
+                          <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1 text-sm text-blue-600">
+                            {tailorResponse.tailoredCv.personalInfo.linkedin && (
+                              <span>linkedin.com/in/{tailorResponse.tailoredCv.personalInfo.linkedin}</span>
+                            )}
+                            {tailorResponse.tailoredCv.personalInfo.github && (
+                              <span>github.com/{tailorResponse.tailoredCv.personalInfo.github}</span>
+                            )}
+                            {tailorResponse.tailoredCv.personalInfo.website && (
+                              <span>{tailorResponse.tailoredCv.personalInfo.website}</span>
+                            )}
+                          </div>
                         )}
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            )}
+                      </header>
 
-            {/* Roadmap Tab */}
-            {tailorResponse.roadmap && (
-              <TabsContent value="roadmap" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Map className="h-5 w-5" />
-                      Career Roadmap
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    {tailorResponse.roadmap.skillGaps && tailorResponse.roadmap.skillGaps.length > 0 && (
-                      <div>
-                        <h4 className="font-semibold mb-2">Skills to Develop</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {tailorResponse.roadmap.skillGaps.map((skill, i) => (
-                            <span key={i} className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm rounded-full">
-                              {skill}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
+                      {/* Summary */}
+                      {tailorResponse.tailoredCv.personalInfo.summary && (
+                        <section>
+                          <h2 className="text-sm font-bold uppercase tracking-wide text-gray-800 border-b border-gray-300 pb-1 mb-2">
+                            Professional Summary
+                          </h2>
+                          <p className="text-sm text-gray-700 leading-relaxed">
+                            {tailorResponse.tailoredCv.personalInfo.summary}
+                          </p>
+                        </section>
+                      )}
+
+                      {/* Dynamic Sections */}
+                      {tailorResponse.tailoredCv.sections.map((section) => {
+                        if (!section.items?.length) return null;
+                        const sectionType = section.type.toLowerCase();
+                        
+                        return (
+                          <section key={section.id}>
+                            <h2 className="text-sm font-bold uppercase tracking-wide text-gray-800 border-b border-gray-300 pb-1 mb-3">
+                              {section.title}
+                            </h2>
+                            
+                            {sectionType === 'skills' ? (
+                              <div className="flex flex-wrap gap-1.5">
+                                {section.items.flatMap((item) => 
+                                  item.tags && item.tags.length > 0 
+                                    ? item.tags.map((tag, idx) => (
+                                        <span 
+                                          key={`${item.id}-${idx}`} 
+                                          className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded"
+                                        >
+                                          {tag}
+                                        </span>
+                                      ))
+                                    : item.title ? [(
+                                        <span 
+                                          key={item.id} 
+                                          className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded"
+                                        >
+                                          {item.title}
+                                        </span>
+                                      )] : []
+                                )}
+                              </div>
+                            ) : sectionType === 'languages' ? (
+                              <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                                {section.items.map((item) => (
+                                  <span key={item.id}>
+                                    <strong>{item.title}</strong>
+                                    {item.subtitle && <span className="text-gray-500"> ({item.subtitle})</span>}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="space-y-3">
+                                {section.items.map((item) => (
+                                  <div key={item.id}>
+                                    <div className="flex justify-between items-start">
+                                      <div>
+                                        <h3 className="font-semibold text-gray-900">{item.title}</h3>
+                                        {item.subtitle && (
+                                          <p className="text-gray-600 text-sm">{item.subtitle}</p>
+                                        )}
+                                      </div>
+                                      <div className="text-right text-sm text-gray-500 whitespace-nowrap">
+                                        {item.date}
+                                      </div>
+                                    </div>
+                                    {item.location && (
+                                      <p className="text-gray-500 text-sm">{item.location}</p>
+                                    )}
+                                    {item.description && (
+                                      <p className="text-sm text-gray-700 mt-1 leading-relaxed">{item.description}</p>
+                                    )}
+                                    {item.tags && item.tags.length > 0 && (
+                                      <div className="flex flex-wrap gap-1 mt-1.5">
+                                        {item.tags.map((tag, idx) => (
+                                          <span 
+                                            key={idx} 
+                                            className="px-1.5 py-0.5 bg-blue-50 text-blue-700 text-xs rounded"
+                                          >
+                                            {tag}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </section>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Additional Features Tabs - Below the main content */}
+          {hasAdditionalFeatures && (
+            <Card>
+              <CardContent className="p-0">
+                <Tabs defaultValue={tailorResponse.coverLetter ? 'cover-letter' : tailorResponse.interviewPrep ? 'interview' : 'roadmap'}>
+                  <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0">
+                    {tailorResponse.coverLetter && (
+                      <TabsTrigger 
+                        value="cover-letter" 
+                        className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
+                      >
+                        <FileText className="h-4 w-4 mr-2" />
+                        Cover Letter
+                      </TabsTrigger>
                     )}
+                    {tailorResponse.interviewPrep?.questions?.length && (
+                      <TabsTrigger 
+                        value="interview"
+                        className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
+                      >
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        Interview Prep
+                      </TabsTrigger>
+                    )}
+                    {tailorResponse.roadmap?.steps?.length && (
+                      <TabsTrigger 
+                        value="roadmap"
+                        className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
+                      >
+                        <Map className="h-4 w-4 mr-2" />
+                        Career Roadmap
+                      </TabsTrigger>
+                    )}
+                  </TabsList>
 
-                    <div>
-                      <h4 className="font-semibold mb-3">Action Steps</h4>
+                  {/* Cover Letter Tab */}
+                  {tailorResponse.coverLetter && (
+                    <TabsContent value="cover-letter" className="p-6">
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <h3 className="font-semibold">Generated Cover Letter</h3>
+                          <p className="text-sm text-muted-foreground">Tailored to the job description</p>
+                        </div>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => {
+                            navigator.clipboard.writeText(tailorResponse.coverLetter || '');
+                            toast.success('Copied to clipboard!');
+                          }}
+                        >
+                          Copy
+                        </Button>
+                      </div>
+                      <div className="bg-white dark:bg-zinc-900 border rounded-lg p-6">
+                        <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-gray-800 dark:text-gray-200">
+                          {tailorResponse.coverLetter}
+                        </pre>
+                      </div>
+                    </TabsContent>
+                  )}
+
+                  {/* Interview Tab */}
+                  {tailorResponse.interviewPrep?.questions?.length && (
+                    <TabsContent value="interview" className="p-6">
+                      <div className="mb-4">
+                        <h3 className="font-semibold">Potential Interview Questions</h3>
+                        <p className="text-sm text-muted-foreground">Based on the job requirements and your experience</p>
+                      </div>
+                      <div className="space-y-3">
+                        {tailorResponse.interviewPrep.questions.map((q, i) => (
+                          <div key={i} className="p-4 bg-muted rounded-lg">
+                            <div className="flex items-start justify-between gap-4">
+                              <p className="font-medium">
+                                <span className="text-primary mr-2">Q{i + 1}:</span>
+                                {q.question}
+                              </p>
+                              {q.category && (
+                                <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded capitalize whitespace-nowrap">
+                                  {q.category}
+                                </span>
+                              )}
+                            </div>
+                            {q.hint && (
+                              <p className="text-sm text-muted-foreground mt-2">
+                                <strong>Hint:</strong> {q.hint}
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </TabsContent>
+                  )}
+
+                  {/* Roadmap Tab */}
+                  {tailorResponse.roadmap?.steps?.length && (
+                    <TabsContent value="roadmap" className="p-6">
+                      <div className="mb-4">
+                        <h3 className="font-semibold">Career Development Roadmap</h3>
+                        <p className="text-sm text-muted-foreground">Skills and steps to improve your fit for this role</p>
+                      </div>
+                      
+                      {tailorResponse.roadmap.skillGaps && tailorResponse.roadmap.skillGaps.length > 0 && (
+                        <div className="mb-6">
+                          <h4 className="text-sm font-medium mb-2">Skills to Develop</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {tailorResponse.roadmap.skillGaps.map((skill, i) => (
+                              <span 
+                                key={i} 
+                                className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm rounded-full"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       <div className="space-y-3">
                         {tailorResponse.roadmap.steps.map((step, i) => (
                           <div key={i} className="flex items-start gap-3 p-3 bg-muted rounded-lg">
                             <div className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
                               {i + 1}
                             </div>
-                            <div>
+                            <div className="flex-1">
                               <p className="font-medium">{step.step}</p>
                               {step.timeframe && (
                                 <p className="text-sm text-muted-foreground mt-0.5">⏱️ {step.timeframe}</p>
@@ -804,19 +1036,17 @@ export default function UploadPage() {
                           </div>
                         ))}
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            )}
-          </Tabs>
+                    </TabsContent>
+                  )}
+                </Tabs>
+              </CardContent>
+            </Card>
+          )}
 
-          <div className="flex justify-between gap-3 mt-6">
+          {/* Navigation */}
+          <div className="flex justify-between gap-3">
             <Button variant="outline" onClick={() => setCurrentStep(3)}>
               <ArrowLeft className="mr-2 h-4 w-4" /> Back
-            </Button>
-            <Button variant="outline" onClick={() => setCurrentStep(2)}>
-              <Edit2 className="mr-2 h-4 w-4" /> Edit Resume
             </Button>
           </div>
         </div>
