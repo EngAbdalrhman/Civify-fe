@@ -8,22 +8,35 @@ import { toast } from "sonner";
 // Flag to prevent multiple simultaneous refresh attempts
 let isRefreshing = false;
 // Queue of requests waiting for token refresh
-let refreshSubscribers: ((token: string) => void)[] = [];
+let refreshSubscribers: {
+  resolve: (token: string) => void;
+  reject: (error: Error) => void;
+}[] = [];
 
 // Subscribe a request to wait for token refresh
-const subscribeTokenRefresh = (callback: (token: string) => void) => {
-  refreshSubscribers.push(callback);
+const subscribeTokenRefresh = (
+  resolve: (token: string) => void,
+  reject: (error: Error) => void
+) => {
+  refreshSubscribers.push({ resolve, reject });
 };
 
 // Notify all subscribers with new token
 const onTokenRefreshed = (token: string) => {
-  refreshSubscribers.forEach((callback) => callback(token));
+  refreshSubscribers.forEach(({ resolve }) => resolve(token));
+  refreshSubscribers = [];
+};
+
+// Notify all subscribers of refresh failure
+const onTokenRefreshFailed = (error: Error) => {
+  refreshSubscribers.forEach(({ reject }) => reject(error));
   refreshSubscribers = [];
 };
 
 // Clear auth state and redirect to login
 const clearAuthAndRedirect = () => {
   if (typeof window !== "undefined") {
+    console.log("[Auth] Clearing tokens and redirecting to login");
     localStorage.removeItem("auth_token");
     localStorage.removeItem("refresh_token");
     window.location.href = "/login";
@@ -99,17 +112,24 @@ apiClient.interceptors.response.use(
       // Skip refresh for login/refresh endpoints themselves
       const url = originalRequest.url || "";
       if (url.includes("/login") || url.includes("/auth/refresh")) {
+        console.log("[Auth] 401 on login/refresh endpoint, redirecting to login");
         clearAuthAndRedirect();
         return Promise.reject(error);
       }
 
       // If already refreshing, queue this request
       if (isRefreshing) {
-        return new Promise((resolve) => {
-          subscribeTokenRefresh((token: string) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            resolve(apiClient(originalRequest));
-          });
+        console.log("[Auth] Refresh in progress, queuing request:", url);
+        return new Promise((resolve, reject) => {
+          subscribeTokenRefresh(
+            (token: string) => {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              resolve(apiClient(originalRequest));
+            },
+            (refreshError: Error) => {
+              reject(refreshError);
+            }
+          );
         });
       }
 
@@ -122,9 +142,12 @@ apiClient.interceptors.response.use(
           : null;
 
         if (!refreshToken) {
+          console.log("[Auth] No refresh token available");
           throw new Error("No refresh token available");
         }
 
+        console.log("[Auth] Attempting token refresh...");
+        
         // Call refresh endpoint
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
@@ -133,6 +156,12 @@ apiClient.interceptors.response.use(
         );
 
         const { accessToken, refreshToken: newRefreshToken } = response.data;
+
+        if (!accessToken) {
+          throw new Error("No access token in refresh response");
+        }
+
+        console.log("[Auth] Token refresh successful");
 
         if (typeof window !== "undefined") {
           localStorage.setItem("auth_token", accessToken);
@@ -148,8 +177,9 @@ apiClient.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return apiClient(originalRequest);
       } catch (refreshError) {
+        console.log("[Auth] Token refresh failed:", refreshError);
         isRefreshing = false;
-        refreshSubscribers = [];
+        onTokenRefreshFailed(refreshError instanceof Error ? refreshError : new Error("Refresh failed"));
         clearAuthAndRedirect();
         return Promise.reject(refreshError);
       }

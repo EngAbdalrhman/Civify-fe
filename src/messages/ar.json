@@ -110,7 +110,39 @@
     "selectPlan": "اختر الخطة",
     "currentPlan": "الخطة الحالية",
     "upgrade": "ترقية",
-    "features": "المميزات"
+    "features": "المميزات",
+    "errorLoading": "فشل في تحميل الخطط. يرجى المحاولة مرة أخرى.",
+    "retry": "إعادة المحاولة"
+  },
+  "checkout": {
+    "orderSummary": "ملخص الطلب",
+    "billingCycle": "دورة الفوترة",
+    "promoCode": "رمز الخصم",
+    "total": "الإجمالي",
+    "paymentMethod": "طريقة الدفع",
+    "pay": "ادفع",
+    "processing": "جاري المعالجة..."
+  },
+  "payment": {
+    "success": {
+      "title": "تم الدفع بنجاح!",
+      "subtitle": "تم تفعيل اشتراكك",
+      "message": "شكراً لعملية الشراء! تم ترقية حسابك ويمكنك الآن الوصول إلى جميع الميزات المميزة.",
+      "goToDashboard": "الذهاب إلى لوحة التحكم",
+      "startCreating": "ابدأ بإنشاء السيرة الذاتية",
+      "verifying": "جاري التحقق من الدفع...",
+      "verifyingMessage": "يرجى الانتظار بينما نؤكد دفعك.",
+      "verificationPending": "التحقق معلق",
+      "verificationPendingMessage": "لا نزال نعالج دفعك."
+    },
+    "failure": {
+      "title": "فشل الدفع",
+      "subtitle": "لم نتمكن من معالجة دفعك",
+      "whatYouCanDo": "ما يمكنك فعله:",
+      "tryAgain": "حاول مرة أخرى",
+      "backToDashboard": "العودة إلى لوحة التحكم",
+      "contactSupport": "تواصل مع الدعم"
+    }
   },
   "subscription": {
     "confirm": {

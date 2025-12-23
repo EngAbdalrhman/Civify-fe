@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Menu, ChevronDown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, ChevronDown, User, LogOut, LayoutDashboard } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -9,10 +9,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Image from "next/image";
+import { usePermissions } from "@/contexts/PermissionContext";
 
 const navigationItems = [
   {
@@ -53,6 +55,36 @@ const navigationItems = [
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { groupName, clearPermissions } = usePermissions();
+
+  // Check authentication status on mount and when window focuses
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+      setIsAuthenticated(!!token);
+    };
+
+    checkAuth();
+
+    // Re-check on window focus (in case user logged in/out in another tab)
+    window.addEventListener("focus", checkAuth);
+    // Also check on storage change event
+    window.addEventListener("storage", checkAuth);
+
+    return () => {
+      window.removeEventListener("focus", checkAuth);
+      window.removeEventListener("storage", checkAuth);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("refresh_token");
+    clearPermissions();
+    setIsAuthenticated(false);
+    window.location.href = "/";
+  };
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -111,15 +143,64 @@ export function Navbar() {
           {/* Auth Buttons - Desktop */}
           <div className="hidden md:flex items-center space-x-3">
             <LanguageSwitcher />
-            <Button variant="ghost" asChild>
-              <Link href="/login">Sign in</Link>
-            </Button>
-            <Button
-              asChild
-              className="bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
-            >
-              <Link href="/signup">Start for free</Link>
-            </Button>
+            
+            {isAuthenticated ? (
+              /* User is logged in - show user menu */
+              <>
+                <Button variant="outline" asChild>
+                  <Link href="/app">
+                    <LayoutDashboard className="h-4 w-4 mr-2" />
+                    Dashboard
+                  </Link>
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="rounded-full">
+                      <User className="h-5 w-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <div className="px-2 py-1.5 text-sm font-medium">
+                      {groupName || "User"}
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/app" className="cursor-pointer">
+                        <LayoutDashboard className="h-4 w-4 mr-2" />
+                        Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/app/settings" className="cursor-pointer">
+                        <User className="h-4 w-4 mr-2" />
+                        Settings
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={handleLogout}
+                      className="cursor-pointer text-red-600 focus:text-red-600"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              /* User is not logged in - show sign in / sign up */
+              <>
+                <Button variant="ghost" asChild>
+                  <Link href="/login">Sign in</Link>
+                </Button>
+                <Button
+                  asChild
+                  className="bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                >
+                  <Link href="/signup">Start for free</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -167,19 +248,43 @@ export function Navbar() {
 
                 {/* Mobile Auth Buttons */}
                 <div className="flex flex-col space-y-2 pt-4 border-t">
-                  <Button variant="outline" asChild className="w-full">
-                    <Link href="/login" onClick={() => setIsOpen(false)}>
-                      Sign in
-                    </Link>
-                  </Button>
-                  <Button
-                    asChild
-                    className="w-full bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
-                  >
-                    <Link href="/signup" onClick={() => setIsOpen(false)}>
-                      Start for free
-                    </Link>
-                  </Button>
+                  {isAuthenticated ? (
+                    <>
+                      <Button variant="outline" asChild className="w-full">
+                        <Link href="/app" onClick={() => setIsOpen(false)}>
+                          <LayoutDashboard className="h-4 w-4 mr-2" />
+                          Dashboard
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="w-full text-red-600 hover:text-red-600 hover:bg-red-50"
+                        onClick={() => {
+                          handleLogout();
+                          setIsOpen(false);
+                        }}
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Logout
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button variant="outline" asChild className="w-full">
+                        <Link href="/login" onClick={() => setIsOpen(false)}>
+                          Sign in
+                        </Link>
+                      </Button>
+                      <Button
+                        asChild
+                        className="w-full bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                      >
+                        <Link href="/signup" onClick={() => setIsOpen(false)}>
+                          Start for free
+                        </Link>
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </SheetContent>

@@ -111,7 +111,39 @@
     "selectPlan": "Select Plan",
     "currentPlan": "Current Plan",
     "upgrade": "Upgrade",
-    "features": "Features"
+    "features": "Features",
+    "errorLoading": "Failed to load plans. Please try again.",
+    "retry": "Retry"
+  },
+  "checkout": {
+    "orderSummary": "Order Summary",
+    "billingCycle": "Billing Cycle",
+    "promoCode": "Promo Code",
+    "total": "Total",
+    "paymentMethod": "Payment Method",
+    "pay": "Pay",
+    "processing": "Processing..."
+  },
+  "payment": {
+    "success": {
+      "title": "Payment Successful!",
+      "subtitle": "Your subscription has been activated",
+      "message": "Thank you for your purchase! Your account has been upgraded and you now have access to all premium features.",
+      "goToDashboard": "Go to Dashboard",
+      "startCreating": "Start Creating CVs",
+      "verifying": "Verifying Payment...",
+      "verifyingMessage": "Please wait while we confirm your payment.",
+      "verificationPending": "Verification Pending",
+      "verificationPendingMessage": "We're still processing your payment."
+    },
+    "failure": {
+      "title": "Payment Failed",
+      "subtitle": "We couldn't process your payment",
+      "whatYouCanDo": "What you can do:",
+      "tryAgain": "Try Again",
+      "backToDashboard": "Back to Dashboard",
+      "contactSupport": "Contact Support"
+    }
   },
   "subscription": {
     "confirm": {

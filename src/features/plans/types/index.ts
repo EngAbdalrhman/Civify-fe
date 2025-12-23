@@ -1,2 +1,76 @@
-// Plans types
-export {};
+/**
+ * Subscription Plan Types
+ * TypeScript interfaces for subscription and payment data
+ */
+
+export interface SubscriptionPlan {
+  id: number;
+  name: string;
+  description: string;
+  monthlyPrice: string;
+  annualPrice: string;
+  cvLimit: number | null;
+  apiLimit: number | null;
+  watermark: boolean;
+  dashboard: boolean;
+  active: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface PlanFeature {
+  id: number;
+  name: string;
+  code: string;
+  description?: string;
+}
+
+export interface UserSubscription {
+  id: number;
+  userId: number;
+  planId: number;
+  planName: string;
+  status: 'ACTIVE' | 'PENDING' | 'CANCELLED' | 'EXPIRED';
+  startDate: string;
+  endDate: string;
+  currentCvCount: number;
+  currentApiCount: number;
+  isAnnual: boolean;
+  createdAt: string;
+}
+
+export interface PaymentInitiationResponse {
+  paymentKey: string;
+  paymentUrl: string;
+  orderId: string;
+  subscriptionId?: number;
+  amount?: string;
+  currency?: string;
+  message?: string;
+}
+
+export interface PaymentTransaction {
+  id: number;
+  userId: number;
+  orderId: string;
+  paymentKey: string;
+  amount: string;
+  currency: string;
+  status: 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED';
+  gateway: string;
+  completedAt?: string;
+  createdAt: string;
+}
+
+export interface PricingTierDisplay {
+  id: string;
+  planId: number;
+  name: string;
+  price: number;
+  period: string;
+  description: string;
+  features: string[];
+  highlighted?: boolean;
+  cta: string;
+  ctaLink: string;
+}

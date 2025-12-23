@@ -14,6 +14,7 @@ import {
 import { DashboardNavbar } from '@/components/DashboardNavbar';
 import { useAuth } from '@/hooks/use-auth';
 import { Link, usePathname } from '@/i18n/routing';
+import Image from "next/image";
 
 export default function UserDashboardLayout({
   children,
@@ -49,13 +50,24 @@ export default function UserDashboardLayout({
       <aside className="w-64 border-r bg-background flex flex-col fixed inset-y-0 z-50">
         <div className="p-6">
           <div className="flex items-center gap-2 mb-8">
-             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <LayoutDashboard className="h-5 w-5" />
-             </div>
-             <div className="grid flex-1 ltr:text-left rtl:text-right text-sm leading-tight">
-                <span className="truncate font-semibold">Civify</span>
-                <span className="truncate text-xs text-muted-foreground">Pro Plan</span>
-             </div>
+           {/* Logo */}
+           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                <Link href="/" className="flex items-center space-x-2">
+                  <div className="flex items-center">
+                    <Image
+                      src="/civify-logo-simple.png"
+                      alt="Civify Logo"
+                      width={75}
+                      height={35}
+                      className="object-contain"
+                    />
+                  </div>
+                </Link>
+            </div>
+            <div className="grid flex-1 ltr:text-left rtl:text-right text-sm leading-tight">
+               <span className="truncate font-semibold">Civify</span>
+               <span className="truncate text-xs text-muted-foreground">Pro Plan</span>
+            </div>
           </div>
 
           <nav className="space-y-1">
