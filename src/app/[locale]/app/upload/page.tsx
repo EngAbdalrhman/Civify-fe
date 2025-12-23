@@ -26,7 +26,8 @@ import {
   Globe,
   MapPin,
   RefreshCw,
-  Settings
+  Settings,
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,6 +37,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 import { useUploadCv, useTailorCv } from '@/features/upload-cv/hooks';
 import { 
@@ -184,6 +191,25 @@ export default function UploadPage() {
             ? { ...section, items: section.items.filter(item => item.id !== itemId) }
             : section
         )
+      };
+    });
+  }, []);
+
+  // Add new section
+  const addSection = useCallback((type: string, title: string) => {
+    setResumeData(prev => {
+      if (!prev) return null;
+      const newSection: ResumeSection = {
+        id: `section-${Date.now()}`,
+        title,
+        type,
+        items: [],
+        order: prev.sections.length,
+        visible: true,
+      };
+      return {
+        ...prev,
+        sections: [...prev.sections, newSection]
       };
     });
   }, []);
@@ -457,18 +483,51 @@ export default function UploadPage() {
                       </Button>
                       
                       {sectionType === 'skills' ? (
-                        <div className="space-y-2">
-                          <Label>Skills (comma-separated)</Label>
-                          <Input 
-                            value={(item.tags || []).join(', ')} 
-                            onChange={(e) => updateSectionItem(
-                              section.id, 
-                              item.id, 
-                              'tags', 
-                              e.target.value.split(',').map(s => s.trim()).filter(Boolean)
-                            )}
-                            placeholder="JavaScript, React, TypeScript, Node.js"
-                          />
+                        <div className="space-y-3">
+                          <div className="space-y-2">
+                            <Label>Skills (comma-separated)</Label>
+                            <Textarea 
+                              value={(item.tags || []).join(', ')} 
+                              onChange={(e) => updateSectionItem(
+                                section.id, 
+                                item.id, 
+                                'tags', 
+                                e.target.value.split(',').map(s => s.trim()).filter(Boolean)
+                              )}
+                              placeholder="JavaScript, React, TypeScript, Node.js"
+                              rows={2}
+                            />
+                          </div>
+                          {/* Visual Tags */}
+                          {(item.tags && item.tags.length > 0) && (
+                            <div className="flex flex-wrap gap-1.5">
+                              {item.tags.slice(0, 10).map((tag: string, idx: number) => (
+                                <span 
+                                  key={idx} 
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-md border border-blue-200"
+                                >
+                                  {tag}
+                                  <button
+                                    type="button"
+                                    onClick={() => updateSectionItem(
+                                      section.id, 
+                                      item.id, 
+                                      'tags', 
+                                      item.tags?.filter((_: string, i: number) => i !== idx) || []
+                                    )}
+                                    className="ml-0.5 hover:text-red-600 transition-colors"
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </button>
+                                </span>
+                              ))}
+                              {item.tags.length > 10 && (
+                                <span className="px-2.5 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-md">
+                                  +{item.tags.length - 10} more
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
                       ) : sectionType === 'languages' ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -483,13 +542,83 @@ export default function UploadPage() {
                             placeholder="Level (e.g., Native, Fluent)"
                           />
                         </div>
-                      ) : (
+                      ) : section.type.toLowerCase() === 'certifications' || section.title.toLowerCase().includes('course') ? (
+                        /* Courses/Certifications: Name + optional provider */
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <Input 
+                            value={item.title} 
+                            onChange={(e) => updateSectionItem(section.id, item.id, 'title', e.target.value)}
+                            placeholder="Course/Certification Name"
+                          />
+                          <Input 
+                            value={item.subtitle || ''} 
+                            onChange={(e) => updateSectionItem(section.id, item.id, 'subtitle', e.target.value)}
+                            placeholder="Provider (optional)"
+                          />
+                        </div>
+                      ) : section.title.toLowerCase().includes('interest') ? (
+                        /* Interests: Name only */
+                        <Input 
+                          value={item.title} 
+                          onChange={(e) => updateSectionItem(section.id, item.id, 'title', e.target.value)}
+                          placeholder="Interest (e.g., Chess, Photography)"
+                        />
+                      ) : section.title.toLowerCase().includes('activit') || section.title.toLowerCase().includes('volunteer') ? (
+                        /* Activities/Volunteering: Title + Role + Date */
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <Input 
+                              value={item.title} 
+                              onChange={(e) => updateSectionItem(section.id, item.id, 'title', e.target.value)}
+                              placeholder="Organization/Event Name"
+                            />
+                            <Input 
+                              value={item.subtitle || ''} 
+                              onChange={(e) => updateSectionItem(section.id, item.id, 'subtitle', e.target.value)}
+                              placeholder="Role (e.g., Volunteer, Organizer)"
+                            />
+                          </div>
+                          <Input 
+                            value={item.date || ''} 
+                            onChange={(e) => updateSectionItem(section.id, item.id, 'date', e.target.value)}
+                            placeholder="Date (e.g., 01/2024 or 2023 - 2024)"
+                          />
+                        </div>
+                      ) : section.type.toLowerCase() === 'projects' ? (
+                        /* Projects: Name + Tech Stack + Date + Description (no location) */
                         <>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <Input 
                               value={item.title} 
                               onChange={(e) => updateSectionItem(section.id, item.id, 'title', e.target.value)}
-                              placeholder={section.type === 'experience' ? 'Job Title' : section.type === 'projects' ? 'Project Name' : 'Title'}
+                              placeholder="Project Name"
+                            />
+                            <Input 
+                              value={item.subtitle || ''} 
+                              onChange={(e) => updateSectionItem(section.id, item.id, 'subtitle', e.target.value)}
+                              placeholder="Tech Stack / Category"
+                            />
+                          </div>
+                          <Input 
+                            value={item.date || ''} 
+                            onChange={(e) => updateSectionItem(section.id, item.id, 'date', e.target.value)}
+                            placeholder="2024 or 01/2024 - Present"
+                          />
+                          <Textarea 
+                            value={item.description || ''} 
+                            onChange={(e) => updateSectionItem(section.id, item.id, 'description', e.target.value)}
+                            placeholder="Brief description of the project..."
+                            rows={2}
+                          />
+                        </>
+                      ) : (
+                        /* Default: Experience, Education - Full fields */
+                        <>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <Input 
+                              value={item.title} 
+                              onChange={(e) => updateSectionItem(section.id, item.id, 'title', e.target.value)}
+                              placeholder={section.type === 'experience' ? 'Job Title' : 'Title'}
                             />
                             <Input 
                               value={item.subtitle || ''} 
@@ -524,16 +653,52 @@ export default function UploadPage() {
             );
           })}
 
-          <div className="flex justify-between gap-3">
+          {/* Add New Section Dropdown + Navigation */}
+          <div className="flex justify-between items-center gap-3">
             <Button variant="outline" onClick={() => setCurrentStep(1)}>
               <ArrowLeft className="mr-2 h-4 w-4" /> Back
             </Button>
-            <Button 
-              onClick={() => setCurrentStep(3)} 
-              disabled={!isResumeValid()}
-            >
-              Continue to Generate <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+            
+            <div className="flex gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add Section
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  {[
+                    { type: 'experience', title: 'Experience', match: ['experience', 'professional experience'] },
+                    { type: 'education', title: 'Education', match: ['education'] },
+                    { type: 'projects', title: 'Projects', match: ['project'] },
+                    { type: 'skills', title: 'Skills', match: ['skill', 'competenc'] },
+                    { type: 'languages', title: 'Languages', match: ['language'] },
+                    { type: 'certifications', title: 'Courses', match: ['course', 'certif'] },
+                    { type: 'custom', title: 'Interests', match: ['interest', 'hobby'] },
+                    { type: 'custom', title: 'Activities & Volunteering', match: ['activit', 'volunteer'] },
+                  ].filter(s => !resumeData.sections.some(
+                    existing => s.match.some(m => existing.title.toLowerCase().includes(m))
+                  )).map(s => (
+                    <DropdownMenuItem
+                      key={s.title}
+                      onClick={() => addSection(s.type, s.title.toUpperCase())}
+                      className="cursor-pointer"
+                    >
+                      <Plus className="h-4 w-4 mr-2 text-muted-foreground" />
+                      {s.title}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <Button 
+                onClick={() => setCurrentStep(3)} 
+                disabled={!isResumeValid()}
+              >
+                Continue to Generate <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       )}
