@@ -196,7 +196,7 @@ export default function UploadPage() {
   }, []);
 
   // Add new section
-  const addSection = useCallback((type: string, title: string) => {
+  const addSection = useCallback((type: ResumeSection['type'], title: string) => {
     setResumeData(prev => {
       if (!prev) return null;
       const newSection: ResumeSection = {
@@ -205,7 +205,7 @@ export default function UploadPage() {
         type,
         items: [],
         order: prev.sections.length,
-        visible: true,
+        isVisible: true,
       };
       return {
         ...prev,
@@ -453,6 +453,108 @@ export default function UploadPage() {
           {resumeData.sections.map((section) => {
             const sectionType = getSectionType(section);
             
+            // Skills Section: Consolidated single-block editing
+            if (sectionType === 'skills') {
+              // Get all skills as titles from items
+              const allSkills = section.items.map(item => item.title).filter(Boolean);
+              
+              return (
+                <Card key={section.id}>
+                  <CardHeader>
+                    <CardTitle className="capitalize">{section.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Skills (comma-separated)</Label>
+                      <Textarea 
+                        value={allSkills.join(', ')} 
+                        onChange={(e) => {
+                          // Parse comma-separated input into individual items
+                          const newSkills = e.target.value.split(',').map(s => s.trim()).filter(Boolean);
+                          setResumeData(prev => {
+                            if (!prev) return null;
+                            return {
+                              ...prev,
+                              sections: prev.sections.map(s => 
+                                s.id === section.id 
+                                  ? { 
+                                      ...s, 
+                                      items: newSkills.map((skill, idx) => ({
+                                        id: `skill-${idx}`,
+                                        title: skill,
+                                        subtitle: '',
+                                        date: '',
+                                        description: '',
+                                        location: '',
+                                        tags: [],
+                                        isVisible: true,
+                                      }))
+                                    }
+                                  : s
+                              )
+                            };
+                          });
+                        }}
+                        placeholder="Java, Spring Boot, Angular, TypeScript, React..."
+                        rows={3}
+                      />
+                    </div>
+                    {/* Visual Tags */}
+                    {allSkills.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {allSkills.slice(0, 15).map((skill, idx) => (
+                          <span 
+                            key={idx} 
+                            className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-md border border-blue-200"
+                          >
+                            {skill}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newSkills = allSkills.filter((_, i) => i !== idx);
+                                setResumeData(prev => {
+                                  if (!prev) return null;
+                                  return {
+                                    ...prev,
+                                    sections: prev.sections.map(s => 
+                                      s.id === section.id 
+                                        ? { 
+                                            ...s, 
+                                            items: newSkills.map((sk, i) => ({
+                                              id: `skill-${i}`,
+                                              title: sk,
+                                              subtitle: '',
+                                              date: '',
+                                              description: '',
+                                              location: '',
+                                              tags: [],
+                                              isVisible: true,
+                                            }))
+                                          }
+                                        : s
+                                    )
+                                  };
+                                });
+                              }}
+                              className="ml-0.5 hover:text-red-600 transition-colors"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </span>
+                        ))}
+                        {allSkills.length > 15 && (
+                          <span className="px-2.5 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-md">
+                            +{allSkills.length - 15} more
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            }
+            
+            // Other sections: Normal item-by-item rendering
             return (
               <Card key={section.id}>
                 <CardHeader className="flex flex-row items-center justify-between">
@@ -482,54 +584,7 @@ export default function UploadPage() {
                         <Trash2 className="h-3 w-3" />
                       </Button>
                       
-                      {sectionType === 'skills' ? (
-                        <div className="space-y-3">
-                          <div className="space-y-2">
-                            <Label>Skills (comma-separated)</Label>
-                            <Textarea 
-                              value={(item.tags || []).join(', ')} 
-                              onChange={(e) => updateSectionItem(
-                                section.id, 
-                                item.id, 
-                                'tags', 
-                                e.target.value.split(',').map(s => s.trim()).filter(Boolean)
-                              )}
-                              placeholder="JavaScript, React, TypeScript, Node.js"
-                              rows={2}
-                            />
-                          </div>
-                          {/* Visual Tags */}
-                          {(item.tags && item.tags.length > 0) && (
-                            <div className="flex flex-wrap gap-1.5">
-                              {item.tags.slice(0, 10).map((tag: string, idx: number) => (
-                                <span 
-                                  key={idx} 
-                                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-md border border-blue-200"
-                                >
-                                  {tag}
-                                  <button
-                                    type="button"
-                                    onClick={() => updateSectionItem(
-                                      section.id, 
-                                      item.id, 
-                                      'tags', 
-                                      item.tags?.filter((_: string, i: number) => i !== idx) || []
-                                    )}
-                                    className="ml-0.5 hover:text-red-600 transition-colors"
-                                  >
-                                    <X className="h-3 w-3" />
-                                  </button>
-                                </span>
-                              ))}
-                              {item.tags.length > 10 && (
-                                <span className="px-2.5 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-md">
-                                  +{item.tags.length - 10} more
-                                </span>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      ) : sectionType === 'languages' ? (
+                      {sectionType === 'languages' ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <Input 
                             value={item.title} 
@@ -544,18 +599,11 @@ export default function UploadPage() {
                         </div>
                       ) : section.type.toLowerCase() === 'certifications' || section.title.toLowerCase().includes('course') ? (
                         /* Courses/Certifications: Name + optional provider */
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <Input 
-                            value={item.title} 
-                            onChange={(e) => updateSectionItem(section.id, item.id, 'title', e.target.value)}
-                            placeholder="Course/Certification Name"
-                          />
-                          <Input 
-                            value={item.subtitle || ''} 
-                            onChange={(e) => updateSectionItem(section.id, item.id, 'subtitle', e.target.value)}
-                            placeholder="Provider (optional)"
-                          />
-                        </div>
+                        <Input 
+                          value={item.title} 
+                          onChange={(e) => updateSectionItem(section.id, item.id, 'title', e.target.value)}
+                          placeholder="Course/Certification Name"
+                        />
                       ) : section.title.toLowerCase().includes('interest') ? (
                         /* Interests: Name only */
                         <Input 
@@ -682,7 +730,7 @@ export default function UploadPage() {
                   )).map(s => (
                     <DropdownMenuItem
                       key={s.title}
-                      onClick={() => addSection(s.type, s.title.toUpperCase())}
+                      onClick={() => addSection(s.type as ResumeSection['type'], s.title.toUpperCase())}
                       className="cursor-pointer"
                     >
                       <Plus className="h-4 w-4 mr-2 text-muted-foreground" />
