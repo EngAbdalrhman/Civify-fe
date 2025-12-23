@@ -2,12 +2,17 @@
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Link, useRouter } from '@/i18n/routing';
-import { useLogin, LoginSchemaType } from '@/features/auth/hooks';
+import { useLogin, LoginSchemaType, useVerifyOtp } from '@/features/auth/hooks';
 import { SubmitHandler } from 'react-hook-form';
+import { usePermissions } from '@/contexts/PermissionContext';
+import { useEffect, useState } from 'react';
 
 export default function LoginPage() {
   const t = useTranslations('auth');
   const router = useRouter();
+  const { fetchPermissions } = usePermissions();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  
   const { 
     form, 
     login, 
@@ -16,7 +21,19 @@ export default function LoginPage() {
     showResendVerification,
     handleResendVerification,
     isResendPending,
+    // 2FA
+    requires2FA,
+    loginUsername,
+    reset2FA,
   } = useLogin();
+
+  const {
+    otpCode,
+    setOtpCode,
+    handleVerify,
+    isVerifying,
+    isVerifySuccess,
+  } = useVerifyOtp();
 
   const {
     register,
@@ -28,16 +45,77 @@ export default function LoginPage() {
     login(data);
   };
 
-  // Redirect on successful login
-  if (isLoginSuccess) {
-    router.push('/app');
-  }
+  // Handle redirect after successful login - fetch permissions first
+  useEffect(() => {
+    const handleLoginSuccess = async () => {
+      if ((isLoginSuccess && !requires2FA) || isVerifySuccess) {
+        if (isRedirecting) return; // Prevent double redirect
+        setIsRedirecting(true);
+        
+        // Fetch permissions before redirecting
+        await fetchPermissions();
+        router.push('/app');
+      }
+    };
+    
+    handleLoginSuccess();
+  }, [isLoginSuccess, requires2FA, isVerifySuccess, fetchPermissions, router, isRedirecting]);
 
   const handleGoogleLogin = () => {
-    // Redirect to backend Google OAuth endpoint
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8077/apis';
     window.location.href = `${backendUrl}/oauth2/authorization/google`;
   };
+
+  // 2FA OTP Verification UI
+  if (requires2FA && loginUsername) {
+    return (
+      <div className="flex min-h-screen items-center justify-center p-8">
+        <div className="w-full max-w-md space-y-6">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold">{t('twoFactorAuth') || 'Two-Factor Authentication'}</h1>
+            <p className="text-muted-foreground mt-2">
+              {t('otpSentToEmail') || 'A verification code has been sent to your email'}
+            </p>
+          </div>
+
+          <div className="rounded-lg border p-6 space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">{t('verificationCode') || 'Verification Code'}</label>
+              <input 
+                type="text"
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value)}
+                className="w-full rounded-md border px-3 py-2 text-center text-2xl tracking-widest font-mono"
+                placeholder="000000"
+                maxLength={6}
+                autoFocus
+              />
+              <p className="text-xs text-muted-foreground text-center">
+                {t('enterOtpCode') || 'Enter the 6-digit code from your email'}
+              </p>
+            </div>
+
+            <Button 
+              className="w-full" 
+              onClick={() => handleVerify(loginUsername)}
+              disabled={isVerifying || otpCode.length < 4}
+            >
+              {isVerifying ? (t('verifying') || 'Verifying...') : (t('verify') || 'Verify')}
+            </Button>
+
+            <Button 
+              type="button"
+              variant="ghost" 
+              className="w-full"
+              onClick={reset2FA}
+            >
+              {t('backToLogin') || 'Back to Login'}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center p-8">

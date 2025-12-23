@@ -1,14 +1,40 @@
 import axios, {
   type AxiosInstance,
   type InternalAxiosRequestConfig,
+  type AxiosError,
 } from "axios";
 import { toast } from "sonner";
+
+// Flag to prevent multiple simultaneous refresh attempts
+let isRefreshing = false;
+// Queue of requests waiting for token refresh
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+// Subscribe a request to wait for token refresh
+const subscribeTokenRefresh = (callback: (token: string) => void) => {
+  refreshSubscribers.push(callback);
+};
+
+// Notify all subscribers with new token
+const onTokenRefreshed = (token: string) => {
+  refreshSubscribers.forEach((callback) => callback(token));
+  refreshSubscribers = [];
+};
+
+// Clear auth state and redirect to login
+const clearAuthAndRedirect = () => {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("refresh_token");
+    window.location.href = "/login";
+  }
+};
 
 // Create axios instance with default config
 const apiClient: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   timeout: 30000,
-  withCredentials: true, // Enable sending cookies with requests
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
@@ -17,7 +43,6 @@ const apiClient: AxiosInstance = axios.create({
 // Request interceptor for adding auth token
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Get token from localStorage or cookies
     const token =
       typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
 
@@ -32,13 +57,21 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Response interceptor for handling errors and extracting tokens
+// Response interceptor for handling errors and token refresh
 apiClient.interceptors.response.use(
   (response) => {
-    // Extract token from Authorization header if present (for login responses)
+    // Extract tokens from response body (login/refresh responses)
+    const data = response.data;
+    if (data?.accessToken && typeof window !== "undefined") {
+      localStorage.setItem("auth_token", data.accessToken);
+    }
+    if (data?.refreshToken && typeof window !== "undefined") {
+      localStorage.setItem("refresh_token", data.refreshToken);
+    }
+    
+    // Also check Authorization header (legacy support)
     const authHeader = response.headers["authorization"];
     if (authHeader && typeof window !== "undefined") {
-      // Remove 'Bearer ' prefix if present
       const token = authHeader.startsWith("Bearer ")
         ? authHeader.substring(7)
         : authHeader;
@@ -46,36 +79,97 @@ apiClient.interceptors.response.use(
     }
     return response;
   },
-  (error) => {
+  async (error: AxiosError) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+
     // Handle 401 Unauthorized
-    if (error.response?.status === 401) {
-      const errorCode = error.response?.data?.errorCode;
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+      const errorCode = (error.response?.data as { errorCode?: string })?.errorCode;
       
-      // Skip redirect if error is about email verification (let component handle it)
-      if (errorCode === 'AUTH_001') {
-        // Do nothing, let component handle email verification flow
-      } else {
-        // Clear auth token and redirect for other 401 errors
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("auth_token");
-          window.location.href = "/login";
+      // Skip refresh for email verification errors - let component handle it
+      if (errorCode === "AUTH_001") {
+        return Promise.reject({
+          status: error.response?.status,
+          message: (error.response?.data as { message?: string })?.message || "Email not verified",
+          errorCode,
+          data: error.response?.data,
+        });
+      }
+
+      // Skip refresh for login/refresh endpoints themselves
+      const url = originalRequest.url || "";
+      if (url.includes("/login") || url.includes("/auth/refresh")) {
+        clearAuthAndRedirect();
+        return Promise.reject(error);
+      }
+
+      // If already refreshing, queue this request
+      if (isRefreshing) {
+        return new Promise((resolve) => {
+          subscribeTokenRefresh((token: string) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            resolve(apiClient(originalRequest));
+          });
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const refreshToken = typeof window !== "undefined" 
+          ? localStorage.getItem("refresh_token") 
+          : null;
+
+        if (!refreshToken) {
+          throw new Error("No refresh token available");
         }
+
+        // Call refresh endpoint
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+          null,
+          { params: { refreshToken } }
+        );
+
+        const { accessToken, refreshToken: newRefreshToken } = response.data;
+
+        if (typeof window !== "undefined") {
+          localStorage.setItem("auth_token", accessToken);
+          if (newRefreshToken) {
+            localStorage.setItem("refresh_token", newRefreshToken);
+          }
+        }
+
+        isRefreshing = false;
+        onTokenRefreshed(accessToken);
+
+        // Retry original request with new token
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        return apiClient(originalRequest);
+      } catch (refreshError) {
+        isRefreshing = false;
+        refreshSubscribers = [];
+        clearAuthAndRedirect();
+        return Promise.reject(refreshError);
       }
     }
 
     // Handle other errors
     const errorMessage =
-      error.response?.data?.message ||
+      (error.response?.data as { message?: string })?.message ||
       error.message ||
       "An error occurred. Please try again.";
 
-    // Show error toast
-    toast.error(errorMessage);
+    // Only show toast for non-auth errors
+    if (error.response?.status !== 401) {
+      toast.error(errorMessage);
+    }
 
     return Promise.reject({
       status: error.response?.status,
       message: errorMessage,
-      errorCode: error.response?.data?.errorCode,
+      errorCode: (error.response?.data as { errorCode?: string })?.errorCode,
       data: error.response?.data,
     });
   }

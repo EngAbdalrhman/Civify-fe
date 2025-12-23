@@ -1,17 +1,12 @@
 "use client";
 
 import { useTranslations } from 'next-intl';
-import { Link, usePathname } from '@/i18n/routing';
-import { 
-  Users, 
-  CreditCard, 
-  Tag, 
-  BarChart3, 
-  Activity, 
-  LayoutDashboard,
-  Shield
-} from 'lucide-react';
+import { Link, usePathname, useRouter } from '@/i18n/routing';
+import { LayoutDashboard, Shield, ShieldX } from 'lucide-react';
 import { DashboardNavbar } from '@/components/DashboardNavbar';
+import { usePermissions } from '@/contexts/PermissionContext';
+import { ADMIN_MENU_ITEMS, ADMIN_ACTION_PERMISSIONS } from '@/config/adminMenuConfig';
+import { Button } from '@/components/ui/button';
 
 export default function AdminDashboardLayout({
   children,
@@ -20,6 +15,11 @@ export default function AdminDashboardLayout({
 }) {
   const t = useTranslations('nav');
   const pathname = usePathname();
+  const router = useRouter();
+  const { hasPermission, isLoading, permissions } = usePermissions();
+
+  // Check if user has access to admin dashboard at all
+  const hasAdminAccess = isLoading || hasPermission(ADMIN_ACTION_PERMISSIONS.ADMIN_DASHBOARD_VIEW);
 
   // Helper to check if a link is active
   const isActive = (path: string) => {
@@ -34,6 +34,37 @@ export default function AdminDashboardLayout({
         : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:translate-x-1'
     }`;
   };
+
+  // Filter menu items based on user permissions
+  const allowedMenuItems = ADMIN_MENU_ITEMS.filter((item) => {
+    // If loading, show all (skeleton state)
+    if (isLoading) return true;
+    // Only show items user has permission for
+    return hasPermission(item.permission);
+  });
+
+  // Show access denied if user doesn't have admin access
+  if (!isLoading && !hasAdminAccess) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="text-center space-y-4">
+          <div className="flex justify-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
+              <ShieldX className="h-8 w-8 text-destructive" />
+            </div>
+          </div>
+          <h1 className="text-2xl font-bold">Access Denied</h1>
+          <p className="text-muted-foreground max-w-md">
+            You don&apos;t have permission to access the admin dashboard. 
+            Contact your administrator if you believe this is an error.
+          </p>
+          <Button onClick={() => router.push('/app')} variant="outline">
+            Go to Dashboard
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -51,41 +82,28 @@ export default function AdminDashboardLayout({
           </div>
           
           <nav className="space-y-1">
-            <Link 
-              href="/admin/users" 
-              className={getLinkClasses('/admin/users')}
-            >
-              <Users className="h-4 w-4" />
-              {t('users')}
-            </Link>
-            <Link 
-              href="/admin/plans" 
-              className={getLinkClasses('/admin/plans')}
-            >
-              <CreditCard className="h-4 w-4" />
-              {t('plans')}
-            </Link>
-            <Link 
-              href="/admin/promos" 
-              className={getLinkClasses('/admin/promos')}
-            >
-              <Tag className="h-4 w-4" />
-              {t('promos')}
-            </Link>
-            <Link 
-              href="/admin/stats" 
-              className={getLinkClasses('/admin/stats')}
-            >
-              <BarChart3 className="h-4 w-4" />
-              {t('stats')}
-            </Link>
-            <Link 
-              href="/admin/api-usage" 
-              className={getLinkClasses('/admin/api-usage')}
-            >
-              <Activity className="h-4 w-4" />
-              {t('apiUsage')}
-            </Link>
+            {isLoading ? (
+              // Show skeleton while loading permissions
+              <div className="space-y-2">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="h-9 bg-muted/50 rounded-md animate-pulse" />
+                ))}
+              </div>
+            ) : (
+              allowedMenuItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link 
+                    key={item.path}
+                    href={item.path} 
+                    className={getLinkClasses(item.path)}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {t(item.labelKey)}
+                  </Link>
+                );
+              })
+            )}
           </nav>
           
           <div className="pt-4 border-t">

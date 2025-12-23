@@ -12,62 +12,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "./ui/badge";
-import { useRouter } from "@/i18n/routing";
-import { toast } from "sonner";
-import apiClient from "@/api/client";
+import { useLogout } from "@/features/auth/hooks";
 
 export function DashboardNavbar() {
-  // const t = useTranslations('dashboard');
-  const router = useRouter();
+  const { logout, isLoggingOut } = useLogout();
   const date = new Date().toLocaleDateString('en-US', { 
     weekday: 'long', 
     year: 'numeric', 
     month: 'long', 
     day: 'numeric' 
   });
-
-  const handleLogout = async () => {
-    try {
-      // Get access token from localStorage
-      const accessToken = localStorage.getItem('auth_token');
-      
-      // Get refresh token from cookies
-      const refreshToken = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('refreshToken='))
-        ?.split('=')[1];
-
-      // // Call backend logout endpoint (optional - for token blacklisting)
-      // if (accessToken && refreshToken) {
-      //   try {
-      //     await apiClient.post('/auth/logout', null, {
-      //       params: { refreshToken },
-      //       headers: {
-      //         Authorization: `Bearer ${accessToken}`
-      //       }
-      //     });
-      //   } catch (error) {
-      //     // Continue with logout even if backend call fails
-      //     console.error('Backend logout failed:', error);
-      //   }
-      // }
-
-      // Clear local storage
-      localStorage.removeItem('auth_token');
-      
-      // Clear cookie (client-side - best effort)
-      document.cookie = 'refreshToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-      
-      // Show success message
-      toast.success('Logged out successfully');
-      
-      // Redirect to login page
-      router.push('/login');
-    } catch (error) {
-      console.error('Logout error:', error);
-      toast.error('Failed to logout. Please try again.');
-    }
-  };
 
   return (
     <div className="flex items-center justify-between p-4 border-b bg-background">
@@ -127,9 +81,10 @@ export function DashboardNavbar() {
             <DropdownMenuItem>Billing</DropdownMenuItem>
             <DropdownMenuItem 
               className="text-red-500 cursor-pointer"
-              onClick={handleLogout}
+              onClick={logout}
+              disabled={isLoggingOut}
             >
-              Sign Out
+              {isLoggingOut ? 'Signing out...' : 'Sign Out'}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
