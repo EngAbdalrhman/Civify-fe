@@ -8,6 +8,7 @@ import {
   TrendingUp,
   Download,
   Gauge,
+  Globe,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { features } from "../data";
@@ -20,6 +21,7 @@ const iconMap = {
   TrendingUp,
   Download,
   Gauge,
+  Globe,
 };
 
 export function FeaturesSection() {

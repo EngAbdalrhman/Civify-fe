@@ -64,14 +64,19 @@ export const features: Feature[] = [
     description: "Shows missing skills and recommends additions based on job requirements",
   },
   {
-    icon: "Download",
-    title: "Multiple Export Options",
-    description: "PDF, Word, LinkedIn-ready formats with one-click export",
+    icon: "Globe",
+    title: "Full Arabic Support 🇸🇦",
+    description: "Native RTL support, Arabic OCR for scanned documents, and bilingual CV generation",
   },
   {
     icon: "Gauge",
     title: "Real-time Score Indicator",
     description: "Displays CV Match Score before download so you know exactly where you stand",
+  },
+  {
+    icon: "Download",
+    title: "CV Masking & Privacy",
+    description: "Protect your personal info when sharing CVs—mask emails, phones, and addresses",
   },
 ];
 

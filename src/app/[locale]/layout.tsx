@@ -21,8 +21,56 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Civify - AI CV Generator",
-  description: "Generate professional CVs with AI assistance",
+  title: "Civify - AI CV Builder with ATS Optimization | 92% Match Rate",
+  description: "75% of CVs never get seen by humans. Civify uses AI to analyze job descriptions and tailor your CV for ATS systems. Full Arabic support. Start free, no credit card required.",
+  keywords: [
+    "AI CV builder",
+    "ATS resume optimization",
+    "Arabic resume builder",
+    "CV tailoring",
+    "resume match score",
+    "job description analyzer",
+    "ATS-friendly CV",
+    "CV masking",
+    "multilingual CV",
+    "Arabic OCR CV",
+  ],
+  authors: [{ name: "Civify" }],
+  creator: "Civify",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    alternateLocale: "ar_SA",
+    url: "https://civify.cv",
+    siteName: "Civify",
+    title: "Civify - AI CV Builder | Make Your CV Get Seen",
+    description: "75% of CVs are rejected by ATS. Civify uses AI to tailor your CV, achieving 92% average match scores. Full Arabic support.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Civify - AI-Powered CV Builder",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Civify - AI CV Builder with ATS Optimization",
+    description: "75% of CVs never get seen. Make yours the exception with AI-powered optimization. 92% match rate. Full Arabic support.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default async function LocaleLayout({

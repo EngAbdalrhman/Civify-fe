@@ -18,7 +18,14 @@ import { usePermissions } from "@/contexts/PermissionContext";
 import { ThemeToggle } from "./theme-toggle";
 import { useTheme } from "next-themes";
 
-const navigationItems = [
+type NavItem = {
+  name: string;
+  hasDropdown: boolean;
+  items?: { name: string; href: string }[];
+  href?: string;
+};
+
+const navigationItems: NavItem[] = [
   {
     name: "Products",
     hasDropdown: true,

@@ -20,13 +20,13 @@ const Homepage = () => {
       <HowItWorksSection />
       <FeaturesSection />
       <BeforeAfterSection />
-      <TemplatesSection />
+      {/* <TemplatesSection /> */}
       <RolePersonalizationSection />
-      <TestimonialsSection />
+      {/* <TestimonialsSection /> */}
       <PricingSection />
       <FAQSection />
-      <IntegrationsSection />
-      <BlogPreviewSection />
+      {/* <IntegrationsSection /> */}
+      {/* <BlogPreviewSection /> */}
       <CTASection />
     </>
   );

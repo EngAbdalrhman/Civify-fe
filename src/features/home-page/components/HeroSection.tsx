@@ -1,9 +1,10 @@
 "use client";
 
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight, Play, Globe } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { BetaBadge } from "@/components/BetaBadge";
 
 export function HeroSection() {
   return (
@@ -18,46 +19,60 @@ export function HeroSection() {
 
       <div className="container relative mx-auto px-4 py-20 md:py-32">
         <div className="mx-auto max-w-4xl text-center">
-          {/* Badge */}
-          <Badge variant="secondary" className="mb-6 px-4 py-2 text-sm font-medium">
-            🚀 Trusted by 50,000+ job seekers worldwide
-          </Badge>
+          {/* Beta Badge */}
+          <div className="mb-6">
+            <BetaBadge />
+          </div>
 
-          {/* Main Headline */}
+          {/* Language Support Badges */}
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <Badge variant="secondary" className="px-3 py-1.5 text-sm font-medium">
+              <Globe className="w-3.5 h-3.5 mr-1.5" />
+              English
+            </Badge>
+            <Badge variant="secondary" className="px-3 py-1.5 text-sm font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+              🇸🇦 العربية - Full Arabic Support
+            </Badge>
+          </div>
+
+          {/* Problem-Focused Headline */}
           <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-            Generate a{" "}
+            <span className="text-red-500 dark:text-red-400">75% of CVs</span>
+            {" "}Never Get Seen.{" "}
+            <br className="hidden sm:block" />
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Job-Winning
+              Make Yours the Exception.
             </span>
-            , ATS-Optimized CV in Minutes
           </h1>
 
-          {/* Subtext */}
+          {/* Solution Subtext */}
           <p className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground md:text-xl">
-            Paste the job description → Get a tailored CV → Increase your interview chances.
+            Civify uses AI to analyze job descriptions and tailor your CV for ATS systems.
             <br />
-            <span className="font-semibold text-foreground">No design skills required.</span>
+            <span className="font-semibold text-foreground">
+              92% average match score. 3x more interviews.
+            </span>
           </p>
 
           {/* CTAs */}
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button asChild size="lg" className="group h-12 px-8 text-base font-semibold">
-              <Link href="/signup">
-                Create Your CV
+              <Link href="/app/upload">
+                Start Free — No Credit Card
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="h-12 px-8 text-base font-semibold">
+            {/* <Button asChild variant="outline" size="lg" className="h-12 px-8 text-base font-semibold">
               <Link href="#demo">
                 <Play className="mr-2 h-5 w-5" />
                 See Demo
               </Link>
-            </Button>
+            </Button> */}
           </div>
 
           {/* Trust indicators */}
           <div className="mt-12 flex flex-col items-center justify-center gap-6 sm:flex-row sm:gap-8">
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <div className="flex -space-x-2">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <div
@@ -79,12 +94,12 @@ export function HeroSection() {
                   ))}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  <span className="font-semibold text-foreground">4.9/5</span> from 2,000+ reviews
+                  <span className="font-semibold text-foreground">4.9/5</span> from early testers
                 </p>
               </div>
-            </div>
+            </div> */}
 
-            <div className="h-8 w-px bg-border hidden sm:block" />
+            {/* <div className="h-8 w-px bg-border hidden sm:block" /> */}
 
             <div className="text-center sm:text-left">
               <p className="text-2xl font-bold text-foreground">92%</p>
@@ -96,6 +111,13 @@ export function HeroSection() {
             <div className="text-center sm:text-left">
               <p className="text-2xl font-bold text-foreground">3x</p>
               <p className="text-sm text-muted-foreground">More interviews</p>
+            </div>
+
+            <div className="h-8 w-px bg-border hidden sm:block" />
+
+            <div className="text-center sm:text-left">
+              <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">🇸🇦</p>
+              <p className="text-sm text-muted-foreground">Arabic OCR</p>
             </div>
           </div>
         </div>
@@ -118,3 +140,4 @@ export function HeroSection() {
     </section>
   );
 }
+
