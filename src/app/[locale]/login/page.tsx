@@ -6,12 +6,16 @@ import { useLogin, LoginSchemaType, useVerifyOtp } from '@/features/auth/hooks';
 import { SubmitHandler } from 'react-hook-form';
 import { usePermissions } from '@/contexts/PermissionContext';
 import { useEffect, useState } from 'react';
+import { Checkbox } from '@/components/ui/checkbox';
+
+const REMEMBER_ME_KEY = 'civify_remember_email';
 
 export default function LoginPage() {
   const t = useTranslations('auth');
   const router = useRouter();
   const { fetchPermissions } = usePermissions();
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   
   const { 
     form, 
@@ -39,9 +43,25 @@ export default function LoginPage() {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = form;
 
+  // Load remembered email on mount
+  useEffect(() => {
+    const savedEmail = localStorage.getItem(REMEMBER_ME_KEY);
+    if (savedEmail) {
+      setValue('email', savedEmail);
+      setRememberMe(true);
+    }
+  }, [setValue]);
+
   const onSubmit: SubmitHandler<LoginSchemaType> = (data) => {
+    // Handle Remember Me - save or clear email
+    if (rememberMe) {
+      localStorage.setItem(REMEMBER_ME_KEY, data.email);
+    } else {
+      localStorage.removeItem(REMEMBER_ME_KEY);
+    }
     login(data);
   };
 
@@ -129,14 +149,14 @@ export default function LoginPage() {
 
         {/* Resend Verification Alert */}
         {showResendVerification && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 space-y-3">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 space-y-3 dark:bg-yellow-900/20 dark:border-yellow-800">
             <div className="flex items-start gap-3">
-              <svg className="w-5 h-5 text-yellow-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-5 h-5 text-yellow-600 mt-0.5 dark:text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
               <div className="flex-1">
-                <h3 className="text-sm font-semibold text-yellow-800">Email Not Verified</h3>
-                <p className="text-sm text-yellow-700 mt-1">
+                <h3 className="text-sm font-semibold text-yellow-800 dark:text-yellow-400">Email Not Verified</h3>
+                <p className="text-sm text-yellow-700 mt-1 dark:text-yellow-300">
                   Please check your inbox for the verification email. Didn't receive it?
                 </p>
               </div>
@@ -145,7 +165,7 @@ export default function LoginPage() {
               type="button"
               variant="outline"
               size="sm"
-              className="w-full border-yellow-300 hover:bg-yellow-100"
+              className="w-full border-yellow-300 hover:bg-yellow-100 dark:border-yellow-700 dark:hover:bg-yellow-900/40"
               onClick={handleResendVerification}
               disabled={isResendPending}
             >
@@ -160,11 +180,11 @@ export default function LoginPage() {
             <input 
               type="email" 
               {...register('email')}
-              className="w-full rounded-md border px-3 py-2"
+              className="w-full rounded-md border px-3 py-2 bg-background"
               placeholder="your@email.com"
             />
             {errors.email && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-error text-xs mt-1">
                 {errors.email.message}
               </p>
             )}
@@ -175,19 +195,22 @@ export default function LoginPage() {
             <input 
               type="password" 
               {...register('password')}
-              className="w-full rounded-md border px-3 py-2"
+              className="w-full rounded-md border px-3 py-2 bg-background"
               placeholder="••••••••"
             />
             {errors.password && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-error text-xs mt-1">
                 {errors.password.message}
               </p>
             )}
           </div>
 
           <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" />
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <Checkbox 
+                checked={rememberMe}
+                onCheckedChange={(checked) => setRememberMe(checked === true)}
+              />
               {t('rememberMe')}
             </label>
             <Link href="/forgot-password" className="text-sm text-primary hover:underline">
@@ -230,3 +253,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

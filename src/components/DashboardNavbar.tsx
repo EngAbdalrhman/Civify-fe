@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "./ui/badge";
 import { useLogout } from "@/features/auth/hooks";
+import { ThemeToggle } from "./theme-toggle";
 
 export function DashboardNavbar() {
   const { logout, isLoggingOut } = useLogout();
@@ -32,23 +33,20 @@ export function DashboardNavbar() {
         </div>
 
         {/* Search Bar */}
-        <div className="relative max-w-md w-full">
+        {/* <div className="relative max-w-md w-full">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
             placeholder="Search..."
             className="pl-9 bg-muted/20 border-muted-foreground/20 focus-visible:ring-1 focus-visible:ring-ring"
           />
-        </div>
+        </div> */}
       </div>
 
       <div className="flex items-center gap-2 ml-4">
-        {/* Upgrade Badge */}
-        <Badge className="hidden md:flex items-center px-3 py-1 text-white text-xs font-semibold rounded-full shadow-sm mr-2">
-          Free Trial
-        </Badge>
 
         <LanguageSwitcher />
+        <ThemeToggle />
 
         {/* Notifications */}
         <DropdownMenu>

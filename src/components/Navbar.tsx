@@ -15,18 +15,9 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Image from "next/image";
 import { usePermissions } from "@/contexts/PermissionContext";
+import { ThemeToggle } from "./theme-toggle";
 
 const navigationItems = [
-  {
-    name: "Features",
-    hasDropdown: true,
-    items: [
-      { name: "AI CV Generation", href: "/features/ai-generation" },
-      { name: "Templates", href: "/features/templates" },
-      { name: "Export Options", href: "/features/export" },
-      { name: "Analytics", href: "/features/analytics" },
-    ],
-  },
   {
     name: "Products",
     hasDropdown: true,
@@ -35,21 +26,6 @@ const navigationItems = [
       { name: "Pro Plan", href: "/plans" },
       { name: "Enterprise", href: "/plans" },
     ],
-  },
-  {
-    name: "Resources",
-    hasDropdown: true,
-    items: [
-      { name: "Blog", href: "/resources/blog" },
-      { name: "Documentation", href: "/resources/docs" },
-      { name: "Help Center", href: "/resources/help" },
-      { name: "Community", href: "/resources/community" },
-    ],
-  },
-  {
-    name: "Contact",
-    hasDropdown: false,
-    href: "/contact",
   },
 ];
 
@@ -143,7 +119,7 @@ export function Navbar() {
           {/* Auth Buttons - Desktop */}
           <div className="hidden md:flex items-center space-x-3">
             <LanguageSwitcher />
-            
+            <ThemeToggle />
             {isAuthenticated ? (
               /* User is logged in - show user menu */
               <>

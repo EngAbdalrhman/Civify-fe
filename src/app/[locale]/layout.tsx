@@ -5,6 +5,7 @@ import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { QueryProvider } from '@/providers/query-provider';
+import { ThemeProvider } from '@/providers/theme-provider';
 import { PermissionProvider } from '@/contexts/PermissionContext';
 import LayoutWrapper from "@/components/LayoutWrapper";
 import "../globals.css";
@@ -43,19 +44,22 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+    <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <QueryProvider>
-          <PermissionProvider>
-            <NextIntlClientProvider messages={messages}>
-              <LayoutWrapper>{children}</LayoutWrapper>
-            </NextIntlClientProvider>
-          </PermissionProvider>
-        </QueryProvider>
+        <ThemeProvider>
+          <QueryProvider>
+            <PermissionProvider>
+              <NextIntlClientProvider messages={messages}>
+                <LayoutWrapper>{children}</LayoutWrapper>
+              </NextIntlClientProvider>
+            </PermissionProvider>
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
 }
+
 
