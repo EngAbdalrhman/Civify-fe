@@ -15,6 +15,8 @@ import { DashboardNavbar } from '@/components/DashboardNavbar';
 import { useAuth } from '@/hooks/use-auth';
 import { Link, usePathname } from '@/i18n/routing';
 import Image from "next/image";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export default function UserDashboardLayout({
   children,
@@ -24,6 +26,13 @@ export default function UserDashboardLayout({
   const t = useTranslations('nav');
   const { isAdmin } = useAuth();
   const pathname = usePathname();
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // Avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Helper to check if a link is active
   const isActive = (path: string) => {
@@ -44,6 +53,11 @@ export default function UserDashboardLayout({
      }`;
   };
 
+  // Determine logo based on theme
+  const logoSrc = mounted && resolvedTheme === 'dark' 
+    ? '/civify-logo-simple-dark-2.png' 
+    : '/civify-logo-simple.png';
+
   return (
     <div className="flex min-h-screen bg-background">
       {/* Left Sidebar */}
@@ -51,11 +65,11 @@ export default function UserDashboardLayout({
         <div className="p-6">
           <div className="flex items-center gap-2 mb-8">
            {/* Logo */}
-           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+           <div className="flex h-8 w-8 items-center justify-center rounded-lg">
                 <Link href="/" className="flex items-center space-x-2">
                   <div className="flex items-center">
                     <Image
-                      src="/civify-logo-simple.png"
+                      src={logoSrc}
                       alt="Civify Logo"
                       width={75}
                       height={35}

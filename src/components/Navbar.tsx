@@ -16,6 +16,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Image from "next/image";
 import { usePermissions } from "@/contexts/PermissionContext";
 import { ThemeToggle } from "./theme-toggle";
+import { useTheme } from "next-themes";
 
 const navigationItems = [
   {
@@ -32,7 +33,14 @@ const navigationItems = [
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { groupName, clearPermissions } = usePermissions();
+  const { resolvedTheme } = useTheme();
+
+  // Avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Check authentication status on mount and when window focuses
   useEffect(() => {
@@ -62,6 +70,11 @@ export function Navbar() {
     window.location.href = "/";
   };
 
+  // Determine logo based on theme
+  const logoSrc = mounted && resolvedTheme === 'dark' 
+    ? '/civfiy-logo-dark.png' 
+    : '/civify-logo-2.png';
+
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
@@ -70,7 +83,7 @@ export function Navbar() {
           <Link href="/" className="flex items-center space-x-2">
             <div className="flex items-center">
               <Image
-                src="/civify-logo-2.png"
+                src={logoSrc}
                 alt="Civify Logo"
                 width={150}
                 height={32}
