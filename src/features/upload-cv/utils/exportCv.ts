@@ -2,50 +2,162 @@ import { saveAs } from 'file-saver';
 import type { ResumeData } from '../types';
 
 /**
- * Export the CV preview to PDF using html2canvas and jspdf
- * @param element - The HTML element to capture (CV preview container)
- * @param filename - The output filename (without extension)
+ * Export the CV to PDF by generating directly from resume data
+ * This provides consistent styling without html2canvas issues
  */
-export async function exportToPdf(element: HTMLElement, filename: string = 'cv'): Promise<void> {
-  // Dynamically import to avoid SSR issues
-  const html2canvas = (await import('html2canvas')).default;
+export async function exportToPdf(element: HTMLElement, filename: string = 'cv', resumeData?: ResumeData): Promise<void> {
   const { jsPDF } = await import('jspdf');
+  
+  // If no resumeData provided, try to use the window object (will be set by caller)
+  const data = resumeData || (window as any).__cvExportData;
+  if (!data) {
+    throw new Error('No resume data available for PDF export');
+  }
 
-  // Capture the element as canvas
-  const canvas = await html2canvas(element, {
-    scale: 2, // Higher quality
-    useCORS: true,
-    logging: false,
-    backgroundColor: '#ffffff',
-  });
-
-  // Create PDF with A4 dimensions
   const pdf = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
     format: 'a4',
   });
 
-  const imgData = canvas.toDataURL('image/png');
-  const imgWidth = 210; // A4 width in mm
-  const pageHeight = 297; // A4 height in mm
-  const imgHeight = (canvas.height * imgWidth) / canvas.width;
-  let heightLeft = imgHeight;
-  let position = 0;
+  const pageWidth = 210;
+  const pageHeight = 297;
+  const margin = 20;
+  const contentWidth = pageWidth - (margin * 2);
+  let y = margin;
 
-  // Add first page
-  pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-  heightLeft -= pageHeight;
+  const addNewPageIfNeeded = (requiredSpace: number = 15) => {
+    if (y + requiredSpace > pageHeight - margin) {
+      pdf.addPage();
+      y = margin;
+    }
+  };
 
-  // Add additional pages if needed
-  while (heightLeft > 0) {
-    position = heightLeft - imgHeight;
-    pdf.addPage();
-    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
+  // Helper to add text with word wrap
+  const addText = (text: string, fontSize: number, options: { bold?: boolean; italic?: boolean; color?: string; align?: 'left' | 'center' | 'right' } = {}) => {
+    pdf.setFontSize(fontSize);
+    pdf.setTextColor(options.color || '#1f2937');
+    
+    if (options.bold && options.italic) {
+      pdf.setFont('helvetica', 'bolditalic');
+    } else if (options.bold) {
+      pdf.setFont('helvetica', 'bold');
+    } else if (options.italic) {
+      pdf.setFont('helvetica', 'italic');
+    } else {
+      pdf.setFont('helvetica', 'normal');
+    }
+
+    const lines = pdf.splitTextToSize(text, contentWidth);
+    const lineHeight = fontSize * 0.4;
+    
+    lines.forEach((line: string) => {
+      addNewPageIfNeeded(lineHeight);
+      if (options.align === 'center') {
+        pdf.text(line, pageWidth / 2, y, { align: 'center' });
+      } else if (options.align === 'right') {
+        pdf.text(line, pageWidth - margin, y, { align: 'right' });
+      } else {
+        pdf.text(line, margin, y);
+      }
+      y += lineHeight;
+    });
+  };
+
+  const addLine = () => {
+    addNewPageIfNeeded(5);
+    pdf.setDrawColor('#374151');
+    pdf.setLineWidth(0.5);
+    pdf.line(margin, y, pageWidth - margin, y);
+    y += 5;
+  };
+
+  const { personalInfo, sections } = data;
+
+  // Header - Name
+  addText(personalInfo.fullName || 'Resume', 24, { bold: true, align: 'center' });
+  y += 2;
+
+  // Contact info
+  const contactParts: string[] = [];
+  if (personalInfo.email) contactParts.push(personalInfo.email);
+  if (personalInfo.phone) contactParts.push(personalInfo.phone);
+  if (personalInfo.city || personalInfo.country) {
+    contactParts.push([personalInfo.city, personalInfo.country].filter(Boolean).join(', '));
+  }
+  if (contactParts.length > 0) {
+    addText(contactParts.join(' | '), 10, { align: 'center', color: '#6b7280' });
   }
 
-  // Save the PDF
+  // Links
+  const linkParts: string[] = [];
+  if (personalInfo.linkedin) linkParts.push(personalInfo.linkedin);
+  if (personalInfo.github) linkParts.push(personalInfo.github);
+  if (personalInfo.website) linkParts.push(personalInfo.website);
+  if (linkParts.length > 0) {
+    addText(linkParts.join(' | '), 9, { align: 'center', color: '#6b7280' });
+  }
+
+  y += 5;
+
+  // Summary
+  if (personalInfo.summary) {
+    addLine();
+    addText('PROFESSIONAL SUMMARY', 12, { bold: true });
+    y += 2;
+    addText(personalInfo.summary, 10);
+    y += 5;
+  }
+
+  // Sections
+  for (const section of sections || []) {
+    if (section.isVisible === false) continue;
+    
+    addNewPageIfNeeded(20);
+    addLine();
+    addText(section.title?.toUpperCase() || '', 12, { bold: true });
+    y += 3;
+
+    if (section.type === 'skills') {
+      const skills = section.items?.map((item: { title?: string }) => item.title).filter(Boolean).join(', ');
+      if (skills) {
+        addText(skills, 10);
+      }
+    } else if (section.type === 'languages') {
+      for (const item of section.items || []) {
+        addNewPageIfNeeded(8);
+        addText(`${item.title}${item.subtitle ? ` - ${item.subtitle}` : ''}`, 10);
+      }
+    } else {
+      for (const item of section.items || []) {
+        addNewPageIfNeeded(15);
+        
+        // Title line
+        let titleLine = item.title || '';
+        if (item.subtitle) titleLine += ` | ${item.subtitle}`;
+        addText(titleLine, 11, { bold: true });
+
+        // Date/Location line
+        if (item.date || item.location) {
+          addText([item.date, item.location].filter(Boolean).join(' | '), 9, { italic: true, color: '#6b7280' });
+        }
+
+        // Description
+        if (item.description) {
+          y += 1;
+          const lines = item.description.split('\n').filter((l: string) => l.trim());
+          for (const line of lines) {
+            addNewPageIfNeeded(6);
+            const bulletLine = line.startsWith('•') || line.startsWith('-') ? line : `• ${line}`;
+            addText(bulletLine, 9);
+          }
+        }
+        y += 3;
+      }
+    }
+    y += 3;
+  }
+
   pdf.save(`${filename}.pdf`);
 }
 

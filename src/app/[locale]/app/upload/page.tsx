@@ -71,7 +71,8 @@ export default function UploadPage() {
   const [includeInterviewQuestions, setIncludeInterviewQuestions] = useState(false);
   const [includeRoadmap, setIncludeRoadmap] = useState(false);
   const [maskPII, setMaskPII] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+  const [isExportingDocx, setIsExportingDocx] = useState(false);
   
   // API Hooks
   const { mutate: uploadCv, isPending: isUploading } = useUploadCv();
@@ -110,23 +111,23 @@ export default function UploadPage() {
   const handleDownloadPdf = useCallback(async () => {
     if (!cvPreviewRef.current || !tailorResponse) return;
     
-    setIsExporting(true);
+    setIsExportingPdf(true);
     try {
       const filename = `${tailorResponse.tailoredCv.personalInfo.fullName || 'cv'}_tailored`;
-      await exportToPdf(cvPreviewRef.current, filename);
+      await exportToPdf(cvPreviewRef.current, filename, tailorResponse.tailoredCv);
       toast.success('PDF downloaded successfully!');
     } catch (error) {
       console.error('PDF export failed:', error);
       toast.error('Failed to download PDF. Please try again.');
     } finally {
-      setIsExporting(false);
+      setIsExportingPdf(false);
     }
   }, [tailorResponse]);
 
   const handleDownloadDocx = useCallback(async () => {
     if (!tailorResponse) return;
     
-    setIsExporting(true);
+    setIsExportingDocx(true);
     try {
       const filename = `${tailorResponse.tailoredCv.personalInfo.fullName || 'cv'}_tailored`;
       await exportToDocx(tailorResponse.tailoredCv, filename);
@@ -135,7 +136,7 @@ export default function UploadPage() {
       console.error('DOCX export failed:', error);
       toast.error('Failed to download DOCX. Please try again.');
     } finally {
-      setIsExporting(false);
+      setIsExportingDocx(false);
     }
   }, [tailorResponse]);
 
@@ -912,20 +913,20 @@ export default function UploadPage() {
                       className="w-full" 
                       size="sm"
                       onClick={handleDownloadPdf}
-                      disabled={isExporting}
+                      disabled={isExportingPdf || isExportingDocx}
                     >
                       <Download className="mr-2 h-4 w-4" />
-                      {isExporting ? 'Exporting...' : 'Download PDF'}
+                      {isExportingPdf ? 'Exporting PDF...' : 'Download PDF'}
                     </Button>
                     <Button 
                       variant="outline" 
                       className="w-full" 
                       size="sm"
                       onClick={handleDownloadDocx}
-                      disabled={isExporting}
+                      disabled={isExportingPdf || isExportingDocx}
                     >
                       <Download className="mr-2 h-4 w-4" />
-                      {isExporting ? 'Exporting...' : 'Download DOCX'}
+                      {isExportingDocx ? 'Exporting DOCX...' : 'Download DOCX'}
                     </Button>
                   </div>
                 </CardContent>
