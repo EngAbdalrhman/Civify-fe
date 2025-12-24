@@ -53,10 +53,12 @@ import {
   emptyResumeData, 
   PII_FIELDS 
 } from '@/features/upload-cv/types';
+import { exportToPdf, exportToDocx } from '@/features/upload-cv/utils/exportCv';
 
 export default function UploadPage() {
   const t = useTranslations('upload');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cvPreviewRef = useRef<HTMLDivElement>(null);
   
   // State
   const [currentStep, setCurrentStep] = useState(1);
@@ -69,6 +71,7 @@ export default function UploadPage() {
   const [includeInterviewQuestions, setIncludeInterviewQuestions] = useState(false);
   const [includeRoadmap, setIncludeRoadmap] = useState(false);
   const [maskPII, setMaskPII] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   
   // API Hooks
   const { mutate: uploadCv, isPending: isUploading } = useUploadCv();
@@ -102,6 +105,39 @@ export default function UploadPage() {
     setResumeData(emptyResumeData);
     setCurrentStep(2);
   }, []);
+
+  // Download handlers
+  const handleDownloadPdf = useCallback(async () => {
+    if (!cvPreviewRef.current || !tailorResponse) return;
+    
+    setIsExporting(true);
+    try {
+      const filename = `${tailorResponse.tailoredCv.personalInfo.fullName || 'cv'}_tailored`;
+      await exportToPdf(cvPreviewRef.current, filename);
+      toast.success('PDF downloaded successfully!');
+    } catch (error) {
+      console.error('PDF export failed:', error);
+      toast.error('Failed to download PDF. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
+  }, [tailorResponse]);
+
+  const handleDownloadDocx = useCallback(async () => {
+    if (!tailorResponse) return;
+    
+    setIsExporting(true);
+    try {
+      const filename = `${tailorResponse.tailoredCv.personalInfo.fullName || 'cv'}_tailored`;
+      await exportToDocx(tailorResponse.tailoredCv, filename);
+      toast.success('DOCX downloaded successfully!');
+    } catch (error) {
+      console.error('DOCX export failed:', error);
+      toast.error('Failed to download DOCX. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
+  }, [tailorResponse]);
 
   const handleGenerate = useCallback(() => {
     if (!resumeData) return;
@@ -872,11 +908,24 @@ export default function UploadPage() {
                   </p>
                   
                   <div className="space-y-2">
-                    <Button className="w-full" size="sm">
-                      <Download className="mr-2 h-4 w-4" /> Download PDF
+                    <Button 
+                      className="w-full" 
+                      size="sm"
+                      onClick={handleDownloadPdf}
+                      disabled={isExporting}
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      {isExporting ? 'Exporting...' : 'Download PDF'}
                     </Button>
-                    <Button variant="outline" className="w-full" size="sm">
-                      <Download className="mr-2 h-4 w-4" /> Download DOCX
+                    <Button 
+                      variant="outline" 
+                      className="w-full" 
+                      size="sm"
+                      onClick={handleDownloadDocx}
+                      disabled={isExporting}
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      {isExporting ? 'Exporting...' : 'Download DOCX'}
                     </Button>
                   </div>
                 </CardContent>
@@ -910,15 +959,44 @@ export default function UploadPage() {
               {/* ATS Score */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">AI Impact Score</CardTitle>
+                  <CardTitle className="text-base">ATS Match Score</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  {/* Before/After Comparison */}
+                  {tailorResponse.originalAtsScore && (
+                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg mb-3">
+                      <div className="text-center">
+                        <p className="text-xs text-muted-foreground mb-1">Before</p>
+                        <span className={`text-xl font-bold ${getScoreColor(tailorResponse.originalAtsScore.overall)}`}>
+                          {tailorResponse.originalAtsScore.overall}%
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <ArrowRight className="h-5 w-5 text-muted-foreground" />
+                        {tailorResponse.atsScore.overall > tailorResponse.originalAtsScore.overall && (
+                          <span className="text-xs text-green-600 font-semibold">
+                            +{tailorResponse.atsScore.overall - tailorResponse.originalAtsScore.overall}%
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs text-muted-foreground mb-1">After</p>
+                        <span className={`text-xl font-bold ${getScoreColor(tailorResponse.atsScore.overall)}`}>
+                          {tailorResponse.atsScore.overall}%
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Main Score Display */}
                   <div className="space-y-2">
                     <div className="flex items-baseline gap-2">
                       <span className={`text-4xl font-bold ${getScoreColor(tailorResponse.atsScore.overall)}`}>
                         {tailorResponse.atsScore.overall}%
                       </span>
-                      <span className="text-sm text-muted-foreground">Match Rate</span>
+                      <span className="text-sm text-muted-foreground">
+                        {tailorResponse.originalAtsScore ? 'Optimized Score' : 'Match Rate'}
+                      </span>
                     </div>
                     <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                       <div 
@@ -973,7 +1051,10 @@ export default function UploadPage() {
                 </CardHeader>
                 <CardContent>
                   {/* CV Preview Document */}
-                  <div className="bg-white rounded-[1px] border shadow-sm mx-auto w-full max-w-[850px] min-h-[1100px] p-[40px] text-gray-900 font-sans leading-relaxed selection:bg-blue-100">
+                  <div 
+                    ref={cvPreviewRef}
+                    className="bg-white rounded-[1px] border shadow-sm mx-auto w-full max-w-[850px] min-h-[1100px] p-[40px] text-gray-900 font-sans leading-relaxed selection:bg-blue-100"
+                  >
                     <div className="space-y-6">
                       {/* Header */}
                       <header className="border-b-2 border-gray-800 pb-5">

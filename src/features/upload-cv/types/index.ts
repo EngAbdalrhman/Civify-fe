@@ -91,6 +91,7 @@ export interface Roadmap {
 export interface CvTailorResponse {
   tailoredCv: ResumeData;
   atsScore: AtsScore;
+  originalAtsScore?: AtsScore; // Score for original CV before tailoring (for before/after comparison)
   interviewPrep?: InterviewPrep;
   roadmap?: Roadmap;
   coverLetter?: string;

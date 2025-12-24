@@ -27,7 +27,22 @@ export default function UserDashboardLayout({
   const { isAdmin } = useAuth();
   const pathname = usePathname();
   const { resolvedTheme } = useTheme();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  // Check authentication status on mount
+  useEffect(() => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+    setIsAuthenticated(!!token);
+    
+    // Re-check on storage change (in case user logs in/out in another tab)
+    const handleStorageChange = () => {
+      const currentToken = localStorage.getItem("auth_token");
+      setIsAuthenticated(!!currentToken);
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   // Avoid hydration mismatch
   useEffect(() => {
@@ -85,13 +100,18 @@ export default function UserDashboardLayout({
           </div>
 
           <nav className="space-y-1">
-            <Link 
-              href="/app" 
-              className={getLinkClasses('/app')}
-            >
-              <LayoutDashboard className="h-4 w-4" />
-              {t('dashboard')}
-            </Link>
+            {/* Dashboard - authenticated only */}
+            {isAuthenticated && (
+              <Link 
+                href="/app" 
+                className={getLinkClasses('/app')}
+              >
+                <LayoutDashboard className="h-4 w-4" />
+                {t('dashboard')}
+              </Link>
+            )}
+            
+            {/* Upload CV - always visible (guest feature) */}
             <Link 
               href="/app/upload" 
               className={getLinkClasses('/app/upload')}
@@ -99,27 +119,41 @@ export default function UserDashboardLayout({
               <UploadCloud className="h-4 w-4" />
               {t('upload')}
             </Link>
-            <Link 
-              href="/app/analytics" 
-               className={getLinkClasses('/app/analytics')}
-            >
-              <BarChart2 className="h-4 w-4" />
-              {t('analytics')}
-            </Link>
-            <Link 
-              href="/app/api-keys" 
-               className={getLinkClasses('/app/api-keys')}
-            >
-              <Key className="h-4 w-4" />
-              API Keys
-            </Link>
-            <Link 
-              href="/app/settings" 
-               className={getLinkClasses('/app/settings')}
-            >
-              <Settings className="h-4 w-4" />
-              {t('settings')}
-            </Link>
+            
+            {/* Analytics - authenticated only */}
+            {isAuthenticated && (
+              <Link 
+                href="/app/analytics" 
+                 className={getLinkClasses('/app/analytics')}
+              >
+                <BarChart2 className="h-4 w-4" />
+                {t('analytics')}
+              </Link>
+            )}
+            
+            {/* API Keys - authenticated only */}
+            {isAuthenticated && (
+              <Link 
+                href="/app/api-keys" 
+                 className={getLinkClasses('/app/api-keys')}
+              >
+                <Key className="h-4 w-4" />
+                API Keys
+              </Link>
+            )}
+            
+            {/* Settings - authenticated only */}
+            {isAuthenticated && (
+              <Link 
+                href="/app/settings" 
+                 className={getLinkClasses('/app/settings')}
+              >
+                <Settings className="h-4 w-4" />
+                {t('settings')}
+              </Link>
+            )}
+            
+            {/* Help Center - always visible */}
             <Link 
               href="/app/help" 
                className={`${getLinkClasses('/app/help')} mt-4`}
