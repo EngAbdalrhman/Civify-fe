@@ -1,0 +1,365 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
+import { 
+  Bell, 
+  Send, 
+  Loader2, 
+  AlertCircle,
+  Users,
+  Globe,
+  Search,
+  X,
+  Check
+} from 'lucide-react';
+import { toast } from 'sonner';
+import { adminService, type AdminUser, FilterOperation } from '@/services/admin.service';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+export default function NotificationsPage() {
+  const t = useTranslations('admin');
+
+  // Form state
+  const [title, setTitle] = useState('');
+  const [message, setMessage] = useState('');
+  const [type, setType] = useState<'INFO' | 'WARNING' | 'PROMO' | 'SUCCESS'>('INFO');
+  const [isSending, setIsSending] = useState(false);
+
+  // User selection for targeted notifications
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState<AdminUser[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<AdminUser[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Debounced user search
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (searchTerm.length >= 2) {
+        setIsSearching(true);
+        try {
+          const response = await adminService.filterUsers({
+            filters: [{
+              fieldName: 'email',
+              operation: FilterOperation.MATCH,
+              value: searchTerm,
+            }],
+            page: 0,
+            size: 10,
+          });
+          setSearchResults(response.data.content);
+        } catch (err) {
+          console.error('Search failed:', err);
+        } finally {
+          setIsSearching(false);
+        }
+      } else {
+        setSearchResults([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const handleSendBroadcast = async () => {
+    if (!title.trim() || !message.trim()) {
+      toast.error('Please enter title and message');
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      await adminService.sendBroadcast({ title, message, type });
+      toast.success('Broadcast notification sent to all users!');
+      setTitle('');
+      setMessage('');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to send notification';
+      toast.error(errorMessage);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleSendToUsers = async () => {
+    if (!title.trim() || !message.trim()) {
+      toast.error('Please enter title and message');
+      return;
+    }
+    if (selectedUsers.length === 0) {
+      toast.error('Please select at least one user');
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      await adminService.sendToUsers({
+        title,
+        message,
+        type,
+        userIds: selectedUsers.map(u => u.id),
+      });
+      toast.success(`Notification sent to ${selectedUsers.length} user(s)!`);
+      setTitle('');
+      setMessage('');
+      setSelectedUsers([]);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to send notification';
+      toast.error(errorMessage);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const addUser = (user: AdminUser) => {
+    if (!selectedUsers.find(u => u.id === user.id)) {
+      setSelectedUsers([...selectedUsers, user]);
+    }
+    setSearchTerm('');
+    setSearchResults([]);
+  };
+
+  const removeUser = (userId: number) => {
+    setSelectedUsers(selectedUsers.filter(u => u.id !== userId));
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold">Notification Management</h1>
+        <p className="text-muted-foreground">Send push notifications to users</p>
+      </div>
+
+      <Tabs defaultValue="broadcast" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="broadcast" className="flex items-center gap-2">
+            <Globe className="h-4 w-4" />
+            Broadcast
+          </TabsTrigger>
+          <TabsTrigger value="targeted" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Targeted
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Broadcast Tab */}
+        <TabsContent value="broadcast">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Globe className="h-5 w-5" />
+                Broadcast to All Users
+              </CardTitle>
+              <CardDescription>
+                Send a notification to all registered users at once
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Notification Type</Label>
+                <Select value={type} onValueChange={(v) => setType(v as typeof type)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="INFO">
+                      <span className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-blue-500" />
+                        Information
+                      </span>
+                    </SelectItem>
+                    <SelectItem value="SUCCESS">
+                      <span className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-green-500" />
+                        Success
+                      </span>
+                    </SelectItem>
+                    <SelectItem value="WARNING">
+                      <span className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-yellow-500" />
+                        Warning
+                      </span>
+                    </SelectItem>
+                    <SelectItem value="PROMO">
+                      <span className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-purple-500" />
+                        Promotion
+                      </span>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="title">Title</Label>
+                <Input
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Notification title..."
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="message">Message</Label>
+                <Textarea
+                  id="message"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Notification message..."
+                  rows={4}
+                />
+              </div>
+
+              <Button 
+                onClick={handleSendBroadcast} 
+                disabled={isSending || !title.trim() || !message.trim()}
+                className="w-full"
+              >
+                {isSending ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4 mr-2" />
+                )}
+                Send to All Users
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Targeted Tab */}
+        <TabsContent value="targeted">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Send to Specific Users
+              </CardTitle>
+              <CardDescription>
+                Select users to receive this notification
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* User Search */}
+              <div className="space-y-2">
+                <Label>Search Users</Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search by email..."
+                    className="pl-9"
+                  />
+                  {isSearching && (
+                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+                  )}
+                </div>
+
+                {/* Search Results */}
+                {searchResults.length > 0 && (
+                  <div className="border rounded-md max-h-40 overflow-y-auto">
+                    {searchResults.map((user) => (
+                      <button
+                        key={user.id}
+                        onClick={() => addUser(user)}
+                        className="w-full flex items-center justify-between px-3 py-2 hover:bg-muted text-left"
+                      >
+                        <div>
+                          <div className="font-medium">{user.name || user.email}</div>
+                          <div className="text-sm text-muted-foreground">{user.email}</div>
+                        </div>
+                        {selectedUsers.find(u => u.id === user.id) ? (
+                          <Check className="h-4 w-4 text-green-500" />
+                        ) : null}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Selected Users */}
+              {selectedUsers.length > 0 && (
+                <div className="space-y-2">
+                  <Label>Selected Users ({selectedUsers.length})</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedUsers.map((user) => (
+                      <Badge key={user.id} variant="secondary" className="flex items-center gap-1">
+                        {user.email}
+                        <button onClick={() => removeUser(user.id)} className="ml-1 hover:text-destructive">
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label>Notification Type</Label>
+                <Select value={type} onValueChange={(v) => setType(v as typeof type)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="INFO">Information</SelectItem>
+                    <SelectItem value="SUCCESS">Success</SelectItem>
+                    <SelectItem value="WARNING">Warning</SelectItem>
+                    <SelectItem value="PROMO">Promotion</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="targetTitle">Title</Label>
+                <Input
+                  id="targetTitle"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Notification title..."
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="targetMessage">Message</Label>
+                <Textarea
+                  id="targetMessage"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Notification message..."
+                  rows={4}
+                />
+              </div>
+
+              <Button 
+                onClick={handleSendToUsers} 
+                disabled={isSending || !title.trim() || !message.trim() || selectedUsers.length === 0}
+                className="w-full"
+              >
+                {isSending ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4 mr-2" />
+                )}
+                Send to {selectedUsers.length} User(s)
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}

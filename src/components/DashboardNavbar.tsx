@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Search, Bell, User, LogIn } from "lucide-react";
+import { User, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import {
   DropdownMenu,
@@ -12,10 +11,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "./ui/badge";
 import { useLogout } from "@/features/auth/hooks";
 import { ThemeToggle } from "./theme-toggle";
 import { Link } from "@/i18n/routing";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 export function DashboardNavbar() {
   const { logout, isLoggingOut } = useLogout();
@@ -56,26 +55,8 @@ export function DashboardNavbar() {
         <LanguageSwitcher />
         <ThemeToggle />
 
-        {/* Notifications - only show for authenticated users */}
-        {isAuthenticated && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500 box-content border-2 border-background" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80">
-              <div className="flex items-center justify-between px-4 py-2 border-b">
-                <span className="font-semibold">Notifications</span>
-                <span className="text-xs text-muted-foreground">Mark all read</span>
-              </div>
-              <div className="p-4 text-sm text-center text-muted-foreground">
-                No new notifications
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+        {/* Real-time Notifications - only show for authenticated users */}
+        {isAuthenticated && <NotificationBell />}
 
         {/* User Profile / Sign In */}
         {isAuthenticated ? (

@@ -1,6 +1,8 @@
 "use client";
 
 import { useTranslations } from 'next-intl';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { 
   BarChart, 
   Bar, 
@@ -21,29 +23,124 @@ import {
   CardDescription 
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Zap, Activity, FileText, ArrowUpRight } from 'lucide-react';
+import { Zap, Activity, FileText, ArrowUpRight, Loader2, AlertTriangle } from 'lucide-react';
+import { subscriptionService } from '@/services/subscription.service';
+import { useAuth } from '@/hooks/use-auth';
+import { Link } from '@/i18n/routing';
 
-const mockGenerationsData = [
-  { name: 'Jan', generations: 12 },
-  { name: 'Feb', generations: 18 },
-  { name: 'Mar', generations: 25 },
-  { name: 'Apr', generations: 32 },
-  { name: 'May', generations: 45 },
-  { name: 'Jun', generations: 56 },
-];
+import type { UserSubscription } from '@/features/plans/types';
 
-const mockApiUsageData = [
-  { name: 'Mon', extract: 120, generate: 85, match: 30 },
-  { name: 'Tue', extract: 132, generate: 90, match: 45 },
-  { name: 'Wed', extract: 101, generate: 120, match: 55 },
-  { name: 'Thu', extract: 134, generate: 110, match: 40 },
-  { name: 'Fri', extract: 190, generate: 150, match: 70 },
-  { name: 'Sat', extract: 90, generate: 60, match: 20 },
-  { name: 'Sun', extract: 70, generate: 40, match: 15 },
-];
+// Extended type for analytics display (combines UserSubscription with subscription service response)
+interface SubscriptionDisplay extends Omit<UserSubscription, 'planId' | 'planName'> {
+  plan: {
+    id: number;
+    name: string;
+    cvLimit: number | null;
+    apiLimit: number | null;
+  };
+  usageResetDate?: string;
+}
 
 export default function AnalyticsPage() {
   const t = useTranslations('analytics');
+  const router = useRouter();
+  const { permissions, isLoading: isAuthLoading, hasPermission } = useAuth();
+  
+  const [subscription, setSubscription] = useState<SubscriptionDisplay | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Check permission - user should have CV.CREATE to view their analytics
+  const canViewAnalytics = hasPermission('CV.CREATE') || hasPermission('STATS.VIEW');
+
+  useEffect(() => {
+    if (isAuthLoading) return;
+
+    if (!canViewAnalytics) {
+      setIsLoading(false);
+      return;
+    }
+
+    loadSubscriptionData();
+  }, [isAuthLoading, canViewAnalytics]);
+
+  const loadSubscriptionData = async () => {
+    try {
+      setIsLoading(true);
+      const data = await subscriptionService.getMyActiveSubscription();
+      setSubscription(data as unknown as SubscriptionDisplay);
+    } catch (err) {
+      setError('Failed to load subscription data');
+      console.error('Error loading subscription:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Calculate usage percentages
+  const cvUsagePercent = subscription?.plan?.cvLimit 
+    ? Math.round((subscription.currentCvCount / subscription.plan.cvLimit) * 100)
+    : 0;
+  const apiUsagePercent = subscription?.plan?.apiLimit 
+    ? Math.round((subscription.currentApiCount / subscription.plan.apiLimit) * 100)
+    : 0;
+
+  // Format remaining days until reset
+  const getDaysUntilReset = () => {
+    if (!subscription?.usageResetDate) return null;
+    const resetDate = new Date(subscription.usageResetDate);
+    const today = new Date();
+    const diffTime = resetDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : 0;
+  };
+
+  // Mock data for charts (would come from API in production)
+  const mockGenerationsData = [
+    { name: 'Week 1', generations: Math.round(subscription?.currentCvCount ? subscription.currentCvCount * 0.2 : 5) },
+    { name: 'Week 2', generations: Math.round(subscription?.currentCvCount ? subscription.currentCvCount * 0.3 : 8) },
+    { name: 'Week 3', generations: Math.round(subscription?.currentCvCount ? subscription.currentCvCount * 0.25 : 6) },
+    { name: 'Week 4', generations: Math.round(subscription?.currentCvCount ? subscription.currentCvCount * 0.25 : 7) },
+  ];
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!canViewAnalytics) {
+    return (
+      <div className="flex min-h-[400px] flex-col items-center justify-center gap-4">
+        <AlertTriangle className="h-12 w-12 text-yellow-500" />
+        <h2 className="text-xl font-semibold">Access Denied</h2>
+        <p className="text-muted-foreground text-center">
+          You don't have permission to view analytics.<br />
+          Please subscribe to a plan to access this feature.
+        </p>
+        <Button asChild>
+          <Link href="/plans">View Plans</Link>
+        </Button>
+      </div>
+    );
+  }
+
+  if (error || !subscription) {
+    return (
+      <div className="flex min-h-[400px] flex-col items-center justify-center gap-4">
+        <AlertTriangle className="h-12 w-12 text-red-500" />
+        <h2 className="text-xl font-semibold">Unable to Load Data</h2>
+        <p className="text-muted-foreground">
+          {error || 'No active subscription found.'}
+        </p>
+        <Button onClick={loadSubscriptionData}>Try Again</Button>
+      </div>
+    );
+  }
+
+  const daysUntilReset = getDaysUntilReset();
 
   return (
     <div className="space-y-8">
@@ -51,7 +148,7 @@ export default function AnalyticsPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Analytics & Usage</h1>
         <p className="text-muted-foreground mt-2">
-          Track your CV generations and API usage in real-time.
+          Track your CV generations and API usage. Usage resets {daysUntilReset !== null ? `in ${daysUntilReset} days` : 'monthly'}.
         </p>
       </div>
 
@@ -59,26 +156,32 @@ export default function AnalyticsPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total CV Generations</CardTitle>
+            <CardTitle className="text-sm font-medium">CV Generations</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">188</div>
+            <div className="text-2xl font-bold">{subscription.currentCvCount}</div>
             <p className="text-xs text-muted-foreground">
-              +20.1% from last month
+              {subscription.plan.cvLimit 
+                ? `of ${subscription.plan.cvLimit} this month`
+                : 'Unlimited'}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Remaining Credits</CardTitle>
+            <CardTitle className="text-sm font-medium">Remaining CVs</CardTitle>
             <Zap className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-             <div className="text-2xl font-bold">12</div>
+             <div className="text-2xl font-bold">
+               {subscription.plan.cvLimit 
+                 ? Math.max(0, subscription.plan.cvLimit - subscription.currentCvCount)
+                 : '∞'}
+             </div>
              <p className="text-xs text-muted-foreground">
-               of 200 monthly credits
+               {subscription.plan.cvLimit ? `${cvUsagePercent}% used` : 'Unlimited plan'}
              </p>
           </CardContent>
         </Card>
@@ -89,9 +192,11 @@ export default function AnalyticsPage() {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-             <div className="text-2xl font-bold">2,350</div>
+             <div className="text-2xl font-bold">{subscription.currentApiCount}</div>
              <p className="text-xs text-muted-foreground">
-               +15% from last week
+               {subscription.plan.apiLimit 
+                 ? `of ${subscription.plan.apiLimit} this month`
+                 : 'Unlimited'}
              </p>
           </CardContent>
         </Card>
@@ -102,9 +207,11 @@ export default function AnalyticsPage() {
              <Zap className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-             <div className="text-2xl font-bold">Pro Plan</div>
-             <Button variant="link" className="px-0 h-auto text-xs text-primary">
-               Manage Subscription <ArrowUpRight className="ml-1 h-3 w-3" />
+             <div className="text-2xl font-bold">{subscription.plan.name}</div>
+             <Button variant="link" className="px-0 h-auto text-xs text-primary" asChild>
+               <Link href="/plans">
+                 Manage Subscription <ArrowUpRight className="ml-1 h-3 w-3" />
+               </Link>
              </Button>
           </CardContent>
         </Card>
@@ -114,9 +221,9 @@ export default function AnalyticsPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
           <CardHeader>
-            <CardTitle>Monthly CV Generations</CardTitle>
+            <CardTitle>This Month's Usage</CardTitle>
             <CardDescription>
-              Overview of CVs generated over the last 6 months.
+              Weekly breakdown of CVs generated this month.
             </CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
@@ -151,24 +258,35 @@ export default function AnalyticsPage() {
 
         <Card className="col-span-3">
           <CardHeader>
-            <CardTitle>API Usage per Endpoint</CardTitle>
+            <CardTitle>Subscription Status</CardTitle>
             <CardDescription>
-              Daily requests breakdown by endpoint type.
+              Your current plan details and status.
             </CardDescription>
           </CardHeader>
           <CardContent>
-             <div className="h-[350px]">
-                <ResponsiveContainer width="100%" height="100%">
-                   <LineChart data={mockApiUsageData}>
-                     <Tooltip 
-                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                     />
-                     <Legend verticalAlign="top" height={36} />
-                     <Line type="monotone" dataKey="extract" stroke="#8884d8" strokeWidth={2} dot={false} name="/extract-data" />
-                     <Line type="monotone" dataKey="generate" stroke="#82ca9d" strokeWidth={2} dot={false} name="/generate-cv" />
-                     <Line type="monotone" dataKey="match" stroke="#ffc658" strokeWidth={2} dot={false} name="/match-score" />
-                   </LineChart>
-                </ResponsiveContainer>
+             <div className="space-y-4">
+               <div className="flex justify-between items-center">
+                 <span className="text-sm text-muted-foreground">Status</span>
+                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                   subscription.status === 'ACTIVE' 
+                     ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                     : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                 }`}>
+                   {subscription.status}
+                 </span>
+               </div>
+               <div className="flex justify-between items-center">
+                 <span className="text-sm text-muted-foreground">Start Date</span>
+                 <span className="text-sm">{new Date(subscription.startDate).toLocaleDateString()}</span>
+               </div>
+               <div className="flex justify-between items-center">
+                 <span className="text-sm text-muted-foreground">End Date</span>
+                 <span className="text-sm">{new Date(subscription.endDate).toLocaleDateString()}</span>
+               </div>
+               <div className="flex justify-between items-center">
+                 <span className="text-sm text-muted-foreground">Usage Resets</span>
+                 <span className="text-sm">{subscription.usageResetDate ? new Date(subscription.usageResetDate).toLocaleDateString() : 'Monthly'}</span>
+               </div>
              </div>
           </CardContent>
         </Card>
@@ -178,7 +296,7 @@ export default function AnalyticsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Plan & Limits</CardTitle>
-          <CardDescription>You are currently on the Pro Plan.</CardDescription>
+          <CardDescription>You are currently on the {subscription.plan.name}.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-6 md:grid-cols-2">
@@ -186,28 +304,40 @@ export default function AnalyticsPage() {
                <div>
                   <div className="flex items-center justify-between mb-2">
                      <span className="text-sm font-medium">CV Generations</span>
-                     <span className="text-sm text-muted-foreground">188 / 200</span>
+                     <span className="text-sm text-muted-foreground">
+                       {subscription.currentCvCount} / {subscription.plan.cvLimit || '∞'}
+                     </span>
                   </div>
                   <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                     <div className="h-full bg-primary w-[94%]" />
+                     <div 
+                       className={`h-full transition-all ${cvUsagePercent > 90 ? 'bg-red-500' : cvUsagePercent > 70 ? 'bg-yellow-500' : 'bg-primary'}`} 
+                       style={{ width: `${Math.min(cvUsagePercent, 100)}%` }} 
+                     />
                   </div>
                </div>
                <div>
                   <div className="flex items-center justify-between mb-2">
                      <span className="text-sm font-medium">API Calls</span>
-                     <span className="text-sm text-muted-foreground">2.3k / 10k</span>
+                     <span className="text-sm text-muted-foreground">
+                       {subscription.currentApiCount} / {subscription.plan.apiLimit || '∞'}
+                     </span>
                   </div>
                    <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                     <div className="h-full bg-blue-500 w-[23%]" />
+                     <div 
+                       className={`h-full transition-all ${apiUsagePercent > 90 ? 'bg-red-500' : apiUsagePercent > 70 ? 'bg-yellow-500' : 'bg-blue-500'}`}
+                       style={{ width: `${Math.min(apiUsagePercent, 100)}%` }}
+                     />
                   </div>
                </div>
              </div>
              <div className="flex flex-col items-center justify-center space-y-3 p-6 bg-muted/30 rounded-lg">
                 <h4 className="font-semibold text-lg">Need more power?</h4>
                 <p className="text-center text-sm text-muted-foreground">
-                  Upgrade to Enterprise for unlimited generations and priority support.
+                  Upgrade for higher limits and priority support.
                 </p>
-                <Button className="w-full sm:w-auto">Upgrade to Enterprise</Button>
+                <Button className="w-full sm:w-auto" asChild>
+                  <Link href="/plans">View Upgrade Options</Link>
+                </Button>
              </div>
           </div>
         </CardContent>
@@ -215,3 +345,4 @@ export default function AnalyticsPage() {
     </div>
   );
 }
+

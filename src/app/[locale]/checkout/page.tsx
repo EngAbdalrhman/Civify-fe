@@ -7,10 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, CreditCard, ArrowLeft, Shield, Tag, Check } from 'lucide-react';
+import { Loader2, CreditCard, ArrowLeft, Shield, Tag, Check, X } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { subscriptionService } from '@/services/subscription.service';
 import { paymentService } from '@/services/payment.service';
+import { adminService, type ValidatePromoResponse } from '@/services/admin.service';
 import type { SubscriptionPlan } from '@/features/plans/types';
 import { toast } from 'sonner';
 
@@ -29,6 +30,11 @@ function CheckoutContent() {
   const [promoCode, setPromoCode] = useState('');
   const [gateway, setGateway] = useState('fawaterak');
   const [enabledGateways, setEnabledGateways] = useState<string[]>([]);
+  
+  // Promo code validation state
+  const [isValidatingPromo, setIsValidatingPromo] = useState(false);
+  const [promoValidation, setPromoValidation] = useState<ValidatePromoResponse | null>(null);
+  const [promoError, setPromoError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!planId) {
@@ -38,6 +44,14 @@ function CheckoutContent() {
 
     loadData();
   }, [planId]);
+
+  // Reset promo validation when billing cycle changes
+  useEffect(() => {
+    if (promoValidation) {
+      setPromoValidation(null);
+      setPromoError(null);
+    }
+  }, [isAnnual]);
 
   const loadData = async () => {
     try {
@@ -67,6 +81,37 @@ function CheckoutContent() {
     }
   };
 
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim() || !plan) return;
+
+    setIsValidatingPromo(true);
+    setPromoError(null);
+    setPromoValidation(null);
+
+    try {
+      const price = isAnnual ? parseFloat(plan.annualPrice) : parseFloat(plan.monthlyPrice);
+      const response = await adminService.validatePromoCode(promoCode, plan.id, price);
+      
+      if (response.valid) {
+        setPromoValidation(response);
+        toast.success('Promo code applied!');
+      } else {
+        setPromoError(response.message || 'Invalid promo code');
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to validate promo code';
+      setPromoError(message);
+    } finally {
+      setIsValidatingPromo(false);
+    }
+  };
+
+  const handleRemovePromo = () => {
+    setPromoCode('');
+    setPromoValidation(null);
+    setPromoError(null);
+  };
+
   const handleCheckout = async () => {
     if (!plan) return;
 
@@ -76,7 +121,7 @@ function CheckoutContent() {
       const response = await paymentService.initiatePayment(
         plan.id,
         isAnnual,
-        promoCode || undefined,
+        promoValidation ? promoCode : undefined,
         gateway
       );
 
@@ -110,7 +155,9 @@ function CheckoutContent() {
     );
   }
 
-  const price = isAnnual ? parseFloat(plan.annualPrice) : parseFloat(plan.monthlyPrice);
+  const originalPrice = isAnnual ? parseFloat(plan.annualPrice) : parseFloat(plan.monthlyPrice);
+  const discountAmount = promoValidation?.discountAmount || 0;
+  const finalPrice = Math.max(0, originalPrice - discountAmount);
   const period = isAnnual ? 'year' : 'month';
 
   return (
@@ -177,24 +224,81 @@ function CheckoutContent() {
                   <Tag className="h-4 w-4 inline mr-1" />
                   {t('promoCode')}
                 </Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="promo"
-                    placeholder="Enter promo code"
-                    value={promoCode}
-                    onChange={(e) => setPromoCode(e.target.value)}
-                  />
-                  <Button variant="outline" disabled={!promoCode}>
-                    Apply
-                  </Button>
-                </div>
+                {promoValidation ? (
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900">
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="font-medium text-green-700 dark:text-green-400">
+                        {promoCode.toUpperCase()}
+                      </span>
+                      <span className="text-sm text-green-600">
+                        ({promoValidation.discountType === 'PERCENTAGE' 
+                          ? `${promoValidation.discountValue}% off`
+                          : `-$${promoValidation.discountValue}`})
+                      </span>
+                    </div>
+                    <button onClick={handleRemovePromo} className="text-green-700 hover:text-red-500">
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex gap-2">
+                      <Input
+                        id="promo"
+                        placeholder="Enter promo code"
+                        value={promoCode}
+                        onChange={(e) => {
+                          setPromoCode(e.target.value.toUpperCase());
+                          setPromoError(null);
+                        }}
+                      />
+                      <Button 
+                        variant="outline" 
+                        disabled={!promoCode.trim() || isValidatingPromo}
+                        onClick={handleApplyPromo}
+                      >
+                        {isValidatingPromo ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          'Apply'
+                        )}
+                      </Button>
+                    </div>
+                    {promoError && (
+                      <p className="text-sm text-destructive mt-1">{promoError}</p>
+                    )}
+                  </>
+                )}
               </div>
 
               {/* Total */}
-              <div className="border-t pt-4">
+              <div className="border-t pt-4 space-y-2">
+                <div className="flex justify-between items-center text-sm text-muted-foreground">
+                  <span>Subtotal</span>
+                  <span>${originalPrice.toFixed(2)}</span>
+                </div>
+                {promoValidation && (
+                  <div className="flex justify-between items-center text-sm text-green-600">
+                    <span>Discount</span>
+                    <span>-${discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center text-lg font-bold">
                   <span>{t('total')}</span>
-                  <span>${price.toFixed(2)} / {period}</span>
+                  <div className="text-right">
+                    {promoValidation ? (
+                      <>
+                        <span className="line-through text-muted-foreground text-sm mr-2">
+                          ${originalPrice.toFixed(2)}
+                        </span>
+                        <span className="text-green-600">${finalPrice.toFixed(2)}</span>
+                      </>
+                    ) : (
+                      <span>${originalPrice.toFixed(2)}</span>
+                    )}
+                    <span className="text-sm font-normal text-muted-foreground"> / {period}</span>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -286,7 +390,7 @@ function CheckoutContent() {
                   </>
                 ) : (
                   <>
-                    Pay ${price.toFixed(2)}
+                    Pay ${finalPrice.toFixed(2)}
                   </>
                 )}
               </Button>
