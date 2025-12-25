@@ -61,20 +61,30 @@ export default function AnalyticsPage() {
     loadSubscriptionData();
   }, [isAuthLoading, canViewAnalytics]);
 
+
   const loadSubscriptionData = async () => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      const [subData, logsData, statsData] = await Promise.all([
-        subscriptionService.getMyActiveSubscription(),
+      // Fetch subscription independently so it doesn't block other data
+      try {
+        const subData = await subscriptionService.getMyActiveSubscription();
+        setSubscription(subData);
+      } catch (err) {
+        console.warn('No active subscription or error fetching it:', err);
+        // Do not set error state here to allow viewing other stats
+      }
+
+      // Fetch other stats
+      const [logsData, statsData] = await Promise.all([
         apiUsageService.getMyLogs({ size: 10 }).catch(() => ({ content: [] })),
         apiUsageService.getMyStats().catch(() => null),
       ]);
-      setSubscription(subData);
+      
       setApiLogs(logsData.content || []);
       setApiStats(statsData);
     } catch (err) {
-      setError('Failed to load subscription data');
-      console.error('Error loading subscription:', err);
+      console.error('Error loading analytics data:', err);
+      setError('Failed to load analytics data');
     } finally {
       setIsLoading(false);
     }
@@ -100,10 +110,10 @@ export default function AnalyticsPage() {
 
   // Mock data for charts (would come from API in production)
   const mockGenerationsData = [
-    { name: 'Week 1', generations: Math.round(subscription?.currentCvCount ? subscription.currentCvCount * 0.2 : 5) },
-    { name: 'Week 2', generations: Math.round(subscription?.currentCvCount ? subscription.currentCvCount * 0.3 : 8) },
-    { name: 'Week 3', generations: Math.round(subscription?.currentCvCount ? subscription.currentCvCount * 0.25 : 6) },
-    { name: 'Week 4', generations: Math.round(subscription?.currentCvCount ? subscription.currentCvCount * 0.25 : 7) },
+    { name: 'Week 1', generations: Math.round(subscription?.currentCvCount ? subscription.currentCvCount * 0.2 : 0) },
+    { name: 'Week 2', generations: Math.round(subscription?.currentCvCount ? subscription.currentCvCount * 0.3 : 0) },
+    { name: 'Week 3', generations: Math.round(subscription?.currentCvCount ? subscription.currentCvCount * 0.25 : 0) },
+    { name: 'Week 4', generations: Math.round(subscription?.currentCvCount ? subscription.currentCvCount * 0.25 : 0) },
   ];
 
   if (isLoading) {
@@ -130,13 +140,13 @@ export default function AnalyticsPage() {
     );
   }
 
-  if (error || !subscription) {
+  if (error) {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center gap-4">
         <AlertTriangle className="h-12 w-12 text-red-500" />
         <h2 className="text-xl font-semibold">Unable to Load Data</h2>
         <p className="text-muted-foreground">
-          {error || 'No active subscription found.'}
+          {error}
         </p>
         <Button onClick={loadSubscriptionData}>Try Again</Button>
       </div>
@@ -163,11 +173,11 @@ export default function AnalyticsPage() {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{subscription.currentCvCount}</div>
+            <div className="text-2xl font-bold">{subscription?.currentCvCount ?? 0}</div>
             <p className="text-xs text-muted-foreground">
-              {subscription.cvLimit 
+              {subscription?.cvLimit 
                 ? `of ${subscription.cvLimit} this month`
-                : 'Unlimited'}
+                : subscription ? 'Unlimited' : 'No active plan'}
             </p>
           </CardContent>
         </Card>
@@ -179,12 +189,12 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
              <div className="text-2xl font-bold">
-               {subscription.cvLimit 
-                 ? Math.max(0, subscription.cvLimit - subscription.currentCvCount)
+               {subscription?.cvLimit 
+                 ? Math.max(0, subscription.cvLimit - (subscription.currentCvCount ?? 0))
                  : '∞'}
              </div>
              <p className="text-xs text-muted-foreground">
-               {subscription.cvLimit ? `${cvUsagePercent}% used` : 'Unlimited plan'}
+               {subscription?.cvLimit ? `${cvUsagePercent}% used` : 'Unlimited plan'}
              </p>
           </CardContent>
         </Card>
@@ -195,11 +205,11 @@ export default function AnalyticsPage() {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-             <div className="text-2xl font-bold">{subscription.currentApiCount}</div>
+             <div className="text-2xl font-bold">{subscription?.currentApiCount ?? 0}</div>
              <p className="text-xs text-muted-foreground">
-               {subscription.apiLimit 
+               {subscription?.apiLimit 
                  ? `of ${subscription.apiLimit} this month`
-                 : 'Unlimited'}
+                 : subscription ? 'Unlimited' : 'No active plan'}
              </p>
           </CardContent>
         </Card>
@@ -210,10 +220,10 @@ export default function AnalyticsPage() {
              <Zap className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-             <div className="text-2xl font-bold">{subscription.planName}</div>
+             <div className="text-2xl font-bold">{subscription?.planName ?? 'None'}</div>
              <Button variant="link" className="px-0 h-auto text-xs text-primary" asChild>
                <Link href="/plans">
-                 Manage Subscription <ArrowUpRight className="ml-1 h-3 w-3" />
+                 {subscription ? 'Manage Subscription' : 'Subscribe Now'} <ArrowUpRight className="ml-1 h-3 w-3" />
                </Link>
              </Button>
           </CardContent>
@@ -271,24 +281,24 @@ export default function AnalyticsPage() {
                <div className="flex justify-between items-center">
                  <span className="text-sm text-muted-foreground">Status</span>
                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                   subscription.status === 'ACTIVE' 
+                   subscription?.status === 'ACTIVE' 
                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                      : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
                  }`}>
-                   {subscription.status}
+                   {subscription?.status ?? 'INACTIVE'}
                  </span>
                </div>
                <div className="flex justify-between items-center">
                  <span className="text-sm text-muted-foreground">Start Date</span>
-                 <span className="text-sm">{new Date(subscription.startDate).toLocaleDateString()}</span>
+                 <span className="text-sm">{subscription ? new Date(subscription.startDate).toLocaleDateString() : '-'}</span>
                </div>
                <div className="flex justify-between items-center">
                  <span className="text-sm text-muted-foreground">End Date</span>
-                 <span className="text-sm">{new Date(subscription.endDate).toLocaleDateString()}</span>
+                 <span className="text-sm">{subscription ? new Date(subscription.endDate).toLocaleDateString() : '-'}</span>
                </div>
                <div className="flex justify-between items-center">
                  <span className="text-sm text-muted-foreground">Usage Resets</span>
-                 <span className="text-sm">{subscription.usageResetDate ? new Date(subscription.usageResetDate).toLocaleDateString() : 'Monthly'}</span>
+                 <span className="text-sm">{subscription?.usageResetDate ? new Date(subscription.usageResetDate).toLocaleDateString() : 'Monthly'}</span>
                </div>
              </div>
           </CardContent>
@@ -299,7 +309,7 @@ export default function AnalyticsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Plan & Limits</CardTitle>
-          <CardDescription>You are currently on the {subscription.planName}.</CardDescription>
+          <CardDescription>You are currently on the {subscription?.planName ?? 'Free'} plan.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-6 md:grid-cols-2">
@@ -308,7 +318,7 @@ export default function AnalyticsPage() {
                   <div className="flex items-center justify-between mb-2">
                      <span className="text-sm font-medium">CV Generations</span>
                      <span className="text-sm text-muted-foreground">
-                       {subscription.currentCvCount} / {subscription.cvLimit || '∞'}
+                       {subscription?.currentCvCount ?? 0} / {subscription?.cvLimit || '∞'}
                      </span>
                   </div>
                   <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
@@ -322,7 +332,7 @@ export default function AnalyticsPage() {
                   <div className="flex items-center justify-between mb-2">
                      <span className="text-sm font-medium">API Calls</span>
                      <span className="text-sm text-muted-foreground">
-                       {subscription.currentApiCount} / {subscription.apiLimit || '∞'}
+                       {subscription?.currentApiCount ?? 0} / {subscription?.apiLimit || '∞'}
                      </span>
                   </div>
                    <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">

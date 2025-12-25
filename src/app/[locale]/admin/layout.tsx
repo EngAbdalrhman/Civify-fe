@@ -7,6 +7,9 @@ import { DashboardNavbar } from '@/components/DashboardNavbar';
 import { usePermissions } from '@/contexts/PermissionContext';
 import { ADMIN_MENU_ITEMS, ADMIN_ACTION_PERMISSIONS } from '@/config/adminMenuConfig';
 import { Button } from '@/components/ui/button';
+import Image from "next/image";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export default function AdminDashboardLayout({
   children,
@@ -16,7 +19,13 @@ export default function AdminDashboardLayout({
   const t = useTranslations('nav');
   const pathname = usePathname();
   const router = useRouter();
-  const { hasPermission, isLoading, permissions } = usePermissions();
+  const { permissions, isLoading, hasPermission } = usePermissions();
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Check if user has access to admin dashboard at all
   const hasAdminAccess = isLoading || hasPermission(ADMIN_ACTION_PERMISSIONS.ADMIN_DASHBOARD_VIEW);
@@ -72,10 +81,20 @@ export default function AdminDashboardLayout({
       <aside className="w-64 ltr:border-r rtl:border-l bg-background p-6">
         <div className="space-y-6">
           <div className="flex items-center gap-2 mb-8">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <Shield className="h-5 w-5" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg">
+                <Link href="/admin" className="flex items-center space-x-2">
+                  <div className="flex items-center">
+                    <Image
+                      src={mounted && resolvedTheme === 'dark' ? '/civify-logo-simple-dark-2.png' : '/civify-logo-simple.png'}
+                      alt="Civify Admin"
+                      width={75}
+                      height={35}
+                      className="object-contain"
+                    />
+                  </div>
+                </Link>
             </div>
-            <div className="grid flex-1 ltr:text-left rtl:text-right text-sm leading-tight">
+             <div className="grid flex-1 ltr:text-left rtl:text-right text-sm leading-tight">
               <span className="truncate font-semibold">Civify Admin</span>
               <span className="truncate text-xs text-muted-foreground">Admin Panel</span>
             </div>

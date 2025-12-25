@@ -152,7 +152,7 @@ export interface CreatePlanRequest {
 export interface UpdatePlanRequest extends Partial<CreatePlanRequest> {}
 
 // ============================================
-// Promo Code Types
+// Promo Codes Types
 // ============================================
 
 export interface PromoCode {
@@ -432,6 +432,22 @@ class AdminService {
       request
     );
     return response.data;
+  }
+
+  async filterSubscriptions(data: InputDataModel): Promise<PagedResponse<any>> {
+    const response = await apiClient.post<ApiResponse<PagedResponse<any>>>(
+      'v1/admin/subscriptions/filter',
+      data
+    );
+    return response.data.data;
+  }
+
+  async filterApiLogs(data: InputDataModel): Promise<PagedResponse<any>> {
+     const response = await apiClient.post<ApiResponse<PagedResponse<any>>>(
+      '/v1/logs/admin/filter',
+      data
+    );
+    return response.data.data;
   }
 }
 
