@@ -175,6 +175,7 @@
         "name": "Name",
         "plan": "Plan",
         "status": "Status",
+        "date": "Registration Date",
         "actions": "Actions"
       }
     },
@@ -202,6 +203,7 @@
     },
     "stats": {
       "title": "Statistics",
+      "totalUsers": "Total Users",
       "revenue": "Revenue",
       "conversions": "Conversions",
       "growth": "Growth"

@@ -123,14 +123,20 @@ export default function UsersPage() {
       filterOperation: FilterOperation.MATCH
     },
     {
-      key: 'active', // This maps to subscriptionStatus or accountLocked conceptually, but let's stick to what we have
+      key: 'accountLocked', 
       label: t('columns.status'),
       render: (_: unknown, item: AdminUser) => (
         <Badge variant={!item.accountLocked ? 'default' : 'destructive'}>
           {!item.accountLocked ? 'Active' : 'Banned'}
         </Badge>
       ),
-      // Advanced filtering for boolean/enum would be better but let's skip for now unless requested specifically
+      filterable: true,
+      filterType: 'select',
+      filterOperation: FilterOperation.EQUAL,
+      filterOptions: [
+        { label: 'Active', value: 'false' },
+        { label: 'Banned', value: 'true' }
+      ]
     },
     {
         key: 'createdAt',

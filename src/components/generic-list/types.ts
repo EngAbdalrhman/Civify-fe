@@ -44,7 +44,7 @@ export enum FilterOperation {
 }
 
 export type ColumnType = 'text' | 'date' | 'status' | 'number' | 'avatar' | 'custom';
-export type FilterType = 'text' | 'number' | 'date' | 'dropdown';
+export type FilterType = 'text' | 'number' | 'date' | 'dropdown' | 'select';
 
 export interface ColumnDef<T = Record<string, unknown>> {
   key: string;

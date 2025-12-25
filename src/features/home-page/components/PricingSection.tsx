@@ -11,8 +11,8 @@ import { pricingTiers as fallbackTiers } from "../data";
 export function PricingSection() {
   const { displayPlans, isLoading, error, isAnnual, setIsAnnual } = usePlans();
 
-  // Use fallback data if API fails
-  const plans = error || displayPlans.length === 0 ? fallbackTiers : displayPlans;
+  // Show error state if API fails - don't use fallback mock data
+  const plans = displayPlans;
 
   return (
     <section className="py-20 md:py-32">
@@ -58,8 +58,16 @@ export function PricingSection() {
           </div>
         )}
 
+        {/* Error State */}
+        {error && !isLoading && (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <p className="text-destructive text-lg font-medium mb-2">Failed to load pricing plans</p>
+            <p className="text-muted-foreground text-sm">Please try again later or contact support</p>
+          </div>
+        )}
+
         {/* Pricing Cards */}
-        {!isLoading && (
+        {!isLoading && !error && plans.length > 0 && (
           <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-3">
             {plans.map((tier) => (
               <Card
