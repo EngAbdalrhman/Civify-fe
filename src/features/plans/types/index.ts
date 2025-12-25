@@ -37,6 +37,11 @@ export interface UserSubscription {
   currentApiCount: number;
   isAnnual: boolean;
   createdAt: string;
+  // DTO Fields
+  cvLimit: number | null;
+  apiLimit: number | null;
+  usageResetDate?: string;
+  currentTokenUsage?: number;
 }
 
 export interface PaymentInitiationResponse {

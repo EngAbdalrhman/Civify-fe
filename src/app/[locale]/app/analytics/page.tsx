@@ -33,23 +33,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 
 import type { UserSubscription } from '@/features/plans/types';
 
-// Extended type for analytics display (combines UserSubscription with subscription service response)
-interface SubscriptionDisplay extends Omit<UserSubscription, 'planId' | 'planName'> {
-  plan: {
-    id: number;
-    name: string;
-    cvLimit: number | null;
-    apiLimit: number | null;
-  };
-  usageResetDate?: string;
-}
+// SubscriptionDisplay interface removed as UserSubscription now includes flattened DTO fields
+
 
 export default function AnalyticsPage() {
   const t = useTranslations('analytics');
   const router = useRouter();
   const { permissions, isLoading: isAuthLoading, hasPermission } = useAuth();
   
-  const [subscription, setSubscription] = useState<SubscriptionDisplay | null>(null);
+  const [subscription, setSubscription] = useState<UserSubscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [apiLogs, setApiLogs] = useState<ApiUsageLog[]>([]);
@@ -77,7 +69,7 @@ export default function AnalyticsPage() {
         apiUsageService.getMyLogs({ size: 10 }).catch(() => ({ content: [] })),
         apiUsageService.getMyStats().catch(() => null),
       ]);
-      setSubscription(subData as unknown as SubscriptionDisplay);
+      setSubscription(subData);
       setApiLogs(logsData.content || []);
       setApiStats(statsData);
     } catch (err) {
@@ -89,11 +81,11 @@ export default function AnalyticsPage() {
   };
 
   // Calculate usage percentages
-  const cvUsagePercent = subscription?.plan?.cvLimit 
-    ? Math.round((subscription.currentCvCount / subscription.plan.cvLimit) * 100)
+  const cvUsagePercent = subscription?.cvLimit 
+    ? Math.round((subscription.currentCvCount / subscription.cvLimit) * 100)
     : 0;
-  const apiUsagePercent = subscription?.plan?.apiLimit 
-    ? Math.round((subscription.currentApiCount / subscription.plan.apiLimit) * 100)
+  const apiUsagePercent = subscription?.apiLimit 
+    ? Math.round((subscription.currentApiCount / subscription.apiLimit) * 100)
     : 0;
 
   // Format remaining days until reset
@@ -173,8 +165,8 @@ export default function AnalyticsPage() {
           <CardContent>
             <div className="text-2xl font-bold">{subscription.currentCvCount}</div>
             <p className="text-xs text-muted-foreground">
-              {subscription.plan.cvLimit 
-                ? `of ${subscription.plan.cvLimit} this month`
+              {subscription.cvLimit 
+                ? `of ${subscription.cvLimit} this month`
                 : 'Unlimited'}
             </p>
           </CardContent>
@@ -187,12 +179,12 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
              <div className="text-2xl font-bold">
-               {subscription.plan.cvLimit 
-                 ? Math.max(0, subscription.plan.cvLimit - subscription.currentCvCount)
+               {subscription.cvLimit 
+                 ? Math.max(0, subscription.cvLimit - subscription.currentCvCount)
                  : '∞'}
              </div>
              <p className="text-xs text-muted-foreground">
-               {subscription.plan.cvLimit ? `${cvUsagePercent}% used` : 'Unlimited plan'}
+               {subscription.cvLimit ? `${cvUsagePercent}% used` : 'Unlimited plan'}
              </p>
           </CardContent>
         </Card>
@@ -205,8 +197,8 @@ export default function AnalyticsPage() {
           <CardContent>
              <div className="text-2xl font-bold">{subscription.currentApiCount}</div>
              <p className="text-xs text-muted-foreground">
-               {subscription.plan.apiLimit 
-                 ? `of ${subscription.plan.apiLimit} this month`
+               {subscription.apiLimit 
+                 ? `of ${subscription.apiLimit} this month`
                  : 'Unlimited'}
              </p>
           </CardContent>
@@ -218,7 +210,7 @@ export default function AnalyticsPage() {
              <Zap className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-             <div className="text-2xl font-bold">{subscription.plan.name}</div>
+             <div className="text-2xl font-bold">{subscription.planName}</div>
              <Button variant="link" className="px-0 h-auto text-xs text-primary" asChild>
                <Link href="/plans">
                  Manage Subscription <ArrowUpRight className="ml-1 h-3 w-3" />
@@ -307,7 +299,7 @@ export default function AnalyticsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Plan & Limits</CardTitle>
-          <CardDescription>You are currently on the {subscription.plan.name}.</CardDescription>
+          <CardDescription>You are currently on the {subscription.planName}.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-6 md:grid-cols-2">
@@ -316,7 +308,7 @@ export default function AnalyticsPage() {
                   <div className="flex items-center justify-between mb-2">
                      <span className="text-sm font-medium">CV Generations</span>
                      <span className="text-sm text-muted-foreground">
-                       {subscription.currentCvCount} / {subscription.plan.cvLimit || '∞'}
+                       {subscription.currentCvCount} / {subscription.cvLimit || '∞'}
                      </span>
                   </div>
                   <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
@@ -330,7 +322,7 @@ export default function AnalyticsPage() {
                   <div className="flex items-center justify-between mb-2">
                      <span className="text-sm font-medium">API Calls</span>
                      <span className="text-sm text-muted-foreground">
-                       {subscription.currentApiCount} / {subscription.plan.apiLimit || '∞'}
+                       {subscription.currentApiCount} / {subscription.apiLimit || '∞'}
                      </span>
                   </div>
                    <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
