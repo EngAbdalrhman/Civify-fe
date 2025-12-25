@@ -72,7 +72,7 @@ export interface AdminPlan {
   monthlyPrice: string;
   annualPrice: string;
   features: PlanFeature[];
-  isActive: boolean;
+  active: boolean; // Changed from isActive to match backend
   isFeatured: boolean;
   sortOrder: number;
   maxBillingCycles?: number;

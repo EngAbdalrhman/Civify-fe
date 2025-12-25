@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Plus, 
   Copy, 
@@ -34,51 +34,80 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-
-// Mock Data
-const initialKeys = [
-  { id: '1', name: 'Production', key: 'sk_live_...2384', created: '2023-10-15', lastUsed: '2 mins ago', status: 'active' },
-  { id: '2', name: 'Development', key: 'sk_test_...9921', created: '2023-11-01', lastUsed: '1 day ago', status: 'active' },
-  { id: '3', name: 'Staging', key: 'sk_test_...8842', created: '2023-09-20', lastUsed: '3 months ago', status: 'revoked' },
-];
+import { Link } from '@/i18n/routing';
+import { Book } from 'lucide-react';
+import { apiKeyService, type ApiKey } from '@/services/api-key.service';
+import { toast } from 'sonner';
 
 export default function ApiKeysPage() {
-  const [keys, setKeys] = useState(initialKeys);
+  const [keys, setKeys] = useState<ApiKey[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [newKeyName, setNewKeyName] = useState('');
   const [generatedKey, setGeneratedKey] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleGenerateKey = () => {
+  // Fetch API keys on mount
+  useEffect(() => {
+    fetchApiKeys();
+  }, []);
+
+  const fetchApiKeys = async () => {
+    try {
+      setIsLoading(true);
+      const data = await apiKeyService.getUserApiKeys();
+      setKeys(data);
+    } catch (error) {
+      console.error('Failed to fetch API keys:', error);
+      toast.error('Failed to load API keys');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGenerateKey = async () => {
     if (!newKeyName) return;
     setIsGenerating(true);
     
-    // Simulate generation
-    setTimeout(() => {
-      const newKey = `sk_live_${Math.random().toString(36).substring(7)}${Math.random().toString(36).substring(7)}`;
-      setGeneratedKey(newKey);
-      setKeys([
-        { 
-          id: Math.random().toString(), 
-          name: newKeyName, 
-          key: `sk_live_...${newKey.slice(-4)}`, 
-          created: new Date().toISOString().split('T')[0], 
-          lastUsed: 'Never', 
-          status: 'active' 
-        },
-        ...keys
-      ]);
+    try {
+      const rawKey = await apiKeyService.createApiKey();
+      setGeneratedKey(rawKey);
+      toast.success('API key generated successfully');
+      // Refresh the list
+      await fetchApiKeys();
       setNewKeyName('');
+    } catch (error) {
+      console.error('Failed to generate API key:', error);
+      toast.error('Failed to generate API key');
+    } finally {
       setIsGenerating(false);
-    }, 1500);
+    }
   };
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
-    // Could add a toast here
+    toast.success('Copied to clipboard');
   };
 
-  const handleRevoke = (id: string) => {
-    setKeys(keys.map(k => k.id === id ? { ...k, status: 'revoked' } : k));
+  const handleRevoke = async (id: number) => {
+    if (!confirm('Are you sure you want to revoke this API key? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      await apiKeyService.revokeApiKey(id);
+      toast.success('API key revoked successfully');
+      await fetchApiKeys();
+    } catch (error) {
+      console.error('Failed to revoke API key:', error);
+      toast.error('Failed to revoke API key');  
+    }
+  };
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
+    setGeneratedKey(null);
+    setNewKeyName('');
   };
 
   return (
@@ -90,71 +119,80 @@ export default function ApiKeysPage() {
         </p>
       </div>
 
-      {/* Generate Key Section */}
-      <Dialog>
-        <DialogTrigger asChild>
-          <Card className="border-dashed border-2 bg-muted/20 hover:bg-muted/30 transition-colors cursor-pointer w-full max-w-sm">
-             <CardContent className="flex flex-col items-center justify-center py-8 space-y-4">
-                <div className="p-3 bg-primary/10 rounded-full">
-                  <Plus className="h-6 w-6 text-primary" />
-                </div>
-                <div className="text-center">
-                   <h3 className="font-semibold text-lg">Generate New API Key</h3>
-                   <p className="text-sm text-muted-foreground">Create a new key for your application</p>
-                </div>
-             </CardContent>
-          </Card>
-        </DialogTrigger>
-        
-        <DialogContent className="sm:max-w-md">
-           {!generatedKey ? (
-            <>
-              <DialogHeader>
-                <DialogTitle>Create API Key</DialogTitle>
-                <DialogDescription>
-                  Enter a name for your new API key to help you identify it later.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Input 
-                    id="name" 
-                    placeholder="e.g. Website Checkout" 
-                    className="col-span-4" 
-                    value={newKeyName}
-                    onChange={(e) => setNewKeyName(e.target.value)}
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button onClick={handleGenerateKey} disabled={isGenerating || !newKeyName}>
-                  {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  Generate Key
-                </Button>
-              </DialogFooter>
-            </>
-           ) : (
-            <>
-              <DialogHeader>
-                <DialogTitle>API Key Generated</DialogTitle>
-                <DialogDescription className="text-red-500 font-medium bg-red-50 p-2 rounded-md mt-2 flex items-center gap-2">
-                  <ShieldAlert className="h-4 w-4" />
-                  Please copy this key now. You won't be able to see it again!
-                </DialogDescription>
-              </DialogHeader>
-              <div className="flex items-center space-x-2 my-4">
-                <Input value={generatedKey} readOnly className="font-mono bg-muted" />
-                <Button size="icon" variant="outline" onClick={() => handleCopy(generatedKey)}>
-                  <Copy className="h-4 w-4" />
-                </Button>
-              </div>
-              <DialogFooter>
-                <Button onClick={() => setGeneratedKey(null)}>Done</Button>
-              </DialogFooter>
-            </>
-           )}
-        </DialogContent>
-      </Dialog>
+      {/* Generate Key Button */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-xl font-semibold">Your API Keys</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Manage API keys to access the Civify API programmatically
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" asChild>
+            <Link href="/app/api-documentation">
+              <Book className="h-4 w-4 mr-2" />
+              View Documentation
+            </Link>
+          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg">
+                <Plus className="h-4 w-4 mr-2" />
+                Generate New Key
+              </Button>
+            </DialogTrigger>
+          
+            <DialogContent className="sm:max-w-md">
+               {!generatedKey ? (
+                <>
+                  <DialogHeader>
+                    <DialogTitle>Create API Key</DialogTitle>
+                    <DialogDescription>
+                      Enter a name for your new API key to help you identify it later.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Input 
+                        id="name" 
+                        placeholder="e.g. Website Checkout" 
+                        className="col-span-4" 
+                        value={newKeyName}
+                        onChange={(e) => setNewKeyName(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button onClick={handleGenerateKey} disabled={isGenerating || !newKeyName}>
+                      {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                      Generate Key
+                    </Button>
+                  </DialogFooter>
+                </>
+               ) : (
+                <>
+                  <DialogHeader>
+                    <DialogTitle>API Key Generated</DialogTitle>
+                    <DialogDescription className="text-red-500 font-medium bg-red-50 dark:bg-red-950/20 p-2 rounded-md mt-2 flex items-center gap-2">
+                      <ShieldAlert className="h-4 w-4" />
+                      Please copy this key now. You won't be able to see it again!
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="flex items-center space-x-2 my-4">
+                    <Input value={generatedKey} readOnly className="font-mono bg-muted" />
+                    <Button size="icon" variant="outline" onClick={() => handleCopy(generatedKey)}>
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <DialogFooter>
+                    <Button onClick={handleDialogClose}>Done</Button>
+                  </DialogFooter>
+                </>
+               )}
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
 
       {/* Existing Keys Table */}
       <Card>
@@ -165,40 +203,54 @@ export default function ApiKeysPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Key Name</TableHead>
-                <TableHead>Masked Key</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead>Last Used</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {keys.map((key) => (
-                <TableRow key={key.id}>
-                  <TableCell className="font-medium">{key.name}</TableCell>
-                  <TableCell className="font-mono text-xs">{key.key}</TableCell>
-                  <TableCell>{key.created}</TableCell>
-                  <TableCell>{key.lastUsed}</TableCell>
-                  <TableCell>
-                    <Badge variant={key.status === 'active' ? 'default' : 'destructive'} className={key.status === 'active' ? 'bg-green-600 hover:bg-green-700' : ''}>
-                      {key.status === 'active' ? 'Active' : 'Revoked'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {key.status === 'active' && (
-                      <Button variant="ghost" size="sm" onClick={() => handleRevoke(key.id)} className="text-destructive hover:text-destructive/90 hover:bg-destructive/10">
-                         Revoke
-                      </Button>
-                    )}
-                  </TableCell>
+          {isLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : keys.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>No API keys found. Generate your first key to get started.</p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Key ID</TableHead>
+                  <TableHead>Masked Key</TableHead>
+                  <TableHead>Created</TableHead>
+                  <TableHead>Last Used</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {keys.map((key) => (
+                  <TableRow key={key.id}>
+                    <TableCell className="font-medium">#{key.id}</TableCell>
+                    <TableCell className="font-mono text-xs">{key.keyPreview}</TableCell>
+                    <TableCell>{new Date(key.createdAt).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      {key.lastUsedAt 
+                        ? new Date(key.lastUsedAt).toLocaleDateString()
+                        : 'Never'}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={!key.revoked ? 'default' : 'destructive'} className={!key.revoked ? 'bg-green-600 hover:bg-green-700' : ''}>
+                        {!key.revoked ? 'Active' : 'Revoked'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {!key.revoked && (
+                        <Button variant="ghost" size="sm" onClick={() => handleRevoke(key.id)} className="text-destructive hover:text-destructive/90 hover:bg-destructive/10">
+                           Revoke
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

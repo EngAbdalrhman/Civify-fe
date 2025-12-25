@@ -139,7 +139,7 @@ export default function PlansPage() {
 
   const handleToggleActive = async (plan: AdminPlan) => {
     try {
-      if (plan.isActive) {
+      if (plan.active) {
         await adminService.deactivatePlan(plan.id);
         toast.success('Plan deactivated');
       } else {
@@ -214,8 +214,8 @@ export default function PlansPage() {
                   {plan.isFeatured && (
                     <Badge variant="default" className="text-xs">Popular</Badge>
                   )}
-                  <Badge variant={plan.isActive ? 'secondary' : 'destructive'} className="text-xs">
-                    {plan.isActive ? 'Active' : 'Inactive'}
+                  <Badge variant={plan.active ? 'secondary' : 'destructive'} className="text-xs">
+                    {plan.active ? 'Active' : 'Inactive'}
                   </Badge>
                 </div>
               </div>
@@ -235,7 +235,7 @@ export default function PlansPage() {
                   size="sm" 
                   onClick={() => handleToggleActive(plan)}
                 >
-                  {plan.isActive ? (
+                  {plan.active ? (
                     <><PowerOff className="h-3 w-3 mr-1" />Deactivate</>
                   ) : (
                     <><Power className="h-3 w-3 mr-1" />Activate</>
