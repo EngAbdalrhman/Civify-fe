@@ -82,7 +82,7 @@ export default function AdminDashboardLayout({
         <div className="space-y-6">
           <div className="flex items-center gap-2 mb-8">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg">
-                <Link href="/admin" className="flex items-center space-x-2">
+                <Link href="/" className="flex items-center space-x-2">
                   <div className="flex items-center">
                     <Image
                       src={mounted && resolvedTheme === 'dark' ? '/civify-logo-simple-dark-2.png' : '/civify-logo-simple.png'}

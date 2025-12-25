@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { UserPlus, Ban, Edit, Users, UserCheck } from 'lucide-react';
@@ -32,31 +32,26 @@ export default function UsersPage() {
   const [metrics, setMetrics] = useState({
       totalUsers: 0,
       activeUsers: 0,
-      newUsers: 0 // We might not have this exact metric from getStats, usually rely on total or period stats
+      newUsers: 0
   });
 
-  // Fetch stats separate from users list
-  useMemo(() => {
+  // Fetch stats on mount only
+  useEffect(() => {
       const loadStats = async () => {
           try {
               const stats = await adminService.getStats('MONTHLY');
               setMetrics({
                   totalUsers: stats.totalUsers,
-                  activeUsers: stats.subscribedUsers, // Assuming subscribed ~ active or similar proxy, or just total
-                  // The API returns: totalUsers, subscribedUsers, activeSubscriptions
-                  // We'll map totalUsers to total.
-                  // For "Active Users" in the card, previously it was "isActive" status.
-                  // AdminStats doesn't explicitly have "Active Users" (enabled/disabled).
-                  // It has subscribedUsers.
-                  // We'll stick to totalUsers for now for the first card.
-                  newUsers: 0 // API doesn't provide "new users" count directly in this interface, maybe implement later
+                  activeUsers: stats.subscribedUsers,
+                  newUsers: 0
               });
           } catch (error) {
               console.error("Failed to load stats", error);
           }
       };
       loadStats();
-  }, []);
+  }, []); // Empty dependency array = run once on mount
+
 
   const handleCreateUser = () => {
     setDialogMode('create');

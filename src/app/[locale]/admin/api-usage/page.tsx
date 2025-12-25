@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Activity } from 'lucide-react';
@@ -25,20 +25,21 @@ export default function ApiUsagePage() {
       errors: 0
   });
 
-  useMemo(() => {
+  // Fetch stats on mount only
+  useEffect(() => {
     const loadStats = async () => {
         try {
             const stats = await adminService.getStats('MONTHLY');
             setMetrics({
                 totalApiCalls: stats.apiCallsThisMonth,
-                errors: 0 // Backend doesn't provide error count in AdminStats yet
+                errors: 0
             });
         } catch (error) {
             console.error("Failed to load stats", error);
         }
     };
     loadStats();
-  }, []);
+  }, []); // Run once on mount
 
   const columns: ColumnDef<any>[] = useMemo(() => [
       {
@@ -123,8 +124,8 @@ export default function ApiUsagePage() {
       sort: null as any
   });
 
-  // Effect to load data when params change
-  useMemo(() => {
+  // Load data when params change
+  useEffect(() => {
      const load = async () => {
          setLoading(true);
          try {
