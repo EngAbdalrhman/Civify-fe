@@ -20,16 +20,16 @@ class SubscriptionService {
    * Get all active subscription plans (public endpoint)
    */
   async getAllPlans(): Promise<SubscriptionPlan[]> {
-    const response = await apiClient.get<SubscriptionPlan[]>(API_ENDPOINTS.PLANS);
-    return response.data;
+    const response = await apiClient.get<{ data: SubscriptionPlan[] }>(API_ENDPOINTS.PLANS);
+    return response.data.data;
   }
 
   /**
    * Get subscription plan by ID
    */
   async getPlanById(planId: number): Promise<SubscriptionPlan> {
-    const response = await apiClient.get<SubscriptionPlan>(API_ENDPOINTS.PLAN_BY_ID(planId));
-    return response.data;
+    const response = await apiClient.get<{ data: SubscriptionPlan }>(API_ENDPOINTS.PLAN_BY_ID(planId));
+    return response.data.data;
   }
 
   /**
@@ -37,8 +37,8 @@ class SubscriptionService {
    */
   async getMyActiveSubscription(): Promise<UserSubscription | null> {
     try {
-      const response = await apiClient.get<UserSubscription>(API_ENDPOINTS.MY_SUBSCRIPTION);
-      return response.data;
+      const response = await apiClient.get<{ data: UserSubscription }>(API_ENDPOINTS.MY_SUBSCRIPTION);
+      return response.data.data;
     } catch (error: unknown) {
       // Return null if no active subscription found (404)
       const err = error as { status?: number };
@@ -53,28 +53,28 @@ class SubscriptionService {
    * Get current user's subscription history
    */
   async getMySubscriptions(): Promise<UserSubscription[]> {
-    const response = await apiClient.get<UserSubscription[]>(API_ENDPOINTS.MY_SUBSCRIPTIONS);
-    return response.data;
+    const response = await apiClient.get<{ data: UserSubscription[] }>(API_ENDPOINTS.MY_SUBSCRIPTIONS);
+    return response.data.data;
   }
 
   /**
    * Cancel a subscription
    */
   async cancelSubscription(subscriptionId: number): Promise<{ message: string }> {
-    const response = await apiClient.post<{ message: string }>(API_ENDPOINTS.CANCEL(subscriptionId));
-    return response.data;
+    const response = await apiClient.post<{ data: { message: string } }>(API_ENDPOINTS.CANCEL(subscriptionId));
+    return response.data.data;
   }
 
   /**
    * Renew a subscription
    */
   async renewSubscription(subscriptionId: number, isAnnual: boolean = false): Promise<{ message: string }> {
-    const response = await apiClient.post<{ message: string }>(
+    const response = await apiClient.post<{ data: { message: string } }>(
       API_ENDPOINTS.RENEW(subscriptionId),
       null,
       { params: { isAnnual } }
     );
-    return response.data;
+    return response.data.data;
   }
 
   /**

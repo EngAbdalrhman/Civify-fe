@@ -30,7 +30,7 @@ export function NotificationBell() {
   // Fetch unread count
   const fetchUnreadCount = useCallback(async () => {
     try {
-      const response = await apiClient.get<{ count: number }>('/api/v1/notifications/unread-count');
+      const response = await apiClient.get<{ count: number }>('/v1/notifications/unread-count');
       setUnreadCount(response.data.count);
     } catch (err) {
       console.error('Failed to fetch unread count:', err);
@@ -42,9 +42,14 @@ export function NotificationBell() {
     const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
     if (!token) return;
 
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+    // Set cookie for EventSource authentication (since headers aren't supported)
+    document.cookie = `auth_token=${token}; path=/; max-age=3600; SameSite=Strict`;
+
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8077/apis';
+    
+    // Connect to stream using cookie for auth
     const eventSource = new EventSource(
-      `${baseUrl}/api/v1/notifications/stream`,
+      `${baseUrl}/v1/notifications/stream`,
       { withCredentials: true }
     );
 

@@ -39,12 +39,12 @@ interface FilterInput {
   page?: number;
   size?: number;
   filters?: Array<{
-    key: string;
+    fieldName: string;
     operation: string;
     value: string | number | boolean;
   }>;
   sorts?: Array<{
-    key: string;
+    fieldName: string;
     direction: 'ASC' | 'DESC';
   }>;
 }
@@ -52,6 +52,7 @@ interface FilterInput {
 const API_ENDPOINTS = {
   MY_LOGS_FILTER: '/v1/logs/my-logs/filter',
   MY_STATS: '/v1/logs/my-stats',
+  ADMIN_FILTER: '/v1/logs/admin/filter',
 };
 
 class ApiUsageService {
@@ -67,12 +68,13 @@ class ApiUsageService {
       page: params.page ?? 0,
       size: params.size ?? 20,
       filters: [],
+      sorts: [{ fieldName: 'timestamp', direction: 'DESC' }]
     };
 
     // Add endpoint filter if provided
     if (params.endpoint) {
       input.filters?.push({
-        key: 'endpoint',
+        fieldName: 'endpoint',
         operation: 'cn', // contains
         value: params.endpoint,
       });
@@ -90,6 +92,44 @@ class ApiUsageService {
    */
   async getMyStats(): Promise<ApiUsageStats> {
     const response = await apiClient.get<{ data: ApiUsageStats }>(API_ENDPOINTS.MY_STATS);
+    return response.data.data;
+  }
+
+  /**
+   * Admin: Get all API usage logs with filtering
+   */
+  async getAdminLogs(params: {
+    page?: number;
+    size?: number;
+    endpoint?: string;
+    email?: string;
+    method?: string;
+    statusCode?: number;
+  } = {}): Promise<ApiUsageLogsResponse> {
+    const input: FilterInput = {
+      page: params.page ?? 0,
+      size: params.size ?? 20,
+      filters: [],
+      sorts: [{ fieldName: 'timestamp', direction: 'DESC' }]
+    };
+
+    if (params.endpoint) {
+      input.filters?.push({ fieldName: 'endpoint', operation: 'cn', value: params.endpoint });
+    }
+    if (params.email) {
+      input.filters?.push({ fieldName: 'user.email', operation: 'eq', value: params.email });
+    }
+    if (params.method) {
+      input.filters?.push({ fieldName: 'method', operation: 'eq', value: params.method });
+    }
+    if (params.statusCode) {
+      input.filters?.push({ fieldName: 'statusCode', operation: 'eq', value: params.statusCode });
+    }
+
+    const response = await apiClient.post<{ data: ApiUsageLogsResponse }>(
+      API_ENDPOINTS.ADMIN_FILTER,
+      input
+    );
     return response.data.data;
   }
 }
