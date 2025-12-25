@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { 
   Users, 
@@ -34,7 +34,18 @@ export default function StatsPage() {
   const [error, setError] = useState<string | null>(null);
   const [period, setPeriod] = useState<StatsPeriod>('MONTHLY');
 
+  const lastFetchRef = useRef<{ period: StatsPeriod; time: number } | null>(null);
+
   const fetchStats = useCallback(async (selectedPeriod: StatsPeriod) => {
+    // Prevent duplicate fetches within 1 second for same period to avoid loops
+    if (lastFetchRef.current && 
+        lastFetchRef.current.period === selectedPeriod && 
+        Date.now() - lastFetchRef.current.time < 1000) {
+      return;
+    }
+    
+    lastFetchRef.current = { period: selectedPeriod, time: Date.now() };
+
     setIsLoading(true);
     setError(null);
     try {
@@ -43,7 +54,10 @@ export default function StatsPage() {
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to fetch stats';
       setError(message);
-      toast.error(message);
+      // Only toast on manual interactions or non-loop causing errors
+      if (Date.now() - (lastFetchRef.current?.time || 0) > 2000) {
+        toast.error(message);
+      }
     } finally {
       setIsLoading(false);
     }

@@ -36,10 +36,29 @@ const onTokenRefreshFailed = (error: Error) => {
 // Clear auth state and redirect to login
 const clearAuthAndRedirect = () => {
   if (typeof window !== "undefined") {
-    console.log("[Auth] Clearing tokens and redirecting to login");
+    console.log("[Auth] Clearing tokens");
     localStorage.removeItem("auth_token");
     localStorage.removeItem("refresh_token");
-    window.location.href = "/login";
+    
+    // Check if we are on a public page where we shouldn't redirect
+    const path = window.location.pathname;
+    
+    // Whitelist of paths that should NOT redirect to login on 401
+    // Includes landing page (/), legacy upload (/app/upload), and plans (/plans)
+    // Also include locale prefixes
+    const isPublicPage = 
+      path === "/" || 
+      path === "/en" || 
+      path === "/ar" ||
+      path.includes("/plans") ||
+      path.includes("/app/upload");
+
+    if (!isPublicPage) {
+      console.log("[Auth] Redirecting to login from protected route");
+      window.location.href = "/login";
+    } else {
+      console.log("[Auth] Staying on public page after auth clear");
+    }
   }
 };
 

@@ -168,7 +168,25 @@
       "title": "User Management",
       "totalUsers": "Total Users",
       "activeUsers": "Active Users",
-      "newUsers": "New Users"
+      "newUsers": "New Users",
+      "columns": {
+        "id": "ID",
+        "email": "Email",
+        "name": "Name",
+        "plan": "Plan",
+        "status": "Status",
+        "actions": "Actions"
+      }
+    },
+    "subscriptions": {
+      "title": "Subscription Management",
+      "user": "User",
+      "plan": "Plan",
+      "billingCycle": "Billing Cycle",
+      "status": "Status",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "renew": "Auto Renew"
     },
     "plans": {
       "title": "Plan Management",

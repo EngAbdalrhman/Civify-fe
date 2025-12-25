@@ -297,7 +297,7 @@ export function GenericList<T extends { id?: string | number } = Record<string, 
                   </div>
                 </TableHead>
               ))}
-              {actions.length > 0 && <TableHead className="w-[100px] text-right">Actions</TableHead>}
+              {actions.length > 0 && <TableHead className="w-[100px] text-right sticky right-0 z-10 bg-muted/50 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.1)]">Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -336,7 +336,7 @@ export function GenericList<T extends { id?: string | number } = Record<string, 
                     </TableCell>
                   ))}
                   {actions.length > 0 && (
-                    <TableCell className="text-right py-3">
+                    <TableCell className="text-right py-3 sticky right-0 z-10 bg-card shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                       <div className="flex items-center justify-end gap-1">
                         {directActions
                           .filter(action => !action.condition || action.condition(item))
