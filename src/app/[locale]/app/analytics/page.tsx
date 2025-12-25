@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from 'next-intl';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   BarChart, 
@@ -10,10 +10,7 @@ import {
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  Legend
+  ResponsiveContainer
 } from 'recharts';
 import { 
   Card, 
@@ -23,18 +20,17 @@ import {
   CardDescription 
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Zap, Activity, FileText, ArrowUpRight, Loader2, AlertTriangle, CheckCircle2, XCircle, Key } from 'lucide-react';
+import { Zap, Activity, FileText, ArrowUpRight, Loader2, AlertTriangle } from 'lucide-react';
 import { subscriptionService } from '@/services/subscription.service';
 import { apiUsageService, type ApiUsageLog, type ApiUsageStats } from '@/services/api-usage.service';
 import { useAuth } from '@/hooks/use-auth';
 import { Link } from '@/i18n/routing';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GenericList, buildInputDataModel } from '@/components/generic-list/GenericList';
+import { ColumnDef, FilterOperation } from '@/components/generic-list/types';
 
 import type { UserSubscription } from '@/features/plans/types';
-
-// SubscriptionDisplay interface removed as UserSubscription now includes flattened DTO fields
-
 
 export default function AnalyticsPage() {
   const t = useTranslations('analytics');
@@ -46,6 +42,14 @@ export default function AnalyticsPage() {
   const [error, setError] = useState<string | null>(null);
   const [apiLogs, setApiLogs] = useState<ApiUsageLog[]>([]);
   const [apiStats, setApiStats] = useState<ApiUsageStats | null>(null);
+
+  // Pagination for logs
+  const [logsPagination, setLogsPagination] = useState({
+    page: 0,
+    size: 10,
+    totalElements: 0,
+    totalPages: 0
+  });
 
   // Check permission - user should have CV.CREATE to view their analytics
   const canViewAnalytics = hasPermission('CV.CREATE') || hasPermission('STATS.VIEW');
@@ -71,16 +75,22 @@ export default function AnalyticsPage() {
         setSubscription(subData);
       } catch (err) {
         console.warn('No active subscription or error fetching it:', err);
-        // Do not set error state here to allow viewing other stats
       }
 
       // Fetch other stats
       const [logsData, statsData] = await Promise.all([
-        apiUsageService.getMyLogs({ size: 10 }).catch(() => ({ content: [] })),
+        apiUsageService.getMyLogs({ page: 0, size: 10 }).catch(() => ({ content: [], totalElements: 0, totalPages: 0, size: 10, page: 0 })),
         apiUsageService.getMyStats().catch(() => null),
       ]);
       
       setApiLogs(logsData.content || []);
+      setLogsPagination({
+        page: logsData.page || 0,
+        size: logsData.size || 10,
+        totalElements: logsData.totalElements || 0,
+        totalPages: logsData.totalPages || 0
+      });
+
       setApiStats(statsData);
     } catch (err) {
       console.error('Error loading analytics data:', err);
@@ -115,6 +125,66 @@ export default function AnalyticsPage() {
     { name: 'Week 3', generations: Math.round(subscription?.currentCvCount ? subscription.currentCvCount * 0.25 : 0) },
     { name: 'Week 4', generations: Math.round(subscription?.currentCvCount ? subscription.currentCvCount * 0.25 : 0) },
   ];
+
+  // Logs Columns Definition
+  const logsColumns: ColumnDef<ApiUsageLog>[] = useMemo(() => [
+    {
+        key: 'endpoint',
+        label: 'Endpoint',
+        sortable: true,
+        filterable: true,
+        filterType: 'text',
+        filterOperation: FilterOperation.MATCH
+    },
+    // Method column removed as requested
+    {
+        key: 'statusCode',
+        label: 'Status',
+        render: (_, item) => (
+           <Badge variant={item.statusCode >= 200 && item.statusCode < 300 ? 'default' : 'destructive'}>
+               {item.statusCode}
+           </Badge>
+        ),
+        sortable: true,
+        filterable: true,
+        filterType: 'number',
+        filterOperation: FilterOperation.EQUAL
+    },
+    {
+        key: 'errorMessage',
+        label: 'Error',
+        render: (_, item) => (
+          <span className="text-red-500 text-xs" title={item.errorMessage || ''}>
+            {item.errorMessage || '-'}
+          </span>
+        ),
+        filterable: true,
+        filterType: 'text',
+        filterOperation: FilterOperation.MATCH
+    },
+    {
+        key: 'timestamp',
+        label: 'Time',
+        render: (_, item) => <span>{new Date(item.timestamp).toLocaleString()}</span>,
+        sortable: true
+    }
+  ], []);
+
+  const handleLogsPageChange = async (newPage: number) => {
+      try {
+        const logsData = await apiUsageService.getMyLogs({ page: newPage, size: logsPagination.size });
+        setApiLogs(logsData.content || []);
+        setLogsPagination(prev => ({
+            ...prev,
+            page: logsData.page || 0,
+            totalElements: logsData.totalElements || 0,
+            totalPages: logsData.totalPages || 0
+        }));
+      } catch (e) {
+          console.error("Failed to load page", e);
+      }
+  }
+
 
   if (isLoading) {
     return (
@@ -165,272 +235,174 @@ export default function AnalyticsPage() {
         </p>
       </div>
 
-      {/* Usage Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">CV Generations</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{subscription?.currentCvCount ?? 0}</div>
-            <p className="text-xs text-muted-foreground">
-              {subscription?.cvLimit 
-                ? `of ${subscription.cvLimit} this month`
-                : subscription ? 'Unlimited' : 'No active plan'}
-            </p>
-          </CardContent>
-        </Card>
+      <Tabs defaultValue="stats" className="w-full">
+        <TabsList>
+          <TabsTrigger value="stats">General Statistics</TabsTrigger>
+          <TabsTrigger value="logs">API Logs</TabsTrigger>
+        </TabsList>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Remaining CVs</CardTitle>
-            <Zap className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-             <div className="text-2xl font-bold">
-               {subscription?.cvLimit 
-                 ? Math.max(0, subscription.cvLimit - (subscription.currentCvCount ?? 0))
-                 : '∞'}
-             </div>
-             <p className="text-xs text-muted-foreground">
-               {subscription?.cvLimit ? `${cvUsagePercent}% used` : 'Unlimited plan'}
-             </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">API Requests</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-             <div className="text-2xl font-bold">{subscription?.currentApiCount ?? 0}</div>
-             <p className="text-xs text-muted-foreground">
-               {subscription?.apiLimit 
-                 ? `of ${subscription.apiLimit} this month`
-                 : subscription ? 'Unlimited' : 'No active plan'}
-             </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-             <CardTitle className="text-sm font-medium">Current Plan</CardTitle>
-             <Zap className="h-4 w-4 text-yellow-500" />
-          </CardHeader>
-          <CardContent>
-             <div className="text-2xl font-bold">{subscription?.planName ?? 'None'}</div>
-             <Button variant="link" className="px-0 h-auto text-xs text-primary" asChild>
-               <Link href="/plans">
-                 {subscription ? 'Manage Subscription' : 'Subscribe Now'} <ArrowUpRight className="ml-1 h-3 w-3" />
-               </Link>
-             </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Charts */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>This Month's Usage</CardTitle>
-            <CardDescription>
-              Weekly breakdown of CVs generated this month.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pl-2">
-            <div className="h-[350px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={mockGenerationsData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis 
-                    dataKey="name" 
-                    stroke="#888888" 
-                    fontSize={12} 
-                    tickLine={false} 
-                    axisLine={false} 
-                  />
-                  <YAxis 
-                    stroke="#888888" 
-                    fontSize={12} 
-                    tickLine={false} 
-                    axisLine={false} 
-                    tickFormatter={(value) => `${value}`}
-                  />
-                  <Tooltip 
-                    cursor={{ fill: 'transparent' }}
-                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  />
-                  <Bar dataKey="generations" fill="currentColor" radius={[4, 4, 0, 0]} className="fill-primary" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>Subscription Status</CardTitle>
-            <CardDescription>
-              Your current plan details and status.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-             <div className="space-y-4">
-               <div className="flex justify-between items-center">
-                 <span className="text-sm text-muted-foreground">Status</span>
-                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                   subscription?.status === 'ACTIVE' 
-                     ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                     : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-                 }`}>
-                   {subscription?.status ?? 'INACTIVE'}
-                 </span>
-               </div>
-               <div className="flex justify-between items-center">
-                 <span className="text-sm text-muted-foreground">Start Date</span>
-                 <span className="text-sm">{subscription ? new Date(subscription.startDate).toLocaleDateString() : '-'}</span>
-               </div>
-               <div className="flex justify-between items-center">
-                 <span className="text-sm text-muted-foreground">End Date</span>
-                 <span className="text-sm">{subscription ? new Date(subscription.endDate).toLocaleDateString() : '-'}</span>
-               </div>
-               <div className="flex justify-between items-center">
-                 <span className="text-sm text-muted-foreground">Usage Resets</span>
-                 <span className="text-sm">{subscription?.usageResetDate ? new Date(subscription.usageResetDate).toLocaleDateString() : 'Monthly'}</span>
-               </div>
-             </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Plan Details */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Plan & Limits</CardTitle>
-          <CardDescription>You are currently on the {subscription?.planName ?? 'Free'} plan.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-6 md:grid-cols-2">
-             <div className="space-y-4">
-               <div>
-                  <div className="flex items-center justify-between mb-2">
-                     <span className="text-sm font-medium">CV Generations</span>
-                     <span className="text-sm text-muted-foreground">
-                       {subscription?.currentCvCount ?? 0} / {subscription?.cvLimit || '∞'}
-                     </span>
-                  </div>
-                  <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                     <div 
-                       className={`h-full transition-all ${cvUsagePercent > 90 ? 'bg-red-500' : cvUsagePercent > 70 ? 'bg-yellow-500' : 'bg-primary'}`} 
-                       style={{ width: `${Math.min(cvUsagePercent, 100)}%` }} 
-                     />
-                  </div>
-               </div>
-               <div>
-                  <div className="flex items-center justify-between mb-2">
-                     <span className="text-sm font-medium">API Calls</span>
-                     <span className="text-sm text-muted-foreground">
-                       {subscription?.currentApiCount ?? 0} / {subscription?.apiLimit || '∞'}
-                     </span>
-                  </div>
-                   <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                     <div 
-                       className={`h-full transition-all ${apiUsagePercent > 90 ? 'bg-red-500' : apiUsagePercent > 70 ? 'bg-yellow-500' : 'bg-blue-500'}`}
-                       style={{ width: `${Math.min(apiUsagePercent, 100)}%` }}
-                     />
-                  </div>
-               </div>
-             </div>
-             <div className="flex flex-col items-center justify-center space-y-3 p-6 bg-muted/30 rounded-lg">
-                <h4 className="font-semibold text-lg">Need more power?</h4>
-                <p className="text-center text-sm text-muted-foreground">
-                  Upgrade for higher limits and priority support.
+        <TabsContent value="stats" className="space-y-6">
+          {/* Usage Cards */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">CV Generations</CardTitle>
+                <FileText className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{subscription?.currentCvCount ?? 0}</div>
+                <p className="text-xs text-muted-foreground">
+                  {subscription?.cvLimit 
+                    ? `of ${subscription.cvLimit} this month`
+                    : subscription ? 'Unlimited' : 'No active plan'}
                 </p>
-                <Button className="w-full sm:w-auto" asChild>
-                  <Link href="/plans">View Upgrade Options</Link>
-                </Button>
-             </div>
-          </div>
-        </CardContent>
-      </Card>
-      {/* API Usage Logs Section */}
-      {apiStats && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Key className="h-5 w-5" />
-              API Key Usage
-            </CardTitle>
-            <CardDescription>
-              Your API call history and statistics for this month.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {/* API Stats Summary */}
-            <div className="grid gap-4 md:grid-cols-4 mb-6">
-              <div className="p-4 bg-muted/30 rounded-lg text-center">
-                <div className="text-2xl font-bold">{apiStats.totalCalls}</div>
-                <div className="text-xs text-muted-foreground">Total Calls</div>
-              </div>
-              <div className="p-4 bg-green-500/10 rounded-lg text-center">
-                <div className="text-2xl font-bold text-green-600">{apiStats.successCount}</div>
-                <div className="text-xs text-muted-foreground">Successful</div>
-              </div>
-              <div className="p-4 bg-red-500/10 rounded-lg text-center">
-                <div className="text-2xl font-bold text-red-600">{apiStats.failureCount}</div>
-                <div className="text-xs text-muted-foreground">Failed</div>
-              </div>
-              <div className="p-4 bg-blue-500/10 rounded-lg text-center">
-                <div className="text-2xl font-bold text-blue-600">{apiStats.successRate}%</div>
-                <div className="text-xs text-muted-foreground">Success Rate</div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
-            {/* Recent API Logs Table */}
-            {apiLogs.length > 0 ? (
-              <div className="border rounded-lg overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Endpoint</TableHead>
-                      <TableHead>Method</TableHead>
-                      <TableHead>Time</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {apiLogs.slice(0, 10).map((log) => (
-                      <TableRow key={log.id}>
-                        <TableCell>
-                          {log.success ? (
-                            <CheckCircle2 className="h-4 w-4 text-green-500" />
-                          ) : (
-                            <XCircle className="h-4 w-4 text-red-500" />
-                          )}
-                        </TableCell>
-                        <TableCell className="font-mono text-xs">{log.endpoint}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="text-xs">{log.method}</Badge>
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {new Date(log.timestamp).toLocaleString()}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                No API usage logs yet. API calls made with your API keys will appear here.
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Remaining CVs</CardTitle>
+                <Zap className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {subscription?.cvLimit 
+                    ? Math.max(0, subscription.cvLimit - (subscription.currentCvCount ?? 0))
+                    : '∞'}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {subscription?.cvLimit ? `${cvUsagePercent}% used` : 'Unlimited plan'}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">API Requests</CardTitle>
+                <Activity className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{subscription?.currentApiCount ?? 0}</div>
+                <p className="text-xs text-muted-foreground">
+                  {subscription?.apiLimit 
+                    ? `of ${subscription.apiLimit} this month`
+                    : subscription ? 'Unlimited' : 'No active plan'}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Current Plan</CardTitle>
+                <Zap className="h-4 w-4 text-yellow-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{subscription?.planName ?? 'None'}</div>
+                <Button variant="link" className="px-0 h-auto text-xs text-primary" asChild>
+                  <Link href="/plans">
+                    {subscription ? 'Manage Subscription' : 'Subscribe Now'} <ArrowUpRight className="ml-1 h-3 w-3" />
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Charts */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            <Card className="col-span-4">
+              <CardHeader>
+                <CardTitle>This Month's Usage</CardTitle>
+                <CardDescription>
+                  Weekly breakdown of CVs generated this month.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pl-2">
+                <div className="h-[350px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={mockGenerationsData}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                      <XAxis 
+                        dataKey="name" 
+                        stroke="#888888" 
+                        fontSize={12} 
+                        tickLine={false} 
+                        axisLine={false} 
+                      />
+                      <YAxis 
+                        stroke="#888888" 
+                        fontSize={12} 
+                        tickLine={false} 
+                        axisLine={false} 
+                        tickFormatter={(value) => `${value}`}
+                      />
+                      <Tooltip 
+                        cursor={{ fill: 'transparent' }}
+                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                      />
+                      <Bar dataKey="generations" fill="currentColor" radius={[4, 4, 0, 0]} className="fill-primary" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="col-span-3">
+              <CardHeader>
+                <CardTitle>Subscription Status</CardTitle>
+                <CardDescription>
+                  Your current plan details and status.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Status</span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      subscription?.status === 'ACTIVE' 
+                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                        : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                    }`}>
+                      {subscription?.status ?? 'INACTIVE'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Start Date</span>
+                    <span className="text-sm">{subscription ? new Date(subscription.startDate).toLocaleDateString() : '-'}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">End Date</span>
+                    <span className="text-sm">{subscription ? new Date(subscription.endDate).toLocaleDateString() : '-'}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Usage Resets</span>
+                    <span className="text-sm">{subscription?.usageResetDate ? new Date(subscription.usageResetDate).toLocaleDateString() : 'Monthly'}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="logs">
+          <Card>
+            <CardHeader>
+              <CardTitle>API Usage Logs</CardTitle>
+              <CardDescription>Detailed logs of your API activity.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <GenericList 
+                data={apiLogs}
+                columns={logsColumns}
+                meta={logsPagination} 
+                isLoading={isLoading}
+                onPageChange={handleLogsPageChange}
+                // Filter not fully implemented on backend user endpoint yet, 
+                // but if it were, we would use onFilterChange
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
-

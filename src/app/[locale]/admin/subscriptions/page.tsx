@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
-import { Shield } from 'lucide-react';
+import { CreditCard, Shield } from 'lucide-react';
 import { adminService } from '@/services/admin.service';
 import { GenericList, buildInputDataModel } from '@/components/generic-list/GenericList';
 import { ColumnDef, FilterOperation } from '@/components/generic-list/types';
@@ -59,19 +59,19 @@ export default function SubscriptionsPage() {
           filterOperation: FilterOperation.EQUAL
       },
       {
-          key: 'user.email',
+          key: 'userEmail', // Changed from user.email to userEmail based on flattened interface
           label: 'User',
           render: (_, item) => (
               <div className="flex flex-col">
-                  <span className="font-medium">{item.user?.name}</span>
-                  <span className="text-xs text-muted-foreground">{item.user?.email}</span>
+                  <span className="font-medium">{item.userName}</span>
+                  <span className="text-xs text-muted-foreground">{item.userEmail}</span>
               </div>
           )
       },
       {
-          key: 'plan.name',
+          key: 'planName', // Changed from plan.name to flattened planName
           label: 'Plan',
-          render: (_, item) => <Badge variant="outline">{item.plan?.name}</Badge>
+          render: (_, item) => <Badge variant="outline">{item.planName}</Badge>
       },
       {
           key: 'status',
@@ -140,6 +140,16 @@ export default function SubscriptionsPage() {
         <div>
           <h1 className="text-3xl font-bold">Subscriptions</h1>
           <p className="text-muted-foreground">Manage user subscriptions</p>
+        </div>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-3 mb-6">
+        <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="flex items-center justify-between space-y-0 pb-2">
+            <h3 className="text-sm font-medium text-muted-foreground">Active Subscriptions</h3>
+            <CreditCard className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <div className="text-2xl font-bold">{metrics.activeSubscriptions}</div>
         </div>
       </div>
 

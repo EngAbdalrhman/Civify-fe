@@ -3,8 +3,9 @@
 import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
-import { UserPlus, Ban, Edit } from 'lucide-react';
+import { UserPlus, Ban, Edit, Users, UserCheck } from 'lucide-react';
 import { UserDialog } from '@/features/admin-dashboard/users';
+import { adminService } from '@/services/admin.service';
 import { useAdminUsers } from '@/features/admin-dashboard/users/hooks/useAdminUsers';
 import { GenericList, buildInputDataModel } from '@/components/generic-list/GenericList';
 import { ColumnDef, ActionDef, FilterOperation } from '@/components/generic-list/types';
@@ -27,6 +28,35 @@ export default function UsersPage() {
     refresh,
     fetchUsers
   } = useAdminUsers({ pageSize: 10 });
+
+  const [metrics, setMetrics] = useState({
+      totalUsers: 0,
+      activeUsers: 0,
+      newUsers: 0 // We might not have this exact metric from getStats, usually rely on total or period stats
+  });
+
+  // Fetch stats separate from users list
+  useMemo(() => {
+      const loadStats = async () => {
+          try {
+              const stats = await adminService.getStats('MONTHLY');
+              setMetrics({
+                  totalUsers: stats.totalUsers,
+                  activeUsers: stats.subscribedUsers, // Assuming subscribed ~ active or similar proxy, or just total
+                  // The API returns: totalUsers, subscribedUsers, activeSubscriptions
+                  // We'll map totalUsers to total.
+                  // For "Active Users" in the card, previously it was "isActive" status.
+                  // AdminStats doesn't explicitly have "Active Users" (enabled/disabled).
+                  // It has subscribedUsers.
+                  // We'll stick to totalUsers for now for the first card.
+                  newUsers: 0 // API doesn't provide "new users" count directly in this interface, maybe implement later
+              });
+          } catch (error) {
+              console.error("Failed to load stats", error);
+          }
+      };
+      loadStats();
+  }, []);
 
   const handleCreateUser = () => {
     setDialogMode('create');
@@ -56,15 +86,15 @@ export default function UsersPage() {
   const columns: ColumnDef<AdminUser>[] = useMemo(() => [
     {
       key: 'id',
-      label: 'ID',
+      label: t('columns.id'), 
       sortable: true,
       filterable: true,
       filterType: 'text',
-      filterOperation: FilterOperation.MATCH
+      filterOperation: FilterOperation.EQUAL
     },
     {
       key: 'email',
-      label: t('email'),
+      label: t('columns.email'),
       sortable: true,
       filterable: true,
       filterType: 'text',
@@ -72,34 +102,46 @@ export default function UsersPage() {
     },
     {
       key: 'name',
-      label: t('name'),
+      label: t('columns.name'),
       render: (_: unknown, item: AdminUser) => (
         <span>{item.name || `${item.firstName || ''} ${item.lastName || ''}`.trim() || 'Unknown'}</span>
-      )
+      ),
+      sortable: true,
+      filterable: true,
+      filterType: 'text',
+      filterOperation: FilterOperation.MATCH
     },
     {
       key: 'currentPlan',
-      label: t('plan'),
+      label: t('columns.plan'),
         render: (_: unknown, item: AdminUser) => (
             <Badge variant="outline">{item.currentPlan || 'Free'}</Badge>
-        )
+        ),
+      sortable: true,
+      filterable: true,
+      filterType: 'text',
+      filterOperation: FilterOperation.MATCH
     },
     {
-      key: 'active',
-      label: t('status'),
+      key: 'active', // This maps to subscriptionStatus or accountLocked conceptually, but let's stick to what we have
+      label: t('columns.status'),
       render: (_: unknown, item: AdminUser) => (
         <Badge variant={!item.accountLocked ? 'default' : 'destructive'}>
           {!item.accountLocked ? 'Active' : 'Banned'}
         </Badge>
-      )
+      ),
+      // Advanced filtering for boolean/enum would be better but let's skip for now unless requested specifically
     },
     {
         key: 'createdAt',
-        label: common('date'),
+        label: t('columns.date'),
         sortable: true,
-        render: (_: unknown, item: AdminUser) => <span>{new Date(item.createdAt).toLocaleDateString()}</span>
+        render: (_: unknown, item: AdminUser) => <span>{new Date(item.createdAt).toLocaleDateString()}</span>,
+        filterable: true,
+        filterType: 'date',
+        filterOperation: FilterOperation.DATE_BETWEEN 
     }
-  ], [t, common]);
+  ], [t]);
 
   // Define Actions
   const actions: ActionDef<AdminUser>[] = [
@@ -145,10 +187,32 @@ export default function UsersPage() {
         </Button>
       </div>
 
+       <div className="grid gap-6 md:grid-cols-3">
+        <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="flex items-center justify-between space-y-0 pb-2">
+            <h3 className="text-sm font-medium text-muted-foreground">{t('totalUsers')}</h3>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <div className="text-2xl font-bold">
+            {metrics.totalUsers}
+          </div>
+        </div>
+        <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="flex items-center justify-between space-y-0 pb-2">
+            <h3 className="text-sm font-medium text-muted-foreground">Subscribed Users</h3>
+            <UserCheck className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <div className="text-2xl font-bold">
+            {metrics.activeUsers}
+          </div>
+        </div>
+        {/* Removed New Users card until backend supports it specifically, or use pagination count as proxy? */}
+      </div>
+
       <div className="bg-card rounded-lg border shadow-sm">
          <GenericList
             data={users}
-            columns={columns as any} // Cast to satisfy loose types if needed
+            columns={columns as any}
             meta={pagination}
             isLoading={isLoading}
             actions={actions as any}

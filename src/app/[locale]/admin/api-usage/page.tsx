@@ -20,31 +20,56 @@ export default function ApiUsagePage() {
   });
 
   // Columns
+  const [metrics, setMetrics] = useState({
+      totalApiCalls: 0,
+      errors: 0
+  });
+
+  useMemo(() => {
+    const loadStats = async () => {
+        try {
+            const stats = await adminService.getStats('MONTHLY');
+            setMetrics({
+                totalApiCalls: stats.apiCallsThisMonth,
+                errors: 0 // Backend doesn't provide error count in AdminStats yet
+            });
+        } catch (error) {
+            console.error("Failed to load stats", error);
+        }
+    };
+    loadStats();
+  }, []);
+
   const columns: ColumnDef<any>[] = useMemo(() => [
+      {
+          key: 'id',
+          label: 'ID', // Keep ID
+          sortable: true,
+      },
+      {
+          key: 'user', // Access flat fields via render
+          label: 'User',
+          render: (_, item) => (
+             <div className="flex flex-col">
+                 <span className="font-medium">{item.userName || 'System'}</span>
+                 <span className="text-xs text-muted-foreground">{item.userEmail || '-'}</span>
+             </div>
+          ),
+          filterable: true,
+          filterType: 'text',
+          filterOperation: FilterOperation.MATCH
+      },
       {
           key: 'apiKey',
           label: 'API Key',
+          render: (_, item) => <span className="font-mono text-xs">{item.apiKey || '-'}</span>,
           sortable: true,
           filterable: true,
           filterType: 'text',
           filterOperation: FilterOperation.MATCH
       },
       {
-        key: 'method',
-        label: 'Method',
-        render: (_, item) => <Badge variant="outline">{item.method}</Badge>,
-        filterable: true,
-        filterType: 'dropdown',
-        filterOptions: [
-            { label: 'GET', value: 'GET' },
-            { label: 'POST', value: 'POST' },
-            { label: 'PUT', value: 'PUT' },
-            { label: 'DELETE', value: 'DELETE' }
-        ],
-        filterOperation: FilterOperation.EQUAL
-      },
-      {
-          key: 'path',
+          key: 'endpoint', // Changed from path to endpoint
           label: 'Endpoint',
           sortable: true,
           filterable: true,
@@ -63,6 +88,15 @@ export default function ApiUsagePage() {
           filterable: true,
           filterType: 'number',
           filterOperation: FilterOperation.EQUAL
+      },
+      {
+          key: 'errorMessage',
+          label: 'Error',
+          render: (_, item) => (
+            <span className="text-xs text-muted-foreground max-w-[200px] truncate block" title={item.errorMessage}>
+                {item.errorMessage || '-'}
+            </span>
+          )
       },
       {
           key: 'responseTimeMs',
@@ -115,6 +149,16 @@ export default function ApiUsagePage() {
         <div>
           <h1 className="text-3xl font-bold">API Logs</h1>
           <p className="text-muted-foreground">Monitor system API usage</p>
+        </div>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-3 mb-6">
+        <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="flex items-center justify-between space-y-0 pb-2">
+            <h3 className="text-sm font-medium text-muted-foreground">Monthly API Calls</h3>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <div className="text-2xl font-bold">{metrics.totalApiCalls}</div>
         </div>
       </div>
 

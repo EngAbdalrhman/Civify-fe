@@ -4,62 +4,12 @@
  */
 
 import apiClient from '@/api/client';
+import { InputDataModel, FilterOperation, FilterItem } from '@/components/generic-list/types';
 
-// ============================================
-// Types matching backend InputDataModel
-// ============================================
-
-export enum FilterOperation {
-  // Comparison Operations
-  GREATER_THAN = 'GREATER_THAN',
-  LESS_THAN = 'LESS_THAN',
-  GREATER_THAN_EQUAL = 'GREATER_THAN_EQUAL',
-  LESS_THAN_EQUAL = 'LESS_THAN_EQUAL',
-  NOT_EQUAL = 'NOT_EQUAL',
-  EQUAL = 'EQUAL',
-  // String Operations
-  MATCH = 'MATCH',
-  MATCH_START = 'MATCH_START',
-  MATCH_END = 'MATCH_END',
-  MATCH_EXACT = 'MATCH_EXACT',
-  // Collection Operations
-  IN_STRING_LIST = 'IN_STRING_LIST',
-  NOT_IN_STRING_LIST = 'NOT_IN_STRING_LIST',
-  // Null Operations
-  IS_NOT_NULL = 'IS_NOT_NULL',
-  IS_NULL = 'IS_NULL',
-  // Date Operations
-  DATE_GREATER_THAN = 'DATE_GREATER_THAN',
-  DATE_LESS_THAN = 'DATE_LESS_THAN',
-  DATE_BETWEEN = 'DATE_BETWEEN',
-}
-
-export interface FilterCriteria {
-  fieldName: string;
-  operation: FilterOperation;
-  value: unknown;
-  value2?: unknown;
-}
-
-export interface SortCriteria {
-  fieldName: string;
-  direction: 'ASC' | 'DESC';
-}
-
-export interface FilterGroup {
-  operation: 'AND' | 'OR' | 'NOT';
-  filters: FilterCriteria[];
-  groups?: FilterGroup[];
-}
-
-export interface InputDataModel {
-  filters: FilterCriteria[];
-  filterGroups?: FilterGroup[];
-  operation?: 'AND' | 'OR' | 'NOT';
-  sorts?: SortCriteria[];
-  page: number;
-  size: number;
-}
+// Re-export for distinct usage if needed, or just use directly
+export { FilterOperation };
+export type { InputDataModel };
+export type { FilterItem as FilterCriteria }; // Alias for backward compatibility
 
 export interface PagedResponse<T> {
   content: T[];
