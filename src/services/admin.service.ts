@@ -285,8 +285,14 @@ class AdminService {
   // ==========================================
 
   async getAllPlans(): Promise<AdminPlan[]> {
-    const response = await apiClient.get<ApiResponse<AdminPlan[]>>(ADMIN_API.PLANS);
-    return response.data.data;
+    const response = await apiClient.get<ApiResponse<AdminPlan[]> | AdminPlan[]>(ADMIN_API.PLANS);
+    // Handle both wrapped and unwrapped responses
+    const data = response.data;
+    if (Array.isArray(data)) {
+      return data;
+    }
+    // Wrapped response
+    return (data as ApiResponse<AdminPlan[]>).data || [];
   }
 
   async getPlanById(planId: number): Promise<AdminPlan> {

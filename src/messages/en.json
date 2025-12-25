@@ -39,6 +39,8 @@
     "stats": "Statistics",
     "apiUsage": "API Usage",
     "groups": "Groups",
+    "subscriptions": "Subscriptions",
+    "notifications": "Notifications",
     "logout": "Logout",
     "language": {
       "switch": "Switch Language"

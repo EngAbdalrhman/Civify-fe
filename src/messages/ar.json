@@ -38,6 +38,9 @@
     "promos": "العروض الترويجية",
     "stats": "الإحصائيات",
     "apiUsage": "استخدام API",
+    "groups": "المجموعات",
+    "subscriptions": "الاشتراكات",
+    "notifications": "الإشعارات",
     "logout": "تسجيل الخروج",
     "language": {
       "switch": "تغيير اللغة"

@@ -23,10 +23,13 @@ import {
   CardDescription 
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Zap, Activity, FileText, ArrowUpRight, Loader2, AlertTriangle } from 'lucide-react';
+import { Zap, Activity, FileText, ArrowUpRight, Loader2, AlertTriangle, CheckCircle2, XCircle, Key } from 'lucide-react';
 import { subscriptionService } from '@/services/subscription.service';
+import { apiUsageService, type ApiUsageLog, type ApiUsageStats } from '@/services/api-usage.service';
 import { useAuth } from '@/hooks/use-auth';
 import { Link } from '@/i18n/routing';
+import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 import type { UserSubscription } from '@/features/plans/types';
 
@@ -49,6 +52,8 @@ export default function AnalyticsPage() {
   const [subscription, setSubscription] = useState<SubscriptionDisplay | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [apiLogs, setApiLogs] = useState<ApiUsageLog[]>([]);
+  const [apiStats, setApiStats] = useState<ApiUsageStats | null>(null);
 
   // Check permission - user should have CV.CREATE to view their analytics
   const canViewAnalytics = hasPermission('CV.CREATE') || hasPermission('STATS.VIEW');
@@ -67,8 +72,14 @@ export default function AnalyticsPage() {
   const loadSubscriptionData = async () => {
     try {
       setIsLoading(true);
-      const data = await subscriptionService.getMyActiveSubscription();
-      setSubscription(data as unknown as SubscriptionDisplay);
+      const [subData, logsData, statsData] = await Promise.all([
+        subscriptionService.getMyActiveSubscription(),
+        apiUsageService.getMyLogs({ size: 10 }).catch(() => ({ content: [] })),
+        apiUsageService.getMyStats().catch(() => null),
+      ]);
+      setSubscription(subData as unknown as SubscriptionDisplay);
+      setApiLogs(logsData.content || []);
+      setApiStats(statsData);
     } catch (err) {
       setError('Failed to load subscription data');
       console.error('Error loading subscription:', err);
@@ -342,6 +353,81 @@ export default function AnalyticsPage() {
           </div>
         </CardContent>
       </Card>
+      {/* API Usage Logs Section */}
+      {apiStats && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Key className="h-5 w-5" />
+              API Key Usage
+            </CardTitle>
+            <CardDescription>
+              Your API call history and statistics for this month.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {/* API Stats Summary */}
+            <div className="grid gap-4 md:grid-cols-4 mb-6">
+              <div className="p-4 bg-muted/30 rounded-lg text-center">
+                <div className="text-2xl font-bold">{apiStats.totalCalls}</div>
+                <div className="text-xs text-muted-foreground">Total Calls</div>
+              </div>
+              <div className="p-4 bg-green-500/10 rounded-lg text-center">
+                <div className="text-2xl font-bold text-green-600">{apiStats.successCount}</div>
+                <div className="text-xs text-muted-foreground">Successful</div>
+              </div>
+              <div className="p-4 bg-red-500/10 rounded-lg text-center">
+                <div className="text-2xl font-bold text-red-600">{apiStats.failureCount}</div>
+                <div className="text-xs text-muted-foreground">Failed</div>
+              </div>
+              <div className="p-4 bg-blue-500/10 rounded-lg text-center">
+                <div className="text-2xl font-bold text-blue-600">{apiStats.successRate}%</div>
+                <div className="text-xs text-muted-foreground">Success Rate</div>
+              </div>
+            </div>
+
+            {/* Recent API Logs Table */}
+            {apiLogs.length > 0 ? (
+              <div className="border rounded-lg overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Endpoint</TableHead>
+                      <TableHead>Method</TableHead>
+                      <TableHead>Time</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {apiLogs.slice(0, 10).map((log) => (
+                      <TableRow key={log.id}>
+                        <TableCell>
+                          {log.success ? (
+                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <XCircle className="h-4 w-4 text-red-500" />
+                          )}
+                        </TableCell>
+                        <TableCell className="font-mono text-xs">{log.endpoint}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="text-xs">{log.method}</Badge>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {new Date(log.timestamp).toLocaleString()}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                No API usage logs yet. API calls made with your API keys will appear here.
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
