@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from 'react';
-import type { ColumnDef } from './types';
+import type { ColumnDef, FilterType } from './types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,7 +21,7 @@ interface ColumnFilterProps {
   column: { 
     key: string; 
     label: string; 
-    filterType?: 'text' | 'number' | 'date' | 'dropdown';
+    filterType?: FilterType;
     filterOptions?: { label: string; value: string | number | boolean }[];
   };
   value: string | number | boolean | null | undefined;
@@ -93,7 +93,7 @@ export function ColumnFilter({ column, value, onChange }: ColumnFilterProps) {
           </div>
 
           <div className="grid gap-2">
-            {column.filterType === 'dropdown' && column.filterOptions ? (
+            {(column.filterType === 'dropdown' || column.filterType === 'select') && column.filterOptions ? (
               <Select
                 value={localValue ? String(localValue) : undefined}
                 onValueChange={setLocalValue}
