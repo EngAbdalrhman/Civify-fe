@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { DashboardNavbar } from '@/components/DashboardNavbar';
 import { useAuth } from '@/hooks/use-auth';
+import { usePermissions } from '@/contexts/PermissionContext';
 import { Link, usePathname } from '@/i18n/routing';
 import Image from "next/image";
 import { useTheme } from "next-themes";
@@ -25,10 +26,15 @@ export default function UserDashboardLayout({
 }) {
   const t = useTranslations('nav');
   const { isAdmin } = useAuth();
+  const { hasPermission, hasAnyPermission } = usePermissions();
   const pathname = usePathname();
   const { resolvedTheme } = useTheme();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  // Permission checks for menu items
+  const canViewApiKeys = hasAnyPermission(['API.ACCESS', 'API.KEY.CREATE']);
+  const canViewAnalytics = hasAnyPermission(['STATS.VIEW', 'API_USAGE.VIEW']);
 
   // Check authentication status on mount
   useEffect(() => {
@@ -120,8 +126,8 @@ export default function UserDashboardLayout({
               {t('upload')}
             </Link>
             
-            {/* Analytics - authenticated only */}
-            {isAuthenticated && (
+            {/* Analytics - requires STATS.VIEW or API_USAGE.VIEW */}
+            {isAuthenticated && canViewAnalytics && (
               <Link 
                 href="/app/analytics" 
                  className={getLinkClasses('/app/analytics')}
@@ -131,8 +137,8 @@ export default function UserDashboardLayout({
               </Link>
             )}
             
-            {/* API Keys - authenticated only */}
-            {isAuthenticated && (
+            {/* API Keys - requires API.ACCESS or API.KEY.CREATE */}
+            {isAuthenticated && canViewApiKeys && (
               <Link 
                 href="/app/api-keys" 
                  className={getLinkClasses('/app/api-keys')}
