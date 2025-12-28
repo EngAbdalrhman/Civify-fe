@@ -10,7 +10,6 @@ export interface SubscriptionPlan {
   monthlyPrice: string;
   annualPrice: string;
   cvLimit: number | null;
-  apiLimit: number | null;
   watermark: boolean;
   dashboard: boolean;
   active: boolean;
@@ -34,14 +33,13 @@ export interface UserSubscription {
   startDate: string;
   endDate: string;
   currentCvCount: number;
-  currentApiCount: number;
   isAnnual: boolean;
   createdAt: string;
   // DTO Fields
   cvLimit: number | null;
-  apiLimit: number | null;
   usageResetDate?: string;
   currentTokenUsage?: number;
+  autoRenew?: boolean;
 }
 
 export interface PaymentInitiationResponse {

@@ -67,7 +67,7 @@ export default function UsersPage() {
          email: user.email,
          role: 'user', // Default since not in AdminUser
          plan: user.currentPlan || 'free',
-         credits: user.customApiLimit || 0
+         credits: user.customCvLimit || 0
     });
     setDialogOpen(true);
   };

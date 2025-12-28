@@ -104,9 +104,6 @@ export default function AnalyticsPage() {
   const cvUsagePercent = subscription?.cvLimit 
     ? Math.round((subscription.currentCvCount / subscription.cvLimit) * 100)
     : 0;
-  const apiUsagePercent = subscription?.apiLimit 
-    ? Math.round((subscription.currentApiCount / subscription.apiLimit) * 100)
-    : 0;
 
   // Format remaining days until reset
   const getDaysUntilReset = () => {
@@ -278,15 +275,13 @@ export default function AnalyticsPage() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">API Requests</CardTitle>
+                <CardTitle className="text-sm font-medium">Token Usage</CardTitle>
                 <Activity className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{subscription?.currentApiCount ?? 0}</div>
+                <div className="text-2xl font-bold">{subscription?.currentTokenUsage ?? 0}</div>
                 <p className="text-xs text-muted-foreground">
-                  {subscription?.apiLimit 
-                    ? `of ${subscription.apiLimit} this month`
-                    : subscription ? 'Unlimited' : 'No active plan'}
+                  {subscription ? 'Tokens used this month' : 'No active plan'}
                 </p>
               </CardContent>
             </Card>

@@ -11,8 +11,7 @@ const API_ENDPOINTS = {
   PLAN_BY_ID: (id: number) => `/v1/subscriptions/plans/${id}`,
   MY_SUBSCRIPTION: '/v1/subscriptions/my-subscription',
   MY_SUBSCRIPTIONS: '/v1/subscriptions/my-subscriptions',
-  CANCEL: (id: number) => `/v1/subscriptions/cancel/${id}`,
-  RENEW: (id: number) => `/v1/subscriptions/renew/${id}`,
+  CANCEL: '/v1/subscriptions/cancel',
 };
 
 class SubscriptionService {
@@ -58,22 +57,10 @@ class SubscriptionService {
   }
 
   /**
-   * Cancel a subscription
+   * Cancel subscription (marks for cancellation at end of billing period)
    */
-  async cancelSubscription(subscriptionId: number): Promise<{ message: string }> {
-    const response = await apiClient.post<{ data: { message: string } }>(API_ENDPOINTS.CANCEL(subscriptionId));
-    return response.data.data;
-  }
-
-  /**
-   * Renew a subscription
-   */
-  async renewSubscription(subscriptionId: number, isAnnual: boolean = false): Promise<{ message: string }> {
-    const response = await apiClient.post<{ data: { message: string } }>(
-      API_ENDPOINTS.RENEW(subscriptionId),
-      null,
-      { params: { isAnnual } }
-    );
+  async cancelSubscription(): Promise<{ message: string }> {
+    const response = await apiClient.post<{ data: { message: string } }>(API_ENDPOINTS.CANCEL);
     return response.data.data;
   }
 
@@ -100,12 +87,6 @@ class SubscriptionService {
       features.push('Unlimited CV generations');
     } else {
       features.push(`${plan.cvLimit} CV generations per month`);
-    }
-
-    // API Access
-    if (plan.apiLimit !== null && plan.apiLimit > 0) {
-      features.push('Full API access');
-      features.push(`${plan.apiLimit} API calls per month`);
     }
 
     // Standard features

@@ -22,7 +22,7 @@ interface UseAdminUsersReturn {
   fetchUsers: (page?: number) => Promise<void>;
   searchUsers: (searchTerm: string) => Promise<void>;
   filterUsers: (filters: FilterCriteria[]) => Promise<void>;
-  updateUserLimits: (userId: number, cvLimit?: number, apiLimit?: number) => Promise<void>;
+  updateUserLimits: (userId: number, cvLimit?: number) => Promise<void>;
   refresh: () => Promise<void>;
 }
 
@@ -136,11 +136,10 @@ export function useAdminUsers(options: UseAdminUsersOptions = {}): UseAdminUsers
 
   const updateUserLimits = useCallback(async (
     userId: number,
-    cvLimit?: number,
-    apiLimit?: number
+    cvLimit?: number
   ) => {
     try {
-      await adminService.updateUserLimits(userId, cvLimit, apiLimit);
+      await adminService.updateUserLimits(userId, cvLimit);
       toast.success('User limits updated');
       await fetchUsers();
     } catch (err) {

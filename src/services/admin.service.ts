@@ -56,7 +56,6 @@ export interface AdminUser {
   createdAt: string;
   lastLoginAt?: string;
   customCvLimit?: number;
-  customApiLimit?: number;
   currentPlan?: string;
   subscriptionStatus?: string;
 }
@@ -216,12 +215,10 @@ class AdminService {
 
   async updateUserLimits(
     userId: number,
-    cvLimit?: number,
-    apiLimit?: number
+    cvLimit?: number
   ): Promise<ApiResponse<AdminUser>> {
     const params = new URLSearchParams();
     if (cvLimit !== undefined) params.append('cvLimit', cvLimit.toString());
-    if (apiLimit !== undefined) params.append('apiLimit', apiLimit.toString());
 
     const response = await apiClient.put<ApiResponse<AdminUser>>(
       `${ADMIN_API.USERS}/${userId}/limits?${params.toString()}`,

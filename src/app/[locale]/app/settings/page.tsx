@@ -52,9 +52,8 @@ interface Subscription {
   startDate: string;
   endDate: string;
   cvLimit: number;
-  apiLimit: number;
   currentCvCount: number;
-  currentApiCount: number;
+  autoRenew?: boolean;
 }
 
 export default function SettingsPage() {
@@ -418,8 +417,8 @@ export default function SettingsPage() {
                         <p className="font-medium">{subscription.currentCvCount} / {subscription.cvLimit}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">API Usage</p>
-                        <p className="font-medium">{subscription.currentApiCount} / {subscription.apiLimit}</p>
+                        <p className="text-muted-foreground">Auto Renew</p>
+                        <p className="font-medium">{subscription.autoRenew !== false ? 'Yes' : 'No'}</p>
                       </div>
                       <div>
                         <p className="text-muted-foreground">Started</p>
