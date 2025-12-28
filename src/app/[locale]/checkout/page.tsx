@@ -11,7 +11,7 @@ import { Loader2, CreditCard, ArrowLeft, Shield, Tag, Check, X } from 'lucide-re
 import { Link } from '@/i18n/routing';
 import { subscriptionService } from '@/services/subscription.service';
 import { paymentService } from '@/services/payment.service';
-import { adminService, type ValidatePromoResponse } from '@/services/admin.service';
+import { adminService, type PriceCalculationResponse } from '@/services/admin.service';
 import type { SubscriptionPlan } from '@/features/plans/types';
 import { toast } from 'sonner';
 
@@ -33,7 +33,7 @@ function CheckoutContent() {
   
   // Promo code validation state
   const [isValidatingPromo, setIsValidatingPromo] = useState(false);
-  const [promoValidation, setPromoValidation] = useState<ValidatePromoResponse | null>(null);
+  const [priceCalculation, setPriceCalculation] = useState<PriceCalculationResponse | null>(null);
   const [promoError, setPromoError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -47,8 +47,8 @@ function CheckoutContent() {
 
   // Reset promo validation when billing cycle changes
   useEffect(() => {
-    if (promoValidation) {
-      setPromoValidation(null);
+    if (priceCalculation) {
+      setPriceCalculation(null);
       setPromoError(null);
     }
   }, [isAnnual]);
@@ -86,17 +86,17 @@ function CheckoutContent() {
 
     setIsValidatingPromo(true);
     setPromoError(null);
-    setPromoValidation(null);
+    setPriceCalculation(null);
 
     try {
-      const price = isAnnual ? parseFloat(plan.annualPrice) : parseFloat(plan.monthlyPrice);
-      const response = await adminService.validatePromoCode(promoCode, plan.id, price);
+      const response = await adminService.calculatePrice(plan.id, isAnnual, promoCode);
       
-      if (response.valid) {
-        setPromoValidation(response);
+      if (response.promoCode) {
+        setPriceCalculation(response);
         toast.success('Promo code applied!');
       } else {
-        setPromoError(response.message || 'Invalid promo code');
+        // Promo wasn't applied - server will handle error in CommonResponse
+        setPromoError('Invalid or inapplicable promo code');
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to validate promo code';
@@ -108,7 +108,7 @@ function CheckoutContent() {
 
   const handleRemovePromo = () => {
     setPromoCode('');
-    setPromoValidation(null);
+    setPriceCalculation(null);
     setPromoError(null);
   };
 
@@ -121,7 +121,7 @@ function CheckoutContent() {
       const response = await paymentService.initiatePayment(
         plan.id,
         isAnnual,
-        promoValidation ? promoCode : undefined,
+        priceCalculation ? promoCode : undefined,
         gateway
       );
 
@@ -156,8 +156,8 @@ function CheckoutContent() {
   }
 
   const originalPrice = isAnnual ? parseFloat(plan.annualPrice) : parseFloat(plan.monthlyPrice);
-  const discountAmount = promoValidation?.discountAmount || 0;
-  const finalPrice = Math.max(0, originalPrice - discountAmount);
+  const discountAmount = priceCalculation?.discount || 0;
+  const finalPrice = priceCalculation?.totalPrice || originalPrice;
   const period = isAnnual ? 'year' : 'month';
 
   return (
@@ -224,7 +224,7 @@ function CheckoutContent() {
                   <Tag className="h-4 w-4 inline mr-1" />
                   {t('promoCode')}
                 </Label>
-                {promoValidation ? (
+                {priceCalculation ? (
                   <div className="flex items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900">
                     <div className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-600" />
@@ -232,9 +232,7 @@ function CheckoutContent() {
                         {promoCode.toUpperCase()}
                       </span>
                       <span className="text-sm text-green-600">
-                        ({promoValidation.discountType === 'PERCENTAGE' 
-                          ? `${promoValidation.discountValue}% off`
-                          : `-$${promoValidation.discountValue}`})
+                        (-{priceCalculation.currency} {discountAmount.toFixed(2)})
                       </span>
                     </div>
                     <button onClick={handleRemovePromo} className="text-green-700 hover:text-red-500">
@@ -278,21 +276,21 @@ function CheckoutContent() {
                   <span>Subtotal</span>
                   <span>${originalPrice.toFixed(2)}</span>
                 </div>
-                {promoValidation && (
+                {priceCalculation && (
                   <div className="flex justify-between items-center text-sm text-green-600">
                     <span>Discount</span>
-                    <span>-${discountAmount.toFixed(2)}</span>
+                    <span>-{priceCalculation.currency} {discountAmount.toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between items-center text-lg font-bold">
                   <span>{t('total')}</span>
                   <div className="text-right">
-                    {promoValidation ? (
+                    {priceCalculation ? (
                       <>
                         <span className="line-through text-muted-foreground text-sm mr-2">
-                          ${originalPrice.toFixed(2)}
+                          {priceCalculation.currency} {originalPrice.toFixed(2)}
                         </span>
-                        <span className="text-green-600">${finalPrice.toFixed(2)}</span>
+                        <span className="text-green-600">{priceCalculation.currency} {finalPrice.toFixed(2)}</span>
                       </>
                     ) : (
                       <span>${originalPrice.toFixed(2)}</span>

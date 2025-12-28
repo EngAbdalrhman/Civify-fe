@@ -127,6 +127,18 @@ export interface ValidatePromoResponse {
   message?: string;
 }
 
+export interface PriceCalculationResponse {
+  planId: number;
+  planName: string;
+  basePrice: number;
+  discount: number;
+  totalPrice: number;
+  promoCode?: string;
+  isAnnual: boolean;
+  billingCycle: 'MONTHLY' | 'ANNUAL';
+  currency: string;
+}
+
 // ============================================
 // Subscription Types
 // ============================================
@@ -336,17 +348,24 @@ class AdminService {
     return response.data;
   }
 
-  async validatePromoCode(
-    code: string,
+  /**
+   * Calculate subscription price with promo validation.
+   * Replaces old validatePromoCode - use this for checkout.
+   */
+  async calculatePrice(
     planId: number,
-    amount: number
-  ): Promise<ValidatePromoResponse> {
-    // Use public subscription endpoint for checkout promo validation
-    const response = await apiClient.post<ValidatePromoResponse>(
-      'v1/subscriptions/validate-promo',
-      { code, planId, amount }
+    isAnnual: boolean,
+    promoCode?: string
+  ): Promise<PriceCalculationResponse> {
+    const params = new URLSearchParams();
+    params.append('planId', planId.toString());
+    params.append('isAnnual', isAnnual.toString());
+    if (promoCode) params.append('promoCode', promoCode);
+
+    const response = await apiClient.get<ApiResponse<PriceCalculationResponse>>(
+      `v1/subscriptions/calculate-price?${params.toString()}`
     );
-    return response.data;
+    return response.data.data;
   }
 
   // ==========================================
