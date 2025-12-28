@@ -18,6 +18,7 @@ import { Link, usePathname } from '@/i18n/routing';
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import apiClient from "@/api/client";
 
 export default function UserDashboardLayout({
   children,
@@ -26,11 +27,12 @@ export default function UserDashboardLayout({
 }) {
   const t = useTranslations('nav');
   const { isAdmin } = useAuth();
-  const { hasPermission, hasAnyPermission } = usePermissions();
+  const { hasAnyPermission } = usePermissions();
   const pathname = usePathname();
   const { resolvedTheme } = useTheme();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [planName, setPlanName] = useState<string | null>(null);
 
   // Permission checks for menu items
   const canViewApiKeys = hasAnyPermission(['API.ACCESS', 'API.KEY.CREATE']);
@@ -48,6 +50,22 @@ export default function UserDashboardLayout({
     };
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  // Fetch subscription plan name
+  useEffect(() => {
+    const fetchSubscription = async () => {
+      const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+      if (!token) return;
+      
+      try {
+        const response = await apiClient.get('/v1/subscriptions/my-subscription');
+        setPlanName(response.data?.planName || null);
+      } catch {
+        // User might not have a subscription
+      }
+    };
+    fetchSubscription();
   }, []);
 
   // Avoid hydration mismatch
@@ -101,7 +119,9 @@ export default function UserDashboardLayout({
             </div>
             <div className="grid flex-1 ltr:text-left rtl:text-right text-sm leading-tight">
                <span className="truncate font-semibold">Civify</span>
-               <span className="truncate text-xs text-muted-foreground">Pro Plan</span>
+               <span className="truncate text-xs text-muted-foreground">
+                 {planName || (isAuthenticated ? 'Free Plan' : 'Guest')}
+               </span>
             </div>
           </div>
 
