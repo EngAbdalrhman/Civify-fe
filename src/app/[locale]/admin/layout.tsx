@@ -39,7 +39,7 @@ export default function AdminDashboardLayout({
     const active = isActive(path);
     return `flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
       active 
-        ? 'bg-gray-300/30 text-gray-700 translate-x-1' 
+        ? `bg-gray-300/30 ${mounted && resolvedTheme === 'dark' ? 'text-white' : 'text-grey-700'} translate-x-1` 
         : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:translate-x-1'
     }`;
   };
