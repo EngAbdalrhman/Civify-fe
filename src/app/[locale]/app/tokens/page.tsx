@@ -8,13 +8,15 @@ import { Loader2, Zap, Coins, ArrowLeft, CheckCircle, Sparkles, CreditCard, Wall
 import { Link } from '@/i18n/routing';
 import { tokenPackageService, type TokenPackage, type TokenBalanceResponse } from '@/services/token-package.service';
 import { toast } from 'sonner';
+import { TokenPurchaseDialog } from '@/components/tokens/TokenPurchaseDialog';
 
 export default function AppTokensPage() {
   const router = useRouter();
   const [packages, setPackages] = useState<TokenPackage[]>([]);
   const [balance, setBalance] = useState<TokenBalanceResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [purchasingId, setPurchasingId] = useState<number | null>(null);
+  const [selectedPackage, setSelectedPackage] = useState<TokenPackage | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -37,24 +39,9 @@ export default function AppTokensPage() {
     }
   };
 
-  const handlePurchase = async (packageId: number) => {
-    try {
-      setPurchasingId(packageId);
-      const result = await tokenPackageService.purchasePackage(packageId);
-      
-      if (result.paymentUrl) {
-        window.location.href = result.paymentUrl;
-      } else if (result.paymentKey) {
-        toast.success('Payment initiated');
-      } else {
-        toast.error(result.message || 'Failed to initiate payment');
-      }
-    } catch (error: any) {
-      console.error('Error purchasing package:', error);
-      toast.error(error?.message || 'Failed to initiate purchase');
-    } finally {
-      setPurchasingId(null);
-    }
+  const openPurchaseDialog = (pkg: TokenPackage) => {
+    setSelectedPackage(pkg);
+    setIsDialogOpen(true);
   };
 
   const getFeaturedIndex = (pkgs: TokenPackage[]): number => {
@@ -257,20 +244,10 @@ export default function AppTokensPage() {
                           ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600' 
                           : ''
                       }`}
-                      onClick={() => handlePurchase(pkg.id)}
-                      disabled={purchasingId !== null}
+                      onClick={() => openPurchaseDialog(pkg)}
                     >
-                      {purchasingId === pkg.id ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Processing...
-                        </>
-                      ) : (
-                        <>
-                          <Zap className="mr-2 h-4 w-4" />
-                          Buy Now
-                        </>
-                      )}
+                      <Zap className="mr-2 h-4 w-4" />
+                      Buy Now
                     </Button>
                   </CardContent>
                 </Card>
@@ -297,6 +274,12 @@ export default function AppTokensPage() {
           </Card>
         </>
       )}
+
+      <TokenPurchaseDialog 
+        open={isDialogOpen} 
+        onOpenChange={setIsDialogOpen} 
+        tokenPackage={selectedPackage} 
+      />
     </div>
   );
 }

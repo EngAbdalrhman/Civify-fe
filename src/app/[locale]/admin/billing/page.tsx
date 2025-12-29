@@ -18,7 +18,8 @@ import {
   PowerOff,
   AlertCircle,
   Coins,
-  CreditCard
+  CreditCard,
+  Lock
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { adminService, type AdminPlan } from '@/services/admin.service';
@@ -35,6 +36,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { tokenPackageService, type TokenPackage } from '@/services/token-package.service';
 import apiClient from '@/api/client';
+import { usePermissions } from '@/contexts/PermissionContext';
+import { ADMIN_ACTION_PERMISSIONS } from '@/config/adminMenuConfig';
 
 function getPlanIcon(name: string) {
   const lower = name.toLowerCase();
@@ -69,10 +72,34 @@ const tokenPackageAdminApi = {
 export default function BillingPage() {
   const t = useTranslations('admin.plans');
   const common = useTranslations('common');
+  const { hasPermission, isLoading: isLoadingPermissions } = usePermissions();
+
+  // Permissions
+  const canViewPlans = hasPermission(ADMIN_ACTION_PERMISSIONS.PLAN_VIEW);
+  // Currently using same permission, but separated for future extensibility
+  const canViewTokens = hasPermission(ADMIN_ACTION_PERMISSIONS.PLAN_VIEW);
+  const canModifyPlans = hasPermission(ADMIN_ACTION_PERMISSIONS.PLAN_EDIT);
+
+  // Tab state
+  const [activeTab, setActiveTab] = useState<string>('');
+
+  // Set initial active tab based on permissions
+  useEffect(() => {
+    if (isLoadingPermissions) return;
+    
+    // Only set default tab if no tab is currently active
+    if (!activeTab) {
+      if (canViewPlans) {
+        setActiveTab('plans');
+      } else if (canViewTokens) {
+        setActiveTab('tokens');
+      }
+    }
+  }, [isLoadingPermissions, canViewPlans, canViewTokens, activeTab]);
 
   // Plans state
   const [plans, setPlans] = useState<AdminPlan[]>([]);
-  const [isLoadingPlans, setIsLoadingPlans] = useState(true);
+  const [isLoadingPlans, setIsLoadingPlans] = useState(false); // Default false, load on demand
   const [plansError, setPlansError] = useState<string | null>(null);
   const [editingPlan, setEditingPlan] = useState<AdminPlan | null>(null);
   const [isPlanDialogOpen, setIsPlanDialogOpen] = useState(false);
@@ -80,7 +107,7 @@ export default function BillingPage() {
 
   // Token packages state
   const [tokenPackages, setTokenPackages] = useState<TokenPackage[]>([]);
-  const [isLoadingTokens, setIsLoadingTokens] = useState(true);
+  const [isLoadingTokens, setIsLoadingTokens] = useState(false); // Default false, load on demand
   const [tokensError, setTokensError] = useState<string | null>(null);
   const [editingTokenPackage, setEditingTokenPackage] = useState<TokenPackage | null>(null);
   const [isTokenDialogOpen, setIsTokenDialogOpen] = useState(false);
@@ -106,6 +133,8 @@ export default function BillingPage() {
 
   // Fetch plans
   const fetchPlans = useCallback(async () => {
+    if (!canViewPlans) return;
+    
     setIsLoadingPlans(true);
     setPlansError(null);
     try {
@@ -117,10 +146,12 @@ export default function BillingPage() {
     } finally {
       setIsLoadingPlans(false);
     }
-  }, []);
+  }, [canViewPlans]);
 
   // Fetch token packages
   const fetchTokenPackages = useCallback(async () => {
+    if (!canViewTokens) return;
+
     setIsLoadingTokens(true);
     setTokensError(null);
     try {
@@ -132,12 +163,16 @@ export default function BillingPage() {
     } finally {
       setIsLoadingTokens(false);
     }
-  }, []);
+  }, [canViewTokens]);
 
+  // Lazy load data when tab changes
   useEffect(() => {
-    fetchPlans();
-    fetchTokenPackages();
-  }, [fetchPlans, fetchTokenPackages]);
+    if (activeTab === 'plans' && plans.length === 0 && !plansError) {
+      fetchPlans();
+    } else if (activeTab === 'tokens' && tokenPackages.length === 0 && !tokensError) {
+      fetchTokenPackages();
+    }
+  }, [activeTab, fetchPlans, fetchTokenPackages, plans.length, tokenPackages.length, plansError, tokensError]);
 
   // Plan handlers
   const handleCreatePlan = () => {
@@ -292,6 +327,28 @@ export default function BillingPage() {
     }
   };
 
+  if (isLoadingPermissions) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!canViewPlans && !canViewTokens) {
+    return (
+      <div className="flex h-[50vh] flex-col items-center justify-center gap-4 text-center">
+        <div className="rounded-full bg-muted p-4">
+          <Lock className="h-8 w-8 text-muted-foreground" />
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold">Access Denied</h2>
+          <p className="text-muted-foreground">You don't have permission to view billing settings.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -302,195 +359,213 @@ export default function BillingPage() {
         <p className="text-muted-foreground">Manage subscription plans and token packages</p>
       </div>
 
-      <Tabs defaultValue="plans" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="plans" className="flex items-center gap-2">
-            <Package className="h-4 w-4" />
-            Subscription Plans
-          </TabsTrigger>
-          <TabsTrigger value="tokens" className="flex items-center gap-2">
-            <Coins className="h-4 w-4" />
-            Token Packages
-          </TabsTrigger>
+          {canViewPlans && (
+            <TabsTrigger value="plans" className="flex items-center gap-2">
+              <Package className="h-4 w-4" />
+              Subscription Plans
+            </TabsTrigger>
+          )}
+          {canViewTokens && (
+            <TabsTrigger value="tokens" className="flex items-center gap-2">
+              <Coins className="h-4 w-4" />
+              Token Packages
+            </TabsTrigger>
+          )}
         </TabsList>
 
         {/* Plans Tab */}
-        <TabsContent value="plans" className="space-y-6 mt-6">
-          <div className="flex justify-between items-center">
-            <p className="text-sm text-muted-foreground">
-              Configure subscription plans that users can purchase
-            </p>
-            <Button onClick={handleCreatePlan}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Plan
-            </Button>
-          </div>
+        {canViewPlans && (
+          <TabsContent value="plans" className="space-y-6 mt-6">
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-muted-foreground">
+                Configure subscription plans that users can purchase
+              </p>
+              {canModifyPlans && (
+                <Button onClick={handleCreatePlan}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Plan
+                </Button>
+              )}
+            </div>
 
-          {isLoadingPlans ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : plansError ? (
-            <div className="flex flex-col items-center justify-center gap-4 py-12">
-              <AlertCircle className="h-12 w-12 text-destructive" />
-              <p className="text-lg text-muted-foreground">{plansError}</p>
-              <Button onClick={fetchPlans}>Retry</Button>
-            </div>
-          ) : (
-            <div className="grid gap-6 md:grid-cols-3">
-              {plans.map((plan) => (
-                <div 
-                  key={plan.id}
-                  className={`rounded-lg border p-6 shadow-sm ${
-                    plan.isFeatured ? 'border-primary/20 bg-primary/5' : 'bg-card'
-                  }`}
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center gap-2">
-                      {getPlanIcon(plan.name)}
-                      <div>
-                        <h3 className="font-bold text-xl">{plan.name}</h3>
-                        <p className="text-muted-foreground text-sm">{plan.description}</p>
+            {isLoadingPlans ? (
+              <div className="flex justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : plansError ? (
+              <div className="flex flex-col items-center justify-center gap-4 py-12">
+                <AlertCircle className="h-12 w-12 text-destructive" />
+                <p className="text-lg text-muted-foreground">{plansError}</p>
+                <Button onClick={fetchPlans}>Retry</Button>
+              </div>
+            ) : (
+              <div className="grid gap-6 md:grid-cols-3">
+                {plans.map((plan) => (
+                  <div 
+                    key={plan.id}
+                    className={`rounded-lg border p-6 shadow-sm ${
+                      plan.isFeatured ? 'border-primary/20 bg-primary/5' : 'bg-card'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex items-center gap-2">
+                        {getPlanIcon(plan.name)}
+                        <div>
+                          <h3 className="font-bold text-xl">{plan.name}</h3>
+                          <p className="text-muted-foreground text-sm">{plan.description}</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-1">
+                        {plan.isFeatured && (
+                          <Badge variant="default" className="text-xs">Popular</Badge>
+                        )}
+                        <Badge variant={plan.active ? 'secondary' : 'destructive'} className="text-xs">
+                          {plan.active ? 'Active' : 'Inactive'}
+                        </Badge>
                       </div>
                     </div>
-                    <div className="flex gap-1">
-                      {plan.isFeatured && (
-                        <Badge variant="default" className="text-xs">Popular</Badge>
-                      )}
-                      <Badge variant={plan.active ? 'secondary' : 'destructive'} className="text-xs">
-                        {plan.active ? 'Active' : 'Inactive'}
-                      </Badge>
+                    
+                    <div className="text-2xl font-bold mb-4">
+                      ${parseFloat(plan.monthlyPrice).toFixed(0)}
+                      <span className="text-sm font-normal text-muted-foreground">/mo</span>
                     </div>
-                  </div>
-                  
-                  <div className="text-2xl font-bold mb-4">
-                    ${parseFloat(plan.monthlyPrice).toFixed(0)}
-                    <span className="text-sm font-normal text-muted-foreground">/mo</span>
-                  </div>
 
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => handleEditPlan(plan)}>
-                      <Edit2 className="h-3 w-3 mr-1" />
-                      Edit
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => handleTogglePlanActive(plan)}
-                    >
-                      {plan.active ? (
-                        <><PowerOff className="h-3 w-3 mr-1" />Deactivate</>
-                      ) : (
-                        <><Power className="h-3 w-3 mr-1" />Activate</>
-                      )}
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      className="text-destructive hover:text-destructive"
-                      onClick={() => handleDeletePlan(plan)}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
+                    {canModifyPlans && (
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={() => handleEditPlan(plan)}>
+                          <Edit2 className="h-3 w-3 mr-1" />
+                          Edit
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleTogglePlanActive(plan)}
+                        >
+                          {plan.active ? (
+                            <><PowerOff className="h-3 w-3 mr-1" />Deactivate</>
+                          ) : (
+                            <><Power className="h-3 w-3 mr-1" />Activate</>
+                          )}
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="text-destructive hover:text-destructive"
+                          onClick={() => handleDeletePlan(plan)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </TabsContent>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        )}
 
         {/* Token Packages Tab */}
-        <TabsContent value="tokens" className="space-y-6 mt-6">
-          <div className="flex justify-between items-center">
-            <p className="text-sm text-muted-foreground">
-              Configure token packages that users can purchase for additional usage
-            </p>
-            <Button onClick={handleCreateTokenPackage}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Package
-            </Button>
-          </div>
-
-          {isLoadingTokens ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : tokensError ? (
-            <div className="flex flex-col items-center justify-center gap-4 py-12">
-              <AlertCircle className="h-12 w-12 text-destructive" />
-              <p className="text-lg text-muted-foreground">{tokensError}</p>
-              <Button onClick={fetchTokenPackages}>Retry</Button>
-            </div>
-          ) : tokenPackages.length === 0 ? (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <Coins className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h2 className="text-lg font-semibold mb-2">No Token Packages</h2>
-                <p className="text-muted-foreground mb-4">
-                  Create your first token package to allow users to purchase extra tokens.
-                </p>
+        {canViewTokens && (
+          <TabsContent value="tokens" className="space-y-6 mt-6">
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-muted-foreground">
+                Configure token packages that users can purchase for additional usage
+              </p>
+              {canModifyPlans && (
                 <Button onClick={handleCreateTokenPackage}>
                   <Plus className="h-4 w-4 mr-2" />
                   Create Package
                 </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-6 md:grid-cols-3">
-              {tokenPackages.map((pkg) => (
-                <Card key={pkg.id} className={!pkg.active ? 'opacity-60' : ''}>
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div className="flex items-center gap-2">
-                        <Coins className="h-5 w-5 text-amber-500" />
-                        <CardTitle className="text-lg">{pkg.name}</CardTitle>
-                      </div>
-                      <Badge variant={pkg.active ? 'secondary' : 'destructive'} className="text-xs">
-                        {pkg.active ? 'Active' : 'Inactive'}
-                      </Badge>
-                    </div>
-                    {pkg.description && (
-                      <CardDescription>{pkg.description}</CardDescription>
-                    )}
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-primary">
-                          {tokenPackageService.formatTokens(pkg.tokens)} tokens
+              )}
+            </div>
+
+            {isLoadingTokens ? (
+              <div className="flex justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : tokensError ? (
+              <div className="flex flex-col items-center justify-center gap-4 py-12">
+                <AlertCircle className="h-12 w-12 text-destructive" />
+                <p className="text-lg text-muted-foreground">{tokensError}</p>
+                <Button onClick={fetchTokenPackages}>Retry</Button>
+              </div>
+            ) : tokenPackages.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Coins className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h2 className="text-lg font-semibold mb-2">No Token Packages</h2>
+                  <p className="text-muted-foreground mb-4">
+                    Create your first token package to allow users to purchase extra tokens.
+                  </p>
+                  {canModifyPlans && (
+                    <Button onClick={handleCreateTokenPackage}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Package
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-6 md:grid-cols-3">
+                {tokenPackages.map((pkg) => (
+                  <Card key={pkg.id} className={!pkg.active ? 'opacity-60' : ''}>
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <div className="flex items-center gap-2">
+                          <Coins className="h-5 w-5 text-amber-500" />
+                          <CardTitle className="text-lg">{pkg.name}</CardTitle>
                         </div>
-                        <div className="text-xl font-semibold">
-                          {pkg.price.toFixed(2)} {pkg.currency}
-                        </div>
+                        <Badge variant={pkg.active ? 'secondary' : 'destructive'} className="text-xs">
+                          {pkg.active ? 'Active' : 'Inactive'}
+                        </Badge>
                       </div>
-                      <div className="flex gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="flex-1"
-                          onClick={() => handleEditTokenPackage(pkg)}
-                        >
-                          <Edit2 className="h-3 w-3 mr-1" />
-                          Edit
-                        </Button>
-                        {pkg.active && (
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            className="text-destructive hover:text-destructive"
-                            onClick={() => handleDeactivateTokenPackage(pkg)}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
+                      {pkg.description && (
+                        <CardDescription>{pkg.description}</CardDescription>
+                      )}
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-primary">
+                            {tokenPackageService.formatTokens(pkg.tokens)} tokens
+                          </div>
+                          <div className="text-xl font-semibold">
+                            {pkg.price.toFixed(2)} {pkg.currency}
+                          </div>
+                        </div>
+                        {canModifyPlans && (
+                          <div className="flex gap-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="flex-1"
+                              onClick={() => handleEditTokenPackage(pkg)}
+                            >
+                              <Edit2 className="h-3 w-3 mr-1" />
+                              Edit
+                            </Button>
+                            {pkg.active && (
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                className="text-destructive hover:text-destructive"
+                                onClick={() => handleDeactivateTokenPackage(pkg)}
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            )}
+                          </div>
                         )}
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </TabsContent>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        )}
       </Tabs>
 
       {/* Plan Edit/Create Dialog */}
