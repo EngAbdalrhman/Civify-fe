@@ -107,7 +107,7 @@ export interface UpdatePlanRequest extends Partial<CreatePlanRequest> {}
 export interface PromoCode {
   id: number;
   code: string;
-  discountType: 'PERCENTAGE' | 'FIXED';
+  discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
   discountValue: number;
   maxUses?: number;
   currentUses: number;
@@ -122,7 +122,7 @@ export interface PromoCode {
 export interface ValidatePromoResponse {
   valid: boolean;
   discountAmount: number;
-  discountType: 'PERCENTAGE' | 'FIXED';
+  discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
   discountValue: number;
   message?: string;
 }

@@ -31,6 +31,16 @@ export interface TokenBalanceResponse {
   totalAvailable: number;
 }
 
+export interface PurchasePreviewResponse {
+  originalPrice: number;
+  discountAmount: number;
+  finalPrice: number;
+  currency: string;
+  promoCode: string;
+  promoApplied: boolean;
+  message?: string;
+}
+
 const API_ENDPOINTS = {
   PACKAGES: '/v1/tokens/packages',
   BALANCE: '/v1/tokens/balance',
@@ -51,6 +61,21 @@ class TokenPackageService {
    */
   async getBalance(): Promise<TokenBalanceResponse> {
     const response = await apiClient.get<TokenBalanceResponse>(API_ENDPOINTS.BALANCE);
+    return response.data;
+  }
+
+
+
+  /**
+   * Preview a purchase (calculate discount)
+   */
+  async previewPurchase(packageId: number, promoCode: string): Promise<PurchasePreviewResponse> {
+    const params = new URLSearchParams();
+    params.append('promoCode', promoCode);
+    
+    const response = await apiClient.get<PurchasePreviewResponse>(
+      `${API_ENDPOINTS.PURCHASE(packageId)}/preview?${params.toString()}`
+    );
     return response.data;
   }
 

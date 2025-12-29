@@ -59,7 +59,7 @@ export default function PromosPage() {
   // Form state
   const [formData, setFormData] = useState({
     code: '',
-    discountType: 'PERCENTAGE' as 'PERCENTAGE' | 'FIXED',
+    discountType: 'PERCENTAGE' as 'PERCENTAGE' | 'FIXED_AMOUNT',
     discountValue: '',
     maxUses: '',
     validUntil: '',
@@ -342,14 +342,14 @@ export default function PromosPage() {
                 <Label>Discount Type</Label>
                 <Select 
                   value={formData.discountType} 
-                  onValueChange={(v) => setFormData({ ...formData, discountType: v as 'PERCENTAGE' | 'FIXED' })}
+                  onValueChange={(v) => setFormData({ ...formData, discountType: v as 'PERCENTAGE' | 'FIXED_AMOUNT' })}
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="PERCENTAGE">Percentage (%)</SelectItem>
-                    <SelectItem value="FIXED">Fixed Amount ($)</SelectItem>
+                    <SelectItem value="FIXED_AMOUNT">Fixed Amount ($)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
