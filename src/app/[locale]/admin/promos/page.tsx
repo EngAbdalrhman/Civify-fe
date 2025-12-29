@@ -15,7 +15,7 @@ import {
   Check
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { adminService, type PromoCode } from '@/services/admin.service';
+import { adminService, type PromoCode, type PromoApplicabilityType } from '@/services/admin.service';
 import {
   Dialog,
   DialogContent,
@@ -61,8 +61,9 @@ export default function PromosPage() {
     code: '',
     discountType: 'PERCENTAGE' as 'PERCENTAGE' | 'FIXED_AMOUNT',
     discountValue: '',
-    maxUses: '',
-    validUntil: '',
+    usageLimit: '',
+    expiresAt: '',
+    applicabilityType: 'ALL' as PromoApplicabilityType,
   });
 
   const fetchPromoCodes = useCallback(async () => {
@@ -97,7 +98,7 @@ export default function PromosPage() {
 
     if (statusFilter !== 'all') {
       result = result.filter(p => 
-        statusFilter === 'active' ? p.isActive : !p.isActive
+        statusFilter === 'active' ? p.active : !p.active
       );
     }
 
@@ -110,8 +111,9 @@ export default function PromosPage() {
       code: '',
       discountType: 'PERCENTAGE',
       discountValue: '',
-      maxUses: '',
-      validUntil: '',
+      usageLimit: '',
+      expiresAt: '',
+      applicabilityType: 'ALL',
     });
     setIsDialogOpen(true);
   };
@@ -122,8 +124,9 @@ export default function PromosPage() {
       code: promo.code,
       discountType: promo.discountType,
       discountValue: String(promo.discountValue),
-      maxUses: promo.maxUses ? String(promo.maxUses) : '',
-      validUntil: promo.validUntil ? promo.validUntil.split('T')[0] : '',
+      usageLimit: promo.usageLimit ? String(promo.usageLimit) : '',
+      expiresAt: promo.expiresAt ? promo.expiresAt.split('T')[0] : '',
+      applicabilityType: promo.applicabilityType || 'ALL',
     });
     setIsDialogOpen(true);
   };
@@ -135,9 +138,10 @@ export default function PromosPage() {
         code: formData.code.toUpperCase(),
         discountType: formData.discountType,
         discountValue: parseFloat(formData.discountValue),
-        usageLimit: formData.maxUses ? parseInt(formData.maxUses) : undefined,
-        expiresAt: formData.validUntil ? `${formData.validUntil}T23:59:59` : undefined,
+        usageLimit: formData.usageLimit ? parseInt(formData.usageLimit) : undefined,
+        expiresAt: formData.expiresAt ? `${formData.expiresAt}T23:59:59` : undefined,
         active: true,
+        applicabilityType: formData.applicabilityType,
       };
 
       if (editingPromo) {
@@ -240,6 +244,7 @@ export default function PromosPage() {
               <TableRow>
                 <TableHead>Code</TableHead>
                 <TableHead>Discount</TableHead>
+                <TableHead>Applies To</TableHead>
                 <TableHead>Usage</TableHead>
                 <TableHead>Expires</TableHead>
                 <TableHead>Status</TableHead>
@@ -249,7 +254,7 @@ export default function PromosPage() {
             <TableBody>
               {filteredCodes.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                     No promo codes found
                   </TableCell>
                 </TableRow>
@@ -278,16 +283,19 @@ export default function PromosPage() {
                         : `$${promo.discountValue}`}
                     </TableCell>
                     <TableCell>
-                      {promo.currentUses}/{promo.maxUses || '∞'}
+                      <Badge variant="outline">{promo.applicabilityType || 'ALL'}</Badge>
                     </TableCell>
                     <TableCell>
-                      {promo.validUntil 
-                        ? new Date(promo.validUntil).toLocaleDateString()
+                      {promo.usedCount}/{promo.usageLimit || '∞'}
+                    </TableCell>
+                    <TableCell>
+                      {promo.expiresAt 
+                        ? new Date(promo.expiresAt).toLocaleDateString()
                         : 'Never'}
                     </TableCell>
                     <TableCell>
-                      <Badge variant={promo.isActive ? 'default' : 'secondary'}>
-                        {promo.isActive ? 'Active' : 'Inactive'}
+                      <Badge variant={promo.active ? 'default' : 'secondary'}>
+                        {promo.active ? 'Active' : 'Inactive'}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -295,7 +303,7 @@ export default function PromosPage() {
                         <Button variant="ghost" size="sm" onClick={() => handleEditPromo(promo)}>
                           <Edit2 className="h-3 w-3" />
                         </Button>
-                        {promo.isActive && (
+                        {promo.active && (
                           <Button variant="ghost" size="sm" onClick={() => handleDeactivate(promo)}>
                             Deactivate
                           </Button>
@@ -337,7 +345,24 @@ export default function PromosPage() {
                 placeholder="SUMMER20"
               />
             </div>
+            
             <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Applicability</Label>
+                <Select 
+                  value={formData.applicabilityType} 
+                  onValueChange={(v) => setFormData({ ...formData, applicabilityType: v as PromoApplicabilityType })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">All (Plans & Tokens)</SelectItem>
+                    <SelectItem value="PLAN">Plans Only</SelectItem>
+                    <SelectItem value="TOKEN">Tokens Only</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="space-y-2">
                 <Label>Discount Type</Label>
                 <Select 
@@ -353,6 +378,9 @@ export default function PromosPage() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="discountValue">
                   {formData.discountType === 'PERCENTAGE' ? 'Percentage' : 'Amount'}
@@ -365,27 +393,26 @@ export default function PromosPage() {
                   placeholder={formData.discountType === 'PERCENTAGE' ? '20' : '10'}
                 />
               </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="maxUses">Max Uses (optional)</Label>
+                <Label htmlFor="usageLimit">Max Uses (optional)</Label>
                 <Input
-                  id="maxUses"
+                  id="usageLimit"
                   type="number"
-                  value={formData.maxUses}
-                  onChange={(e) => setFormData({ ...formData, maxUses: e.target.value })}
+                  value={formData.usageLimit}
+                  onChange={(e) => setFormData({ ...formData, usageLimit: e.target.value })}
                   placeholder="100"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="validUntil">Expires On (optional)</Label>
-                <Input
-                  id="validUntil"
-                  type="date"
-                  value={formData.validUntil}
-                  onChange={(e) => setFormData({ ...formData, validUntil: e.target.value })}
-                />
-              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="expiresAt">Expires On (optional)</Label>
+              <Input
+                id="expiresAt"
+                type="date"
+                value={formData.expiresAt}
+                onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
+              />
             </div>
           </div>
 

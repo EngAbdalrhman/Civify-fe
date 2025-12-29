@@ -104,19 +104,23 @@ export interface UpdatePlanRequest extends Partial<CreatePlanRequest> {}
 // Promo Codes Types
 // ============================================
 
+export type PromoApplicabilityType = 'ALL' | 'PLAN' | 'TOKEN';
+
 export interface PromoCode {
   id: number;
   code: string;
+  description?: string;
   discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
   discountValue: number;
-  maxUses?: number;
-  currentUses: number;
-  validFrom: string;
-  validUntil: string;
-  isActive: boolean;
-  applicablePlans?: number[];
-  minPurchaseAmount?: number;
+  minimumPurchase?: number; // Matches BigDecimal
+  usageLimit?: number;
+  usedCount: number;
+  expiresAt?: string; // Instant or LocalDateTime -> string
+  active: boolean;
+  applicabilityType: PromoApplicabilityType;
+  maxDiscountAmount?: number;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface ValidatePromoResponse {

@@ -136,7 +136,7 @@ export default function ApiKeysPage() {
           </Button>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg">
+              <Button>
                 <Plus className="h-4 w-4 mr-2" />
                 Generate New Key
               </Button>
