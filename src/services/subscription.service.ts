@@ -109,19 +109,27 @@ class SubscriptionService {
     }
 
     const price = isAnnual ? parseFloat(plan.annualPrice) : parseFloat(plan.monthlyPrice);
-    const isPopular = name.includes('premium') || name.includes('pro');
+    const isPopular = name.includes('premium') || name.includes('pro') || name.includes('beta');
+    
+    const isFreePlan = name === 'free';
+    
+    // Capitalize first letter of each word for display
+    const displayName = plan.name
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
 
     return {
       id: name.replace(/\s+/g, '-').toLowerCase(),
       planId: plan.id,
-      name: plan.name,
+      name: displayName,
       price,
       period: isAnnual ? 'year' : 'month',
       description: plan.description,
       features,
       highlighted: isPopular,
-      cta: price === 0 ? 'Get Started' : (isPopular ? 'Start Free Trial' : 'Select Plan'),
-      ctaLink: price === 0 ? '/signup' : `/checkout?planId=${plan.id}`,
+      cta: isFreePlan ? 'Get Started' : 'Select Plan',
+      ctaLink: isFreePlan ? '/signup' : `/checkout?planId=${plan.id}`,
     };
   }
 }
