@@ -31,9 +31,9 @@ export const ADMIN_MENU_ITEMS: AdminMenuItem[] = [
     permission: 'USER.VIEW' 
   },
   { 
-    path: '/admin/plans', 
+    path: '/admin/billing', 
     icon: CreditCard, 
-    labelKey: 'plans', 
+    labelKey: 'billing', 
     permission: 'PLAN.VIEW' 
   },
   { 

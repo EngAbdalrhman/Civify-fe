@@ -9,7 +9,8 @@ import {
   LayoutDashboard,
   Shield,
   Key,
-  HelpCircle 
+  HelpCircle,
+  Zap
 } from 'lucide-react';
 import { DashboardNavbar } from '@/components/DashboardNavbar';
 import { useAuth } from '@/hooks/use-auth';
@@ -176,6 +177,17 @@ export default function UserDashboardLayout({
               >
                 <Settings className="h-4 w-4" />
                 {t('settings')}
+              </Link>
+            )}
+            
+            {/* Buy Tokens - authenticated only */}
+            {isAuthenticated && (
+              <Link 
+                href="/app/tokens" 
+                 className={getLinkClasses('/app/tokens')}
+              >
+                <Zap className="h-4 w-4" />
+                Buy Tokens
               </Link>
             )}
             

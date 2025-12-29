@@ -1445,7 +1445,7 @@ export default function UploadPage() {
                 Upgrade Plan
               </Button>
             </Link>
-            <Link href="/tokens" className="w-full">
+            <Link href="/app/tokens" className="w-full">
               <Button variant="outline" className="w-full" size="lg">
                 <CreditCard className="mr-2 h-4 w-4" />
                 Buy Token Package
