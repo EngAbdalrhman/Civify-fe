@@ -4,15 +4,40 @@ import { Check, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "@/i18n/routing";
+import { useRouter } from '@/i18n/routing';
 import { usePlans } from "@/features/plans/hooks/usePlans";
 import { pricingTiers as fallbackTiers } from "../data";
+import { useState, useEffect } from "react";
 
 export function PricingSection() {
+  const router = useRouter();
   const { displayPlans, isLoading, error, isAnnual, setIsAnnual } = usePlans();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    setIsAuthenticated(!!localStorage.getItem('auth_token'));
+  }, []);
 
   // Show error state if API fails - don't use fallback mock data
   const plans = displayPlans;
+
+  const handlePlanSelect = (ctaLink: string) => {
+    // If it's a signup link (free plan), just go there
+    if (ctaLink.startsWith('/signup')) {
+      router.push(ctaLink);
+      return;
+    }
+
+    if (!isAuthenticated) {
+      // Redirect to signup with callback
+      // Construct callback URL: /checkout?planId=X
+      const callbackUrl = encodeURIComponent(ctaLink);
+      router.push(`/signup?callbackUrl=${callbackUrl}`);
+    } else {
+      // Proceed to checkout
+      router.push(ctaLink);
+    }
+  };
 
   return (
     <section className="py-20 md:py-32">
@@ -111,7 +136,6 @@ export function PricingSection() {
 
                   {/* CTA */}
                   <Button
-                    asChild
                     size="lg"
                     className={`w-full ${
                       tier.highlighted
@@ -119,8 +143,9 @@ export function PricingSection() {
                         : ""
                     }`}
                     variant={tier.highlighted ? "default" : "outline"}
+                    onClick={() => handlePlanSelect(tier.ctaLink)}
                   >
-                    <Link href={tier.ctaLink}>{tier.cta}</Link>
+                    {tier.cta}
                   </Button>
                 </CardContent>
               </Card>

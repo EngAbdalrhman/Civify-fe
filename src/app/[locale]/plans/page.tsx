@@ -3,13 +3,39 @@
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Check, Loader2 } from 'lucide-react';
-import { Link } from '@/i18n/routing';
+import { Link, useRouter } from '@/i18n/routing';
 import { usePlans } from '@/features/plans/hooks/usePlans';
 import { Badge } from '@/components/ui/badge';
 
+import { useState, useEffect } from 'react';
+
 export default function PlansPage() {
   const t = useTranslations('plans');
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { displayPlans, isLoading, error, isAnnual, setIsAnnual } = usePlans();
+
+  useEffect(() => {
+    setIsAuthenticated(!!localStorage.getItem('auth_token'));
+  }, []);
+
+  const handlePlanSelect = (ctaLink: string) => {
+    // If it's a signup link (free plan), just go there
+    if (ctaLink.startsWith('/signup')) {
+      router.push(ctaLink);
+      return;
+    }
+
+    if (!isAuthenticated) {
+      // Redirect to signup with callback
+      // Construct callback URL: /checkout?planId=X
+      const callbackUrl = encodeURIComponent(ctaLink);
+      router.push(`/signup?callbackUrl=${callbackUrl}`);
+    } else {
+      // Proceed to checkout
+      router.push(ctaLink);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -96,12 +122,12 @@ export default function PlansPage() {
             </ul>
 
             <Button 
-              asChild 
               className="w-full" 
               variant={plan.highlighted ? 'default' : 'outline'}
               size="lg"
+              onClick={() => handlePlanSelect(plan.ctaLink)}
             >
-              <Link href={plan.ctaLink}>{plan.cta}</Link>
+              {plan.cta}
             </Button>
           </div>
         ))}

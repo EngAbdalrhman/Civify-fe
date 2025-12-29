@@ -27,13 +27,26 @@ export function NotificationBell() {
   const [isConnected, setIsConnected] = useState(false);
   const eventSourceRef = useRef<EventSource | null>(null);
 
-  // Fetch unread count
-  const fetchUnreadCount = useCallback(async () => {
+  // Fetch unread count and recent notifications
+  const fetchNotifications = useCallback(async () => {
     try {
-      const response = await apiClient.get<{ count: number }>('/v1/notifications/unread-count');
-      setUnreadCount(response.data.count);
+      // 1. Get unread count
+      const countRes = await apiClient.get<{ count: number }>('/v1/notifications/unread-count');
+      setUnreadCount(countRes.data.count);
+
+      // 2. Get recent notifications (for the list)
+      const listRes = await apiClient.get<{ content: any[] }>('/v1/notifications?size=20');
+      // Fix: Ensure we use the 'content' field from Page response
+      if (listRes.data && Array.isArray(listRes.data.content)) {
+          const mappedNotifications = listRes.data.content.map((n: any) => ({
+              ...n,
+              timestamp: n.createdAt || n.timestamp, // Handle both API (createdAt) and SSE (timestamp) formats
+              read: n.delivered // Map delivered to read status if needed, though logic might differ
+          }));
+          setNotifications(mappedNotifications); 
+      }
     } catch (err) {
-      console.error('Failed to fetch unread count:', err);
+      console.error('Failed to fetch notifications:', err);
     }
   }, []);
 
@@ -76,13 +89,13 @@ export function NotificationBell() {
     eventSourceRef.current = eventSource;
 
     // Initial fetch
-    fetchUnreadCount();
+    fetchNotifications();
 
     return () => {
       eventSource.close();
       setIsConnected(false);
     };
-  }, [fetchUnreadCount]);
+  }, [fetchNotifications]);
 
   const markAsRead = (id: number) => {
     setNotifications(prev =>
