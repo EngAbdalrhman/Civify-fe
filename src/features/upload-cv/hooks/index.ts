@@ -22,9 +22,22 @@ export const useUploadCv = () => {
       });
       
       // Handle CommonResponse wrapper
-      return response.data?.data || response.data;
+      const data = response.data?.data || response.data;
+      
+      // Check for token limit exceeded error
+      if (!data.success && data.errorCode === 'TOKEN_LIMIT_EXCEEDED') {
+        const error = new Error('TOKEN_LIMIT_EXCEEDED') as Error & { errorCode?: string };
+        error.errorCode = 'TOKEN_LIMIT_EXCEEDED';
+        throw error;
+      }
+      
+      return data;
     },
     onError: (error: any) => {
+      // Don't show toast for TOKEN_LIMIT_EXCEEDED - let the component handle it
+      if (error?.errorCode === 'TOKEN_LIMIT_EXCEEDED' || error?.message === 'TOKEN_LIMIT_EXCEEDED') {
+        return;
+      }
       const errorMessage = error?.message || "Failed to parse CV";
       toast.error(errorMessage);
     },

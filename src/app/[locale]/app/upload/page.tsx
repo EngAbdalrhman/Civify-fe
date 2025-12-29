@@ -43,7 +43,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
+import Link from 'next/link';
+import { Zap, CreditCard } from 'lucide-react';
 import { useUploadCv, useTailorCv } from '@/features/upload-cv/hooks';
 import { 
   type ResumeData, 
@@ -73,6 +85,7 @@ export default function UploadPage() {
   const [maskPII, setMaskPII] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
+  const [showTokenLimitModal, setShowTokenLimitModal] = useState(false);
   
   // API Hooks
   const { mutate: uploadCv, isPending: isUploading } = useUploadCv();
@@ -97,6 +110,12 @@ export default function UploadPage() {
           toast.success('CV parsed successfully!');
         } else {
           toast.error('Failed to parse CV data');
+        }
+      },
+      onError: (error: any) => {
+        // Handle TOKEN_LIMIT_EXCEEDED error
+        if (error?.errorCode === 'TOKEN_LIMIT_EXCEEDED' || error?.message === 'TOKEN_LIMIT_EXCEEDED') {
+          setShowTokenLimitModal(true);
         }
       },
     });
@@ -1406,6 +1425,38 @@ export default function UploadPage() {
           </div>
         </div>
       )}
+
+      {/* Token Limit Exceeded Modal */}
+      <AlertDialog open={showTokenLimitModal} onOpenChange={setShowTokenLimitModal}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/20">
+              <Zap className="h-6 w-6 text-amber-600" />
+            </div>
+            <AlertDialogTitle className="text-center">Token Limit Reached</AlertDialogTitle>
+            <AlertDialogDescription className="text-center">
+              You've used all your monthly tokens. Upgrade your plan for more usage or purchase additional tokens to continue.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="grid gap-3 py-4">
+            <Link href="/plans" className="w-full">
+              <Button className="w-full" size="lg">
+                <Sparkles className="mr-2 h-4 w-4" />
+                Upgrade Plan
+              </Button>
+            </Link>
+            <Link href="/tokens" className="w-full">
+              <Button variant="outline" className="w-full" size="lg">
+                <CreditCard className="mr-2 h-4 w-4" />
+                Buy Token Package
+              </Button>
+            </Link>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="w-full">Maybe Later</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
