@@ -5,12 +5,13 @@ import apiClient from "@/api/client";
 
 interface PermissionsResponse {
   permissions: string[];
-  encryptedPermissions: string;
+  permissionToken: string; // JWT-signed token for verification
   groupName: string;
 }
 
 interface PermissionContextType {
   permissions: string[];
+  permissionToken: string | null; // Store the JWT token
   groupName: string | null;
   isLoading: boolean;
   error: Error | null;
@@ -29,6 +30,7 @@ interface PermissionProviderProps {
 
 export const PermissionProvider: React.FC<PermissionProviderProps> = ({ children }) => {
   const [permissions, setPermissions] = useState<string[]>([]);
+  const [permissionToken, setPermissionToken] = useState<string | null>(null);
   const [groupName, setGroupName] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -38,6 +40,7 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({ children
     const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
     if (!token) {
       setPermissions([]);
+      setPermissionToken(null);
       setGroupName(null);
       return;
     }
@@ -49,11 +52,13 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({ children
       const response = await apiClient.get<PermissionsResponse>("/auth/permissions");
       const data = response.data;
       setPermissions(data.permissions || []);
+      setPermissionToken(data.permissionToken || null);
       setGroupName(data.groupName || null);
     } catch (err) {
       console.error("Failed to fetch permissions:", err);
       setError(err instanceof Error ? err : new Error("Failed to fetch permissions"));
       setPermissions([]);
+      setPermissionToken(null);
       setGroupName(null);
     } finally {
       setIsLoading(false);
@@ -62,6 +67,7 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({ children
 
   const clearPermissions = useCallback(() => {
     setPermissions([]);
+    setPermissionToken(null);
     setGroupName(null);
     setError(null);
   }, []);
@@ -97,6 +103,7 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({ children
 
   const value: PermissionContextType = {
     permissions,
+    permissionToken,
     groupName,
     isLoading,
     error,
