@@ -3,28 +3,15 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
 import apiClient from "@/api/client";
 
-/**
- * API response - now only contains the JWT permission token
- */
 interface PermissionsResponse {
-  permissionToken: string;
-}
-
-/**
- * Decoded JWT payload structure
- */
-interface PermissionTokenPayload {
-  sub: string; // username
   permissions: string[];
+  permissionToken: string; // JWT-signed token for verification
   groupName: string;
-  type: string;
-  iat: number;
-  exp: number;
 }
 
 interface PermissionContextType {
   permissions: string[];
-  permissionToken: string | null;
+  permissionToken: string | null; // Store the JWT token
   groupName: string | null;
   isLoading: boolean;
   error: Error | null;
@@ -39,28 +26,6 @@ const PermissionContext = createContext<PermissionContextType | undefined>(undef
 
 interface PermissionProviderProps {
   children: ReactNode;
-}
-
-/**
- * Decode a JWT token payload (base64url decoding)
- * Note: This does NOT verify the signature - that was done by the backend
- */
-function decodeJwtPayload<T>(token: string): T | null {
-  try {
-    const parts = token.split('.');
-    if (parts.length !== 3) return null;
-    
-    // Decode base64url to base64, then to string
-    const payload = parts[1]
-      .replace(/-/g, '+')
-      .replace(/_/g, '/');
-    
-    const decoded = atob(payload);
-    return JSON.parse(decoded) as T;
-  } catch (error) {
-    console.error('Failed to decode JWT payload:', error);
-    return null;
-  }
 }
 
 export const PermissionProvider: React.FC<PermissionProviderProps> = ({ children }) => {
@@ -86,22 +51,9 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({ children
     try {
       const response = await apiClient.get<PermissionsResponse>("/auth/permissions");
       const data = response.data;
-      
-      if (data.permissionToken) {
-        setPermissionToken(data.permissionToken);
-        
-        // Decode JWT to extract permissions and groupName
-        const payload = decodeJwtPayload<PermissionTokenPayload>(data.permissionToken);
-        if (payload) {
-          setPermissions(payload.permissions || []);
-          setGroupName(payload.groupName || null);
-        } else {
-          throw new Error("Failed to decode permission token");
-        }
-      } else {
-        setPermissions([]);
-        setGroupName(null);
-      }
+      setPermissions(data.permissions || []);
+      setPermissionToken(data.permissionToken || null);
+      setGroupName(data.groupName || null);
     } catch (err) {
       console.error("Failed to fetch permissions:", err);
       setError(err instanceof Error ? err : new Error("Failed to fetch permissions"));
@@ -144,10 +96,10 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({ children
   // Auto-fetch permissions on mount if token exists
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
-    if (token && permissions.length === 0 && !permissionToken) {
+    if (token && permissions.length === 0) {
       fetchPermissions();
     }
-  }, [fetchPermissions, permissions.length, permissionToken]);
+  }, [fetchPermissions, permissions.length]);
 
   const value: PermissionContextType = {
     permissions,
@@ -190,4 +142,3 @@ export const useHasAnyPermission = (permissions: string[]): boolean => {
 };
 
 export default PermissionContext;
-
