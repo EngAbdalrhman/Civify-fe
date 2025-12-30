@@ -8,7 +8,7 @@ import { ADMIN_ACTION_PERMISSIONS } from '@/config/adminMenuConfig';
  * Provides user info and admin access checks
  */
 export function useAuth() {
-  const { permissions, groupName, isLoading, hasPermission } = usePermissions();
+  const { permissions, groupName, isLoading, hasPermission, fetchPermissions } = usePermissions();
 
   // Check if user has admin dashboard access
   const isAdmin = hasPermission(ADMIN_ACTION_PERMISSIONS.ADMIN_DASHBOARD_VIEW);
@@ -29,5 +29,6 @@ export function useAuth() {
     permissions,
     groupName,
     hasPermission,
+    fetchPermissions,
   };
 }

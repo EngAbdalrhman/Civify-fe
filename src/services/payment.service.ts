@@ -103,17 +103,24 @@ class PaymentService {
     status?: string;
     error?: string;
   } {
-    const status = searchParams.get('invoice_status') || searchParams.get('status');
-    const success = status === 'paid';
-    const orderId = searchParams.get('invoice_id') || undefined;
-    const invoiceKey = searchParams.get('invoice_key') || searchParams.get('payment_key') || undefined;
+    let status = searchParams.get('invoice_status') || searchParams.get('status');
+    const invoiceId = searchParams.get('invoice_id');
+    const invoiceKey = searchParams.get('invoice_key') || searchParams.get('payment_key');
+
+    // If status is missing but we have IDs, this is a success callback
+    if (!status && invoiceId && invoiceKey) {
+      status = 'paid';
+    }
+
+    const success = status === 'paid' || status === 'success';
+    // const orderId = searchParams.get('invoice_id') || undefined; // Already defined above
     const error = !success ? (searchParams.get('error') || `Payment ${status}`) : undefined;
 
     return {
       success,
-      transactionId: invoiceKey,
-      orderId,
-      invoiceKey,
+      transactionId: invoiceKey || undefined,
+      orderId: invoiceId || undefined,
+      invoiceKey: invoiceKey || undefined,
       status: status || undefined,
       error,
     };
