@@ -72,14 +72,20 @@ const apiClient: AxiosInstance = axios.create({
   },
 });
 
-// Request interceptor for adding auth token
+// Request interceptor for adding auth token and Accept-Language header
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+    if (typeof window !== "undefined") {
+      // Add auth token if available
+      const token = localStorage.getItem("auth_token");
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
 
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+      // Add Accept-Language header based on current locale from URL
+      const pathLocale = window.location.pathname.split('/')[1];
+      const locale = ['en', 'ar'].includes(pathLocale) ? pathLocale : 'en';
+      config.headers['Accept-Language'] = locale;
     }
 
     return config;
