@@ -52,7 +52,8 @@ export default function AnalyticsPage() {
   });
 
   // Check permission - user should have CV.CREATE to view their analytics
-  const canViewAnalytics = hasPermission('CV.CREATE') || hasPermission('STATS.VIEW');
+  const canViewAnalytics = hasPermission('STATS.VIEW');
+  const canViewApiLogs = hasPermission('API.ACCESS');
 
   useEffect(() => {
     if (isAuthLoading) return;
@@ -79,7 +80,10 @@ export default function AnalyticsPage() {
 
       // Fetch other stats
       const [logsData, statsData] = await Promise.all([
-        apiUsageService.getMyLogs({ page: 0, size: 10 }).catch(() => ({ content: [], totalElements: 0, totalPages: 0, size: 10, page: 0 })),
+        // Only fetch logs if user has permission
+        canViewApiLogs 
+          ? apiUsageService.getMyLogs({ page: 0, size: 10 }).catch(() => ({ content: [], totalElements: 0, totalPages: 0, size: 10, page: 0 }))
+          : Promise.resolve({ content: [], totalElements: 0, totalPages: 0, size: 10, page: 0 }),
         apiUsageService.getMyStats().catch(() => null),
       ]);
       
@@ -235,7 +239,7 @@ export default function AnalyticsPage() {
       <Tabs defaultValue="stats" className="w-full">
         <TabsList>
           <TabsTrigger value="stats">General Statistics</TabsTrigger>
-          <TabsTrigger value="logs">API Logs</TabsTrigger>
+          {canViewApiLogs && <TabsTrigger value="logs">API Logs</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="stats" className="space-y-6">
@@ -378,25 +382,27 @@ export default function AnalyticsPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="logs">
-          <Card>
-            <CardHeader>
-              <CardTitle>API Usage Logs</CardTitle>
-              <CardDescription>Detailed logs of your API activity.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <GenericList 
-                data={apiLogs}
-                columns={logsColumns}
-                meta={logsPagination} 
-                isLoading={isLoading}
-                onPageChange={handleLogsPageChange}
-                // Filter not fully implemented on backend user endpoint yet, 
-                // but if it were, we would use onFilterChange
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
+        {canViewApiLogs && (
+          <TabsContent value="logs">
+            <Card>
+              <CardHeader>
+                <CardTitle>API Usage Logs</CardTitle>
+                <CardDescription>Detailed logs of your API activity.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <GenericList 
+                  data={apiLogs}
+                  columns={logsColumns}
+                  meta={logsPagination} 
+                  isLoading={isLoading}
+                  onPageChange={handleLogsPageChange}
+                  // Filter not fully implemented on backend user endpoint yet, 
+                  // but if it were, we would use onFilterChange
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );

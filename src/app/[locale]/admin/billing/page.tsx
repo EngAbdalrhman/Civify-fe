@@ -76,9 +76,10 @@ export default function BillingPage() {
 
   // Permissions
   const canViewPlans = hasPermission(ADMIN_ACTION_PERMISSIONS.PLAN_VIEW);
-  // Currently using same permission, but separated for future extensibility
-  const canViewTokens = hasPermission(ADMIN_ACTION_PERMISSIONS.PLAN_VIEW);
+  const canViewTokens = hasPermission(ADMIN_ACTION_PERMISSIONS.TOKEN_PACKAGE_VIEW);
+  
   const canModifyPlans = hasPermission(ADMIN_ACTION_PERMISSIONS.PLAN_EDIT);
+  const canModifyTokens = hasPermission(ADMIN_ACTION_PERMISSIONS.TOKEN_PACKAGE_EDIT);
 
   // Tab state
   const [activeTab, setActiveTab] = useState<string>('');
@@ -473,7 +474,7 @@ export default function BillingPage() {
               <p className="text-sm text-muted-foreground">
                 Configure token packages that users can purchase for additional usage
               </p>
-              {canModifyPlans && (
+              {canModifyTokens && (
                 <Button onClick={handleCreateTokenPackage}>
                   <Plus className="h-4 w-4 mr-2" />
                   Create Package
@@ -499,7 +500,7 @@ export default function BillingPage() {
                   <p className="text-muted-foreground mb-4">
                     Create your first token package to allow users to purchase extra tokens.
                   </p>
-                  {canModifyPlans && (
+                  {canModifyTokens && (
                     <Button onClick={handleCreateTokenPackage}>
                       <Plus className="h-4 w-4 mr-2" />
                       Create Package
@@ -535,7 +536,7 @@ export default function BillingPage() {
                             {pkg.price.toFixed(2)} {pkg.currency}
                           </div>
                         </div>
-                        {canModifyPlans && (
+                        {canModifyTokens && (
                           <div className="flex gap-2">
                             <Button 
                               variant="outline" 

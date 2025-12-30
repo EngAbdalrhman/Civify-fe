@@ -46,6 +46,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import { PermissionGate } from "@/components/PermissionGate";
 import { ADMIN_ACTION_PERMISSIONS } from "@/config/adminMenuConfig";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function GroupsPage() {
   const t = useTranslations('admin');
@@ -324,29 +330,40 @@ export default function GroupsPage() {
 
             <div className="space-y-4">
               <Label>Permissions</Label>
-              {Object.entries(permissionsByCategory).map(([category, perms]) => (
-                <div key={category} className="space-y-2">
-                  <h4 className="text-sm font-medium text-muted-foreground">{category}</h4>
-                  <div className="grid grid-cols-2 gap-2">
-                    {perms.map((perm) => (
-                      <div key={perm.id} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`perm-${perm.id}`}
-                          checked={selectedPermissions.includes(perm.id)}
-                          onCheckedChange={() => !isReadOnly && togglePermission(perm.id)}
-                          disabled={isReadOnly}
-                        />
-                        <label
-                          htmlFor={`perm-${perm.id}`}
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          {perm.name}
-                        </label>
-                      </div>
-                    ))}
+              <TooltipProvider delayDuration={200}>
+                {Object.entries(permissionsByCategory).map(([category, perms]) => (
+                  <div key={category} className="space-y-3 pb-4 border-b last:border-b-0">
+                    <h4 className="text-sm font-semibold text-primary">{category}</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      {perms.map((perm) => (
+                        <Tooltip key={perm.id}>
+                          <TooltipTrigger asChild>
+                            <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50 transition-colors cursor-pointer">
+                              <Checkbox
+                                id={`perm-${perm.id}`}
+                                checked={selectedPermissions.includes(perm.id)}
+                                onCheckedChange={() => !isReadOnly && togglePermission(perm.id)}
+                                disabled={isReadOnly}
+                              />
+                              <label
+                                htmlFor={`perm-${perm.id}`}
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                              >
+                                {perm.name}
+                              </label>
+                            </div>
+                          </TooltipTrigger>
+                          {perm.description && (
+                            <TooltipContent side="top" className="max-w-xs">
+                              <p className="text-xs">{perm.description}</p>
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </TooltipProvider>
             </div>
           </div>
 

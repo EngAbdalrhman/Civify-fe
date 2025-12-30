@@ -52,7 +52,7 @@ export const ADMIN_MENU_ITEMS: AdminMenuItem[] = [
     path: '/admin/stats', 
     icon: BarChart3, 
     labelKey: 'stats', 
-    permission: 'STATS.VIEW' 
+    permission: 'ADMIN_STATS.VIEW' 
   },
   { 
     path: '/admin/api-usage', 
@@ -107,10 +107,15 @@ export const ADMIN_ACTION_PERMISSIONS = {
   GROUP_DELETE: 'GROUP.MODIFY',
   
   // Stats
-  STATS_VIEW: 'STATS.VIEW',
+  STATS_VIEW: 'STATS.VIEW', // User analytics
+  ADMIN_STATS_VIEW: 'ADMIN_STATS.VIEW', // Admin platform stats
   
   // API Usage
   API_USAGE_VIEW: 'API_USAGE.VIEW',
+
+  // Token Packages
+  TOKEN_PACKAGE_VIEW: 'TOKEN_PACKAGE.VIEW',
+  TOKEN_PACKAGE_EDIT: 'TOKEN_PACKAGE.MODIFY',
 } as const;
 
 export type AdminActionPermission = typeof ADMIN_ACTION_PERMISSIONS[keyof typeof ADMIN_ACTION_PERMISSIONS];
