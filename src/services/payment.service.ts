@@ -15,15 +15,16 @@ const API_ENDPOINTS = {
 class PaymentService {
   /**
    * Initiate payment for a subscription plan
+   * @param planId - Encoded plan ID (string)
    */
   async initiatePayment(
-    planId: number,
+    planId: string,
     isAnnual: boolean = false,
     promoCode?: string,
     gateway?: string
   ): Promise<PaymentInitiationResponse> {
     const params = new URLSearchParams({
-      planId: planId.toString(),
+      planId: planId, // Already encoded string
       isAnnual: isAnnual.toString(),
     });
 

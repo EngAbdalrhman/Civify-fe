@@ -65,7 +65,7 @@ export interface AdminUser {
 // ============================================
 
 export interface AdminPlan {
-  id: number;
+  id: string; // Encoded plan ID
   name: string;
   description?: string;
   monthlyPrice: string;
@@ -258,7 +258,7 @@ class AdminService {
     return (data as ApiResponse<AdminPlan[]>).data || [];
   }
 
-  async getPlanById(planId: number): Promise<AdminPlan> {
+  async getPlanById(planId: string): Promise<AdminPlan> {
     const response = await apiClient.get<ApiResponse<AdminPlan>>(
       `${ADMIN_API.PLANS}/${planId}`
     );
@@ -273,7 +273,7 @@ class AdminService {
     return response.data;
   }
 
-  async updatePlan(planId: number, data: UpdatePlanRequest): Promise<ApiResponse<AdminPlan>> {
+  async updatePlan(planId: string, data: UpdatePlanRequest): Promise<ApiResponse<AdminPlan>> {
     const response = await apiClient.put<ApiResponse<AdminPlan>>(
       `${ADMIN_API.PLANS}/${planId}`,
       data
@@ -281,7 +281,7 @@ class AdminService {
     return response.data;
   }
 
-  async activatePlan(planId: number): Promise<ApiResponse<AdminPlan>> {
+  async activatePlan(planId: string): Promise<ApiResponse<AdminPlan>> {
     const response = await apiClient.patch<ApiResponse<AdminPlan>>(
       `${ADMIN_API.PLANS}/${planId}/activate`,
       {}
@@ -289,7 +289,7 @@ class AdminService {
     return response.data;
   }
 
-  async deactivatePlan(planId: number): Promise<ApiResponse<AdminPlan>> {
+  async deactivatePlan(planId: string): Promise<ApiResponse<AdminPlan>> {
     const response = await apiClient.patch<ApiResponse<AdminPlan>>(
       `${ADMIN_API.PLANS}/${planId}/deactivate`,
       {}
@@ -297,7 +297,7 @@ class AdminService {
     return response.data;
   }
 
-  async deletePlan(planId: number): Promise<ApiResponse<void>> {
+  async deletePlan(planId: string): Promise<ApiResponse<void>> {
     const response = await apiClient.delete<ApiResponse<void>>(
       `${ADMIN_API.PLANS}/${planId}`
     );
