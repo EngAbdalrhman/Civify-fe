@@ -32,19 +32,21 @@ export function ApiDocumentation() {
       parameters: [
         { name: 'file', type: 'multipart/form-data', required: true, description: 'The CV file (PDF, DOC, DOCX)' },
         { name: 'language', type: 'string', required: false, description: 'Language hint for parsing (e.g., "en", "ar")' },
-        { name: 'userTemplate', type: 'string (JSON/YAML)', required: false, description: 'Optional template to define output structure' },
+        { name: 'userTemplate', type: 'string (JSON/YAML)', required: false, description: 'Optional template string to define output structure' },
       ],
       curlExample: `curl -X POST \\
   ${baseUrl}/api/v1/external/cvs/parse \\
   -H "X-API-KEY: your_api_key_here" \\
   -F "file=@/path/to/cv.pdf" \\
   -F "language=en" \\
-  -F "userTemplate=@/path/to/template.json"`,
+  -F 'userTemplate={"sections": ["experience", "education"]}'`,
       jsExample: `const formData = new FormData();
 formData.append('file', fileInput.files[0]);
 formData.append('language', 'en');
-// Optional: Add template
-// formData.append('userTemplate', templateFile);
+// Optional: Add template as string
+formData.append('userTemplate', JSON.stringify({
+  sections: ['experience', 'education', 'skills']
+}));
 
 const response = await fetch('${baseUrl}/api/v1/external/cvs/parse', {
   method: 'POST',
@@ -57,14 +59,15 @@ const response = await fetch('${baseUrl}/api/v1/external/cvs/parse', {
 const data = await response.json();
 console.log(data);`,
       pythonExample: `import requests
+import json
 
 url = "${baseUrl}/api/v1/external/cvs/parse"
 headers = {"X-API-KEY": "your_api_key_here"}
-files = {
-    "file": open("/path/to/cv.pdf", "rb"),
-    "userTemplate": open("/path/to/template.json", "rb") # Optional
+files = {"file": open("/path/to/cv.pdf", "rb")}
+data = {
+    "language": "en",
+    "userTemplate": json.dumps({"sections": ["experience", "education"]})  # Optional
 }
-data = {"language": "en"}
 
 response = requests.post(url, headers=headers, files=files, data=data)
 result = response.json()
