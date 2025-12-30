@@ -221,9 +221,7 @@
       "title": "Product",
       "overview": "Overview",
       "pricing": "Pricing",
-      "marketplace": "Marketplace",
-      "features": "Features",
-      "integrations": "Integrations"
+      "apiDocs": "API Documentation"
     },
     "company": {
       "title": "Company",

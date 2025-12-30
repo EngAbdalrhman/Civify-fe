@@ -221,9 +221,7 @@
       "title": "المنتج",
       "overview": "نظرة عامة",
       "pricing": "الأسعار",
-      "marketplace": "السوق",
-      "features": "المميزات",
-      "integrations": "التكاملات"
+      "apiDocs": "وثائق API"
     },
     "company": {
       "title": "الشركة",

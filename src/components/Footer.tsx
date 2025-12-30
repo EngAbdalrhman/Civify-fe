@@ -1,13 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { newsletterService } from "@/services/newsletter.service";
+import { toast } from "sonner";
 
 export function Footer() {
   const t = useTranslations("footer");
@@ -35,7 +36,7 @@ export function Footer() {
     <footer className="bg-gray-50 border-t">
       <div className="container mx-auto px-4 py-8">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {/* Product Section */}
           <div>
             <h3 className="font-semibold text-gray-900 mb-3 text-sm">
@@ -44,15 +45,7 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="#"
-                  className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
-                >
-                  {t("product.overview")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
+                  href="/plans"
                   className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
                 >
                   {t("product.pricing")}
@@ -60,26 +53,10 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="#"
+                  href="/api-docs"
                   className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
                 >
-                  {t("product.marketplace")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
-                >
-                  {t("product.features")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
-                >
-                  {t("product.integrations")}
+                  {t("product.apiDocs")}
                 </Link>
               </li>
             </ul>
@@ -113,72 +90,6 @@ export function Footer() {
                   className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
                 >
                   {t("company.terms")}
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Resources Section */}
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-3 text-sm">
-              {t("resources.title")}
-            </h3>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="#"
-                  className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
-                >
-                  {t("resources.help")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
-                >
-                  {t("resources.sales")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
-                >
-                  {t("resources.advertise")}
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Social Section */}
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-3 text-sm">
-              {t("social.title")}
-            </h3>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="#"
-                  className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
-                >
-                  {t("social.twitter")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
-                >
-                  {t("social.instagram")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
-                >
-                  {t("social.linkedin")}
                 </Link>
               </li>
             </ul>
