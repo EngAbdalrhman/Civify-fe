@@ -7,16 +7,28 @@ import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { newsletterService } from "@/services/newsletter.service";
 
 export function Footer() {
   const t = useTranslations("footer");
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement newsletter subscription logic
-    console.log("Newsletter subscription:", email);
-    setEmail("");
+    if (!email) return;
+
+    setLoading(true);
+    try {
+      await newsletterService.subscribe(email);
+      toast.success(t("newsletter.success"));
+      setEmail("");
+    } catch (error) {
+      toast.error(t("newsletter.error"));
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -81,39 +93,7 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="#"
-                  className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
-                >
-                  {t("company.about")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
-                >
-                  {t("company.team")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
-                >
-                  {t("company.blog")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
-                >
-                  {t("company.careers")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
+                  href="/contact"
                   className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
                 >
                   {t("company.contact")}
@@ -121,10 +101,18 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="#"
+                  href="/policy"
                   className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
                 >
                   {t("company.privacy")}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/terms"
+                  className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
+                >
+                  {t("company.terms")}
                 </Link>
               </li>
             </ul>
@@ -216,8 +204,8 @@ export function Footer() {
                 required
                 className="h-8 text-xs"
               />
-              <Button type="submit" size="sm" className="text-xs">
-                {t("newsletter.subscribe")}
+              <Button type="submit" size="sm" className="text-xs" disabled={loading}>
+                {loading ? "..." : t("newsletter.subscribe")}
               </Button>
             </form>
           </div>

@@ -26,15 +26,15 @@ type NavItem = {
 };
 
 const navigationItems: NavItem[] = [
-  {
-    name: "Products",
-    hasDropdown: true,
-    items: [
-      { name: "Free Plan", href: "/plans" },
-      { name: "Pro Plan", href: "/plans" },
-      { name: "Enterprise", href: "/plans" },
-    ],
-  },
+  // {
+  //   name: "Products",
+  //   hasDropdown: true,
+  //   items: [
+  //     { name: "Free Plan", href: "/plans" },
+  //     { name: "Pro Plan", href: "/plans" },
+  //     { name: "Enterprise", href: "/plans" },
+  //   ],
+  // },
 ];
 
 export function Navbar() {
