@@ -28,7 +28,7 @@ export default function UserDashboardLayout({
 }) {
   const t = useTranslations('nav');
   const { isAdmin } = useAuth();
-  const { hasAnyPermission } = usePermissions();
+  const { hasAnyPermission, groupName } = usePermissions();
   const pathname = usePathname();
   const { resolvedTheme } = useTheme();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -121,7 +121,7 @@ export default function UserDashboardLayout({
             <div className="grid flex-1 ltr:text-left rtl:text-right text-sm leading-tight">
                <span className="truncate font-semibold">Civify</span>
                <span className="truncate text-xs text-muted-foreground">
-                 {planName || (isAuthenticated ? 'Free Plan' : 'Guest')}
+                 {groupName || planName || (isAuthenticated ? 'Free Plan' : 'Guest')}
                </span>
             </div>
           </div>
