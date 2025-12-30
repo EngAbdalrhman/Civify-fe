@@ -26,7 +26,7 @@ export function ApiDocumentation() {
     {
       id: 'parse',
       method: 'POST',
-      path: '/api/v1/external/cvs/parse',
+      path: '/v1/external/cvs/parse',
       title: 'Parse CV',
       description: 'Upload a CV to extract structured data in JSON format',
       parameters: [
@@ -35,7 +35,7 @@ export function ApiDocumentation() {
         { name: 'userTemplate', type: 'string (JSON/YAML)', required: false, description: 'Optional template string to define output structure' },
       ],
       curlExample: `curl -X POST \\
-  ${baseUrl}/api/v1/external/cvs/parse \\
+  ${baseUrl}/v1/external/cvs/parse \\
   -H "X-API-KEY: your_api_key_here" \\
   -F "file=@/path/to/cv.pdf" \\
   -F "language=en" \\
@@ -48,7 +48,7 @@ formData.append('userTemplate', JSON.stringify({
   sections: ['experience', 'education', 'skills']
 }));
 
-const response = await fetch('${baseUrl}/api/v1/external/cvs/parse', {
+const response = await fetch('${baseUrl}/v1/external/cvs/parse', {
   method: 'POST',
   headers: {
     'X-API-KEY': 'your_api_key_here'
@@ -61,7 +61,7 @@ console.log(data);`,
       pythonExample: `import requests
 import json
 
-url = "${baseUrl}/api/v1/external/cvs/parse"
+url = "${baseUrl}/v1/external/cvs/parse"
 headers = {"X-API-KEY": "your_api_key_here"}
 files = {"file": open("/path/to/cv.pdf", "rb")}
 data = {
@@ -88,7 +88,7 @@ print(result)`,
     {
       id: 'mask',
       method: 'POST',
-      path: '/api/v1/external/cvs/mask',
+      path: '/v1/external/cvs/mask',
       title: 'Mask CV',
       description: 'Upload a CV to mask PII and receive a masked PDF',
       parameters: [
@@ -96,7 +96,7 @@ print(result)`,
         { name: 'language', type: 'string', required: false, description: 'Language hint for parsing (e.g., "en", "ar")' },
       ],
       curlExample: `curl -X POST \\
-  ${baseUrl}/api/v1/external/cvs/mask \\
+  ${baseUrl}/v1/external/cvs/mask \\
   -H "X-API-KEY: your_api_key_here" \\
   -F "file=@/path/to/cv.pdf" \\
   -F "language=en" \\
@@ -105,7 +105,7 @@ print(result)`,
 formData.append('file', fileInput.files[0]);
 formData.append('language', 'en');
 
-const response = await fetch('${baseUrl}/api/v1/external/cvs/mask', {
+const response = await fetch('${baseUrl}/v1/external/cvs/mask', {
   method: 'POST',
   headers: {
     'X-API-KEY': 'your_api_key_here'
@@ -122,7 +122,7 @@ a.download = 'masked_cv.pdf';
 a.click();`,
       pythonExample: `import requests
 
-url = "${baseUrl}/api/v1/external/cvs/mask"
+url = "${baseUrl}/v1/external/cvs/mask"
 headers = {"X-API-KEY": "your_api_key_here"}
 files = {"file": open("/path/to/cv.pdf", "rb")}
 data = {"language": "en"}
