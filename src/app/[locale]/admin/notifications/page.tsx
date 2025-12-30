@@ -15,6 +15,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { adminService, type AdminUser, FilterOperation } from '@/services/admin.service';
+import { newsletterService } from '@/services/newsletter.service';
+import { usePermissions } from '@/contexts/PermissionContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -38,6 +40,12 @@ export default function NotificationsPage() {
   const [message, setMessage] = useState('');
   const [type, setType] = useState<'INFO' | 'WARNING' | 'PROMO' | 'SUCCESS'>('INFO');
   const [isSending, setIsSending] = useState(false);
+  const { hasPermission } = usePermissions();
+
+  // Newsletter state
+  const [newsletterSubject, setNewsletterSubject] = useState('');
+  const [newsletterContent, setNewsletterContent] = useState('');
+  const [isBroadcastingNewsletter, setIsBroadcastingNewsletter] = useState(false);
 
   // User selection for targeted notifications
   const [searchTerm, setSearchTerm] = useState('');
@@ -136,6 +144,29 @@ export default function NotificationsPage() {
     setSelectedUsers(selectedUsers.filter(u => u.id !== userId));
   };
 
+  const handleBroadcastNewsletter = async () => {
+    if (!newsletterSubject.trim() || !newsletterContent.trim()) {
+      toast.error('Please enter subject and content');
+      return;
+    }
+
+    setIsBroadcastingNewsletter(true);
+    try {
+      await newsletterService.broadcast({
+        subject: newsletterSubject,
+        content: newsletterContent
+      });
+      toast.success('Newsletter broadcast initiated successfully!');
+      setNewsletterSubject('');
+      setNewsletterContent('');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to send newsletter';
+      toast.error(errorMessage);
+    } finally {
+      setIsBroadcastingNewsletter(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -153,6 +184,12 @@ export default function NotificationsPage() {
             <Users className="h-4 w-4" />
             Targeted
           </TabsTrigger>
+          {hasPermission('NEWSLETTER.BROADCAST') && (
+            <TabsTrigger value="newsletter" className="flex items-center gap-2">
+              <Globe className="h-4 w-4" />
+              Newsletter
+            </TabsTrigger>
+          )}
         </TabsList>
 
         {/* Broadcast Tab */}
@@ -359,6 +396,62 @@ export default function NotificationsPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
+
+        {/* Newsletter Tab */}
+        {hasPermission('NEWSLETTER.BROADCAST') && (
+          <TabsContent value="newsletter">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Globe className="h-5 w-5" />
+                  Broadcast Newsletter
+                </CardTitle>
+                <CardDescription>
+                  Send HTML email newsletter to all active subscribers.
+                  <br />
+                  <small className="text-muted-foreground">Note: Unsubscribe link is automatically appended.</small>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="newsletterSubject">Subject</Label>
+                  <Input
+                    id="newsletterSubject"
+                    value={newsletterSubject}
+                    onChange={(e) => setNewsletterSubject(e.target.value)}
+                    placeholder="Newsletter Subject..."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="newsletterContent">Content (HTML supported)</Label>
+                  <Textarea
+                    id="newsletterContent"
+                    value={newsletterContent}
+                    onChange={(e) => setNewsletterContent(e.target.value)}
+                    placeholder="<p>Hello Subscribers...</p>"
+                    rows={8}
+                    className="font-mono text-sm"
+                  />
+                </div>
+
+                <Button 
+                  onClick={handleBroadcastNewsletter} 
+                  disabled={isBroadcastingNewsletter || !newsletterSubject.trim() || !newsletterContent.trim()}
+                  className="w-full"
+                >
+                  {isBroadcastingNewsletter ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4 mr-2" />
+                  )}
+                  Broadcast Newsletter
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );
