@@ -357,12 +357,12 @@ class AdminService {
    * Replaces old validatePromoCode - use this for checkout.
    */
   async calculatePrice(
-    planId: number,
+    planId: string, // Encoded plan ID
     isAnnual: boolean,
     promoCode?: string
   ): Promise<PriceCalculationResponse> {
     const params = new URLSearchParams();
-    params.append('planId', planId.toString());
+    params.append('planId', planId);
     params.append('isAnnual', isAnnual.toString());
     if (promoCode) params.append('promoCode', promoCode);
 

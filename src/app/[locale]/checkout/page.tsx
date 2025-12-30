@@ -57,8 +57,9 @@ function CheckoutContent() {
     try {
       setIsLoading(true);
 
-      // Fetch plan details
-      const fetchedPlan = await subscriptionService.getPlanById(Number(planId));
+      // Fetch plan details - planId is now an encoded string
+      // Non-null assertion is safe because we redirect to /plans if planId is missing
+      const fetchedPlan = await subscriptionService.getPlanById(planId!);
       setPlan(fetchedPlan);
 
       // Fetch enabled gateways

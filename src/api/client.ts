@@ -136,6 +136,28 @@ apiClient.interceptors.response.use(
         return Promise.reject(error);
       }
 
+      // PUBLIC ENDPOINTS: Skip auth handling entirely for public API endpoints
+      // If no token was sent and no refresh token exists, just pass through the error
+      const isPublicEndpoint = 
+        url.includes("/subscriptions/plans") ||
+        url.includes("/cvs/upload") ||
+        url.includes("/cvs/tailor") ||
+        url.includes("/payments/config");
+      
+      const hasAuthToken = typeof window !== "undefined" && localStorage.getItem("auth_token");
+      const hasRefreshToken = typeof window !== "undefined" && localStorage.getItem("refresh_token");
+      
+      if (isPublicEndpoint && !hasAuthToken && !hasRefreshToken) {
+        console.log("[Auth] Public endpoint with no auth, skipping refresh");
+        // Return the original error - let the caller handle it
+        return Promise.reject({
+          status: error.response?.status,
+          message: (error.response?.data as { message?: string })?.message || "Unauthorized",
+          errorCode: (error.response?.data as { errorCode?: string })?.errorCode,
+          data: error.response?.data,
+        });
+      }
+
       // If already refreshing, queue this request
       if (isRefreshing) {
         console.log("[Auth] Refresh in progress, queuing request:", url);

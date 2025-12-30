@@ -8,7 +8,7 @@ import type { SubscriptionPlan, UserSubscription } from '@/features/plans/types'
 
 const API_ENDPOINTS = {
   PLANS: '/v1/subscriptions/plans',
-  PLAN_BY_ID: (id: number) => `/v1/subscriptions/plans/${id}`,
+  PLAN_BY_ID: (id: string) => `/v1/subscriptions/plans/${id}`,
   MY_SUBSCRIPTION: '/v1/subscriptions/my-subscription',
   MY_SUBSCRIPTIONS: '/v1/subscriptions/my-subscriptions',
   CANCEL: '/v1/subscriptions/cancel',
@@ -26,7 +26,7 @@ class SubscriptionService {
   /**
    * Get subscription plan by ID
    */
-  async getPlanById(planId: number): Promise<SubscriptionPlan> {
+  async getPlanById(planId: string): Promise<SubscriptionPlan> {
     const response = await apiClient.get<{ data: SubscriptionPlan }>(API_ENDPOINTS.PLAN_BY_ID(planId));
     return response.data.data;
   }
@@ -69,7 +69,7 @@ class SubscriptionService {
    */
   transformPlanToDisplay(plan: SubscriptionPlan, isAnnual: boolean = false): {
     id: string;
-    planId: number;
+    planId: string; // Encoded plan ID
     name: string;
     price: number;
     period: string;
