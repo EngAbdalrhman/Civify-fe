@@ -170,6 +170,8 @@ export default function UserDashboardLayout({
             )}
             
             {/* Settings - authenticated only */}
+            {/* Settings - moved to navbar profile menu */}
+            {/* 
             {isAuthenticated && (
               <Link 
                 href="/app/settings" 
@@ -178,7 +180,8 @@ export default function UserDashboardLayout({
                 <Settings className="h-4 w-4" />
                 {t('settings')}
               </Link>
-            )}
+            )} 
+            */}
             
             {/* Buy Tokens - authenticated only */}
             {isAuthenticated && (

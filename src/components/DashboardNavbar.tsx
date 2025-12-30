@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { User, LogIn } from "lucide-react";
+import { User, LogIn, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import {
@@ -67,14 +67,26 @@ export function DashboardNavbar() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Billing</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/app/profile" className="w-full cursor-pointer flex items-center">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </Link>
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem asChild>
+                <Link href="/app/settings" className="w-full cursor-pointer flex items-center">
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuItem 
-                className="text-red-500 cursor-pointer"
+                className="text-red-500 cursor-pointer flex items-center"
                 onClick={logout}
                 disabled={isLoggingOut}
               >
-                {isLoggingOut ? 'Signing out...' : 'Sign Out'}
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>{isLoggingOut ? 'Signing out...' : 'Sign Out'}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
