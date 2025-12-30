@@ -4,7 +4,7 @@
  */
 
 export interface SubscriptionPlan {
-  id: string; // Encoded plan ID
+  id: number;
   name: string;
   description: string;
   monthlyPrice: string;
@@ -67,7 +67,7 @@ export interface PaymentTransaction {
 
 export interface PricingTierDisplay {
   id: string;
-  planId: string; // Encoded plan ID
+  planId: number;
   name: string;
   price: number;
   period: string;
