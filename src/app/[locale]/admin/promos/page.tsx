@@ -54,7 +54,7 @@ export default function PromosPage() {
   const [editingPromo, setEditingPromo] = useState<PromoCode | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<number | null>(null);
 
   // Form state
   const [formData, setFormData] = useState({

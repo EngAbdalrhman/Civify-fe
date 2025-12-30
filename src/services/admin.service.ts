@@ -107,7 +107,7 @@ export interface UpdatePlanRequest extends Partial<CreatePlanRequest> {}
 export type PromoApplicabilityType = 'ALL' | 'PLAN' | 'TOKEN';
 
 export interface PromoCode {
-  id: string; // Encoded ID from backend
+  id: number;
   code: string;
   description?: string;
   discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
@@ -329,7 +329,7 @@ class AdminService {
     return response.data;
   }
 
-  async updatePromoCode(id: string, data: Partial<PromoCode>): Promise<ApiResponse<PromoCode>> {
+  async updatePromoCode(id: number, data: Partial<PromoCode>): Promise<ApiResponse<PromoCode>> {
     const response = await apiClient.put<ApiResponse<PromoCode>>(
       `${ADMIN_API.PROMO_CODES}/${id}`,
       data
@@ -337,7 +337,7 @@ class AdminService {
     return response.data;
   }
 
-  async deactivatePromoCode(id: string): Promise<ApiResponse<PromoCode>> {
+  async deactivatePromoCode(id: number): Promise<ApiResponse<PromoCode>> {
     const response = await apiClient.post<ApiResponse<PromoCode>>(
       `${ADMIN_API.PROMO_CODES}/${id}/deactivate`,
       {}
@@ -345,7 +345,7 @@ class AdminService {
     return response.data;
   }
 
-  async deletePromoCode(id: string): Promise<ApiResponse<void>> {
+  async deletePromoCode(id: number): Promise<ApiResponse<void>> {
     const response = await apiClient.delete<ApiResponse<void>>(
       `${ADMIN_API.PROMO_CODES}/${id}`
     );
