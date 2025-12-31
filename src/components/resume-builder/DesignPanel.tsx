@@ -32,11 +32,8 @@ const COLORS = [
 ];
 
 const SKILLS_DISPLAY_STYLES: { id: SkillsDisplayStyle; name: string }[] = [
-  { id: 'grid', name: 'Grid' },
+  { id: 'tags', name: 'Tags' },
   { id: 'level', name: 'Level' },
-  { id: 'compact', name: 'Compact' },
-  { id: 'bubble', name: 'Bubble' },
-  { id: 'text', name: 'Text' },
   { id: 'dots', name: 'Dots' },
   { id: 'bar', name: 'Bar' },
 ];
@@ -45,7 +42,6 @@ const LANGUAGES_DISPLAY_STYLES: { id: LanguagesDisplayStyle; name: string }[] = 
   { id: 'level', name: 'Level' },
   { id: 'dots', name: 'Dots' },
   { id: 'bar', name: 'Bar' },
-  { id: 'text', name: 'Text' },
 ];
 
 export function DesignPanel({ data, onChange }: DesignPanelProps) {
@@ -141,7 +137,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
               key={style.id}
               className={`
                 px-3 py-2 text-sm rounded-lg border transition-all
-                ${(metadata.skillsDisplayStyle || 'grid') === style.id
+                ${(metadata.skillsDisplayStyle || 'tags') === style.id
                   ? 'border-primary bg-primary/10 text-primary font-medium'
                   : 'border-border hover:border-primary/50'}
               `}

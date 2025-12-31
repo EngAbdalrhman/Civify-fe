@@ -18,8 +18,8 @@ export interface PersonalInfo {
 export type SkillLevel = 'expert' | 'advanced' | 'intermediate' | 'beginner' | 'none';
 
 // Display style types
-export type SkillsDisplayStyle = 'grid' | 'level' | 'compact' | 'bubble' | 'text' | 'dots' | 'bar';
-export type LanguagesDisplayStyle = 'level' | 'dots' | 'bar' | 'text';
+export type SkillsDisplayStyle = 'tags' | 'level' | 'dots' | 'bar';
+export type LanguagesDisplayStyle = 'level' | 'dots' | 'bar';
 
 export interface SectionItem {
   id: string;

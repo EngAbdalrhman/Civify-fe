@@ -22,7 +22,7 @@ function parseLevel(value?: string): SkillLevel {
 
 export function ModernTemplate({ data, color }: TemplateProps) {
   const { personalInfo, sections, metadata } = data;
-  const skillsStyle: SkillsDisplayStyle = metadata?.skillsDisplayStyle || 'grid';
+  const skillsStyle: SkillsDisplayStyle = metadata?.skillsDisplayStyle || 'tags';
   const languagesStyle: LanguagesDisplayStyle = metadata?.languagesDisplayStyle || 'level';
 
   const renderSectionItem = (item: any) => (
@@ -54,16 +54,14 @@ export function ModernTemplate({ data, color }: TemplateProps) {
   const renderSkills = (section: any) => {
     const items = section.items.filter((item: any) => item.visible !== false);
     
-    // Grid style - simple tags
-    if (skillsStyle === 'grid' || skillsStyle === 'bubble') {
+    // Tags style - simple tags
+    if (skillsStyle === 'tags') {
       return (
         <div className="flex flex-wrap gap-2">
           {items.map((item: any) => (
             <span 
               key={item.id} 
-              className={`text-sm px-3 py-1 rounded-full text-gray-700 font-medium ${
-                skillsStyle === 'bubble' ? 'border border-gray-300' : 'bg-gray-100'
-              }`}
+              className="text-sm px-3 py-1 bg-gray-100 rounded-full text-gray-700 font-medium"
             >
               {item.title}
             </span>
@@ -72,17 +70,8 @@ export function ModernTemplate({ data, color }: TemplateProps) {
       );
     }
 
-    // Compact style - comma separated
-    if (skillsStyle === 'compact' || skillsStyle === 'text') {
-      return (
-        <p className="text-sm text-gray-700">
-          {items.map((item: any) => item.title).join(', ')}
-        </p>
-      );
-    }
-
     // Level/Dots/Bar styles - show with level visualization
-    const displayDotsOrBar = skillsStyle === 'dots' ? 'dots' : skillsStyle === 'bar' ? 'bar' : 'text';
+    const displayStyle = skillsStyle === 'dots' ? 'dots' : skillsStyle === 'bar' ? 'bar' : 'text';
     
     return (
       <div className="grid grid-cols-2 gap-x-8 gap-y-2">
@@ -91,7 +80,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
           return (
             <div key={item.id} className="flex items-center justify-between">
               <span className="text-sm text-gray-800">{item.title}</span>
-              <LevelVisualizer level={level} style={displayDotsOrBar} color={color} />
+              <LevelVisualizer level={level} style={displayStyle} color={color} />
             </div>
           );
         })}
@@ -102,20 +91,6 @@ export function ModernTemplate({ data, color }: TemplateProps) {
   const renderLanguages = (section: any) => {
     const items = section.items.filter((item: any) => item.visible !== false);
     
-    // Text style - just name with level text
-    if (languagesStyle === 'text') {
-      return (
-        <div className="space-y-1">
-          {items.map((item: any) => (
-            <div key={item.id} className="text-sm">
-              <span className="font-medium text-gray-800">{item.title}</span>
-              {item.subtitle && <span className="text-gray-600"> - {item.subtitle}</span>}
-            </div>
-          ))}
-        </div>
-      );
-    }
-
     // Level text style
     if (languagesStyle === 'level') {
       return (

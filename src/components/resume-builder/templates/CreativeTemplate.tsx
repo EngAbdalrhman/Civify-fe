@@ -21,14 +21,14 @@ function parseLevel(value?: string): SkillLevel {
 
 export function CreativeTemplate({ data, color }: TemplateProps) {
   const { personalInfo, sections, metadata } = data;
-  const skillsStyle: SkillsDisplayStyle = metadata?.skillsDisplayStyle || 'grid';
+  const skillsStyle: SkillsDisplayStyle = metadata?.skillsDisplayStyle || 'tags';
   const languagesStyle: LanguagesDisplayStyle = metadata?.languagesDisplayStyle || 'level';
 
   const renderSkills = (section: any) => {
     const items = section.items.filter((item: any) => item.visible !== false);
     
-    // Grid/Bubble/Compact styles
-    if (skillsStyle === 'grid' || skillsStyle === 'bubble' || skillsStyle === 'compact' || skillsStyle === 'text') {
+    // Tags style
+    if (skillsStyle === 'tags') {
       return (
         <div className="flex flex-wrap gap-2">
           {items.map((item: any) => (
@@ -61,7 +61,7 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
   const renderLanguages = (section: any) => {
     const items = section.items.filter((item: any) => item.visible !== false);
     
-    if (languagesStyle === 'text' || languagesStyle === 'level') {
+    if (languagesStyle === 'level') {
       return (
         <div className="space-y-1">
           {items.map((item: any) => (

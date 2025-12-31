@@ -170,19 +170,17 @@ function SortableSection({
               <Pencil className="h-3 w-3" />
             </Button>
             
-            {section.type === 'custom' && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 text-destructive hover:text-destructive"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete(section.id);
-                }}
-              >
-                <Trash2 className="h-3 w-3" />
-              </Button>
-            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 text-destructive hover:text-destructive"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(section.id);
+              }}
+            >
+              <Trash2 className="h-3 w-3" />
+            </Button>
           </div>
         </AccordionTrigger>
         <AccordionContent className="px-2 pt-2">
