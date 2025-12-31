@@ -57,7 +57,6 @@ export interface ResumeMetadata {
   skillsDisplayStyle?: SkillsDisplayStyle;
   languagesDisplayStyle?: LanguagesDisplayStyle;
   coursesDisplayStyle?: CoursesDisplayStyle;
-  layoutDirection?: 'ltr' | 'rtl' | 'auto';
   sectionOrder?: string[]; // Ordered array of section IDs
 }
 

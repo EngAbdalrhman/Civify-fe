@@ -24,13 +24,6 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
   const languagesStyle: LanguagesDisplayStyle = metadata?.languagesDisplayStyle || 'level';
   const coursesStyle: CoursesDisplayStyle = metadata?.coursesDisplayStyle || 'detailed';
 
-  // Determine direction
-  const direction = metadata?.layoutDirection === 'ltr' ? 'ltr' : 
-                   metadata?.layoutDirection === 'rtl' ? 'rtl' : 
-                   (metadata?.language === 'ar' ? 'rtl' : 'ltr');
-  
-  const isRtl = direction === 'rtl';
-
   const renderSkills = (section: any) => {
     const items = section.items.filter((item: any) => item.visible !== false);
     if (skillsStyle === 'tags') {
@@ -122,14 +115,8 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
   const languagesSections = sections.filter(s => s.type === 'languages' && s.items && s.items.length > 0);
   const otherSections = sections.filter(s => s.type !== 'skills' && s.type !== 'languages' && s.visible !== false && s.items && s.items.length > 0);
 
-  const labels = {
-    profile: metadata?.language === 'ar' ? "الملف الشخصي" : "Profile",
-    linkedin: metadata?.language === 'ar' ? "لينكد إن" : "LinkedIn",
-    github: metadata?.language === 'ar' ? "جيت هب" : "GitHub",
-  };
-
   return (
-    <div className="flex h-full bg-white" dir={direction}>
+    <div className="flex h-full bg-white">
       {/* Left Sidebar */}
       <aside className="w-[30%] text-white p-6 space-y-6" style={{ backgroundColor: color }}>
         <div className="text-center">
@@ -146,24 +133,7 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
            {personalInfo.email && <div className="break-words">{personalInfo.email}</div>}
            {personalInfo.phone && <div>{personalInfo.phone}</div>}
            {personalInfo.address && <div>{personalInfo.address}</div>}
-           {personalInfo.linkedin && (
-             <a href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} 
-                target="_blank" rel="noopener noreferrer" className="block text-white/90 hover:text-white underline">
-               {labels.linkedin}
-             </a>
-           )}
-           {personalInfo.github && (
-             <a href={personalInfo.github.startsWith('http') ? personalInfo.github : `https://github.com/${personalInfo.github}`} 
-                target="_blank" rel="noopener noreferrer" className="block text-white/90 hover:text-white underline">
-               {labels.github}
-             </a>
-           )}
-           {personalInfo.website && (
-             <a href={personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`} 
-                target="_blank" rel="noopener noreferrer" className="block text-white/90 hover:text-white underline break-words">
-               {personalInfo.website}
-             </a>
-           )}
+           {personalInfo.linkedin && <div className="break-words">{personalInfo.linkedin}</div>}
         </div>
 
         {skillsSections.map(section => (
@@ -185,7 +155,7 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
       <main className="flex-1 p-8 text-gray-800">
          {personalInfo.summary && (
            <section className="mb-8">
-             <h2 className="text-xl font-bold uppercase mb-4 text-gray-900 border-b-2 pb-1" style={{ borderColor: color }}>{labels.profile}</h2>
+             <h2 className="text-xl font-bold uppercase mb-4 text-gray-900 border-b-2 pb-1" style={{ borderColor: color }}>Profile</h2>
              <p className="text-gray-600 leading-relaxed text-sm">{personalInfo.summary}</p>
            </section>
          )}

@@ -26,16 +26,12 @@ function downloadBlob(blob: Blob, filename: string): void {
 
 /**
  * Export the CV to PDF by generating directly from resume data
- * Uses drawing primitives for graphics to avoid font encoding issues
+ * This provides consistent styling without html2canvas issues
  */
-export async function exportToPdf(
-  element: HTMLElement, 
-  filename: string = 'cv', 
-  resumeData?: ResumeData,
-  translations?: any
-): Promise<void> {
+export async function exportToPdf(element: HTMLElement, filename: string = 'cv', resumeData?: ResumeData): Promise<void> {
   const { jsPDF } = await import('jspdf');
   
+  // If no resumeData provided, try to use the window object (will be set by caller)
   const data = resumeData || (window as any).__cvExportData;
   if (!data) {
     throw new Error('No resume data available for PDF export');
@@ -60,7 +56,8 @@ export async function exportToPdf(
     }
   };
 
-  const addText = (text: string, fontSize: number, options: { bold?: boolean; italic?: boolean; color?: string; align?: 'left' | 'center' | 'right'; x?: number } = {}) => {
+  // Helper to add text with word wrap
+  const addText = (text: string, fontSize: number, options: { bold?: boolean; italic?: boolean; color?: string; align?: 'left' | 'center' | 'right' } = {}) => {
     pdf.setFontSize(fontSize);
     pdf.setTextColor(options.color || '#1f2937');
     
@@ -74,15 +71,18 @@ export async function exportToPdf(
       pdf.setFont('helvetica', 'normal');
     }
 
-    const x = options.x || (options.align === 'center' ? pageWidth / 2 : options.align === 'right' ? pageWidth - margin : margin);
-    
-    // Simple single line text if no wrapping needed related logic, but splitTextToSize checks width
     const lines = pdf.splitTextToSize(text, contentWidth);
     const lineHeight = fontSize * 0.4;
     
     lines.forEach((line: string) => {
       addNewPageIfNeeded(lineHeight);
-      pdf.text(line, x, y, { align: options.align });
+      if (options.align === 'center') {
+        pdf.text(line, pageWidth / 2, y, { align: 'center' });
+      } else if (options.align === 'right') {
+        pdf.text(line, pageWidth - margin, y, { align: 'right' });
+      } else {
+        pdf.text(line, margin, y);
+      }
       y += lineHeight;
     });
   };
@@ -93,54 +93,6 @@ export async function exportToPdf(
     pdf.setLineWidth(0.5);
     pdf.line(margin, y, pageWidth - margin, y);
     y += 5;
-  };
-
-  // Helper to draw skill bars using rectangles
-  const drawSkillBar = (level: string, x: number, currentY: number, width: number = 40, height: number = 3) => {
-    // Background bar
-    pdf.setFillColor('#e5e7eb'); // gray-200
-    pdf.rect(x, currentY - height + 1, width, height, 'F');
-    
-    // Foreground bar
-    let percentage = 0;
-    switch(level.toLowerCase()) {
-      case 'expert': percentage = 1.0; break;
-      case 'advanced': percentage = 0.8; break;
-      case 'intermediate': percentage = 0.6; break;
-      case 'beginner': percentage = 0.4; break;
-      default: percentage = 0.2;
-    }
-    
-    pdf.setFillColor('#374151'); // gray-700
-    pdf.rect(x, currentY - height + 1, width * percentage, height, 'F');
-  };
-
-  // Helper to draw dots
-  const drawDots = (level: string, x: number, currentY: number) => {
-    let score = 0;
-    switch(level.toLowerCase()) {
-      case 'expert': case 'native': case 'fluent': score = 5; break;
-      case 'advanced': score = 4; break;
-      case 'intermediate': score = 3; break;
-      case 'beginner': score = 2; break;
-      default: score = 1;
-    }
-
-    const dotSize = 1.5;
-    const gap = 4;
-    
-    for (let i = 0; i < 5; i++) {
-        const dotX = x + (i * gap);
-        // Filled if i < score, empty circle otherwise
-        if (i < score) {
-            pdf.setFillColor('#374151');
-            pdf.circle(dotX, currentY - 1, dotSize, 'F');
-        } else {
-            pdf.setDrawColor('#9ca3af');
-            pdf.setLineWidth(0.1);
-            pdf.circle(dotX, currentY - 1, dotSize, 'S');
-        }
-    }
   };
 
   const { personalInfo, sections } = data;
@@ -171,26 +123,10 @@ export async function exportToPdf(
 
   y += 5;
 
-  // Helper to get localized section title
-  const getSectionTitle = (sectionType: string, defaultTitle: string) => {
-    if (translations?.resume?.sections?.[sectionType]) {
-      return translations.resume.sections[sectionType];
-    }
-    return defaultTitle;
-  };
-
-  // Helper to get localized header
-  const getHeader = (key: string, defaultText: string) => {
-    if (translations?.resume?.sections?.[key]) {
-      return translations.resume.sections[key];
-    }
-    return defaultText;
-  };
-
   // Summary
   if (personalInfo.summary) {
     addLine();
-    addText(getHeader('summary', 'PROFESSIONAL SUMMARY'), 12, { bold: true });
+    addText('PROFESSIONAL SUMMARY', 12, { bold: true });
     y += 2;
     addText(personalInfo.summary, 10);
     y += 5;
@@ -205,107 +141,31 @@ export async function exportToPdf(
     
     addNewPageIfNeeded(20);
     addLine();
-    // Localize title
-    const localizedTitle = getSectionTitle(section.type, section.title);
-    addText(localizedTitle.toUpperCase(), 12, { bold: true });
+    addText(section.title?.toUpperCase() || '', 12, { bold: true });
     y += 3;
 
     if (section.type === 'skills') {
-      const skillsStyle = resumeData?.metadata?.skillsDisplayStyle || 'tags';
-      const items = section.items || [];
-      
-      if (skillsStyle === 'tags') {
-        // Comma-separated list
-        const skills = items.map((item: { title?: string }) => item.title).filter(Boolean).join(', ');
-        if (skills) {
-          addText(skills, 10);
+      const skillsWithLevels = section.items?.map((item: { title?: string; level?: string }) => {
+        if (item.level && item.level !== 'none') {
+          return `${item.title} (${item.level})`;
         }
-      } else {
-        // Bar/Dots style
-        for (const item of items as { title?: string; level?: string; subtitle?: string }[]) {
-          addNewPageIfNeeded(8);
-          const level = item.level || 'intermediate';
-          
-          addText(item.title || '', 10);
-          
-          // Draw logic
-          // Move Y back up because addText advanced it
-          const graphicY = y; 
-          y -= 4; // approximate backtrack to align with text baseline
-          
-          const graphicX = margin + 60; // Offset for graphics
-          
-          if (skillsStyle === 'bar') {
-             drawSkillBar(level, graphicX, y);
-          } else if (skillsStyle === 'dots') {
-             drawDots(level, graphicX, y);
-          } else {
-             // Text fallback
-             pdf.text(`(${level})`, graphicX, y);
-          }
-          
-          y = graphicY; // Restore Y
-        }
+        return item.title;
+      }).filter(Boolean).join(', ');
+      if (skillsWithLevels) {
+        addText(skillsWithLevels, 10);
       }
     } else if (section.type === 'languages') {
-      const languagesStyle = resumeData?.metadata?.languagesDisplayStyle || 'level';
-      
       for (const item of section.items || []) {
         addNewPageIfNeeded(8);
-        const level = (item.subtitle || item.level || 'intermediate').toLowerCase();
-        
-        addText(item.title || '', 10);
-        
-        const graphicY = y;
-        y -= 4;
-        const graphicX = margin + 60;
-
-        if (languagesStyle === 'bar') {
-          drawSkillBar(level, graphicX, y);
-        } else if (languagesStyle === 'dots') {
-          drawDots(level, graphicX, y);
-        } else {
-          pdf.text(` - ${item.subtitle || 'Intermediate'}`, margin + pdf.getTextWidth(item.title || '') + 2, y);
-        }
-        
-        y = graphicY;
+        addText(`${item.title}${item.subtitle ? ` - ${item.subtitle}` : ''}`, 10);
       }
     } else if ((section.type === 'certifications' || section.title?.toLowerCase().includes('course')) && 
                resumeData?.metadata?.coursesDisplayStyle === 'simple') {
-      // Simple bullet list for courses - MULTI-COLUMN
-      // 3 Columns
-      const items = section.items || [];
-      const colCount = 3;
-      const colWidth = contentWidth / colCount;
-      const rowHeight = 6;
-      
-      // Calculate layout
-      let maxY = y;
-      
-      items.forEach((item: any, index: number) => {
-          const colIndex = index % colCount;
-          
-          // If starting new row (colIndex == 0), verify space
-          if (colIndex === 0) {
-              addNewPageIfNeeded(rowHeight);
-          }
-          
-          // Current X and Y
-          // If we added a page, 'y' was reset. We need to track 'currentRowY' carefully.
-          // Since addNewPageIfNeeded modifies 'y', we can rely on 'y' being the current row start.
-          // But 'y' increments effectively per row.
-          
-          const xPos = margin + (colIndex * colWidth);
-          // Only increment y after filling the last column
-          
-          pdf.setFontSize(9);
-          pdf.text(`• ${item.title}`, xPos, y);
-          
-          if (colIndex === colCount - 1 || index === items.length - 1) {
-             y += rowHeight;
-          }
-      });
-      
+      // Simple bullet list for courses/certifications
+      const courses = section.items?.map((item: { title?: string }) => `• ${item.title}`).filter(Boolean);
+      if (courses && courses.length > 0) {
+        addText(courses.join('  |  '), 10);
+      }
     } else {
       for (const item of section.items || []) {
         addNewPageIfNeeded(15);
@@ -341,30 +201,13 @@ export async function exportToPdf(
 
 /**
  * Export the CV data to DOCX format
+ * @param resumeData - The resume data to export
+ * @param filename - The output filename (without extension)
  */
-export async function exportToDocx(
-    resumeData: ResumeData, 
-    filename: string = 'cv',
-    translations?: any
-): Promise<void> {
-  const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, Table, TableRow, TableCell, BorderStyle, WidthType } = await import('docx');
+export async function exportToDocx(resumeData: ResumeData, filename: string = 'cv'): Promise<void> {
+  const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } = await import('docx');
 
   const { personalInfo, sections } = resumeData;
-
-  // Helper to get localized header
-  const getHeader = (key: string, defaultText: string) => {
-    if (translations?.resume?.sections?.[key]) {
-      return translations.resume.sections[key];
-    }
-    return defaultText;
-  };
-  
-  const getSectionTitle = (sectionType: string, defaultTitle: string) => {
-    if (translations?.resume?.sections?.[sectionType]) {
-      return translations.resume.sections[sectionType];
-    }
-    return defaultTitle;
-  };
 
   // Build document content
   const children: any[] = [];
@@ -417,7 +260,7 @@ export async function exportToDocx(
   if (personalInfo.summary) {
     children.push(
       new Paragraph({
-        text: getHeader('summary', 'PROFESSIONAL SUMMARY'),
+        text: 'PROFESSIONAL SUMMARY',
         heading: HeadingLevel.HEADING_2,
         thematicBreak: true,
         spacing: { before: 300, after: 200 },
@@ -441,121 +284,56 @@ export async function exportToDocx(
 
     children.push(
       new Paragraph({
-        text: getSectionTitle(section.type, section.title).toUpperCase(),
+        text: section.title.toUpperCase(),
         heading: HeadingLevel.HEADING_2,
         thematicBreak: true,
         spacing: { before: 300, after: 200 },
       })
     );
-    // Skills section - render with safe text visual bars
+
+    // Skills section - render as comma-separated list with levels
     if (section.type === 'skills') {
-      const skillsStyle = resumeData?.metadata?.skillsDisplayStyle || 'tags';
-      
-      if (skillsStyle === 'tags') {
-        const skills = section.items.map(item => item.title).filter(Boolean);
-        if (skills.length > 0) {
-          children.push(
-            new Paragraph({
-              text: skills.join(', '),
-              spacing: { after: 200 },
-            })
-          );
+      const skillsWithLevels = section.items.map(item => {
+        if (item.level && item.level !== 'none') {
+          return `${item.title} (${item.level})`;
         }
-      } else {
-        // Use safer unicode characters or text
-        const levelBars: Record<string, string> = {
-          'expert': '[|||||]',
-          'advanced': '[||||_]',
-          'intermediate': '[|||__]',
-          'beginner': '[||___]',
-        };
-        
-        for (const item of section.items) {
-          const level = item.level || 'intermediate';
-          /* 
-             DOCX rendering of block characters can be font dependent.
-             Sticking to text representation for safety as per user feedback about garbled blocks.
-             Or standard text description.
-          */
-          const visual = `(${level})`; // Safest fallback
-          
-          children.push(
-            new Paragraph({
-              children: [
-                new TextRun({ text: item.title, bold: true }),
-                new TextRun({ text: `  ${visual}` }),
-              ],
-              spacing: { after: 100 },
-            })
-          );
-        }
+        return item.title;
+      }).filter(Boolean);
+      if (skillsWithLevels.length > 0) {
+        children.push(
+          new Paragraph({
+            text: skillsWithLevels.join(', '),
+            spacing: { after: 200 },
+          })
+        );
       }
     }
     // Languages section
     else if (section.type === 'languages') {
-        for (const item of section.items) {
-            children.push(
-              new Paragraph({
-                children: [
-                    new TextRun({ text: item.title, bold: true }),
-                    new TextRun({ text: item.subtitle ? ` - ${item.subtitle}` : '' }),
-                ],
-                spacing: { after: 100 },
-              })
-            );
-        }
+      for (const item of section.items) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({ text: item.title, bold: true }),
+              new TextRun({ text: item.subtitle ? ` - ${item.subtitle}` : '' }),
+            ],
+            spacing: { after: 100 },
+          })
+        );
+      }
     }
-    // Courses/Certifications - simple bullet list - MULTI COLUMN TABLE
+    // Courses/Certifications - simple bullet list
     else if ((section.type === 'certifications' || section.title?.toLowerCase().includes('course')) && 
              resumeData?.metadata?.coursesDisplayStyle === 'simple') {
-      
-        const items = section.items;
-        const colCount = 3;
-        const rows = [];
-        
-        for (let i = 0; i < items.length; i += colCount) {
-            const rowItems = items.slice(i, i + colCount);
-            const cells = rowItems.map(item => 
-                new TableCell({
-                    children: [new Paragraph(`• ${item.title}`)],
-                    borders: {
-                        top: { style: BorderStyle.NONE, size: 0, color: "auto" },
-                        bottom: { style: BorderStyle.NONE, size: 0, color: "auto" },
-                        left: { style: BorderStyle.NONE, size: 0, color: "auto" },
-                        right: { style: BorderStyle.NONE, size: 0, color: "auto" },
-                    },
-                })
-            );
-            // Fill remaining cells if row is incomplete
-            while(cells.length < colCount) {
-                cells.push(new TableCell({ 
-                    children: [],
-                    borders: {
-                        top: { style: BorderStyle.NONE, size: 0, color: "auto" },
-                        bottom: { style: BorderStyle.NONE, size: 0, color: "auto" },
-                        left: { style: BorderStyle.NONE, size: 0, color: "auto" },
-                        right: { style: BorderStyle.NONE, size: 0, color: "auto" },
-                    },
-                }));
-            }
-            
-            rows.push(new TableRow({ children: cells }));
-        }
-
+      const courses = section.items.map(item => `• ${item.title}`).filter(Boolean);
+      if (courses.length > 0) {
         children.push(
-            new Table({
-                rows: rows,
-                width: { size: 100, type: WidthType.PERCENTAGE },
-                borders: {
-                    top: { style: BorderStyle.NONE, size: 0, color: "auto" },
-                    bottom: { style: BorderStyle.NONE, size: 0, color: "auto" },
-                    left: { style: BorderStyle.NONE, size: 0, color: "auto" },
-                    right: { style: BorderStyle.NONE, size: 0, color: "auto" },
-                    insideHorizontal: { style: BorderStyle.NONE, size: 0, color: "auto" },
-                    insideVertical: { style: BorderStyle.NONE, size: 0, color: "auto" },
-                },
-            })
+          new Paragraph({
+            text: courses.join('  |  '),
+            spacing: { after: 200 },
+          })
         );
+      }
     }
     // Other sections (experience, education, projects, etc.)
     else {

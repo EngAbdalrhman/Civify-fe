@@ -3,7 +3,7 @@
 import { ResumeData, SkillsDisplayStyle, LanguagesDisplayStyle, CoursesDisplayStyle } from '@/features/upload-cv/types';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { LayoutTemplate, Type, Palette, Code, Languages, BookOpen, AlignLeft, AlignRight } from 'lucide-react';
+import { LayoutTemplate, Type, Palette, Code, Languages, BookOpen } from 'lucide-react';
 
 interface DesignPanelProps {
   data: ResumeData;
@@ -49,11 +49,8 @@ const COURSES_DISPLAY_STYLES: { id: CoursesDisplayStyle; name: string; desc: str
   { id: 'simple', name: 'Simple', desc: 'Bullet list' },
 ];
 
-import { useTranslations } from 'next-intl';
-
 export function DesignPanel({ data, onChange }: DesignPanelProps) {
   const metadata = data.metadata || {};
-  const t = useTranslations('design');
 
   const updateMetadata = (key: string, value: string) => {
     onChange({
@@ -71,7 +68,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
       <div className="space-y-4">
         <h3 className="font-semibold flex items-center gap-2">
           <LayoutTemplate className="h-4 w-4" />
-          {t('template.title')}
+          Template
         </h3>
         <div className="grid grid-cols-1 gap-4">
           {TEMPLATES.map((template) => (
@@ -85,8 +82,8 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
               `}
               onClick={() => updateMetadata('templateId', template.id)}
             >
-              <div className="font-medium">{t(`template.${template.id}.name` as any)}</div>
-              <div className="text-sm text-muted-foreground">{t(`template.${template.id}.description` as any)}</div>
+              <div className="font-medium">{template.name}</div>
+              <div className="text-sm text-muted-foreground">{template.description}</div>
             </div>
           ))}
         </div>
@@ -96,7 +93,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
        <div className="space-y-4">
         <h3 className="font-semibold flex items-center gap-2">
           <Palette className="h-4 w-4" />
-          {t('colors')}
+          Accent Color
         </h3>
         <div className="flex flex-wrap gap-3">
           {COLORS.map((color) => (
@@ -118,7 +115,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
       <div className="space-y-4">
         <h3 className="font-semibold flex items-center gap-2">
            <Type className="h-4 w-4" />
-           {t('typography')}
+           Typography
         </h3>
         <RadioGroup 
           value={metadata.fontFamily || 'Inter'} 
@@ -137,7 +134,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
       <div className="space-y-4">
         <h3 className="font-semibold flex items-center gap-2">
           <Code className="h-4 w-4" />
-          {t('sectionStyles.skills')}
+          Skills Display
         </h3>
         <div className="grid grid-cols-4 gap-2">
           {SKILLS_DISPLAY_STYLES.map((style) => (
@@ -151,7 +148,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
               `}
               onClick={() => updateMetadata('skillsDisplayStyle', style.id)}
             >
-              {t(`sectionStyles.${style.id}` as any)}
+              {style.name}
             </button>
           ))}
         </div>
@@ -161,7 +158,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
       <div className="space-y-4">
         <h3 className="font-semibold flex items-center gap-2">
           <Languages className="h-4 w-4" />
-          {t('sectionStyles.languages')}
+          Languages Display
         </h3>
         <div className="grid grid-cols-4 gap-2">
           {LANGUAGES_DISPLAY_STYLES.map((style) => (
@@ -175,7 +172,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
               `}
               onClick={() => updateMetadata('languagesDisplayStyle', style.id)}
             >
-              {t(`sectionStyles.${style.id}` as any)}
+              {style.name}
             </button>
           ))}
         </div>
@@ -185,7 +182,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
       <div className="space-y-4">
         <h3 className="font-semibold flex items-center gap-2">
           <BookOpen className="h-4 w-4" />
-          {t('sectionStyles.courses')}
+          Courses / Certifications Display
         </h3>
         <div className="grid grid-cols-2 gap-2">
           {COURSES_DISPLAY_STYLES.map((style) => (
@@ -199,56 +196,10 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
               `}
               onClick={() => updateMetadata('coursesDisplayStyle', style.id)}
             >
-              <div className="font-medium">{t(`sectionStyles.${style.id}.name` as any)}</div>
-              <div className="text-xs text-muted-foreground">{t(`sectionStyles.${style.id}.description` as any)}</div>
+              <div className="font-medium">{style.name}</div>
+              <div className="text-xs text-muted-foreground">{style.desc}</div>
             </button>
           ))}
-        </div>
-      </div>
-
-       {/* Layout Direction */}
-       <div className="space-y-4">
-        <h3 className="font-semibold flex items-center gap-2">
-          <AlignLeft className="h-4 w-4" />
-          {t('layoutDirection.title')}
-        </h3>
-        <div className="grid grid-cols-3 gap-2">
-          <button
-            className={`
-              px-3 py-2 text-sm rounded-lg border transition-all flex flex-col items-center justify-center gap-1
-              ${(!metadata.layoutDirection || metadata.layoutDirection === 'auto')
-                ? 'border-primary bg-primary/10 text-primary font-medium'
-                : 'border-border hover:border-primary/50'}
-            `}
-            onClick={() => updateMetadata('layoutDirection', 'auto')}
-          >
-            <span className="font-medium">{t('layoutDirection.auto')}</span>
-            <span className="text-[10px] text-muted-foreground">{t('layoutDirection.matchLocale')}</span>
-          </button>
-           <button
-            className={`
-              px-3 py-2 text-sm rounded-lg border transition-all flex flex-col items-center justify-center gap-1
-              ${metadata.layoutDirection === 'ltr'
-                ? 'border-primary bg-primary/10 text-primary font-medium'
-                : 'border-border hover:border-primary/50'}
-            `}
-            onClick={() => updateMetadata('layoutDirection', 'ltr')}
-          >
-            <AlignLeft className="h-3 w-3" />
-            <span className="font-medium">{t('layoutDirection.ltr')}</span>
-          </button>
-           <button
-            className={`
-              px-3 py-2 text-sm rounded-lg border transition-all flex flex-col items-center justify-center gap-1
-              ${metadata.layoutDirection === 'rtl'
-                ? 'border-primary bg-primary/10 text-primary font-medium'
-                : 'border-border hover:border-primary/50'}
-            `}
-            onClick={() => updateMetadata('layoutDirection', 'rtl')}
-          >
-            <AlignRight className="h-3 w-3" />
-            <span className="font-medium">{t('layoutDirection.rtl')}</span>
-          </button>
         </div>
       </div>
     </div>
