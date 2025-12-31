@@ -7,7 +7,6 @@ import { routing } from '@/i18n/routing';
 import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { PermissionProvider } from '@/contexts/PermissionContext';
-import { SessionProvider } from '@/providers/session-provider';
 import LayoutWrapper from "@/components/LayoutWrapper";
 import "../globals.css";
 
@@ -98,15 +97,13 @@ export default async function LocaleLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider>
-          <SessionProvider>
-            <QueryProvider>
-              <PermissionProvider>
-                <NextIntlClientProvider messages={messages}>
-                  <LayoutWrapper>{children}</LayoutWrapper>
-                </NextIntlClientProvider>
-              </PermissionProvider>
-            </QueryProvider>
-          </SessionProvider>
+          <QueryProvider>
+            <PermissionProvider>
+              <NextIntlClientProvider messages={messages}>
+                <LayoutWrapper>{children}</LayoutWrapper>
+              </NextIntlClientProvider>
+            </PermissionProvider>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

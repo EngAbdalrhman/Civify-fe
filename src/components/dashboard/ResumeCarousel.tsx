@@ -53,7 +53,7 @@ export function ResumeCarousel() {
   const handleDownload = (id: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    router.push(`/resume-builder?id=${id}&tab=export`);
+    router.push(`/app/resume-builder?id=${id}&tab=export`);
   };
 
   return (
@@ -67,7 +67,7 @@ export function ResumeCarousel() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {/* Create New Card */}
-        <Link href="/resume-builder" className="group">
+        <Link href="/app/resume-builder" className="group">
           <Card className="h-[200px] flex flex-col items-center justify-center border-dashed border-2 hover:border-primary hover:bg-muted/50 transition-all cursor-pointer">
             <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
               <Plus className="h-6 w-6 text-primary" />
@@ -83,7 +83,7 @@ export function ResumeCarousel() {
 
         {/* Resume Cards */}
         {!isLoading && resumes.map((resume) => (
-          <Link href={`/resume-builder?id=${resume.id}`} key={resume.id}>
+          <Link href={`/app/resume-builder?id=${resume.id}`} key={resume.id}>
             <Card className="h-[200px] relative group overflow-hidden border hover:shadow-md transition-all">
               {/* Preview Area (Mock) */}
               <div className="h-[120px] bg-muted relative flex items-center justify-center">
@@ -109,7 +109,7 @@ export function ResumeCarousel() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => router.push(`/resume-builder?id=${resume.id}`)}>
+                      <DropdownMenuItem onClick={() => router.push(`/app/resume-builder?id=${resume.id}`)}>
                         <Edit className="mr-2 h-4 w-4" /> Edit
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={(e) => handleDownload(resume.id, e)}>

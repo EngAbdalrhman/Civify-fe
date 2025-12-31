@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { ResumeService } from '@/services/resume.service';
 
 // Placeholder imports - we will create these next
 import { ResumePreview } from './ResumePreview';
@@ -47,7 +48,7 @@ export function ResumeBuilder({ initialData, isGuest }: ResumeBuilderProps) {
       toast.info("Sign in to save your resume permanently", {
         action: {
           label: "Sign In",
-          onClick: () => router.push('/signin?callbackUrl=/resume-builder')
+          onClick: () => router.push('/login?callbackUrl=/app/resume-builder')
         }
       });
       return;
@@ -55,12 +56,14 @@ export function ResumeBuilder({ initialData, isGuest }: ResumeBuilderProps) {
 
     setIsSaving(true);
     try {
-      // TODO: Call backend API to save
-      // await saveResume(resumeData); 
-      // For now simulate
-      await new Promise(r => setTimeout(r, 1000));
+      if (resumeData.id) {
+          await ResumeService.update(resumeData.id, resumeData.personalInfo.title || 'Untitled CV', resumeData);
+      } else {
+          await ResumeService.create(resumeData.personalInfo.title || 'Untitled CV', resumeData);
+      }
       toast.success("Resume saved successfully");
     } catch (error) {
+      console.error(error);
       toast.error("Failed to save resume");
     } finally {
       setIsSaving(false);

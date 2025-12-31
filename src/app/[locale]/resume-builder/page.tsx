@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { ResumeBuilder } from '@/components/resume-builder/ResumeBuilder';
 import { ResumeData, emptyResumeData } from '@/features/upload-cv/types';
 import { toast } from 'sonner';
@@ -9,7 +8,6 @@ import { toast } from 'sonner';
 const STORAGE_KEY = 'civify_guest_resume';
 
 export default function ResumeBuilderPage() {
-  const { data: session, status } = useSession();
   const [initialData, setInitialData] = useState<ResumeData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
