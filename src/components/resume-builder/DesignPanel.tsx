@@ -1,9 +1,9 @@
 "use client";
 
-import { ResumeData, SkillsDisplayStyle, LanguagesDisplayStyle } from '@/features/upload-cv/types';
+import { ResumeData, SkillsDisplayStyle, LanguagesDisplayStyle, CoursesDisplayStyle } from '@/features/upload-cv/types';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { LayoutTemplate, Type, Palette, Code, Languages } from 'lucide-react';
+import { LayoutTemplate, Type, Palette, Code, Languages, BookOpen } from 'lucide-react';
 
 interface DesignPanelProps {
   data: ResumeData;
@@ -42,6 +42,11 @@ const LANGUAGES_DISPLAY_STYLES: { id: LanguagesDisplayStyle; name: string }[] = 
   { id: 'level', name: 'Level' },
   { id: 'dots', name: 'Dots' },
   { id: 'bar', name: 'Bar' },
+];
+
+const COURSES_DISPLAY_STYLES: { id: CoursesDisplayStyle; name: string; desc: string }[] = [
+  { id: 'detailed', name: 'Detailed', desc: 'Full cards' },
+  { id: 'simple', name: 'Simple', desc: 'Bullet list' },
 ];
 
 export function DesignPanel({ data, onChange }: DesignPanelProps) {
@@ -168,6 +173,31 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
               onClick={() => updateMetadata('languagesDisplayStyle', style.id)}
             >
               {style.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Courses Display Style */}
+      <div className="space-y-4">
+        <h3 className="font-semibold flex items-center gap-2">
+          <BookOpen className="h-4 w-4" />
+          Courses / Certifications Display
+        </h3>
+        <div className="grid grid-cols-2 gap-2">
+          {COURSES_DISPLAY_STYLES.map((style) => (
+            <button
+              key={style.id}
+              className={`
+                px-3 py-2 text-sm rounded-lg border transition-all text-left
+                ${(metadata.coursesDisplayStyle || 'detailed') === style.id
+                  ? 'border-primary bg-primary/10 text-primary font-medium'
+                  : 'border-border hover:border-primary/50'}
+              `}
+              onClick={() => updateMetadata('coursesDisplayStyle', style.id)}
+            >
+              <div className="font-medium">{style.name}</div>
+              <div className="text-xs text-muted-foreground">{style.desc}</div>
             </button>
           ))}
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { ResumeData, SkillLevel, SkillsDisplayStyle, LanguagesDisplayStyle } from '@/features/upload-cv/types';
+import { ResumeData, SkillLevel, SkillsDisplayStyle, LanguagesDisplayStyle, CoursesDisplayStyle } from '@/features/upload-cv/types';
 import { Mail, Phone, MapPin, Linkedin, Github, Globe } from 'lucide-react';
 import { LevelVisualizer } from './LevelVisualizer';
 
@@ -9,7 +9,6 @@ interface TemplateProps {
   color: string;
 }
 
-// Map subtitle/level strings to SkillLevel
 function parseLevel(value?: string): SkillLevel {
   if (!value) return 'intermediate';
   const lower = value.toLowerCase();
@@ -24,6 +23,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
   const { personalInfo, sections, metadata } = data;
   const skillsStyle: SkillsDisplayStyle = metadata?.skillsDisplayStyle || 'tags';
   const languagesStyle: LanguagesDisplayStyle = metadata?.languagesDisplayStyle || 'level';
+  const coursesStyle: CoursesDisplayStyle = metadata?.coursesDisplayStyle || 'detailed';
 
   const renderSectionItem = (item: any) => (
     <div key={item.id} className="mb-4 break-inside-avoid">
@@ -39,40 +39,23 @@ export function ModernTemplate({ data, color }: TemplateProps) {
            {item.description}
         </div>
       )}
-       {item.tags && item.tags.length > 0 && (
-         <div className="flex flex-wrap gap-1 mt-1">
-           {item.tags.map((tag: string, idx: number) => (
-             <span key={idx} className="text-xs bg-gray-100 px-2 py-0.5 rounded text-gray-600">
-               {tag}
-             </span>
-           ))}
-         </div>
-       )}
     </div>
   );
 
   const renderSkills = (section: any) => {
     const items = section.items.filter((item: any) => item.visible !== false);
-    
-    // Tags style - simple tags
     if (skillsStyle === 'tags') {
       return (
         <div className="flex flex-wrap gap-2">
           {items.map((item: any) => (
-            <span 
-              key={item.id} 
-              className="text-sm px-3 py-1 bg-gray-100 rounded-full text-gray-700 font-medium"
-            >
+            <span key={item.id} className="text-sm px-3 py-1 bg-gray-100 rounded-full text-gray-700 font-medium">
               {item.title}
             </span>
           ))}
         </div>
       );
     }
-
-    // Level/Dots/Bar styles - show with level visualization
     const displayStyle = skillsStyle === 'dots' ? 'dots' : skillsStyle === 'bar' ? 'bar' : 'text';
-    
     return (
       <div className="grid grid-cols-2 gap-x-8 gap-y-2">
         {items.map((item: any) => {
@@ -90,8 +73,6 @@ export function ModernTemplate({ data, color }: TemplateProps) {
 
   const renderLanguages = (section: any) => {
     const items = section.items.filter((item: any) => item.visible !== false);
-    
-    // Level text style
     if (languagesStyle === 'level') {
       return (
         <div className="space-y-1">
@@ -104,10 +85,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
         </div>
       );
     }
-
-    // Dots/Bar styles
     const displayStyle = languagesStyle === 'dots' ? 'dots' : 'bar';
-    
     return (
       <div className="space-y-2">
         {items.map((item: any) => {
@@ -123,7 +101,34 @@ export function ModernTemplate({ data, color }: TemplateProps) {
     );
   };
 
-  // Filter out empty sections
+  // Simple bullet list for courses/certifications
+  const renderSimpleCourses = (section: any) => {
+    const items = section.items.filter((item: any) => item.visible !== false);
+    const columnCount = 3;
+    const itemsPerColumn = Math.ceil(items.length / columnCount);
+    const columns: any[][] = [];
+    for (let i = 0; i < columnCount; i++) {
+      columns.push(items.slice(i * itemsPerColumn, (i + 1) * itemsPerColumn));
+    }
+    
+    return (
+      <div className="grid grid-cols-3 gap-4 text-sm">
+        {columns.map((column, colIdx) => (
+          <ul key={colIdx} className="list-disc list-inside space-y-1">
+            {column.map((item: any) => (
+              <li key={item.id} className="text-gray-700">{item.title}</li>
+            ))}
+          </ul>
+        ))}
+      </div>
+    );
+  };
+
+  const isCertOrCourse = (type: string, title: string) => {
+    const lowerTitle = title.toLowerCase();
+    return type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
+  };
+
   const visibleSections = sections.filter(s => s.visible !== false && s.items && s.items.length > 0);
 
   return (
@@ -134,38 +139,13 @@ export function ModernTemplate({ data, color }: TemplateProps) {
           {personalInfo.fullName}
         </h1>
         <p className="text-lg text-gray-600 mb-4">{personalInfo.jobTitle}</p>
-        
         <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-          {personalInfo.email && (
-            <div className="flex items-center gap-1">
-              <Mail className="w-3 h-3" /> {personalInfo.email}
-            </div>
-          )}
-          {personalInfo.phone && (
-            <div className="flex items-center gap-1">
-              <Phone className="w-3 h-3" /> {personalInfo.phone}
-            </div>
-          )}
-           {personalInfo.city && (
-            <div className="flex items-center gap-1">
-              <MapPin className="w-3 h-3" /> {[personalInfo.city, personalInfo.country].filter(Boolean).join(', ')}
-            </div>
-          )}
-          {personalInfo.linkedin && (
-             <div className="flex items-center gap-1">
-              <Linkedin className="w-3 h-3" /> {personalInfo.linkedin}
-            </div>
-          )}
-           {personalInfo.github && (
-             <div className="flex items-center gap-1">
-              <Github className="w-3 h-3" /> {personalInfo.github}
-            </div>
-          )}
-           {personalInfo.website && (
-             <div className="flex items-center gap-1">
-              <Globe className="w-3 h-3" /> {personalInfo.website}
-            </div>
-          )}
+          {personalInfo.email && <div className="flex items-center gap-1"><Mail className="w-3 h-3" /> {personalInfo.email}</div>}
+          {personalInfo.phone && <div className="flex items-center gap-1"><Phone className="w-3 h-3" /> {personalInfo.phone}</div>}
+          {personalInfo.city && <div className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {[personalInfo.city, personalInfo.country].filter(Boolean).join(', ')}</div>}
+          {personalInfo.linkedin && <div className="flex items-center gap-1"><Linkedin className="w-3 h-3" /> {personalInfo.linkedin}</div>}
+          {personalInfo.github && <div className="flex items-center gap-1"><Github className="w-3 h-3" /> {personalInfo.github}</div>}
+          {personalInfo.website && <div className="flex items-center gap-1"><Globe className="w-3 h-3" /> {personalInfo.website}</div>}
         </div>
       </header>
 
@@ -175,9 +155,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
           <h3 className="text-xs font-bold uppercase tracking-wider mb-3 border-b pb-1" style={{ color, borderColor: color + '40' }}>
             Professional Summary
           </h3>
-          <p className="text-sm text-gray-700 leading-relaxed text-justify">
-            {personalInfo.summary}
-          </p>
+          <p className="text-sm text-gray-700 leading-relaxed text-justify">{personalInfo.summary}</p>
         </section>
       )}
 
@@ -192,6 +170,8 @@ export function ModernTemplate({ data, color }: TemplateProps) {
             renderSkills(section)
           ) : section.type === 'languages' ? (
             renderLanguages(section)
+          ) : isCertOrCourse(section.type, section.title) && coursesStyle === 'simple' ? (
+            renderSimpleCourses(section)
           ) : (
             <div className="space-y-4">
               {section.items.filter((i: any) => i.visible !== false).map(renderSectionItem)}

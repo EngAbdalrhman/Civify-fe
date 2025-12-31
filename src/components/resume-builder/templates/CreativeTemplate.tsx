@@ -1,6 +1,6 @@
 "use client";
 
-import { ResumeData, SkillLevel, SkillsDisplayStyle, LanguagesDisplayStyle } from '@/features/upload-cv/types';
+import { ResumeData, SkillLevel, SkillsDisplayStyle, LanguagesDisplayStyle, CoursesDisplayStyle } from '@/features/upload-cv/types';
 import { LevelVisualizer } from './LevelVisualizer';
 
 interface TemplateProps {
@@ -8,7 +8,6 @@ interface TemplateProps {
   color: string;
 }
 
-// Map subtitle/level strings to SkillLevel
 function parseLevel(value?: string): SkillLevel {
   if (!value) return 'intermediate';
   const lower = value.toLowerCase();
@@ -23,11 +22,10 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
   const { personalInfo, sections, metadata } = data;
   const skillsStyle: SkillsDisplayStyle = metadata?.skillsDisplayStyle || 'tags';
   const languagesStyle: LanguagesDisplayStyle = metadata?.languagesDisplayStyle || 'level';
+  const coursesStyle: CoursesDisplayStyle = metadata?.coursesDisplayStyle || 'detailed';
 
   const renderSkills = (section: any) => {
     const items = section.items.filter((item: any) => item.visible !== false);
-    
-    // Tags style
     if (skillsStyle === 'tags') {
       return (
         <div className="flex flex-wrap gap-2">
@@ -39,10 +37,7 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
         </div>
       );
     }
-
-    // Level/Dots/Bar styles
     const displayStyle = skillsStyle === 'dots' ? 'dots' : skillsStyle === 'bar' ? 'bar' : 'text';
-    
     return (
       <div className="space-y-2">
         {items.map((item: any) => {
@@ -60,7 +55,6 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
 
   const renderLanguages = (section: any) => {
     const items = section.items.filter((item: any) => item.visible !== false);
-    
     if (languagesStyle === 'level') {
       return (
         <div className="space-y-1">
@@ -73,9 +67,7 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
         </div>
       );
     }
-
     const displayStyle = languagesStyle === 'dots' ? 'dots' : 'bar';
-    
     return (
       <div className="space-y-2">
         {items.map((item: any) => {
@@ -91,7 +83,34 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
     );
   };
 
-  // Filter out empty sections
+  // Simple bullet list for courses/certifications
+  const renderSimpleCourses = (section: any) => {
+    const items = section.items.filter((item: any) => item.visible !== false);
+    const columnCount = 3;
+    const itemsPerColumn = Math.ceil(items.length / columnCount);
+    const columns: any[][] = [];
+    for (let i = 0; i < columnCount; i++) {
+      columns.push(items.slice(i * itemsPerColumn, (i + 1) * itemsPerColumn));
+    }
+    
+    return (
+      <div className="grid grid-cols-3 gap-4 text-sm">
+        {columns.map((column, colIdx) => (
+          <ul key={colIdx} className="list-disc list-inside space-y-1">
+            {column.map((item: any) => (
+              <li key={item.id} className="text-gray-700">{item.title}</li>
+            ))}
+          </ul>
+        ))}
+      </div>
+    );
+  };
+
+  const isCertOrCourse = (type: string, title: string) => {
+    const lowerTitle = title.toLowerCase();
+    return type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
+  };
+
   const skillsSections = sections.filter(s => s.type === 'skills' && s.items && s.items.length > 0);
   const languagesSections = sections.filter(s => s.type === 'languages' && s.items && s.items.length > 0);
   const otherSections = sections.filter(s => s.type !== 'skills' && s.type !== 'languages' && s.visible !== false && s.items && s.items.length > 0);
@@ -101,7 +120,6 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
       {/* Left Sidebar */}
       <aside className="w-[30%] text-white p-6 space-y-6" style={{ backgroundColor: color }}>
         <div className="text-center">
-           {/* Profile Picture Placeholder */}
            <div className="w-32 h-32 bg-white/20 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl font-bold">
               {personalInfo.fullName.charAt(0)}
            </div>
@@ -118,7 +136,6 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
            {personalInfo.linkedin && <div className="break-words">{personalInfo.linkedin}</div>}
         </div>
 
-        {/* Skills in Sidebar */}
         {skillsSections.map(section => (
           <div key={section.id} className="pt-4 border-t border-white/20">
             <h3 className="font-bold uppercase mb-3 text-white/90">{section.title}</h3>
@@ -126,7 +143,6 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
           </div>
         ))}
 
-        {/* Languages in Sidebar */}
         {languagesSections.map(section => (
           <div key={section.id} className="pt-4 border-t border-white/20">
             <h3 className="font-bold uppercase mb-3 text-white/90">{section.title}</h3>
@@ -150,21 +166,23 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
                {section.title}
              </h2>
              
-             <div className="space-y-6">
-                {section.items.filter((i: any) => i.visible !== false).map((item: any) => (
-                   <div key={item.id} className="relative pl-4 border-l-2 border-gray-200">
-                      <div className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full" style={{ backgroundColor: color }}></div>
-                      <h3 className="font-bold text-gray-800 text-lg">{item.subtitle}</h3>
-                      <div className="text-sm font-semibold text-gray-600 mb-1">{item.title}</div>
-                      <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">
-                        {[item.date, item.location].filter(Boolean).join(' | ')}
-                      </div>
-                      <p className="text-sm text-gray-600 whitespace-pre-wrap">
-                        {item.description}
-                      </p>
-                   </div>
-                ))}
-             </div>
+             {isCertOrCourse(section.type, section.title) && coursesStyle === 'simple' ? (
+               renderSimpleCourses(section)
+             ) : (
+               <div className="space-y-6">
+                  {section.items.filter((i: any) => i.visible !== false).map((item: any) => (
+                     <div key={item.id} className="relative pl-4 border-l-2 border-gray-200">
+                        <div className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full" style={{ backgroundColor: color }}></div>
+                        <h3 className="font-bold text-gray-800 text-lg">{item.subtitle}</h3>
+                        <div className="text-sm font-semibold text-gray-600 mb-1">{item.title}</div>
+                        <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">
+                          {[item.date, item.location].filter(Boolean).join(' | ')}
+                        </div>
+                        {item.description && <p className="text-sm text-gray-600 whitespace-pre-wrap">{item.description}</p>}
+                     </div>
+                  ))}
+               </div>
+             )}
            </section>
          ))}
       </main>

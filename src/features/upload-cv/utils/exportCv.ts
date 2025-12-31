@@ -159,6 +159,13 @@ export async function exportToPdf(element: HTMLElement, filename: string = 'cv',
         addNewPageIfNeeded(8);
         addText(`${item.title}${item.subtitle ? ` - ${item.subtitle}` : ''}`, 10);
       }
+    } else if ((section.type === 'certifications' || section.title?.toLowerCase().includes('course')) && 
+               resumeData?.metadata?.coursesDisplayStyle === 'simple') {
+      // Simple bullet list for courses/certifications
+      const courses = section.items?.map((item: { title?: string }) => `• ${item.title}`).filter(Boolean);
+      if (courses && courses.length > 0) {
+        addText(courses.join('  |  '), 10);
+      }
     } else {
       for (const item of section.items || []) {
         addNewPageIfNeeded(15);
@@ -311,6 +318,19 @@ export async function exportToDocx(resumeData: ResumeData, filename: string = 'c
               new TextRun({ text: item.subtitle ? ` - ${item.subtitle}` : '' }),
             ],
             spacing: { after: 100 },
+          })
+        );
+      }
+    }
+    // Courses/Certifications - simple bullet list
+    else if ((section.type === 'certifications' || section.title?.toLowerCase().includes('course')) && 
+             resumeData?.metadata?.coursesDisplayStyle === 'simple') {
+      const courses = section.items.map(item => `• ${item.title}`).filter(Boolean);
+      if (courses.length > 0) {
+        children.push(
+          new Paragraph({
+            text: courses.join('  |  '),
+            spacing: { after: 200 },
           })
         );
       }

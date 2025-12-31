@@ -20,6 +20,7 @@ export type SkillLevel = 'expert' | 'advanced' | 'intermediate' | 'beginner' | '
 // Display style types
 export type SkillsDisplayStyle = 'tags' | 'level' | 'dots' | 'bar';
 export type LanguagesDisplayStyle = 'level' | 'dots' | 'bar';
+export type CoursesDisplayStyle = 'detailed' | 'simple';
 
 export interface SectionItem {
   id: string;
@@ -55,6 +56,7 @@ export interface ResumeMetadata {
   // Display style options
   skillsDisplayStyle?: SkillsDisplayStyle;
   languagesDisplayStyle?: LanguagesDisplayStyle;
+  coursesDisplayStyle?: CoursesDisplayStyle;
   sectionOrder?: string[]; // Ordered array of section IDs
 }
 
