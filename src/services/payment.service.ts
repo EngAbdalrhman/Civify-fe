@@ -114,7 +114,9 @@ class PaymentService {
 
     const success = status === 'paid' || status === 'success';
     // const orderId = searchParams.get('invoice_id') || undefined; // Already defined above
-    const error = !success ? (searchParams.get('error') || `Payment ${status}`) : undefined;
+    const error = !success 
+      ? (searchParams.get('error') || `Payment status: ${status || 'unknown'}`) 
+      : undefined;
 
     return {
       success,
