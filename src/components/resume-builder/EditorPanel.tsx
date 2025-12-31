@@ -37,6 +37,7 @@ import {
   Trash2
 } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import { useTranslations } from 'next-intl';
 
 import {
   DndContext,
@@ -196,6 +197,9 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
   const [newSectionName, setNewSectionName] = useState('');
   const [newSectionType, setNewSectionType] = useState<string>('custom');
   
+  const t = useTranslations('editor');
+  const tResume = useTranslations('resume.sections');
+  
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -316,6 +320,12 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
     }
   };
 
+  // Helper to get translated label for section types
+  const getSectionTypeLabel = (type: string) => {
+    if (type === 'custom') return tResume('projects'); 
+    return tResume(type as any) || type;
+  };
+
   return (
     <>
       <Accordion type="single" collapsible defaultValue="personal" className="w-full">
@@ -324,7 +334,7 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
           <AccordionTrigger className="hover:no-underline px-2">
             <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-primary" />
-              <span>Personal Information</span>
+              <span>{t('sections.personal')}</span>
             </div>
           </AccordionTrigger>
           <AccordionContent className="px-2 pt-2">
@@ -363,30 +373,30 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
         onClick={() => setShowAddDialog(true)}
       >
         <Plus className="h-4 w-4" />
-        Add Section
+        {t('sections.add')}
       </Button>
 
       {/* Add Section Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add New Section</DialogTitle>
+            <DialogTitle>{t('dialog.title')}</DialogTitle>
             <DialogDescription>
-              Create a new section for your resume. Choose a type to inherit its layout.
+              {t('dialog.description')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Section Name</Label>
+              <Label>{t('dialog.nameLabel')}</Label>
               <Input
                 value={newSectionName}
                 onChange={(e) => setNewSectionName(e.target.value)}
-                placeholder="e.g., Volunteer Work, Awards, Publications..."
+                placeholder={t('dialog.namePlaceholder')}
                 autoFocus
               />
             </div>
             <div className="space-y-2">
-              <Label>Section Type (inherits layout)</Label>
+              <Label>{t('dialog.typeLabel')}</Label>
               <Select value={newSectionType} onValueChange={setNewSectionType}>
                 <SelectTrigger>
                   <SelectValue />
@@ -396,7 +406,7 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
                     <SelectItem key={type.value} value={type.value}>
                       <div className="flex items-center gap-2">
                         {getIcon(type.value)}
-                        {type.label}
+                        {type.value === 'custom' ? 'Custom' : tResume(type.value as any)}
                       </div>
                     </SelectItem>
                   ))}
@@ -406,10 +416,10 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-              Cancel
+              {t('dialog.cancel')}
             </Button>
             <Button onClick={addSection} disabled={!newSectionName.trim()}>
-              Add Section
+              {t('dialog.confirm')}
             </Button>
           </DialogFooter>
         </DialogContent>

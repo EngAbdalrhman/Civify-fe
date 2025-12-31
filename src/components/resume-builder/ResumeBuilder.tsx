@@ -30,6 +30,7 @@ import { useRouter } from 'next/navigation';
 import { ResumeService } from '@/services/resume.service';
 import apiClient from '@/api/client';
 import { CvParseResponse } from '@/features/upload-cv/types';
+import { useTranslations } from 'next-intl';
 
 import { ResumePreview } from './ResumePreview';
 import { EditorPanel } from './EditorPanel';
@@ -61,7 +62,11 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
   const originalDataRef = useRef<ResumeData>(initialData);
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // ... inside ResumeBuilder component
   const [isUploading, setIsUploading] = useState(false);
+  
+  const t = useTranslations('builder');
+  const tCommon = useTranslations('common');
 
   // Update ref when initialData changes (e.g., loading a different resume)
   useEffect(() => {
@@ -69,27 +74,13 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
     setResumeData(initialData);
   }, [initialData]);
 
-  // Guest Persistence
-  useEffect(() => {
-    if (isGuest && !resumeId) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(resumeData));
-    }
-  }, [resumeData, isGuest, resumeId]);
-
-  // Fullscreen change listener
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullScreen(!!document.fullscreenElement);
-    };
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
+  // ... (useEffect for guest persistence and fullscreen)
 
   const handleSaveClick = () => {
     if (isGuest) {
-      toast.info("Sign in to save your resume permanently", {
+      toast.info(t('saveDialog.description'), {
         action: {
-          label: "Sign In",
+          label: tCommon('login'),
           onClick: () => router.push('/login?callbackUrl=/app/resume-builder')
         }
       });
@@ -182,6 +173,8 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
     }
   };
 
+
+
   return (
     <>
       <div className="flex h-screen overflow-hidden bg-background">
@@ -189,7 +182,7 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
         <div className="w-[400px] md:w-[450px] flex-shrink-0 border-r bg-card flex flex-col h-full z-10 shadow-xl">
           <div className="p-4 border-b flex items-center justify-between bg-card">
             <h1 className="font-bold text-xl flex items-center gap-2">
-              <span className="text-primary">Civify</span> Builder
+              <span className="text-primary">Civify</span> {t('title').replace('Civify ', '')}
             </h1>
             <div className="flex gap-2">
               {/* Hidden file input for upload */}
@@ -209,14 +202,14 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
                   className="gap-2"
-                  title="Upload existing CV to parse"
+                  title={t('actions.upload')}
                 >
                   <Upload className="h-4 w-4" />
-                  {isUploading ? 'Parsing...' : 'Upload CV'}
+                  {isUploading ? t('actions.parsing') : t('actions.upload')}
                 </Button>
               )}
               
-              <Button variant="ghost" size="icon" onClick={handleReset} title="Reset to original">
+              <Button variant="ghost" size="icon" onClick={handleReset} title={t('actions.reset')}>
                 <RotateCcw className="h-4 w-4" />
               </Button>
               <Button 
@@ -227,7 +220,7 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
                 className="gap-2"
               >
                 <Save className="h-4 w-4" />
-                {isSaving ? 'Saving...' : 'Save'}
+                {isSaving ? t('actions.saving') : t('actions.save')}
               </Button>
             </div>
           </div>
@@ -237,15 +230,15 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
               <TabsList className="w-full grid grid-cols-3">
                 <TabsTrigger value="content" className="flex gap-2">
                   <FileText className="h-4 w-4" />
-                  <span className="hidden sm:inline">Content</span>
+                  <span className="hidden sm:inline">{t('tabs.content')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="design" className="flex gap-2">
                   <Palette className="h-4 w-4" />
-                  <span className="hidden sm:inline">Design</span>
+                  <span className="hidden sm:inline">{t('tabs.design')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="export" className="flex gap-2">
                   <Download className="h-4 w-4" />
-                  <span className="hidden sm:inline">Export</span>
+                  <span className="hidden sm:inline">{t('tabs.export')}</span>
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -281,9 +274,9 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
                onClick={handleFullScreenToggle}
              >
                {isFullScreen ? (
-                 <><Minimize2 className="h-4 w-4 mr-2" /> Exit Full Screen</>
+                 <><Minimize2 className="h-4 w-4 mr-2" /> {t('actions.exitFullscreen')}</>
                ) : (
-                 <><Maximize2 className="h-4 w-4 mr-2" /> Full Screen</>
+                 <><Maximize2 className="h-4 w-4 mr-2" /> {t('actions.fullscreen')}</>
                )}
              </Button>
           </div>
@@ -300,28 +293,28 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
       <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Save Resume</DialogTitle>
+            <DialogTitle>{t('saveDialog.title')}</DialogTitle>
             <DialogDescription>
-              Enter a title for your resume. This will help you identify it later.
+              {t('saveDialog.description')}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            <Label htmlFor="resume-title">Resume Title</Label>
+            <Label htmlFor="resume-title">{t('saveDialog.label')}</Label>
             <Input
               id="resume-title"
               value={resumeTitle}
               onChange={(e) => setResumeTitle(e.target.value)}
-              placeholder="e.g., Software Engineer Resume"
+              placeholder={t('saveDialog.placeholder')}
               className="mt-2"
               autoFocus
             />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowSaveDialog(false)}>
-              Cancel
+              {t('saveDialog.cancel')}
             </Button>
             <Button onClick={handleSaveConfirm} disabled={!resumeTitle.trim()}>
-              Save Resume
+              {t('saveDialog.confirm')}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -26,12 +26,16 @@ function downloadBlob(blob: Blob, filename: string): void {
 
 /**
  * Export the CV to PDF by generating directly from resume data
- * This provides consistent styling without html2canvas issues
+ * Uses drawing primitives for graphics to avoid font encoding issues
  */
-export async function exportToPdf(element: HTMLElement, filename: string = 'cv', resumeData?: ResumeData): Promise<void> {
+export async function exportToPdf(
+  element: HTMLElement, 
+  filename: string = 'cv', 
+  resumeData?: ResumeData,
+  translations?: any
+): Promise<void> {
   const { jsPDF } = await import('jspdf');
   
-  // If no resumeData provided, try to use the window object (will be set by caller)
   const data = resumeData || (window as any).__cvExportData;
   if (!data) {
     throw new Error('No resume data available for PDF export');
@@ -56,8 +60,7 @@ export async function exportToPdf(element: HTMLElement, filename: string = 'cv',
     }
   };
 
-  // Helper to add text with word wrap
-  const addText = (text: string, fontSize: number, options: { bold?: boolean; italic?: boolean; color?: string; align?: 'left' | 'center' | 'right' } = {}) => {
+  const addText = (text: string, fontSize: number, options: { bold?: boolean; italic?: boolean; color?: string; align?: 'left' | 'center' | 'right'; x?: number } = {}) => {
     pdf.setFontSize(fontSize);
     pdf.setTextColor(options.color || '#1f2937');
     
@@ -71,18 +74,15 @@ export async function exportToPdf(element: HTMLElement, filename: string = 'cv',
       pdf.setFont('helvetica', 'normal');
     }
 
+    const x = options.x || (options.align === 'center' ? pageWidth / 2 : options.align === 'right' ? pageWidth - margin : margin);
+    
+    // Simple single line text if no wrapping needed related logic, but splitTextToSize checks width
     const lines = pdf.splitTextToSize(text, contentWidth);
     const lineHeight = fontSize * 0.4;
     
     lines.forEach((line: string) => {
       addNewPageIfNeeded(lineHeight);
-      if (options.align === 'center') {
-        pdf.text(line, pageWidth / 2, y, { align: 'center' });
-      } else if (options.align === 'right') {
-        pdf.text(line, pageWidth - margin, y, { align: 'right' });
-      } else {
-        pdf.text(line, margin, y);
-      }
+      pdf.text(line, x, y, { align: options.align });
       y += lineHeight;
     });
   };
@@ -93,6 +93,54 @@ export async function exportToPdf(element: HTMLElement, filename: string = 'cv',
     pdf.setLineWidth(0.5);
     pdf.line(margin, y, pageWidth - margin, y);
     y += 5;
+  };
+
+  // Helper to draw skill bars using rectangles
+  const drawSkillBar = (level: string, x: number, currentY: number, width: number = 40, height: number = 3) => {
+    // Background bar
+    pdf.setFillColor('#e5e7eb'); // gray-200
+    pdf.rect(x, currentY - height + 1, width, height, 'F');
+    
+    // Foreground bar
+    let percentage = 0;
+    switch(level.toLowerCase()) {
+      case 'expert': percentage = 1.0; break;
+      case 'advanced': percentage = 0.8; break;
+      case 'intermediate': percentage = 0.6; break;
+      case 'beginner': percentage = 0.4; break;
+      default: percentage = 0.2;
+    }
+    
+    pdf.setFillColor('#374151'); // gray-700
+    pdf.rect(x, currentY - height + 1, width * percentage, height, 'F');
+  };
+
+  // Helper to draw dots
+  const drawDots = (level: string, x: number, currentY: number) => {
+    let score = 0;
+    switch(level.toLowerCase()) {
+      case 'expert': case 'native': case 'fluent': score = 5; break;
+      case 'advanced': score = 4; break;
+      case 'intermediate': score = 3; break;
+      case 'beginner': score = 2; break;
+      default: score = 1;
+    }
+
+    const dotSize = 1.5;
+    const gap = 4;
+    
+    for (let i = 0; i < 5; i++) {
+        const dotX = x + (i * gap);
+        // Filled if i < score, empty circle otherwise
+        if (i < score) {
+            pdf.setFillColor('#374151');
+            pdf.circle(dotX, currentY - 1, dotSize, 'F');
+        } else {
+            pdf.setDrawColor('#9ca3af');
+            pdf.setLineWidth(0.1);
+            pdf.circle(dotX, currentY - 1, dotSize, 'S');
+        }
+    }
   };
 
   const { personalInfo, sections } = data;
@@ -123,10 +171,26 @@ export async function exportToPdf(element: HTMLElement, filename: string = 'cv',
 
   y += 5;
 
+  // Helper to get localized section title
+  const getSectionTitle = (sectionType: string, defaultTitle: string) => {
+    if (translations?.resume?.sections?.[sectionType]) {
+      return translations.resume.sections[sectionType];
+    }
+    return defaultTitle;
+  };
+
+  // Helper to get localized header
+  const getHeader = (key: string, defaultText: string) => {
+    if (translations?.resume?.sections?.[key]) {
+      return translations.resume.sections[key];
+    }
+    return defaultText;
+  };
+
   // Summary
   if (personalInfo.summary) {
     addLine();
-    addText('PROFESSIONAL SUMMARY', 12, { bold: true });
+    addText(getHeader('summary', 'PROFESSIONAL SUMMARY'), 12, { bold: true });
     y += 2;
     addText(personalInfo.summary, 10);
     y += 5;
@@ -141,7 +205,9 @@ export async function exportToPdf(element: HTMLElement, filename: string = 'cv',
     
     addNewPageIfNeeded(20);
     addLine();
-    addText(section.title?.toUpperCase() || '', 12, { bold: true });
+    // Localize title
+    const localizedTitle = getSectionTitle(section.type, section.title);
+    addText(localizedTitle.toUpperCase(), 12, { bold: true });
     y += 3;
 
     if (section.type === 'skills') {
@@ -155,54 +221,91 @@ export async function exportToPdf(element: HTMLElement, filename: string = 'cv',
           addText(skills, 10);
         }
       } else {
-        // Bar/Dots/Level style - show with visual representation
-        const levelBars: Record<string, string> = {
-          'expert': '████████████████████',
-          'advanced': '████████████████░░░░',
-          'intermediate': '████████████░░░░░░░░',
-          'beginner': '████████░░░░░░░░░░░░',
-          'none': '░░░░░░░░░░░░░░░░░░░░'
-        };
-        
+        // Bar/Dots style
         for (const item of items as { title?: string; level?: string; subtitle?: string }[]) {
           addNewPageIfNeeded(8);
           const level = item.level || 'intermediate';
-          const bar = skillsStyle === 'bar' ? levelBars[level] || levelBars['intermediate'] : 
-                     skillsStyle === 'dots' ? (level === 'expert' ? '●●●●●' : level === 'advanced' ? '●●●●○' : level === 'intermediate' ? '●●●○○' : level === 'beginner' ? '●●○○○' : '●○○○○') :
-                     `(${level})`;
-          addText(`${item.title}  ${bar}`, 10);
+          
+          addText(item.title || '', 10);
+          
+          // Draw logic
+          // Move Y back up because addText advanced it
+          const graphicY = y; 
+          y -= 4; // approximate backtrack to align with text baseline
+          
+          const graphicX = margin + 60; // Offset for graphics
+          
+          if (skillsStyle === 'bar') {
+             drawSkillBar(level, graphicX, y);
+          } else if (skillsStyle === 'dots') {
+             drawDots(level, graphicX, y);
+          } else {
+             // Text fallback
+             pdf.text(`(${level})`, graphicX, y);
+          }
+          
+          y = graphicY; // Restore Y
         }
       }
     } else if (section.type === 'languages') {
       const languagesStyle = resumeData?.metadata?.languagesDisplayStyle || 'level';
-      const levelBars: Record<string, string> = {
-        'native': '████████████████████', 'fluent': '████████████████████', 'expert': '████████████████████',
-        'advanced': '████████████████░░░░',
-        'intermediate': '████████████░░░░░░░░',
-        'beginner': '████████░░░░░░░░░░░░',
-      };
       
       for (const item of section.items || []) {
         addNewPageIfNeeded(8);
         const level = (item.subtitle || item.level || 'intermediate').toLowerCase();
+        
+        addText(item.title || '', 10);
+        
+        const graphicY = y;
+        y -= 4;
+        const graphicX = margin + 60;
+
         if (languagesStyle === 'bar') {
-          const bar = levelBars[level] || levelBars['intermediate'];
-          addText(`${item.title}  ${bar}`, 10);
+          drawSkillBar(level, graphicX, y);
         } else if (languagesStyle === 'dots') {
-          const dots = level === 'native' || level === 'fluent' || level === 'expert' ? '●●●●●' : 
-                      level === 'advanced' ? '●●●●○' : level === 'intermediate' ? '●●●○○' : '●●○○○';
-          addText(`${item.title}  ${dots}`, 10);
+          drawDots(level, graphicX, y);
         } else {
-          addText(`${item.title} - ${item.subtitle || 'Intermediate'}`, 10);
+          pdf.text(` - ${item.subtitle || 'Intermediate'}`, margin + pdf.getTextWidth(item.title || '') + 2, y);
         }
+        
+        y = graphicY;
       }
     } else if ((section.type === 'certifications' || section.title?.toLowerCase().includes('course')) && 
                resumeData?.metadata?.coursesDisplayStyle === 'simple') {
-      // Simple bullet list for courses - each on its own line
-      for (const item of section.items || []) {
-        addNewPageIfNeeded(6);
-        addText(`• ${item.title}`, 9);
-      }
+      // Simple bullet list for courses - MULTI-COLUMN
+      // 3 Columns
+      const items = section.items || [];
+      const colCount = 3;
+      const colWidth = contentWidth / colCount;
+      const rowHeight = 6;
+      
+      // Calculate layout
+      let maxY = y;
+      
+      items.forEach((item: any, index: number) => {
+          const colIndex = index % colCount;
+          
+          // If starting new row (colIndex == 0), verify space
+          if (colIndex === 0) {
+              addNewPageIfNeeded(rowHeight);
+          }
+          
+          // Current X and Y
+          // If we added a page, 'y' was reset. We need to track 'currentRowY' carefully.
+          // Since addNewPageIfNeeded modifies 'y', we can rely on 'y' being the current row start.
+          // But 'y' increments effectively per row.
+          
+          const xPos = margin + (colIndex * colWidth);
+          // Only increment y after filling the last column
+          
+          pdf.setFontSize(9);
+          pdf.text(`• ${item.title}`, xPos, y);
+          
+          if (colIndex === colCount - 1 || index === items.length - 1) {
+             y += rowHeight;
+          }
+      });
+      
     } else {
       for (const item of section.items || []) {
         addNewPageIfNeeded(15);
@@ -238,13 +341,30 @@ export async function exportToPdf(element: HTMLElement, filename: string = 'cv',
 
 /**
  * Export the CV data to DOCX format
- * @param resumeData - The resume data to export
- * @param filename - The output filename (without extension)
  */
-export async function exportToDocx(resumeData: ResumeData, filename: string = 'cv'): Promise<void> {
-  const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } = await import('docx');
+export async function exportToDocx(
+    resumeData: ResumeData, 
+    filename: string = 'cv',
+    translations?: any
+): Promise<void> {
+  const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, Table, TableRow, TableCell, BorderStyle, WidthType } = await import('docx');
 
   const { personalInfo, sections } = resumeData;
+
+  // Helper to get localized header
+  const getHeader = (key: string, defaultText: string) => {
+    if (translations?.resume?.sections?.[key]) {
+      return translations.resume.sections[key];
+    }
+    return defaultText;
+  };
+  
+  const getSectionTitle = (sectionType: string, defaultTitle: string) => {
+    if (translations?.resume?.sections?.[sectionType]) {
+      return translations.resume.sections[sectionType];
+    }
+    return defaultTitle;
+  };
 
   // Build document content
   const children: any[] = [];
@@ -297,7 +417,7 @@ export async function exportToDocx(resumeData: ResumeData, filename: string = 'c
   if (personalInfo.summary) {
     children.push(
       new Paragraph({
-        text: 'PROFESSIONAL SUMMARY',
+        text: getHeader('summary', 'PROFESSIONAL SUMMARY'),
         heading: HeadingLevel.HEADING_2,
         thematicBreak: true,
         spacing: { before: 300, after: 200 },
@@ -321,13 +441,13 @@ export async function exportToDocx(resumeData: ResumeData, filename: string = 'c
 
     children.push(
       new Paragraph({
-        text: section.title.toUpperCase(),
+        text: getSectionTitle(section.type, section.title).toUpperCase(),
         heading: HeadingLevel.HEADING_2,
         thematicBreak: true,
         spacing: { before: 300, after: 200 },
       })
     );
-    // Skills section - render with visual bars/dots based on style
+    // Skills section - render with safe text visual bars
     if (section.type === 'skills') {
       const skillsStyle = resumeData?.metadata?.skillsDisplayStyle || 'tags';
       
@@ -342,23 +462,28 @@ export async function exportToDocx(resumeData: ResumeData, filename: string = 'c
           );
         }
       } else {
+        // Use safer unicode characters or text
         const levelBars: Record<string, string> = {
-          'expert': '████████████████████',
-          'advanced': '████████████████░░░░',
-          'intermediate': '████████████░░░░░░░░',
-          'beginner': '████████░░░░░░░░░░░░',
+          'expert': '[|||||]',
+          'advanced': '[||||_]',
+          'intermediate': '[|||__]',
+          'beginner': '[||___]',
         };
         
         for (const item of section.items) {
           const level = item.level || 'intermediate';
-          const bar = skillsStyle === 'bar' ? levelBars[level] || levelBars['intermediate'] : 
-                     skillsStyle === 'dots' ? (level === 'expert' ? '●●●●●' : level === 'advanced' ? '●●●●○' : level === 'intermediate' ? '●●●○○' : '●●○○○') :
-                     `(${level})`;
+          /* 
+             DOCX rendering of block characters can be font dependent.
+             Sticking to text representation for safety as per user feedback about garbled blocks.
+             Or standard text description.
+          */
+          const visual = `(${level})`; // Safest fallback
+          
           children.push(
             new Paragraph({
               children: [
-                new TextRun({ text: item.title }),
-                new TextRun({ text: `  ${bar}` }),
+                new TextRun({ text: item.title, bold: true }),
+                new TextRun({ text: `  ${visual}` }),
               ],
               spacing: { after: 100 },
             })
@@ -368,47 +493,69 @@ export async function exportToDocx(resumeData: ResumeData, filename: string = 'c
     }
     // Languages section
     else if (section.type === 'languages') {
-      const languagesStyle = resumeData?.metadata?.languagesDisplayStyle || 'level';
-      const levelBars: Record<string, string> = {
-        'native': '████████████████████', 'fluent': '████████████████████', 'expert': '████████████████████',
-        'advanced': '████████████████░░░░',
-        'intermediate': '████████████░░░░░░░░',
-        'beginner': '████████░░░░░░░░░░░░',
-      };
-      
-      for (const item of section.items) {
-        const level = (item.subtitle || item.level || 'intermediate').toLowerCase();
-        let visualRep = '';
-        if (languagesStyle === 'bar') {
-          visualRep = levelBars[level] || levelBars['intermediate'];
-        } else if (languagesStyle === 'dots') {
-          visualRep = level === 'native' || level === 'fluent' || level === 'expert' ? '●●●●●' : 
-                      level === 'advanced' ? '●●●●○' : level === 'intermediate' ? '●●●○○' : '●●○○○';
-        } else {
-          visualRep = ` - ${item.subtitle || 'Intermediate'}`;
+        for (const item of section.items) {
+            children.push(
+              new Paragraph({
+                children: [
+                    new TextRun({ text: item.title, bold: true }),
+                    new TextRun({ text: item.subtitle ? ` - ${item.subtitle}` : '' }),
+                ],
+                spacing: { after: 100 },
+              })
+            );
         }
-        children.push(
-          new Paragraph({
-            children: [
-              new TextRun({ text: item.title, bold: true }),
-              new TextRun({ text: `  ${visualRep}` }),
-            ],
-            spacing: { after: 100 },
-          })
-        );
-      }
     }
-    // Courses/Certifications - simple bullet list
+    // Courses/Certifications - simple bullet list - MULTI COLUMN TABLE
     else if ((section.type === 'certifications' || section.title?.toLowerCase().includes('course')) && 
              resumeData?.metadata?.coursesDisplayStyle === 'simple') {
-      for (const item of section.items) {
+      
+        const items = section.items;
+        const colCount = 3;
+        const rows = [];
+        
+        for (let i = 0; i < items.length; i += colCount) {
+            const rowItems = items.slice(i, i + colCount);
+            const cells = rowItems.map(item => 
+                new TableCell({
+                    children: [new Paragraph(`• ${item.title}`)],
+                    borders: {
+                        top: { style: BorderStyle.NONE, size: 0, color: "auto" },
+                        bottom: { style: BorderStyle.NONE, size: 0, color: "auto" },
+                        left: { style: BorderStyle.NONE, size: 0, color: "auto" },
+                        right: { style: BorderStyle.NONE, size: 0, color: "auto" },
+                    },
+                })
+            );
+            // Fill remaining cells if row is incomplete
+            while(cells.length < colCount) {
+                cells.push(new TableCell({ 
+                    children: [],
+                    borders: {
+                        top: { style: BorderStyle.NONE, size: 0, color: "auto" },
+                        bottom: { style: BorderStyle.NONE, size: 0, color: "auto" },
+                        left: { style: BorderStyle.NONE, size: 0, color: "auto" },
+                        right: { style: BorderStyle.NONE, size: 0, color: "auto" },
+                    },
+                }));
+            }
+            
+            rows.push(new TableRow({ children: cells }));
+        }
+
         children.push(
-          new Paragraph({
-            text: `• ${item.title}`,
-            spacing: { after: 50 },
-          })
+            new Table({
+                rows: rows,
+                width: { size: 100, type: WidthType.PERCENTAGE },
+                borders: {
+                    top: { style: BorderStyle.NONE, size: 0, color: "auto" },
+                    bottom: { style: BorderStyle.NONE, size: 0, color: "auto" },
+                    left: { style: BorderStyle.NONE, size: 0, color: "auto" },
+                    right: { style: BorderStyle.NONE, size: 0, color: "auto" },
+                    insideHorizontal: { style: BorderStyle.NONE, size: 0, color: "auto" },
+                    insideVertical: { style: BorderStyle.NONE, size: 0, color: "auto" },
+                },
+            })
         );
-      }
     }
     // Other sections (experience, education, projects, etc.)
     else {

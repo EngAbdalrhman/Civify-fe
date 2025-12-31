@@ -7,21 +7,34 @@ import { FileText, FileType } from 'lucide-react';
 import { exportToPdf, exportToDocx } from '@/features/upload-cv/utils/exportCv';
 import { toast } from 'sonner';
 
+import enTranslations from '@/messages/en.json';
+import arTranslations from '@/messages/ar.json';
+
 interface ExportPanelProps {
   data: ResumeData;
 }
 
+import { useTranslations } from 'next-intl';
+
+// ... (imports)
+
 export function ExportPanel({ data }: ExportPanelProps) {
+  const t = useTranslations('builder.exportPanel');
   
+  const getTranslations = () => {
+    return data.metadata?.language === 'ar' ? arTranslations : enTranslations;
+  };
+
   const handlePdfExport = async () => {
     try {
       const element = document.getElementById('resume-preview-content');
       if (!element) throw new Error("Preview element not found");
       
+      const translations = getTranslations();
       // Inject data for helper
       (window as any).__cvExportData = data;
       
-      await exportToPdf(element, `${data.personalInfo.fullName.replace(/\s+/g, '_')}_CV`, data);
+      await exportToPdf(element, `${data.personalInfo.fullName.replace(/\s+/g, '_')}_CV`, data, translations);
       toast.success("PDF Downloaded");
     } catch (e) {
       console.error(e);
@@ -31,7 +44,8 @@ export function ExportPanel({ data }: ExportPanelProps) {
 
   const handleDocxExport = async () => {
      try {
-      await exportToDocx(data, `${data.personalInfo.fullName.replace(/\s+/g, '_')}_CV`);
+      const translations = getTranslations();
+      await exportToDocx(data, `${data.personalInfo.fullName.replace(/\s+/g, '_')}_CV`, translations);
       toast.success("DOCX Downloaded");
     } catch (e) {
       console.error(e);
@@ -42,9 +56,9 @@ export function ExportPanel({ data }: ExportPanelProps) {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h3 className="text-lg font-semibold">Ready to download?</h3>
+        <h3 className="text-lg font-semibold">{t('title')}</h3>
         <p className="text-muted-foreground text-sm">
-          Select a format to export your resume.
+          {t('subtitle')}
         </p>
       </div>
 
@@ -55,8 +69,8 @@ export function ExportPanel({ data }: ExportPanelProps) {
               <FileType className="h-6 w-6 text-red-600 dark:text-red-400" />
             </div>
             <div className="space-y-1">
-              <CardTitle className="text-base">PDF Document</CardTitle>
-              <CardDescription>Best for sharing and printing. Preserves layout.</CardDescription>
+              <CardTitle className="text-base">{t('pdf.title')}</CardTitle>
+              <CardDescription>{t('pdf.description')}</CardDescription>
             </div>
           </CardHeader>
         </Card>
@@ -67,15 +81,15 @@ export function ExportPanel({ data }: ExportPanelProps) {
               <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div className="space-y-1">
-              <CardTitle className="text-base">Word Document</CardTitle>
-              <CardDescription>Editable in Microsoft Word or Google Docs.</CardDescription>
+              <CardTitle className="text-base">{t('docx.title')}</CardTitle>
+              <CardDescription>{t('docx.description')}</CardDescription>
             </div>
           </CardHeader>
         </Card>
       </div>
 
       <div className="p-4 bg-muted/50 rounded-lg text-sm text-balance text-muted-foreground text-center">
-        Tip: Review your resume in the preview panel before downloading to ensure everything looks perfect.
+        {t('tip')}
       </div>
     </div>
   );
