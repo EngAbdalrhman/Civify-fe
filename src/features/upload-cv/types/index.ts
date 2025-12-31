@@ -22,7 +22,8 @@ export interface SectionItem {
   description?: string;
   location?: string;
   tags?: string[];
-  isVisible?: boolean;
+  visible?: boolean; // Backend uses 'visible'
+  isVisible?: boolean; // Deprecated, use 'visible'
 }
 
 export interface ResumeSection {
@@ -30,7 +31,8 @@ export interface ResumeSection {
   title: string;
   type: 'experience' | 'education' | 'skills' | 'languages' | 'certifications' | 'projects' | 'custom';
   items: SectionItem[];
-  isVisible?: boolean;
+  visible?: boolean; // Backend uses 'visible'
+  isVisible?: boolean; // Deprecated, use 'visible'
   order?: number;
   style?: string;
 }

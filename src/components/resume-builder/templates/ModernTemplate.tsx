@@ -93,7 +93,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
       )}
 
       {/* Dynamic Sections */}
-      {sections.filter(s => s.isVisible).map(section => (
+      {sections.filter(s => s.visible !== false).map(section => (
         <section key={section.id} className="mb-6">
           <h3 className="text-xs font-bold uppercase tracking-wider mb-4 border-b pb-1" style={{ color, borderColor: color + '40' }}>
             {section.title}
@@ -116,7 +116,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
              </div>
           ) : (
              <div className="space-y-4">
-               {section.items.filter(i => i.isVisible !== false).map(renderSectionItem)}
+               {section.items.filter(i => i.visible !== false).map(renderSectionItem)}
              </div>
           )}
         </section>

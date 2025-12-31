@@ -58,14 +58,14 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
            </section>
          )}
 
-         {sections.filter(s => s.type !== 'skills' && s.isVisible).map(section => (
+         {sections.filter(s => s.type !== 'skills' && s.visible !== false).map(section => (
            <section key={section.id} className="mb-8">
              <h2 className="text-xl font-bold uppercase mb-4 text-gray-900 border-b-2 pb-1" style={{ borderColor: color }}>
                {section.title}
              </h2>
              
              <div className="space-y-6">
-                {section.items.filter(i => i.isVisible !== false).map(item => (
+                {section.items.filter(i => i.visible !== false).map(item => (
                    <div key={item.id} className="relative pl-4 border-l-2 border-gray-200">
                       <div className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full" style={{ backgroundColor: color }}></div>
                       <h3 className="font-bold text-gray-800 text-lg">{item.subtitle}</h3>

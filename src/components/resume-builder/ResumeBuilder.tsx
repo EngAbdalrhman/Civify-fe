@@ -22,11 +22,14 @@ import {
   RotateCcw,
   FileText,
   Maximize2,
-  Minimize2
+  Minimize2,
+  Upload
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { ResumeService } from '@/services/resume.service';
+import apiClient from '@/api/client';
+import { CvParseResponse } from '@/features/upload-cv/types';
 
 import { ResumePreview } from './ResumePreview';
 import { EditorPanel } from './EditorPanel';
@@ -57,6 +60,8 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
   const router = useRouter();
   const originalDataRef = useRef<ResumeData>(initialData);
   const previewContainerRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Update ref when initialData changes (e.g., loading a different resume)
   useEffect(() => {
@@ -141,6 +146,42 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
     }
   };
 
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Please upload a PDF or Word document");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await apiClient.post<CvParseResponse>('/v1/cv/parse', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      if (response.data?.resumeData) {
+        setResumeData(response.data.resumeData);
+        originalDataRef.current = response.data.resumeData;
+        toast.success("CV parsed successfully!");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Failed to parse CV. Please try again.");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   return (
     <>
       <div className="flex h-screen overflow-hidden bg-background">
@@ -151,6 +192,30 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
               <span className="text-primary">Civify</span> Builder
             </h1>
             <div className="flex gap-2">
+              {/* Hidden file input for upload */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                accept=".pdf,.doc,.docx"
+                className="hidden"
+              />
+              
+              {/* Upload button - only for authenticated users */}
+              {!isGuest && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="gap-2"
+                  title="Upload existing CV to parse"
+                >
+                  <Upload className="h-4 w-4" />
+                  {isUploading ? 'Parsing...' : 'Upload CV'}
+                </Button>
+              )}
+              
               <Button variant="ghost" size="icon" onClick={handleReset} title="Reset to original">
                 <RotateCcw className="h-4 w-4" />
               </Button>

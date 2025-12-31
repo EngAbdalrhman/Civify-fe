@@ -41,7 +41,7 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
        )}
 
        {/* Sections */}
-       {sections.filter(s => s.isVisible).map(section => (
+       {sections.filter(s => s.visible !== false).map(section => (
          <section key={section.id} className="mb-6">
            <h3 className="text-lg font-bold uppercase border-b border-gray-800 mb-4 flex items-center">
              <span className="bg-gray-800 text-white px-2 py-0.5 text-sm mr-2" style={{ backgroundColor: color }}>
@@ -65,7 +65,7 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
              </div>
            ) : (
              <div className="space-y-4">
-               {section.items.filter(i => i.isVisible !== false).map(item => (
+               {section.items.filter(i => i.visible !== false).map(item => (
                  <div key={item.id}>
                    <div className="flex justify-between font-bold text-gray-800 text-sm">
                      <span>{item.title}</span>
