@@ -2,6 +2,29 @@ import { saveAs } from 'file-saver';
 import type { ResumeData } from '../types';
 
 /**
+ * Reliable download helper with fallback for environments where saveAs doesn't work
+ */
+function downloadBlob(blob: Blob, filename: string): void {
+  try {
+    // Try native approach first (more reliable in modern browsers)
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    // Delay revocation to ensure download starts
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (error) {
+    // Fallback to file-saver
+    console.warn('Native download failed, using file-saver fallback:', error);
+    saveAs(blob, filename);
+  }
+}
+
+/**
  * Export the CV to PDF by generating directly from resume data
  * This provides consistent styling without html2canvas issues
  */
@@ -335,5 +358,5 @@ export async function exportToDocx(resumeData: ResumeData, filename: string = 'c
 
   // Generate and save
   const blob = await Packer.toBlob(doc);
-  saveAs(blob, `${filename}.docx`);
+  downloadBlob(blob, `${filename}.docx`);
 }
