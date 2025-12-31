@@ -24,6 +24,13 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
   const languagesStyle: LanguagesDisplayStyle = metadata?.languagesDisplayStyle || 'level';
   const coursesStyle: CoursesDisplayStyle = metadata?.coursesDisplayStyle || 'detailed';
 
+  // Determine direction
+  const direction = metadata?.layoutDirection === 'ltr' ? 'ltr' : 
+                   metadata?.layoutDirection === 'rtl' ? 'rtl' : 
+                   (metadata?.language === 'ar' ? 'rtl' : 'ltr');
+  
+  const isRtl = direction === 'rtl';
+
   const renderSkills = (section: any) => {
     const items = section.items.filter((item: any) => item.visible !== false);
     if (skillsStyle === 'tags') {
@@ -113,8 +120,15 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
 
   const visibleSections = sections.filter(s => s.visible !== false && s.items && s.items.length > 0);
 
+
+  const labels = {
+    summary: metadata?.language === 'ar' ? "الملخص" : "Summary",
+    linkedin: metadata?.language === 'ar' ? "لينكد إن" : "LinkedIn",
+    github: metadata?.language === 'ar' ? "جيت هب" : "GitHub",
+  };
+
   return (
-    <div className="p-10 h-full bg-white text-gray-900 font-serif leading-relaxed">
+    <div className="p-10 h-full bg-white text-gray-900 font-serif leading-relaxed" dir={direction}>
        <header className="text-center mb-8 border-b-2 border-double border-gray-300 pb-6">
          <h1 className="text-3xl font-bold uppercase mb-2 tracking-wide text-gray-900">
            {personalInfo.fullName}
@@ -129,13 +143,13 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
            {personalInfo.linkedin && (
              <a href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} 
                 target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-               LinkedIn
+               {labels.linkedin}
              </a>
            )}
            {personalInfo.github && (
              <a href={personalInfo.github.startsWith('http') ? personalInfo.github : `https://github.com/${personalInfo.github}`} 
                 target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-               GitHub
+               {labels.github}
              </a>
            )}
            {personalInfo.website && (
@@ -149,7 +163,7 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
 
        {personalInfo.summary && (
          <section className="mb-6 text-center max-w-2xl mx-auto">
-           <h3 className="text-sm font-bold uppercase mb-2 border-b border-gray-300 inline-block px-4">Summary</h3>
+           <h3 className="text-sm font-bold uppercase mb-2 border-b border-gray-300 inline-block px-4">{labels.summary}</h3>
            <p className="text-sm text-justify">{personalInfo.summary}</p>
          </section>
        )}

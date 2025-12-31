@@ -91,7 +91,7 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
 
   const handleSaveConfirm = async () => {
     if (!resumeTitle.trim()) {
-      toast.error(t('toasts.enterTitle'));
+      toast.error("Please enter a title for your resume");
       return;
     }
 
@@ -107,10 +107,10 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
         // Clear guest cache after successful save
         localStorage.removeItem(STORAGE_KEY);
       }
-      toast.success(t('toasts.saveSuccess'));
+      toast.success("Resume saved successfully");
     } catch (error) {
       console.error(error);
-      toast.error(t('toasts.saveError'));
+      toast.error("Failed to save resume");
     } finally {
       setIsSaving(false);
     }
@@ -121,7 +121,7 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
     if (isGuest) {
       localStorage.removeItem(STORAGE_KEY);
     }
-    toast.info(t('toasts.resetInfo'));
+    toast.info("Resume reset to original state");
   };
 
   const handleFullScreenToggle = async () => {
@@ -133,7 +133,7 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
       }
     } catch (err) {
       console.error("Fullscreen error:", err);
-      toast.error(t('toasts.fullscreenError'));
+      toast.error("Fullscreen not supported");
     }
   };
 
@@ -144,7 +144,7 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
     // Validate file type
     const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword'];
     if (!allowedTypes.includes(file.type)) {
-      toast.error(t('toasts.uploadError'));
+      toast.error("Please upload a PDF or Word document");
       return;
     }
 
@@ -160,11 +160,11 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
       if (response.data?.resumeData) {
         setResumeData(response.data.resumeData);
         originalDataRef.current = response.data.resumeData;
-        toast.success(t('toasts.parseSuccess'));
+        toast.success("CV parsed successfully!");
       }
     } catch (error) {
       console.error("Upload error:", error);
-      toast.error(t('toasts.parseError'));
+      toast.error("Failed to parse CV. Please try again.");
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
@@ -194,28 +194,20 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
                 className="hidden"
               />
               
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => {
-                  if (isGuest) {
-                    toast.info(t('toasts.guestUpload'), {
-                      action: {
-                        label: t('toasts.loginAction'),
-                        onClick: () => router.push('/login?callbackUrl=/app/resume-builder')
-                      }
-                    });
-                    return;
-                  }
-                  fileInputRef.current?.click();
-                }}
-                disabled={isUploading}
-                className="gap-2"
-                title={t('actions.upload')}
-              >
-                <Upload className="h-4 w-4" />
-                {isUploading ? t('actions.parsing') : t('actions.upload')}
-              </Button>
+              {/* Upload button - only for authenticated users */}
+              {!isGuest && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="gap-2"
+                  title={t('actions.upload')}
+                >
+                  <Upload className="h-4 w-4" />
+                  {isUploading ? t('actions.parsing') : t('actions.upload')}
+                </Button>
+              )}
               
               <Button variant="ghost" size="icon" onClick={handleReset} title={t('actions.reset')}>
                 <RotateCcw className="h-4 w-4" />
