@@ -22,7 +22,8 @@ export default function HelpPage() {
       title: "Getting Started",
       description: "Learn the basics of uploading and tailoring your CV",
       links: [
-        { label: "Upload your first CV", href: "/app/upload" },
+        { label: "Create your first CV", href: "/app/resume-builder" },
+         { label: "Tailoring your first CV", href: "/app/upload" },
         { label: "How CV tailoring works", href: "#" },
         { label: "Understanding ATS scores", href: "#" },
       ]

@@ -40,7 +40,7 @@ export function CTASection() {
               size="lg"
               className="group h-14 bg-white px-8 text-base font-semibold text-purple-600 hover:bg-white/90"
             >
-              <Link href="/app/upload">
+              <Link href="/app/resume-builder">
                 Create Your CV Now
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>

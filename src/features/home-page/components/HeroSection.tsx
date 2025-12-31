@@ -57,7 +57,7 @@ export function HeroSection() {
           {/* CTAs */}
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button asChild size="lg" className="group h-12 px-8 text-base font-semibold">
-              <Link href="/app/upload">
+              <Link href="/app/resume-builder">
                 Start Free — No Credit Card
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>

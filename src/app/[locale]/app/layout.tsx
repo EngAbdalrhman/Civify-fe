@@ -138,15 +138,17 @@ export default function UserDashboardLayout({
               </Link>
             )}
             
-            {/* Upload CV - always visible (guest feature) for now */}
-            <Link 
+            {/* Upload CV */}
+            {isAuthenticated && (
+              <Link 
               href="/app/upload" 
               className={getLinkClasses('/app/upload')}
             >
               <UploadCloud className="h-4 w-4" />
               {t('upload')}
             </Link>
-            
+          )}
+        
             {/* Analytics - requires STATS.VIEW or API_USAGE.VIEW */}
             {isAuthenticated && canViewAnalytics && (
               <Link 
