@@ -133,7 +133,7 @@ export async function exportToPdf(element: HTMLElement, filename: string = 'cv',
   }
 
   // Sections - filter out empty and hidden sections
-  const visibleSections = (sections || []).filter(s => 
+  const visibleSections = (sections || []).filter((s: { visible: boolean; isVisible: boolean; items: string | any[]; }) => 
     s.visible !== false && s.isVisible !== false && s.items && s.items.length > 0
   );
   
