@@ -10,7 +10,8 @@ import {
   Shield,
   Key,
   HelpCircle,
-  Zap
+  Zap,
+  FileEdit
 } from 'lucide-react';
 import { DashboardNavbar } from '@/components/DashboardNavbar';
 import { useAuth } from '@/hooks/use-auth';
@@ -83,6 +84,7 @@ export default function UserDashboardLayout({
   };
 
   const isUploadPage = pathname.includes('/upload');
+  const isResumeBuilderPage = pathname.includes('/resume-builder');
 
   const getLinkClasses = (path: string) => {
      const active = isActive(path);
@@ -137,6 +139,15 @@ export default function UserDashboardLayout({
                 {t('dashboard')}
               </Link>
             )}
+            
+            {/* Resume Builder - visible for all users (guests can use it) */}
+            <Link 
+              href="/app/resume-builder" 
+              className={getLinkClasses('/app/resume-builder')}
+            >
+              <FileEdit className="h-4 w-4" />
+              Resume Builder
+            </Link>
             
             {/* Upload CV */}
             {isAuthenticated && (
@@ -224,10 +235,14 @@ export default function UserDashboardLayout({
         
         <div className="flex flex-1 overflow-hidden">
           {/* Main Page Content */}
-          <main className="flex-1 p-6 overflow-y-auto">
-            <div className="max-w-7xl mx-auto space-y-6">
-              {children}
-            </div>
+          <main className={`flex-1 overflow-y-auto ${isResumeBuilderPage ? '' : 'p-6'}`}>
+            {isResumeBuilderPage ? (
+              children
+            ) : (
+              <div className="max-w-7xl mx-auto space-y-6">
+                {children}
+              </div>
+            )}
           </main>
 
           {/* Right Utility Panel */}
