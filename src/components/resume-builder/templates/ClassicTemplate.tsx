@@ -1,14 +1,98 @@
 "use client";
 
-import { ResumeData } from '@/features/upload-cv/types';
+import { ResumeData, SkillLevel, SkillsDisplayStyle, LanguagesDisplayStyle } from '@/features/upload-cv/types';
+import { LevelVisualizer } from './LevelVisualizer';
 
 interface TemplateProps {
   data: ResumeData;
   color: string;
 }
 
+// Map subtitle/level strings to SkillLevel
+function parseLevel(value?: string): SkillLevel {
+  if (!value) return 'intermediate';
+  const lower = value.toLowerCase();
+  if (lower === 'native' || lower === 'fluent' || lower === 'expert') return 'expert';
+  if (lower === 'advanced') return 'advanced';
+  if (lower === 'intermediate') return 'intermediate';
+  if (lower === 'beginner') return 'beginner';
+  return 'intermediate';
+}
+
 export function ClassicTemplate({ data, color }: TemplateProps) {
-  const { personalInfo, sections } = data;
+  const { personalInfo, sections, metadata } = data;
+  const skillsStyle: SkillsDisplayStyle = metadata?.skillsDisplayStyle || 'grid';
+  const languagesStyle: LanguagesDisplayStyle = metadata?.languagesDisplayStyle || 'level';
+
+  const renderSkills = (section: any) => {
+    const items = section.items.filter((item: any) => item.visible !== false);
+    
+    // Grid/Compact styles
+    if (skillsStyle === 'grid' || skillsStyle === 'bubble' || skillsStyle === 'compact' || skillsStyle === 'text') {
+      return (
+        <div className="flex flex-wrap gap-2 text-sm">
+          {items.map((item: any) => (
+            <span key={item.id} className="inline-block bg-gray-100 px-2 py-1 rounded mr-1 mb-1">
+              {item.title}
+            </span>
+          ))}
+        </div>
+      );
+    }
+
+    // Level/Dots/Bar styles
+    const displayStyle = skillsStyle === 'dots' ? 'dots' : skillsStyle === 'bar' ? 'bar' : 'text';
+    
+    return (
+      <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+        {items.map((item: any) => {
+          const level = item.level || parseLevel(item.subtitle);
+          return (
+            <div key={item.id} className="flex items-center justify-between">
+              <span className="text-sm text-gray-800">{item.title}</span>
+              <LevelVisualizer level={level} style={displayStyle} color={color} />
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const renderLanguages = (section: any) => {
+    const items = section.items.filter((item: any) => item.visible !== false);
+    
+    if (languagesStyle === 'text' || languagesStyle === 'level') {
+      return (
+        <div className="space-y-1">
+          {items.map((item: any) => (
+            <div key={item.id} className="text-sm">
+              <span className="font-bold text-gray-800">{item.title}</span>
+              {item.subtitle && <span className="text-gray-600"> - {item.subtitle}</span>}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    const displayStyle = languagesStyle === 'dots' ? 'dots' : 'bar';
+    
+    return (
+      <div className="space-y-2">
+        {items.map((item: any) => {
+          const level = item.level || parseLevel(item.subtitle);
+          return (
+            <div key={item.id} className="flex items-center justify-between">
+              <span className="text-sm font-bold text-gray-800">{item.title}</span>
+              <LevelVisualizer level={level} style={displayStyle} color={color} />
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  // Filter out empty sections
+  const visibleSections = sections.filter(s => s.visible !== false && s.items && s.items.length > 0);
 
   return (
     <div className="p-10 h-full bg-white text-gray-900 font-serif leading-relaxed">
@@ -41,7 +125,7 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
        )}
 
        {/* Sections */}
-       {sections.filter(s => s.visible !== false && s.items && s.items.length > 0).map(section => (
+       {visibleSections.map(section => (
          <section key={section.id} className="mb-6">
            <h3 className="text-lg font-bold uppercase border-b border-gray-800 mb-4 flex items-center">
              <span className="bg-gray-800 text-white px-2 py-0.5 text-sm mr-2" style={{ backgroundColor: color }}>
@@ -51,28 +135,12 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
            </h3>
 
            {section.type === 'skills' ? (
-             <div className="flex flex-wrap gap-2 text-sm">
-               {section.items.filter(item => item.visible !== false).map(item => {
-                 // Skills can be stored as item.title or item.tags
-                 if (item.tags && item.tags.length > 0) {
-                   return item.tags.map((tag, i) => (
-                     <span key={`${item.id}-${i}`} className="inline-block bg-gray-100 px-2 py-1 rounded mr-1 mb-1">
-                       {tag}
-                     </span>
-                   ));
-                 } else if (item.title) {
-                   return (
-                     <span key={item.id} className="inline-block bg-gray-100 px-2 py-1 rounded mr-1 mb-1">
-                       {item.title}
-                     </span>
-                   );
-                 }
-                 return null;
-               })}
-             </div>
+             renderSkills(section)
+           ) : section.type === 'languages' ? (
+             renderLanguages(section)
            ) : (
              <div className="space-y-4">
-               {section.items.filter(i => i.visible !== false).map(item => (
+               {section.items.filter((i: any) => i.visible !== false).map((item: any) => (
                  <div key={item.id}>
                    <div className="flex justify-between font-bold text-gray-800 text-sm">
                      <span>{item.title}</span>

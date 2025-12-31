@@ -132,9 +132,12 @@ export async function exportToPdf(element: HTMLElement, filename: string = 'cv',
     y += 5;
   }
 
-  // Sections
-  for (const section of sections || []) {
-    if (section.isVisible === false) continue;
+  // Sections - filter out empty and hidden sections
+  const visibleSections = (sections || []).filter(s => 
+    s.visible !== false && s.isVisible !== false && s.items && s.items.length > 0
+  );
+  
+  for (const section of visibleSections) {
     
     addNewPageIfNeeded(20);
     addLine();
@@ -142,9 +145,14 @@ export async function exportToPdf(element: HTMLElement, filename: string = 'cv',
     y += 3;
 
     if (section.type === 'skills') {
-      const skills = section.items?.map((item: { title?: string }) => item.title).filter(Boolean).join(', ');
-      if (skills) {
-        addText(skills, 10);
+      const skillsWithLevels = section.items?.map((item: { title?: string; level?: string }) => {
+        if (item.level && item.level !== 'none') {
+          return `${item.title} (${item.level})`;
+        }
+        return item.title;
+      }).filter(Boolean).join(', ');
+      if (skillsWithLevels) {
+        addText(skillsWithLevels, 10);
       }
     } else if (section.type === 'languages') {
       for (const item of section.items || []) {
@@ -259,9 +267,13 @@ export async function exportToDocx(resumeData: ResumeData, filename: string = 'c
     );
   }
 
-  // Sections
-  for (const section of sections) {
-    if (!section.isVisible && section.isVisible !== undefined) continue;
+  // Sections - filter out empty and hidden sections
+  const visibleSections = sections.filter(s => 
+    s.visible !== false && s.isVisible !== false && s.items && s.items.length > 0
+  );
+  
+  for (const section of visibleSections) {
+    // Already filtered above, no need for additional check
 
     children.push(
       new Paragraph({
@@ -272,13 +284,18 @@ export async function exportToDocx(resumeData: ResumeData, filename: string = 'c
       })
     );
 
-    // Skills section - render as comma-separated list
+    // Skills section - render as comma-separated list with levels
     if (section.type === 'skills') {
-      const skills = section.items.map(item => item.title).filter(Boolean);
-      if (skills.length > 0) {
+      const skillsWithLevels = section.items.map(item => {
+        if (item.level && item.level !== 'none') {
+          return `${item.title} (${item.level})`;
+        }
+        return item.title;
+      }).filter(Boolean);
+      if (skillsWithLevels.length > 0) {
         children.push(
           new Paragraph({
-            text: skills.join(', '),
+            text: skillsWithLevels.join(', '),
             spacing: { after: 200 },
           })
         );

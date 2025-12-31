@@ -14,6 +14,13 @@ export interface PersonalInfo {
   github?: string;
 }
 
+// Level types for skills and languages
+export type SkillLevel = 'expert' | 'advanced' | 'intermediate' | 'beginner' | 'none';
+
+// Display style types
+export type SkillsDisplayStyle = 'grid' | 'level' | 'compact' | 'bubble' | 'text' | 'dots' | 'bar';
+export type LanguagesDisplayStyle = 'level' | 'dots' | 'bar' | 'text';
+
 export interface SectionItem {
   id: string;
   title: string;
@@ -24,6 +31,7 @@ export interface SectionItem {
   description?: string;
   location?: string;
   tags?: string[];
+  level?: SkillLevel;  // For skills and languages level
   visible?: boolean; // Backend uses 'visible'
   isVisible?: boolean; // Deprecated, use 'visible'
 }
@@ -44,6 +52,10 @@ export interface ResumeMetadata {
   primaryColor?: string;
   fontFamily?: string;
   language?: string;
+  // Display style options
+  skillsDisplayStyle?: SkillsDisplayStyle;
+  languagesDisplayStyle?: LanguagesDisplayStyle;
+  sectionOrder?: string[]; // Ordered array of section IDs
 }
 
 export interface ResumeData {

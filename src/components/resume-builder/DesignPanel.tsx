@@ -1,10 +1,9 @@
 "use client";
 
-import { ResumeData } from '@/features/upload-cv/types';
+import { ResumeData, SkillsDisplayStyle, LanguagesDisplayStyle } from '@/features/upload-cv/types';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Card } from '@/components/ui/card';
-import { LayoutTemplate, Type, Palette } from 'lucide-react';
+import { LayoutTemplate, Type, Palette, Code, Languages } from 'lucide-react';
 
 interface DesignPanelProps {
   data: ResumeData;
@@ -30,6 +29,23 @@ const COLORS = [
   '#16a34a', // Green
   '#9333ea', // Purple
   '#f59e0b', // Amber
+];
+
+const SKILLS_DISPLAY_STYLES: { id: SkillsDisplayStyle; name: string }[] = [
+  { id: 'grid', name: 'Grid' },
+  { id: 'level', name: 'Level' },
+  { id: 'compact', name: 'Compact' },
+  { id: 'bubble', name: 'Bubble' },
+  { id: 'text', name: 'Text' },
+  { id: 'dots', name: 'Dots' },
+  { id: 'bar', name: 'Bar' },
+];
+
+const LANGUAGES_DISPLAY_STYLES: { id: LanguagesDisplayStyle; name: string }[] = [
+  { id: 'level', name: 'Level' },
+  { id: 'dots', name: 'Dots' },
+  { id: 'bar', name: 'Bar' },
+  { id: 'text', name: 'Text' },
 ];
 
 export function DesignPanel({ data, onChange }: DesignPanelProps) {
@@ -111,6 +127,54 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
             </div>
           ))}
         </RadioGroup>
+      </div>
+
+      {/* Skills Display Style */}
+      <div className="space-y-4">
+        <h3 className="font-semibold flex items-center gap-2">
+          <Code className="h-4 w-4" />
+          Skills Display
+        </h3>
+        <div className="grid grid-cols-4 gap-2">
+          {SKILLS_DISPLAY_STYLES.map((style) => (
+            <button
+              key={style.id}
+              className={`
+                px-3 py-2 text-sm rounded-lg border transition-all
+                ${(metadata.skillsDisplayStyle || 'grid') === style.id
+                  ? 'border-primary bg-primary/10 text-primary font-medium'
+                  : 'border-border hover:border-primary/50'}
+              `}
+              onClick={() => updateMetadata('skillsDisplayStyle', style.id)}
+            >
+              {style.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Languages Display Style */}
+      <div className="space-y-4">
+        <h3 className="font-semibold flex items-center gap-2">
+          <Languages className="h-4 w-4" />
+          Languages Display
+        </h3>
+        <div className="grid grid-cols-4 gap-2">
+          {LANGUAGES_DISPLAY_STYLES.map((style) => (
+            <button
+              key={style.id}
+              className={`
+                px-3 py-2 text-sm rounded-lg border transition-all
+                ${(metadata.languagesDisplayStyle || 'level') === style.id
+                  ? 'border-primary bg-primary/10 text-primary font-medium'
+                  : 'border-border hover:border-primary/50'}
+              `}
+              onClick={() => updateMetadata('languagesDisplayStyle', style.id)}
+            >
+              {style.name}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

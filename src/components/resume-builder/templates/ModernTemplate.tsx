@@ -1,15 +1,29 @@
 "use client";
 
-import { ResumeData } from '@/features/upload-cv/types';
+import { ResumeData, SkillLevel, SkillsDisplayStyle, LanguagesDisplayStyle } from '@/features/upload-cv/types';
 import { Mail, Phone, MapPin, Linkedin, Github, Globe } from 'lucide-react';
+import { LevelVisualizer } from './LevelVisualizer';
 
 interface TemplateProps {
   data: ResumeData;
   color: string;
 }
 
+// Map subtitle/level strings to SkillLevel
+function parseLevel(value?: string): SkillLevel {
+  if (!value) return 'intermediate';
+  const lower = value.toLowerCase();
+  if (lower === 'native' || lower === 'fluent' || lower === 'expert') return 'expert';
+  if (lower === 'advanced') return 'advanced';
+  if (lower === 'intermediate') return 'intermediate';
+  if (lower === 'beginner') return 'beginner';
+  return 'intermediate';
+}
+
 export function ModernTemplate({ data, color }: TemplateProps) {
-  const { personalInfo, sections } = data;
+  const { personalInfo, sections, metadata } = data;
+  const skillsStyle: SkillsDisplayStyle = metadata?.skillsDisplayStyle || 'grid';
+  const languagesStyle: LanguagesDisplayStyle = metadata?.languagesDisplayStyle || 'level';
 
   const renderSectionItem = (item: any) => (
     <div key={item.id} className="mb-4 break-inside-avoid">
@@ -36,6 +50,106 @@ export function ModernTemplate({ data, color }: TemplateProps) {
        )}
     </div>
   );
+
+  const renderSkills = (section: any) => {
+    const items = section.items.filter((item: any) => item.visible !== false);
+    
+    // Grid style - simple tags
+    if (skillsStyle === 'grid' || skillsStyle === 'bubble') {
+      return (
+        <div className="flex flex-wrap gap-2">
+          {items.map((item: any) => (
+            <span 
+              key={item.id} 
+              className={`text-sm px-3 py-1 rounded-full text-gray-700 font-medium ${
+                skillsStyle === 'bubble' ? 'border border-gray-300' : 'bg-gray-100'
+              }`}
+            >
+              {item.title}
+            </span>
+          ))}
+        </div>
+      );
+    }
+
+    // Compact style - comma separated
+    if (skillsStyle === 'compact' || skillsStyle === 'text') {
+      return (
+        <p className="text-sm text-gray-700">
+          {items.map((item: any) => item.title).join(', ')}
+        </p>
+      );
+    }
+
+    // Level/Dots/Bar styles - show with level visualization
+    const displayDotsOrBar = skillsStyle === 'dots' ? 'dots' : skillsStyle === 'bar' ? 'bar' : 'text';
+    
+    return (
+      <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+        {items.map((item: any) => {
+          const level = item.level || parseLevel(item.subtitle);
+          return (
+            <div key={item.id} className="flex items-center justify-between">
+              <span className="text-sm text-gray-800">{item.title}</span>
+              <LevelVisualizer level={level} style={displayDotsOrBar} color={color} />
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const renderLanguages = (section: any) => {
+    const items = section.items.filter((item: any) => item.visible !== false);
+    
+    // Text style - just name with level text
+    if (languagesStyle === 'text') {
+      return (
+        <div className="space-y-1">
+          {items.map((item: any) => (
+            <div key={item.id} className="text-sm">
+              <span className="font-medium text-gray-800">{item.title}</span>
+              {item.subtitle && <span className="text-gray-600"> - {item.subtitle}</span>}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // Level text style
+    if (languagesStyle === 'level') {
+      return (
+        <div className="space-y-1">
+          {items.map((item: any) => (
+            <div key={item.id} className="flex items-center justify-between">
+              <span className="text-sm font-medium text-gray-800">{item.title}</span>
+              <span className="text-sm text-gray-600 italic capitalize">{item.subtitle || 'Intermediate'}</span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // Dots/Bar styles
+    const displayStyle = languagesStyle === 'dots' ? 'dots' : 'bar';
+    
+    return (
+      <div className="space-y-2">
+        {items.map((item: any) => {
+          const level = item.level || parseLevel(item.subtitle);
+          return (
+            <div key={item.id} className="flex items-center justify-between">
+              <span className="text-sm font-medium text-gray-800">{item.title}</span>
+              <LevelVisualizer level={level} style={displayStyle} color={color} />
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  // Filter out empty sections
+  const visibleSections = sections.filter(s => s.visible !== false && s.items && s.items.length > 0);
 
   return (
     <div className="p-8 h-full bg-white text-gray-900">
@@ -93,36 +207,20 @@ export function ModernTemplate({ data, color }: TemplateProps) {
       )}
 
       {/* Dynamic Sections */}
-      {sections.filter(s => s.visible !== false && s.items && s.items.length > 0).map(section => (
+      {visibleSections.map(section => (
         <section key={section.id} className="mb-6">
           <h3 className="text-xs font-bold uppercase tracking-wider mb-4 border-b pb-1" style={{ color, borderColor: color + '40' }}>
             {section.title}
           </h3>
           
           {section.type === 'skills' ? (
-             <div className="flex flex-wrap gap-2">
-               {section.items.filter(item => item.visible !== false).map(item => {
-                 // Skills can be stored as item.title or item.tags
-                 if (item.tags && item.tags.length > 0) {
-                   return item.tags.map((tag, i) => (
-                     <span key={`${item.id}-${i}`} className="text-sm px-3 py-1 bg-gray-100 rounded-full text-gray-700 font-medium">
-                       {tag}
-                     </span>
-                   ));
-                 } else if (item.title) {
-                   return (
-                     <span key={item.id} className="text-sm px-3 py-1 bg-gray-100 rounded-full text-gray-700 font-medium">
-                       {item.title}
-                     </span>
-                   );
-                 }
-                 return null;
-               })}
-             </div>
-           ) : (
-             <div className="space-y-4">
-               {section.items.filter(i => i.visible !== false).map(renderSectionItem)}
-             </div>
+            renderSkills(section)
+          ) : section.type === 'languages' ? (
+            renderLanguages(section)
+          ) : (
+            <div className="space-y-4">
+              {section.items.filter((i: any) => i.visible !== false).map(renderSectionItem)}
+            </div>
           )}
         </section>
       ))}

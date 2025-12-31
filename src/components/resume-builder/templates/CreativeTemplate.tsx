@@ -1,21 +1,107 @@
 "use client";
 
-import { ResumeData } from '@/features/upload-cv/types';
+import { ResumeData, SkillLevel, SkillsDisplayStyle, LanguagesDisplayStyle } from '@/features/upload-cv/types';
+import { LevelVisualizer } from './LevelVisualizer';
 
 interface TemplateProps {
   data: ResumeData;
   color: string;
 }
 
+// Map subtitle/level strings to SkillLevel
+function parseLevel(value?: string): SkillLevel {
+  if (!value) return 'intermediate';
+  const lower = value.toLowerCase();
+  if (lower === 'native' || lower === 'fluent' || lower === 'expert') return 'expert';
+  if (lower === 'advanced') return 'advanced';
+  if (lower === 'intermediate') return 'intermediate';
+  if (lower === 'beginner') return 'beginner';
+  return 'intermediate';
+}
+
 export function CreativeTemplate({ data, color }: TemplateProps) {
-  const { personalInfo, sections } = data;
+  const { personalInfo, sections, metadata } = data;
+  const skillsStyle: SkillsDisplayStyle = metadata?.skillsDisplayStyle || 'grid';
+  const languagesStyle: LanguagesDisplayStyle = metadata?.languagesDisplayStyle || 'level';
+
+  const renderSkills = (section: any) => {
+    const items = section.items.filter((item: any) => item.visible !== false);
+    
+    // Grid/Bubble/Compact styles
+    if (skillsStyle === 'grid' || skillsStyle === 'bubble' || skillsStyle === 'compact' || skillsStyle === 'text') {
+      return (
+        <div className="flex flex-wrap gap-2">
+          {items.map((item: any) => (
+            <span key={item.id} className="bg-white/20 px-2 py-1 rounded text-xs">
+              {item.title}
+            </span>
+          ))}
+        </div>
+      );
+    }
+
+    // Level/Dots/Bar styles
+    const displayStyle = skillsStyle === 'dots' ? 'dots' : skillsStyle === 'bar' ? 'bar' : 'text';
+    
+    return (
+      <div className="space-y-2">
+        {items.map((item: any) => {
+          const level = item.level || parseLevel(item.subtitle);
+          return (
+            <div key={item.id} className="flex items-center justify-between">
+              <span className="text-xs">{item.title}</span>
+              <LevelVisualizer level={level} style={displayStyle} color="#ffffff" />
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const renderLanguages = (section: any) => {
+    const items = section.items.filter((item: any) => item.visible !== false);
+    
+    if (languagesStyle === 'text' || languagesStyle === 'level') {
+      return (
+        <div className="space-y-1">
+          {items.map((item: any) => (
+            <div key={item.id} className="text-xs">
+              <span className="font-medium">{item.title}</span>
+              {item.subtitle && <span className="text-white/80"> - {item.subtitle}</span>}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    const displayStyle = languagesStyle === 'dots' ? 'dots' : 'bar';
+    
+    return (
+      <div className="space-y-2">
+        {items.map((item: any) => {
+          const level = item.level || parseLevel(item.subtitle);
+          return (
+            <div key={item.id} className="flex items-center justify-between">
+              <span className="text-xs">{item.title}</span>
+              <LevelVisualizer level={level} style={displayStyle} color="#ffffff" />
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  // Filter out empty sections
+  const skillsSections = sections.filter(s => s.type === 'skills' && s.items && s.items.length > 0);
+  const languagesSections = sections.filter(s => s.type === 'languages' && s.items && s.items.length > 0);
+  const otherSections = sections.filter(s => s.type !== 'skills' && s.type !== 'languages' && s.visible !== false && s.items && s.items.length > 0);
 
   return (
     <div className="flex h-full bg-white">
       {/* Left Sidebar */}
       <aside className="w-[30%] text-white p-6 space-y-6" style={{ backgroundColor: color }}>
         <div className="text-center">
-           {/* Profile Picture Placeholder if we had one */}
+           {/* Profile Picture Placeholder */}
            <div className="w-32 h-32 bg-white/20 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl font-bold">
               {personalInfo.fullName.charAt(0)}
            </div>
@@ -33,27 +119,18 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
         </div>
 
         {/* Skills in Sidebar */}
-        {sections.filter(s => s.type === 'skills' && s.items && s.items.length > 0).map(section => (
+        {skillsSections.map(section => (
           <div key={section.id} className="pt-4 border-t border-white/20">
             <h3 className="font-bold uppercase mb-3 text-white/90">{section.title}</h3>
-            <div className="flex flex-wrap gap-2">
-               {section.items.filter(item => item.visible !== false).map(item => {
-                 if (item.tags && item.tags.length > 0) {
-                   return item.tags.map((tag, i) => (
-                     <span key={`${item.id}-${i}`} className="bg-white/20 px-2 py-1 rounded text-xs">
-                       {tag}
-                     </span>
-                   ));
-                 } else if (item.title) {
-                   return (
-                     <span key={item.id} className="bg-white/20 px-2 py-1 rounded text-xs">
-                       {item.title}
-                     </span>
-                   );
-                 }
-                 return null;
-               })}
-            </div>
+            {renderSkills(section)}
+          </div>
+        ))}
+
+        {/* Languages in Sidebar */}
+        {languagesSections.map(section => (
+          <div key={section.id} className="pt-4 border-t border-white/20">
+            <h3 className="font-bold uppercase mb-3 text-white/90">{section.title}</h3>
+            {renderLanguages(section)}
           </div>
         ))}
       </aside>
@@ -67,14 +144,14 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
            </section>
          )}
 
-         {sections.filter(s => s.type !== 'skills' && s.visible !== false && s.items && s.items.length > 0).map(section => (
+         {otherSections.map(section => (
            <section key={section.id} className="mb-8">
              <h2 className="text-xl font-bold uppercase mb-4 text-gray-900 border-b-2 pb-1" style={{ borderColor: color }}>
                {section.title}
              </h2>
              
              <div className="space-y-6">
-                {section.items.filter(i => i.visible !== false).map(item => (
+                {section.items.filter((i: any) => i.visible !== false).map((item: any) => (
                    <div key={item.id} className="relative pl-4 border-l-2 border-gray-200">
                       <div className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full" style={{ backgroundColor: color }}></div>
                       <h3 className="font-bold text-gray-800 text-lg">{item.subtitle}</h3>
