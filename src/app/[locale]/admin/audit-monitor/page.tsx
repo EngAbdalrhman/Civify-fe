@@ -282,6 +282,159 @@ function AuditTabContent({ entityTypes, useAllEndpoint = false }: AuditTabConten
   );
 }
 
+// CV Log Tab Content
+interface CvLogTabContentProps {
+  // empty props for now
+}
+
+const cvLogColumns: ColumnDef<any>[] = [
+  {
+    key: 'id',
+    label: 'ID',
+    sortable: true,
+  },
+  {
+    key: 'action',
+    label: 'Action',
+    sortable: true,
+    filterable: true,
+    filterType: 'select',
+    filterOptions: [
+      { label: 'Upload', value: 'UPLOAD' },
+      { label: 'Parse', value: 'PARSE' },
+      { label: 'Tailor', value: 'TAILOR' },
+      { label: 'Mask', value: 'MASK' },
+    ],
+    render: (value) => {
+      const action = value as string;
+      const variants: Record<string, 'default' | 'secondary' | 'outline'> = {
+        UPLOAD: 'default',
+        PARSE: 'secondary',
+        TAILOR: 'default',
+        MASK: 'outline',
+      };
+      return <Badge variant={variants[action] || 'outline'}>{action}</Badge>;
+    },
+  },
+  {
+    key: 'source',
+    label: 'Source',
+    sortable: true,
+    filterable: true,
+    filterType: 'select',
+    filterOptions: [
+      { label: 'UI', value: 'INTERNAL' },
+      { label: 'API', value: 'EXTERNAL_API' },
+    ],
+  },
+  {
+    key: 'success',
+    label: 'Status',
+    sortable: true,
+    filterable: true,
+    filterType: 'select',
+    filterOptions: [
+      { label: 'Success', value: 'true' },
+      { label: 'Failed', value: 'false' },
+    ],
+    render: (value) => (
+      <Badge variant={value ? 'default' : 'destructive'}>
+        {value ? 'Success' : 'Failed'}
+      </Badge>
+    ),
+  },
+  {
+    key: 'user.email', // Dot notation for generic filter
+    label: 'User',
+    sortable: false,
+    filterable: true,
+    filterType: 'text',
+    render: (_, item) => item.user?.email || 'Guest',
+  },
+  {
+    key: 'processingTimeMs',
+    label: 'Time (ms)',
+    sortable: true,
+  },
+  {
+    key: 'createdAt',
+    label: 'Date',
+    sortable: true,
+    render: (value) => format(new Date(value as string), 'MMM dd, HH:mm:ss'),
+  },
+];
+
+function CvLogTabContent() {
+  const [data, setData] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalElements, setTotalElements] = useState(0);
+  const [currentSort, setCurrentSort] = useState<SortState>({ field: 'createdAt', direction: 'DESC' });
+  const [currentPage, setCurrentPage] = useState(0);
+  const [currentFilters, setCurrentFilters] = useState<FilterState>({});
+  const pageSize = 10;
+
+  const fetchData = useCallback(async (
+    filters: FilterState,
+    sort: SortState,
+    page: number
+  ) => {
+    setIsLoading(true);
+    try {
+      const inputData = buildInputDataModel(filters, sort, page, pageSize, cvLogColumns);
+      const response = await adminService.getCvLogs(inputData);
+      
+      setData(response.content || []);
+      setTotalElements(response.totalElements || 0);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to fetch CV logs';
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Initial fetch
+  useEffect(() => {
+    fetchData(currentFilters, currentSort, 0);
+  }, []);
+
+  const handleFilterChange = useCallback((filters: FilterState) => {
+    setCurrentFilters(filters);
+    setCurrentPage(0);
+    fetchData(filters, currentSort, 0);
+  }, [fetchData, currentSort]);
+
+  const handleSortChange = useCallback((sort: SortState) => {
+    setCurrentSort(sort);
+    setCurrentPage(0);
+    fetchData(currentFilters, sort, 0);
+  }, [fetchData, currentFilters]);
+
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
+    fetchData(currentFilters, currentSort, page);
+  }, [fetchData, currentSort, currentFilters]);
+
+  return (
+    <GenericList
+      data={data as any}
+      columns={cvLogColumns}
+      isLoading={isLoading}
+      meta={{
+        page: currentPage,
+        size: pageSize,
+        totalElements,
+        totalPages: Math.ceil(totalElements / pageSize),
+      }}
+      onFilterChange={handleFilterChange}
+      onSortChange={handleSortChange}
+      onPageChange={handlePageChange}
+      defaultSort={currentSort}
+      emptyMessage="No CV logs found"
+    />
+  );
+}
+
 export default function AuditMonitorPage() {
   return (
     <div className="space-y-6">
@@ -296,7 +449,7 @@ export default function AuditMonitorPage() {
 
       {/* Tabs */}
       <Tabs defaultValue="users" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 max-w-lg">
+        <TabsList className="grid w-full grid-cols-5 max-w-2xl">
           <TabsTrigger value="users" className="gap-2">
             <Users className="h-4 w-4" />
             Users
@@ -308,6 +461,10 @@ export default function AuditMonitorPage() {
           <TabsTrigger value="promos" className="gap-2">
             <Settings className="h-4 w-4" />
             Promos
+          </TabsTrigger>
+          <TabsTrigger value="cv-logs" className="gap-2">
+            <FileSearch className="h-4 w-4" />
+            CV Logs
           </TabsTrigger>
           <TabsTrigger value="all" className="gap-2">
             <FileSearch className="h-4 w-4" />
@@ -336,6 +493,14 @@ export default function AuditMonitorPage() {
             <h3 className="text-lg font-semibold mb-4">Promo Code Logs</h3>
             <p className="text-sm text-muted-foreground mb-4">Logs for PromoCode entity changes</p>
             <AuditTabContent entityTypes={['PromoCode']} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="cv-logs" className="mt-6">
+          <div className="rounded-lg border bg-card p-6">
+            <h3 className="text-lg font-semibold mb-4">CV Operation Logs</h3>
+            <p className="text-sm text-muted-foreground mb-4">Logs for CV parsing, tailoring, and masking</p>
+            <CvLogTabContent />
           </div>
         </TabsContent>
 

@@ -210,20 +210,38 @@ export interface SendToUsersRequest extends SendNotificationRequest {
 // ============================================
 
 export type AuditAction = 'INSERT' | 'UPDATE' | 'DELETE' | 'READ' | 'LOGIN' | 'LOGOUT' | 'ACTIVATE' | 'DEACTIVATE';
-
 export interface AuditLog {
   id: number;
   entityType: string;
   entityId: string;
-  action: AuditAction;
+  action: string;
   performedBy: string;
   performedAt: string;
-  oldValue?: Record<string, unknown>;
-  newValue?: Record<string, unknown>;
-  changes?: Record<string, unknown>;
+  details: string;
+  ipAddress: string;
+  userAgent: string;
+  oldValue: Record<string, unknown>;
+  newValue: Record<string, unknown>;
+  changes: Record<string, unknown>;
   comment?: string;
-  ipAddress?: string;
-  userAgent?: string;
+}
+
+export interface CvOperationLog {
+  id: number;
+  action: string; // UPLOAD, PARSE, TAILOR, MASK
+  source: string; // INTERNAL, EXTERNAL_API
+  endpoint: string;
+  success: boolean;
+  errorMessage?: string;
+  processingTimeMs: number;
+  ipAddress: string;
+  userAgent: string;
+  createdAt: string;
+  // Nested objects map to Map<String, Object> from backend
+  requestMetadata?: Record<string, unknown>;
+  extractedPii?: Record<string, unknown>;
+  // Virtual field for display if needed
+  userEmail?: string;
 }
 
 // ============================================
@@ -474,6 +492,11 @@ class AdminService {
   // ==========================================
   // Audit Logs
   // ==========================================
+
+  async getCvLogs(data: InputDataModel): Promise<PagedResponse<CvOperationLog>> {
+    const response = await apiClient.post<PagedResponse<CvOperationLog>>('/v1/admin/audit/cv-logs', data);
+    return response.data;
+  }
 
   async getAllAuditLogs(data: InputDataModel): Promise<PagedResponse<AuditLog>> {
     const response = await apiClient.post<PagedResponse<AuditLog>>(
