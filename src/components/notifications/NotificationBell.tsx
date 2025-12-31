@@ -117,6 +117,8 @@ export function NotificationBell() {
         return 'bg-yellow-500';
       case 'PROMO':
         return 'bg-purple-500';
+      case 'SYSTEM':
+        return 'bg-slate-500';
       default:
         return 'bg-blue-500';
     }

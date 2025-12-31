@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -14,7 +13,7 @@ import {
   Trash2,
   Power,
   PowerOff,
-  AlertCircle
+  AlertCircle 
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { adminService, type AdminPlan } from '@/services/admin.service';
@@ -29,6 +28,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { usePermissions } from '@/contexts/PermissionContext';
+import { ADMIN_ACTION_PERMISSIONS } from '@/config/adminMenuConfig';
 import {
   Select,
   SelectContent,
@@ -49,22 +50,24 @@ function getPlanIcon(name: string) {
   return <Package className="h-5 w-5 text-primary" />;
 }
 
-export default function PlansPage() {
-  const t = useTranslations('admin.plans');
-  const common = useTranslations('common');
-
-  const [plans, setPlans] = useState<AdminPlan[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [editingPlan, setEditingPlan] = useState<AdminPlan | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+export function PlansManager() {
+  const { hasPermission } = usePermissions();
   
+  const canModifyPlans = hasPermission(ADMIN_ACTION_PERMISSIONS.PLAN_EDIT);
+  
+  // Plans state
+  const [plans, setPlans] = useState<AdminPlan[]>([]);
+  const [isLoadingPlans, setIsLoadingPlans] = useState(false);
+  const [plansError, setPlansError] = useState<string | null>(null);
+  const [editingPlan, setEditingPlan] = useState<AdminPlan | null>(null);
+  const [isPlanDialogOpen, setIsPlanDialogOpen] = useState(false);
+  const [isSavingPlan, setIsSavingPlan] = useState(false);
+
   // Groups for dropdown
   const { data: groups = [] } = useGroups();
 
-  // Form state
-  const [formData, setFormData] = useState({
+  // Plan form state
+  const [planFormData, setPlanFormData] = useState({
     name: '',
     description: '',
     monthlyPrice: '',
@@ -80,28 +83,30 @@ export default function PlansPage() {
     sortOrder: '0',
   });
 
+  // Fetch plans
   const fetchPlans = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
+    setIsLoadingPlans(true);
+    setPlansError(null);
     try {
       const data = await adminService.getAllPlans();
       setPlans(data);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to fetch plans';
-      setError(message);
-      toast.error(message);
+      setPlansError(message);
     } finally {
-      setIsLoading(false);
+      setIsLoadingPlans(false);
     }
   }, []);
 
+  // Initial fetch
   useEffect(() => {
     fetchPlans();
   }, [fetchPlans]);
 
+  // Plan handlers
   const handleCreatePlan = () => {
     setEditingPlan(null);
-    setFormData({
+    setPlanFormData({
       name: '',
       description: '',
       monthlyPrice: '',
@@ -116,12 +121,12 @@ export default function PlansPage() {
       isFeatured: false,
       sortOrder: '0',
     });
-    setIsDialogOpen(true);
+    setIsPlanDialogOpen(true);
   };
 
   const handleEditPlan = (plan: AdminPlan) => {
     setEditingPlan(plan);
-    setFormData({
+    setPlanFormData({
       name: plan.name,
       description: plan.description || '',
       monthlyPrice: plan.monthlyPrice,
@@ -136,26 +141,26 @@ export default function PlansPage() {
       isFeatured: plan.isFeatured ?? false,
       sortOrder: plan.sortOrder?.toString() || '0',
     });
-    setIsDialogOpen(true);
+    setIsPlanDialogOpen(true);
   };
 
   const handleSavePlan = async () => {
-    setIsSaving(true);
+    setIsSavingPlan(true);
     try {
       const planPayload = {
-        name: formData.name,
-        description: formData.description,
-        monthlyPrice: parseFloat(formData.monthlyPrice),
-        annualPrice: parseFloat(formData.annualPrice),
-        cvLimit: formData.cvLimit ? parseInt(formData.cvLimit) : undefined,
-        tokenLimit: formData.tokenLimit ? parseInt(formData.tokenLimit) : undefined,
-        watermark: formData.watermark,
-        linkedGroupId: formData.linkedGroupId ? parseInt(formData.linkedGroupId) : undefined,
-        allowAnnualBilling: formData.allowAnnualBilling,
-        renewalAllowed: formData.renewalAllowed,
-        maxBillingCycles: formData.maxBillingCycles ? parseInt(formData.maxBillingCycles) : undefined,
-        isFeatured: formData.isFeatured,
-        sortOrder: parseInt(formData.sortOrder) || 0,
+        name: planFormData.name,
+        description: planFormData.description,
+        monthlyPrice: parseFloat(planFormData.monthlyPrice),
+        annualPrice: parseFloat(planFormData.annualPrice),
+        cvLimit: planFormData.cvLimit ? parseInt(planFormData.cvLimit) : undefined,
+        tokenLimit: planFormData.tokenLimit ? parseInt(planFormData.tokenLimit) : undefined,
+        watermark: planFormData.watermark,
+        linkedGroupId: planFormData.linkedGroupId ? parseInt(planFormData.linkedGroupId) : undefined,
+        allowAnnualBilling: planFormData.allowAnnualBilling,
+        renewalAllowed: planFormData.renewalAllowed,
+        maxBillingCycles: planFormData.maxBillingCycles ? parseInt(planFormData.maxBillingCycles) : undefined,
+        isFeatured: planFormData.isFeatured,
+        sortOrder: parseInt(planFormData.sortOrder) || 0,
       };
       
       if (editingPlan) {
@@ -165,17 +170,17 @@ export default function PlansPage() {
         await adminService.createPlan(planPayload);
         toast.success('Plan created successfully');
       }
-      setIsDialogOpen(false);
+      setIsPlanDialogOpen(false);
       fetchPlans();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to save plan';
       toast.error(message);
     } finally {
-      setIsSaving(false);
+      setIsSavingPlan(false);
     }
   };
 
-  const handleToggleActive = async (plan: AdminPlan) => {
+  const handleTogglePlanActive = async (plan: AdminPlan) => {
     try {
       if (plan.active) {
         await adminService.deactivatePlan(plan.id);
@@ -204,32 +209,29 @@ export default function PlansPage() {
     }
   };
 
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-4 py-12">
-        <AlertCircle className="h-12 w-12 text-destructive" />
-        <p className="text-lg text-muted-foreground">{error}</p>
-        <Button onClick={fetchPlans}>Retry</Button>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">{t('title')}</h1>
-          <p className="text-muted-foreground">Manage subscription plans and features</p>
-        </div>
-        <Button onClick={handleCreatePlan}>
-          <Plus className="h-4 w-4 mr-2" />
-          {t('createPlan')}
-        </Button>
+      <div className="flex justify-between items-center">
+        <p className="text-sm text-muted-foreground">
+          Configure subscription plans that users can purchase
+        </p>
+        {canModifyPlans && (
+          <Button onClick={handleCreatePlan}>
+            <Plus className="h-4 w-4 mr-2" />
+            Create Plan
+          </Button>
+        )}
       </div>
 
-      {isLoading ? (
+      {isLoadingPlans ? (
         <div className="flex justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : plansError ? (
+        <div className="flex flex-col items-center justify-center gap-4 py-12">
+          <AlertCircle className="h-12 w-12 text-destructive" />
+          <p className="text-lg text-muted-foreground">{plansError}</p>
+          <Button onClick={fetchPlans}>Retry</Button>
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-3">
@@ -263,38 +265,40 @@ export default function PlansPage() {
                 <span className="text-sm font-normal text-muted-foreground">/mo</span>
               </div>
 
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => handleEditPlan(plan)}>
-                  <Edit2 className="h-3 w-3 mr-1" />
-                  {common('edit')}
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => handleToggleActive(plan)}
-                >
-                  {plan.active ? (
-                    <><PowerOff className="h-3 w-3 mr-1" />Deactivate</>
-                  ) : (
-                    <><Power className="h-3 w-3 mr-1" />Activate</>
-                  )}
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="text-destructive hover:text-destructive"
-                  onClick={() => handleDeletePlan(plan)}
-                >
-                  <Trash2 className="h-3 w-3" />
-                </Button>
-              </div>
+              {canModifyPlans && (
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={() => handleEditPlan(plan)}>
+                    <Edit2 className="h-3 w-3 mr-1" />
+                    Edit
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handleTogglePlanActive(plan)}
+                  >
+                    {plan.active ? (
+                      <><PowerOff className="h-3 w-3 mr-1" />Deactivate</>
+                    ) : (
+                      <><Power className="h-3 w-3 mr-1" />Activate</>
+                    )}
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="text-destructive hover:text-destructive"
+                    onClick={() => handleDeletePlan(plan)}
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </div>
+              )}
             </div>
           ))}
         </div>
       )}
 
       {/* Plan Edit/Create Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isPlanDialogOpen} onOpenChange={setIsPlanDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
@@ -303,22 +307,21 @@ export default function PlansPage() {
           </DialogHeader>
           
           <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto">
-            {/* Basic Info */}
             <div className="space-y-2">
-              <Label htmlFor="name">Name *</Label>
+              <Label htmlFor="planName">Name *</Label>
               <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                id="planName"
+                value={planFormData.name}
+                onChange={(e) => setPlanFormData({ ...planFormData, name: e.target.value })}
                 placeholder="e.g., Pro Plan"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="planDescription">Description</Label>
               <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                id="planDescription"
+                value={planFormData.description}
+                onChange={(e) => setPlanFormData({ ...planFormData, description: e.target.value })}
                 placeholder="Brief description of the plan"
               />
             </div>
@@ -330,8 +333,8 @@ export default function PlansPage() {
                 <Input
                   id="monthlyPrice"
                   type="number"
-                  value={formData.monthlyPrice}
-                  onChange={(e) => setFormData({ ...formData, monthlyPrice: e.target.value })}
+                  value={planFormData.monthlyPrice}
+                  onChange={(e) => setPlanFormData({ ...planFormData, monthlyPrice: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
@@ -339,8 +342,8 @@ export default function PlansPage() {
                 <Input
                   id="annualPrice"
                   type="number"
-                  value={formData.annualPrice}
-                  onChange={(e) => setFormData({ ...formData, annualPrice: e.target.value })}
+                  value={planFormData.annualPrice}
+                  onChange={(e) => setPlanFormData({ ...planFormData, annualPrice: e.target.value })}
                 />
               </div>
             </div>
@@ -352,8 +355,8 @@ export default function PlansPage() {
                 <Input
                   id="cvLimit"
                   type="number"
-                  value={formData.cvLimit}
-                  onChange={(e) => setFormData({ ...formData, cvLimit: e.target.value })}
+                  value={planFormData.cvLimit}
+                  onChange={(e) => setPlanFormData({ ...planFormData, cvLimit: e.target.value })}
                   placeholder="Leave empty for unlimited"
                 />
               </div>
@@ -362,8 +365,8 @@ export default function PlansPage() {
                 <Input
                   id="tokenLimit"
                   type="number"
-                  value={formData.tokenLimit}
-                  onChange={(e) => setFormData({ ...formData, tokenLimit: e.target.value })}
+                  value={planFormData.tokenLimit}
+                  onChange={(e) => setPlanFormData({ ...planFormData, tokenLimit: e.target.value })}
                   placeholder="Monthly AI token allowance"
                 />
               </div>
@@ -373,8 +376,8 @@ export default function PlansPage() {
             <div className="space-y-2">
               <Label htmlFor="linkedGroupId">Linked Permission Group</Label>
               <Select 
-                value={formData.linkedGroupId || 'none'} 
-                onValueChange={(value) => setFormData({ ...formData, linkedGroupId: value === 'none' ? '' : value })}
+                value={planFormData.linkedGroupId || 'none'} 
+                onValueChange={(value) => setPlanFormData({ ...planFormData, linkedGroupId: value === 'none' ? '' : value })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a group (optional)" />
@@ -399,19 +402,19 @@ export default function PlansPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center space-x-2">
                   <Switch
-                    id="allowAnnualBilling"
-                    checked={formData.allowAnnualBilling}
-                    onCheckedChange={(checked) => setFormData({ ...formData, allowAnnualBilling: checked })}
+                    id="allowAnnual"
+                    checked={planFormData.allowAnnualBilling}
+                    onCheckedChange={(checked) => setPlanFormData({ ...planFormData, allowAnnualBilling: checked })}
                   />
-                  <Label htmlFor="allowAnnualBilling" className="text-sm">Allow Annual Billing</Label>
+                  <Label htmlFor="allowAnnual" className="text-sm">Allow Annual Billing</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Switch
-                    id="renewalAllowed"
-                    checked={formData.renewalAllowed}
-                    onCheckedChange={(checked) => setFormData({ ...formData, renewalAllowed: checked })}
+                    id="renewal"
+                    checked={planFormData.renewalAllowed}
+                    onCheckedChange={(checked) => setPlanFormData({ ...planFormData, renewalAllowed: checked })}
                   />
-                  <Label htmlFor="renewalAllowed" className="text-sm">Allow Renewal</Label>
+                  <Label htmlFor="renewal" className="text-sm">Allow Renewal</Label>
                 </div>
               </div>
               <div className="space-y-2">
@@ -419,8 +422,8 @@ export default function PlansPage() {
                 <Input
                   id="maxBillingCycles"
                   type="number"
-                  value={formData.maxBillingCycles}
-                  onChange={(e) => setFormData({ ...formData, maxBillingCycles: e.target.value })}
+                  value={planFormData.maxBillingCycles}
+                  onChange={(e) => setPlanFormData({ ...planFormData, maxBillingCycles: e.target.value })}
                   placeholder="e.g., 1 for one-time purchase"
                   className="h-8"
                 />
@@ -434,16 +437,16 @@ export default function PlansPage() {
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="featured"
-                    checked={formData.isFeatured}
-                    onCheckedChange={(checked) => setFormData({ ...formData, isFeatured: checked })}
+                    checked={planFormData.isFeatured}
+                    onCheckedChange={(checked) => setPlanFormData({ ...planFormData, isFeatured: checked })}
                   />
                   <Label htmlFor="featured" className="text-sm">Featured (Popular)</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="watermark"
-                    checked={formData.watermark}
-                    onCheckedChange={(checked) => setFormData({ ...formData, watermark: checked })}
+                    checked={planFormData.watermark}
+                    onCheckedChange={(checked) => setPlanFormData({ ...planFormData, watermark: checked })}
                   />
                   <Label htmlFor="watermark" className="text-sm">Show Watermark</Label>
                 </div>
@@ -453,8 +456,8 @@ export default function PlansPage() {
                 <Input
                   id="sortOrder"
                   type="number"
-                  value={formData.sortOrder}
-                  onChange={(e) => setFormData({ ...formData, sortOrder: e.target.value })}
+                  value={planFormData.sortOrder}
+                  onChange={(e) => setPlanFormData({ ...planFormData, sortOrder: e.target.value })}
                   className="h-8 w-24"
                 />
               </div>
@@ -462,11 +465,11 @@ export default function PlansPage() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setIsPlanDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSavePlan} disabled={isSaving}>
-              {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+            <Button onClick={handleSavePlan} disabled={isSavingPlan}>
+              {isSavingPlan && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {editingPlan ? 'Update' : 'Create'}
             </Button>
           </DialogFooter>

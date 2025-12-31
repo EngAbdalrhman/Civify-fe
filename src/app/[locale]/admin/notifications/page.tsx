@@ -30,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function NotificationsPage() {
@@ -45,6 +46,7 @@ export default function NotificationsPage() {
   // Newsletter state
   const [newsletterSubject, setNewsletterSubject] = useState('');
   const [newsletterContent, setNewsletterContent] = useState('');
+  const [isHtml, setIsHtml] = useState(false);
   const [isBroadcastingNewsletter, setIsBroadcastingNewsletter] = useState(false);
 
   // User selection for targeted notifications
@@ -154,7 +156,8 @@ export default function NotificationsPage() {
     try {
       await newsletterService.broadcast({
         subject: newsletterSubject,
-        content: newsletterContent
+        content: newsletterContent,
+        isHtml
       });
       toast.success('Newsletter broadcast initiated successfully!');
       setNewsletterSubject('');
@@ -434,6 +437,15 @@ export default function NotificationsPage() {
                     rows={8}
                     className="font-mono text-sm"
                   />
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="isHtml"
+                    checked={isHtml}
+                    onCheckedChange={setIsHtml}
+                  />
+                  <Label htmlFor="isHtml">Send as HTML</Label>
                 </div>
 
                 <Button 
