@@ -145,26 +145,63 @@ export async function exportToPdf(element: HTMLElement, filename: string = 'cv',
     y += 3;
 
     if (section.type === 'skills') {
-      const skillsWithLevels = section.items?.map((item: { title?: string; level?: string }) => {
-        if (item.level && item.level !== 'none') {
-          return `${item.title} (${item.level})`;
+      const skillsStyle = resumeData?.metadata?.skillsDisplayStyle || 'tags';
+      const items = section.items || [];
+      
+      if (skillsStyle === 'tags') {
+        // Comma-separated list
+        const skills = items.map((item: { title?: string }) => item.title).filter(Boolean).join(', ');
+        if (skills) {
+          addText(skills, 10);
         }
-        return item.title;
-      }).filter(Boolean).join(', ');
-      if (skillsWithLevels) {
-        addText(skillsWithLevels, 10);
+      } else {
+        // Bar/Dots/Level style - show with visual representation
+        const levelBars: Record<string, string> = {
+          'expert': '████████████████████',
+          'advanced': '████████████████░░░░',
+          'intermediate': '████████████░░░░░░░░',
+          'beginner': '████████░░░░░░░░░░░░',
+          'none': '░░░░░░░░░░░░░░░░░░░░'
+        };
+        
+        for (const item of items as { title?: string; level?: string; subtitle?: string }[]) {
+          addNewPageIfNeeded(8);
+          const level = item.level || 'intermediate';
+          const bar = skillsStyle === 'bar' ? levelBars[level] || levelBars['intermediate'] : 
+                     skillsStyle === 'dots' ? (level === 'expert' ? '●●●●●' : level === 'advanced' ? '●●●●○' : level === 'intermediate' ? '●●●○○' : level === 'beginner' ? '●●○○○' : '●○○○○') :
+                     `(${level})`;
+          addText(`${item.title}  ${bar}`, 10);
+        }
       }
     } else if (section.type === 'languages') {
+      const languagesStyle = resumeData?.metadata?.languagesDisplayStyle || 'level';
+      const levelBars: Record<string, string> = {
+        'native': '████████████████████', 'fluent': '████████████████████', 'expert': '████████████████████',
+        'advanced': '████████████████░░░░',
+        'intermediate': '████████████░░░░░░░░',
+        'beginner': '████████░░░░░░░░░░░░',
+      };
+      
       for (const item of section.items || []) {
         addNewPageIfNeeded(8);
-        addText(`${item.title}${item.subtitle ? ` - ${item.subtitle}` : ''}`, 10);
+        const level = (item.subtitle || item.level || 'intermediate').toLowerCase();
+        if (languagesStyle === 'bar') {
+          const bar = levelBars[level] || levelBars['intermediate'];
+          addText(`${item.title}  ${bar}`, 10);
+        } else if (languagesStyle === 'dots') {
+          const dots = level === 'native' || level === 'fluent' || level === 'expert' ? '●●●●●' : 
+                      level === 'advanced' ? '●●●●○' : level === 'intermediate' ? '●●●○○' : '●●○○○';
+          addText(`${item.title}  ${dots}`, 10);
+        } else {
+          addText(`${item.title} - ${item.subtitle || 'Intermediate'}`, 10);
+        }
       }
     } else if ((section.type === 'certifications' || section.title?.toLowerCase().includes('course')) && 
                resumeData?.metadata?.coursesDisplayStyle === 'simple') {
-      // Simple bullet list for courses/certifications
-      const courses = section.items?.map((item: { title?: string }) => `• ${item.title}`).filter(Boolean);
-      if (courses && courses.length > 0) {
-        addText(courses.join('  |  '), 10);
+      // Simple bullet list for courses - each on its own line
+      for (const item of section.items || []) {
+        addNewPageIfNeeded(6);
+        addText(`• ${item.title}`, 9);
       }
     } else {
       for (const item of section.items || []) {
@@ -290,32 +327,71 @@ export async function exportToDocx(resumeData: ResumeData, filename: string = 'c
         spacing: { before: 300, after: 200 },
       })
     );
-
-    // Skills section - render as comma-separated list with levels
+    // Skills section - render with visual bars/dots based on style
     if (section.type === 'skills') {
-      const skillsWithLevels = section.items.map(item => {
-        if (item.level && item.level !== 'none') {
-          return `${item.title} (${item.level})`;
+      const skillsStyle = resumeData?.metadata?.skillsDisplayStyle || 'tags';
+      
+      if (skillsStyle === 'tags') {
+        const skills = section.items.map(item => item.title).filter(Boolean);
+        if (skills.length > 0) {
+          children.push(
+            new Paragraph({
+              text: skills.join(', '),
+              spacing: { after: 200 },
+            })
+          );
         }
-        return item.title;
-      }).filter(Boolean);
-      if (skillsWithLevels.length > 0) {
-        children.push(
-          new Paragraph({
-            text: skillsWithLevels.join(', '),
-            spacing: { after: 200 },
-          })
-        );
+      } else {
+        const levelBars: Record<string, string> = {
+          'expert': '████████████████████',
+          'advanced': '████████████████░░░░',
+          'intermediate': '████████████░░░░░░░░',
+          'beginner': '████████░░░░░░░░░░░░',
+        };
+        
+        for (const item of section.items) {
+          const level = item.level || 'intermediate';
+          const bar = skillsStyle === 'bar' ? levelBars[level] || levelBars['intermediate'] : 
+                     skillsStyle === 'dots' ? (level === 'expert' ? '●●●●●' : level === 'advanced' ? '●●●●○' : level === 'intermediate' ? '●●●○○' : '●●○○○') :
+                     `(${level})`;
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: item.title }),
+                new TextRun({ text: `  ${bar}` }),
+              ],
+              spacing: { after: 100 },
+            })
+          );
+        }
       }
     }
     // Languages section
     else if (section.type === 'languages') {
+      const languagesStyle = resumeData?.metadata?.languagesDisplayStyle || 'level';
+      const levelBars: Record<string, string> = {
+        'native': '████████████████████', 'fluent': '████████████████████', 'expert': '████████████████████',
+        'advanced': '████████████████░░░░',
+        'intermediate': '████████████░░░░░░░░',
+        'beginner': '████████░░░░░░░░░░░░',
+      };
+      
       for (const item of section.items) {
+        const level = (item.subtitle || item.level || 'intermediate').toLowerCase();
+        let visualRep = '';
+        if (languagesStyle === 'bar') {
+          visualRep = levelBars[level] || levelBars['intermediate'];
+        } else if (languagesStyle === 'dots') {
+          visualRep = level === 'native' || level === 'fluent' || level === 'expert' ? '●●●●●' : 
+                      level === 'advanced' ? '●●●●○' : level === 'intermediate' ? '●●●○○' : '●●○○○';
+        } else {
+          visualRep = ` - ${item.subtitle || 'Intermediate'}`;
+        }
         children.push(
           new Paragraph({
             children: [
               new TextRun({ text: item.title, bold: true }),
-              new TextRun({ text: item.subtitle ? ` - ${item.subtitle}` : '' }),
+              new TextRun({ text: `  ${visualRep}` }),
             ],
             spacing: { after: 100 },
           })
@@ -325,12 +401,11 @@ export async function exportToDocx(resumeData: ResumeData, filename: string = 'c
     // Courses/Certifications - simple bullet list
     else if ((section.type === 'certifications' || section.title?.toLowerCase().includes('course')) && 
              resumeData?.metadata?.coursesDisplayStyle === 'simple') {
-      const courses = section.items.map(item => `• ${item.title}`).filter(Boolean);
-      if (courses.length > 0) {
+      for (const item of section.items) {
         children.push(
           new Paragraph({
-            text: courses.join('  |  '),
-            spacing: { after: 200 },
+            text: `• ${item.title}`,
+            spacing: { after: 50 },
           })
         );
       }
