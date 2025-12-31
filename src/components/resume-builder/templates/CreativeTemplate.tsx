@@ -133,7 +133,24 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
            {personalInfo.email && <div className="break-words">{personalInfo.email}</div>}
            {personalInfo.phone && <div>{personalInfo.phone}</div>}
            {personalInfo.address && <div>{personalInfo.address}</div>}
-           {personalInfo.linkedin && <div className="break-words">{personalInfo.linkedin}</div>}
+           {personalInfo.linkedin && (
+             <a href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} 
+                target="_blank" rel="noopener noreferrer" className="block text-white/90 hover:text-white underline">
+               LinkedIn
+             </a>
+           )}
+           {personalInfo.github && (
+             <a href={personalInfo.github.startsWith('http') ? personalInfo.github : `https://github.com/${personalInfo.github}`} 
+                target="_blank" rel="noopener noreferrer" className="block text-white/90 hover:text-white underline">
+               GitHub
+             </a>
+           )}
+           {personalInfo.website && (
+             <a href={personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`} 
+                target="_blank" rel="noopener noreferrer" className="block text-white/90 hover:text-white underline break-words">
+               {personalInfo.website}
+             </a>
+           )}
         </div>
 
         {skillsSections.map(section => (
