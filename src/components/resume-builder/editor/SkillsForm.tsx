@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Plus, X } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { useState } from 'react';
 
@@ -17,55 +17,54 @@ interface SkillsFormProps {
 export function SkillsForm({ items = [], onChange }: SkillsFormProps) {
   const [newSkill, setNewSkill] = useState('');
   
-  // Skills are stored as a single SectionItem usually, but we support multiple categories
-  // For simplicity, we'll assume the first item is the main skills list or create one if none
-  const skillsItem = items[0] || {
-    id: uuidv4(),
-    title: 'Skills',
-    items: [], // This structure in types is weird, text based items usually use 'tags' or we create items for categories
-    tags: [] // Using tags for flat list
+  // Get all skill names from items - each item.title is a skill
+  const getSkillNames = (): string[] => {
+    const skills: string[] = [];
+    items.forEach(item => {
+      // If item has tags, add them
+      if (item.tags && item.tags.length > 0) {
+        skills.push(...item.tags);
+      } else if (item.title) {
+        // Otherwise, the title IS the skill
+        skills.push(item.title);
+      }
+    });
+    return skills;
   };
 
   const handleAddSkill = () => {
     if (!newSkill.trim()) return;
     
-    const currentTags = skillsItem.items?.map(i => i.title) || []; // Fallback for ResumeData structure variants
-    // But ResumeData.SectionItem has tags?: string[]
-    
-    // Let's use the 'items' array of the section to store individual skills if they need levels,
-    // OR we can use a single item with tags. 
-    // The previous prompt's type definition: SectionItem has tags?: string[]
-    
-    // Strategy: treating SectionItem as a "Category" of skills (e.g. Frontend, Backend)
-    // If we want a simple flat list, we have one Item called "All Skills" and push to tags.
-    
-    if (items.length === 0) {
-      // Initialize if empty
-      const newItem: SectionItem = {
-        id: uuidv4(),
-        title: 'Technical Skills',
-        items: [], // This is typically null/undefined for leaf items
-        tags: [newSkill.trim()]
-      };
-      onChange([newItem]);
-    } else {
-      // Add to first category or update
-      // For now, let's just make it simple: One category
-      const firstItem = items[0];
-      const updatedTags = [...(firstItem.tags || []), newSkill.trim()];
-      
-      const updatedItem = { ...firstItem, tags: updatedTags };
-      onChange([updatedItem, ...items.slice(1)]);
-    }
+    // Add as a new SectionItem with title = skill name
+    const newItem: SectionItem = {
+      id: uuidv4(),
+      title: newSkill.trim(),
+      tags: [],
+      visible: true
+    };
+    onChange([...items, newItem]);
     setNewSkill('');
   };
 
-  const removeTag = (tagToRemove: string) => {
-    if (items.length === 0) return;
-    const firstItem = items[0];
-    const updatedTags = (firstItem.tags || []).filter(t => t !== tagToRemove);
-    onChange([{ ...firstItem, tags: updatedTags }, ...items.slice(1)]);
+  const removeSkill = (skillToRemove: string) => {
+    // Remove item by title or from tags
+    const updatedItems = items.filter(item => {
+      if (item.tags && item.tags.length > 0) {
+        // Filter out from tags
+        const newTags = item.tags.filter(t => t !== skillToRemove);
+        if (newTags.length !== item.tags.length) {
+          item.tags = newTags;
+          return item.tags.length > 0; // Keep item if still has tags
+        }
+        return true;
+      }
+      // Remove item if title matches
+      return item.title !== skillToRemove;
+    });
+    onChange(updatedItems);
   };
+
+  const skills = getSkillNames();
 
   return (
     <div className="space-y-6">
@@ -75,7 +74,7 @@ export function SkillsForm({ items = [], onChange }: SkillsFormProps) {
           <Input 
             value={newSkill} 
             onChange={e => setNewSkill(e.target.value)} 
-            onKeyDown={e => e.key === 'Enter' && handleAddSkill()}
+            onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddSkill())}
             placeholder="e.g. React, Java, AWS"
           />
           <Button onClick={handleAddSkill} size="icon">
@@ -85,15 +84,15 @@ export function SkillsForm({ items = [], onChange }: SkillsFormProps) {
       </div>
 
       <div className="flex flex-wrap gap-2 p-4 bg-muted/30 rounded-lg min-h-[100px]">
-        {items.length > 0 && items[0].tags?.map((tag, idx) => (
-          <Badge key={idx} variant="secondary" className="pl-2 pr-1 py-1 flex items-center gap-1">
-            {tag}
-            <button onClick={() => removeTag(tag)} className="hover:text-destructive">
+        {skills.map((skill, idx) => (
+          <Badge key={`${skill}-${idx}`} variant="secondary" className="pl-2 pr-1 py-1 flex items-center gap-1">
+            {skill}
+            <button onClick={() => removeSkill(skill)} className="hover:text-destructive">
               <X className="h-3 w-3" />
             </button>
           </Badge>
         ))}
-        {(!items.length || !items[0].tags?.length) && (
+        {skills.length === 0 && (
           <div className="text-muted-foreground text-sm flex items-center justify-center w-full">
             No skills added yet
           </div>

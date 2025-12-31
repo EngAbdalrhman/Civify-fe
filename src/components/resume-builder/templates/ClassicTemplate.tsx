@@ -41,7 +41,7 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
        )}
 
        {/* Sections */}
-       {sections.filter(s => s.visible !== false).map(section => (
+       {sections.filter(s => s.visible !== false && s.items && s.items.length > 0).map(section => (
          <section key={section.id} className="mb-6">
            <h3 className="text-lg font-bold uppercase border-b border-gray-800 mb-4 flex items-center">
              <span className="bg-gray-800 text-white px-2 py-0.5 text-sm mr-2" style={{ backgroundColor: color }}>
@@ -51,17 +51,24 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
            </h3>
 
            {section.type === 'skills' ? (
-             <div className="text-sm">
-                {/* Comma separated skills for classic look */}
-                {section.items.map(item => {
-                   const tags = item.tags?.join(', ');
-                   return tags ? (
-                     <div key={item.id} className="mb-2">
-                       <span className="font-bold">{item.title}: </span>
-                       <span>{tags}</span>
-                     </div>
-                   ) : null;
-                })}
+             <div className="flex flex-wrap gap-2 text-sm">
+               {section.items.filter(item => item.visible !== false).map(item => {
+                 // Skills can be stored as item.title or item.tags
+                 if (item.tags && item.tags.length > 0) {
+                   return item.tags.map((tag, i) => (
+                     <span key={`${item.id}-${i}`} className="inline-block bg-gray-100 px-2 py-1 rounded mr-1 mb-1">
+                       {tag}
+                     </span>
+                   ));
+                 } else if (item.title) {
+                   return (
+                     <span key={item.id} className="inline-block bg-gray-100 px-2 py-1 rounded mr-1 mb-1">
+                       {item.title}
+                     </span>
+                   );
+                 }
+                 return null;
+               })}
              </div>
            ) : (
              <div className="space-y-4">

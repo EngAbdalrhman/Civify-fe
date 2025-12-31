@@ -93,7 +93,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
       )}
 
       {/* Dynamic Sections */}
-      {sections.filter(s => s.visible !== false).map(section => (
+      {sections.filter(s => s.visible !== false && s.items && s.items.length > 0).map(section => (
         <section key={section.id} className="mb-6">
           <h3 className="text-xs font-bold uppercase tracking-wider mb-4 border-b pb-1" style={{ color, borderColor: color + '40' }}>
             {section.title}
@@ -101,20 +101,25 @@ export function ModernTemplate({ data, color }: TemplateProps) {
           
           {section.type === 'skills' ? (
              <div className="flex flex-wrap gap-2">
-               {/* Handle flattened skills vs categorized */}
-               {section.items.map(item => (
-                 item.tags?.map((tag, i) => (
-                   <span key={`${item.id}-${i}`} className="text-sm px-3 py-1 bg-gray-100 rounded-full text-gray-700 font-medium">
-                     {tag}
-                   </span>
-                 )) || (
-                   <span key={item.id} className="text-sm px-3 py-1 bg-gray-100 rounded-full text-gray-700 font-medium">
-                    {item.title}
-                   </span>
-                 )
-               ))}
+               {section.items.filter(item => item.visible !== false).map(item => {
+                 // Skills can be stored as item.title or item.tags
+                 if (item.tags && item.tags.length > 0) {
+                   return item.tags.map((tag, i) => (
+                     <span key={`${item.id}-${i}`} className="text-sm px-3 py-1 bg-gray-100 rounded-full text-gray-700 font-medium">
+                       {tag}
+                     </span>
+                   ));
+                 } else if (item.title) {
+                   return (
+                     <span key={item.id} className="text-sm px-3 py-1 bg-gray-100 rounded-full text-gray-700 font-medium">
+                       {item.title}
+                     </span>
+                   );
+                 }
+                 return null;
+               })}
              </div>
-          ) : (
+           ) : (
              <div className="space-y-4">
                {section.items.filter(i => i.visible !== false).map(renderSectionItem)}
              </div>

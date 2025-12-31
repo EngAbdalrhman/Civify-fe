@@ -19,6 +19,8 @@ export interface SectionItem {
   title: string;
   subtitle?: string;
   date?: string;
+  startDate?: string;  // For separate date fields
+  endDate?: string;    // For separate date fields
   description?: string;
   location?: string;
   tags?: string[];

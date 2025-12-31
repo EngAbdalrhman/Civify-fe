@@ -250,19 +250,21 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
               </TabsList>
             </div>
 
-            <ScrollArea className="flex-1 p-4">
-              <TabsContent value="content" className="mt-0 space-y-6 h-full pb-20">
-                <EditorPanel data={resumeData} onChange={setResumeData} />
-              </TabsContent>
-              
-              <TabsContent value="design" className="mt-0 h-full pb-20">
-                <DesignPanel data={resumeData} onChange={setResumeData} />
-              </TabsContent>
+            <div className="flex-1 overflow-y-auto min-h-0">
+              <div className="p-4 pb-20">
+                <TabsContent value="content" className="mt-0 space-y-6">
+                  <EditorPanel data={resumeData} onChange={setResumeData} />
+                </TabsContent>
+                
+                <TabsContent value="design" className="mt-0">
+                  <DesignPanel data={resumeData} onChange={setResumeData} />
+                </TabsContent>
 
-              <TabsContent value="export" className="mt-0 h-full pb-20">
-                <ExportPanel data={resumeData} />
-              </TabsContent>
-            </ScrollArea>
+                <TabsContent value="export" className="mt-0">
+                  <ExportPanel data={resumeData} />
+                </TabsContent>
+              </div>
+            </div>
           </Tabs>
         </div>
 

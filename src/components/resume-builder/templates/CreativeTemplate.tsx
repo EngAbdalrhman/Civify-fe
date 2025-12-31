@@ -33,17 +33,26 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
         </div>
 
         {/* Skills in Sidebar */}
-        {sections.filter(s => s.type === 'skills').map(section => (
+        {sections.filter(s => s.type === 'skills' && s.items && s.items.length > 0).map(section => (
           <div key={section.id} className="pt-4 border-t border-white/20">
             <h3 className="font-bold uppercase mb-3 text-white/90">{section.title}</h3>
             <div className="flex flex-wrap gap-2">
-               {section.items.map(item => (
-                 item.tags?.map((tag, i) => (
-                   <span key={`${item.id}-${i}`} className="bg-white/20 px-2 py-1 rounded text-xs">
-                     {tag}
-                   </span>
-                 ))
-               ))}
+               {section.items.filter(item => item.visible !== false).map(item => {
+                 if (item.tags && item.tags.length > 0) {
+                   return item.tags.map((tag, i) => (
+                     <span key={`${item.id}-${i}`} className="bg-white/20 px-2 py-1 rounded text-xs">
+                       {tag}
+                     </span>
+                   ));
+                 } else if (item.title) {
+                   return (
+                     <span key={item.id} className="bg-white/20 px-2 py-1 rounded text-xs">
+                       {item.title}
+                     </span>
+                   );
+                 }
+                 return null;
+               })}
             </div>
           </div>
         ))}
@@ -58,7 +67,7 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
            </section>
          )}
 
-         {sections.filter(s => s.type !== 'skills' && s.visible !== false).map(section => (
+         {sections.filter(s => s.type !== 'skills' && s.visible !== false && s.items && s.items.length > 0).map(section => (
            <section key={section.id} className="mb-8">
              <h2 className="text-xl font-bold uppercase mb-4 text-gray-900 border-b-2 pb-1" style={{ borderColor: color }}>
                {section.title}
