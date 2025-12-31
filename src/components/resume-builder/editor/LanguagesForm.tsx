@@ -21,6 +21,7 @@ const LANGUAGE_LEVELS = [
   { value: 'advanced', label: 'Advanced' },
   { value: 'intermediate', label: 'Intermediate' },
   { value: 'beginner', label: 'Beginner' },
+  { value: 'none', label: 'None' },
 ];
 
 export function LanguagesForm({ items = [], onChange }: LanguagesFormProps) {

@@ -189,7 +189,7 @@ export function GenericSectionForm({ sectionType, sectionTitle = '', items, onCh
                     <div className="flex items-center gap-2 mt-1">
                       <Checkbox 
                         id={`present-${item.id}`}
-                        checked={item.endDate === 'Present' || !item.endDate}
+                        checked={item.endDate === 'Present'}
                         onCheckedChange={(checked) => {
                           const endDate = checked ? 'Present' : '';
                           updateItem(item.id, { 
