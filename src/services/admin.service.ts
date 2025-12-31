@@ -45,17 +45,24 @@ export interface AdminStats {
 export interface AdminUser {
   id: number;
   email: string;
+  username?: string;
   name: string;
   firstName?: string;
   lastName?: string;
   phoneNumber?: string;
-  photoUrl?: string;
-  emailVerified: boolean;
+  profilePictureUrl?: string;
+  isEmailVerified: boolean;
   twoFactorEnabled: boolean;
   accountLocked: boolean;
   createdAt: string;
   lastLoginAt?: string;
-  customCvLimit?: number;
+  // Limits
+  cvLimit?: number;
+  extraTokens: number;
+  // Group
+  groupId?: number;
+  groupName?: string;
+  // Subscription (display only)
   currentPlan?: string;
   subscriptionStatus?: string;
 }
@@ -68,14 +75,26 @@ export interface AdminPlan {
   id: number;
   name: string;
   description?: string;
+  details?: string;
+  cvLimit?: number;
+  tokenLimit?: number;
+  watermark: boolean;
   monthlyPrice: string;
   annualPrice: string;
-  features: PlanFeature[];
-  active: boolean; // Changed from isActive to match backend
+  active: boolean;
+  // Billing restrictions
+  allowAnnualBilling: boolean;
+  renewalAllowed: boolean;
+  maxBillingCycles?: number;
+  // Display settings
   isFeatured: boolean;
   sortOrder: number;
-  maxBillingCycles?: number;
-  allowAnnualBilling: boolean;
+  // Linked group
+  linkedGroupId?: number;
+  linkedGroupName?: string;
+  // Collections
+  features: PlanFeature[];
+  // Metadata
   createdAt: string;
   updatedAt: string;
 }
@@ -91,9 +110,19 @@ export interface PlanFeature {
 export interface CreatePlanRequest {
   name: string;
   description?: string;
+  cvLimit?: number;
+  tokenLimit?: number;
+  watermark?: boolean;
   monthlyPrice: number;
   annualPrice: number;
-  features: { featureKey: string; featureValue: string }[];
+  active?: boolean;
+  // Linked group
+  linkedGroupId?: number;
+  // Billing restrictions
+  allowAnnualBilling?: boolean;
+  renewalAllowed?: boolean;
+  maxBillingCycles?: number;
+  // Display settings
   isFeatured?: boolean;
   sortOrder?: number;
 }
@@ -177,6 +206,27 @@ export interface SendToUsersRequest extends SendNotificationRequest {
 }
 
 // ============================================
+// Audit Log Types
+// ============================================
+
+export type AuditAction = 'INSERT' | 'UPDATE' | 'DELETE' | 'READ' | 'LOGIN' | 'LOGOUT' | 'ACTIVATE' | 'DEACTIVATE';
+
+export interface AuditLog {
+  id: number;
+  entityType: string;
+  entityId: string;
+  action: AuditAction;
+  performedBy: string;
+  performedAt: string;
+  oldValue?: Record<string, unknown>;
+  newValue?: Record<string, unknown>;
+  changes?: Record<string, unknown>;
+  comment?: string;
+  ipAddress?: string;
+  userAgent?: string;
+}
+
+// ============================================
 // API Endpoints
 // ============================================
 
@@ -187,6 +237,7 @@ const ADMIN_API = {
   PROMO_CODES: 'v1/admin/promocodes',
   SUBSCRIPTIONS: 'v1/admin/subscriptions',
   NOTIFICATIONS: 'v1/admin/notifications',
+  AUDIT: 'v1/admin/audit',
 };
 
 // ============================================
@@ -418,6 +469,26 @@ class AdminService {
       data
     );
     return response.data.data;
+  }
+
+  // ==========================================
+  // Audit Logs
+  // ==========================================
+
+  async getAllAuditLogs(data: InputDataModel): Promise<PagedResponse<AuditLog>> {
+    const response = await apiClient.post<PagedResponse<AuditLog>>(
+      `${ADMIN_API.AUDIT}/all`,
+      data
+    );
+    return response.data;
+  }
+
+  async getAuditLogsByType(entityType: string, data: InputDataModel): Promise<PagedResponse<AuditLog>> {
+    const response = await apiClient.post<PagedResponse<AuditLog>>(
+      `${ADMIN_API.AUDIT}/${entityType}`,
+      data
+    );
+    return response.data;
   }
 }
 

@@ -29,6 +29,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useGroups } from '@/features/admin-dashboard/groups';
 
 function getPlanIcon(name: string) {
   const lower = name.toLowerCase();
@@ -51,6 +59,9 @@ export default function PlansPage() {
   const [editingPlan, setEditingPlan] = useState<AdminPlan | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Groups for dropdown
+  const { data: groups = [] } = useGroups();
 
   // Form state
   const [formData, setFormData] = useState({
@@ -58,7 +69,15 @@ export default function PlansPage() {
     description: '',
     monthlyPrice: '',
     annualPrice: '',
+    cvLimit: '',
+    tokenLimit: '',
+    watermark: true,
+    linkedGroupId: '',
+    allowAnnualBilling: true,
+    renewalAllowed: true,
+    maxBillingCycles: '',
     isFeatured: false,
+    sortOrder: '0',
   });
 
   const fetchPlans = useCallback(async () => {
@@ -87,7 +106,15 @@ export default function PlansPage() {
       description: '',
       monthlyPrice: '',
       annualPrice: '',
+      cvLimit: '',
+      tokenLimit: '',
+      watermark: true,
+      linkedGroupId: '',
+      allowAnnualBilling: true,
+      renewalAllowed: true,
+      maxBillingCycles: '',
       isFeatured: false,
+      sortOrder: '0',
     });
     setIsDialogOpen(true);
   };
@@ -99,7 +126,15 @@ export default function PlansPage() {
       description: plan.description || '',
       monthlyPrice: plan.monthlyPrice,
       annualPrice: plan.annualPrice,
-      isFeatured: plan.isFeatured,
+      cvLimit: plan.cvLimit?.toString() || '',
+      tokenLimit: plan.tokenLimit?.toString() || '',
+      watermark: plan.watermark ?? true,
+      linkedGroupId: plan.linkedGroupId?.toString() || '',
+      allowAnnualBilling: plan.allowAnnualBilling ?? true,
+      renewalAllowed: plan.renewalAllowed ?? true,
+      maxBillingCycles: plan.maxBillingCycles?.toString() || '',
+      isFeatured: plan.isFeatured ?? false,
+      sortOrder: plan.sortOrder?.toString() || '0',
     });
     setIsDialogOpen(true);
   };
@@ -107,24 +142,27 @@ export default function PlansPage() {
   const handleSavePlan = async () => {
     setIsSaving(true);
     try {
+      const planPayload = {
+        name: formData.name,
+        description: formData.description,
+        monthlyPrice: parseFloat(formData.monthlyPrice),
+        annualPrice: parseFloat(formData.annualPrice),
+        cvLimit: formData.cvLimit ? parseInt(formData.cvLimit) : undefined,
+        tokenLimit: formData.tokenLimit ? parseInt(formData.tokenLimit) : undefined,
+        watermark: formData.watermark,
+        linkedGroupId: formData.linkedGroupId ? parseInt(formData.linkedGroupId) : undefined,
+        allowAnnualBilling: formData.allowAnnualBilling,
+        renewalAllowed: formData.renewalAllowed,
+        maxBillingCycles: formData.maxBillingCycles ? parseInt(formData.maxBillingCycles) : undefined,
+        isFeatured: formData.isFeatured,
+        sortOrder: parseInt(formData.sortOrder) || 0,
+      };
+      
       if (editingPlan) {
-        await adminService.updatePlan(editingPlan.id, {
-          name: formData.name,
-          description: formData.description,
-          monthlyPrice: parseFloat(formData.monthlyPrice),
-          annualPrice: parseFloat(formData.annualPrice),
-          isFeatured: formData.isFeatured,
-        });
+        await adminService.updatePlan(editingPlan.id, planPayload);
         toast.success('Plan updated successfully');
       } else {
-        await adminService.createPlan({
-          name: formData.name,
-          description: formData.description,
-          monthlyPrice: parseFloat(formData.monthlyPrice),
-          annualPrice: parseFloat(formData.annualPrice),
-          features: [],
-          isFeatured: formData.isFeatured,
-        });
+        await adminService.createPlan(planPayload);
         toast.success('Plan created successfully');
       }
       setIsDialogOpen(false);
@@ -264,13 +302,15 @@ export default function PlansPage() {
             </DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-4 py-4">
+          <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto">
+            {/* Basic Info */}
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">Name *</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="e.g., Pro Plan"
               />
             </div>
             <div className="space-y-2">
@@ -279,11 +319,14 @@ export default function PlansPage() {
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Brief description of the plan"
               />
             </div>
+            
+            {/* Pricing */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="monthlyPrice">Monthly Price ($)</Label>
+                <Label htmlFor="monthlyPrice">Monthly Price ($) *</Label>
                 <Input
                   id="monthlyPrice"
                   type="number"
@@ -292,7 +335,7 @@ export default function PlansPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="annualPrice">Annual Price ($)</Label>
+                <Label htmlFor="annualPrice">Annual Price ($) *</Label>
                 <Input
                   id="annualPrice"
                   type="number"
@@ -301,13 +344,120 @@ export default function PlansPage() {
                 />
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="featured"
-                checked={formData.isFeatured}
-                onCheckedChange={(checked) => setFormData({ ...formData, isFeatured: checked })}
-              />
-              <Label htmlFor="featured">Featured (Popular)</Label>
+            
+            {/* Limits */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="cvLimit">CV Limit (empty = unlimited)</Label>
+                <Input
+                  id="cvLimit"
+                  type="number"
+                  value={formData.cvLimit}
+                  onChange={(e) => setFormData({ ...formData, cvLimit: e.target.value })}
+                  placeholder="Leave empty for unlimited"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="tokenLimit">Token Limit (empty = unlimited)</Label>
+                <Input
+                  id="tokenLimit"
+                  type="number"
+                  value={formData.tokenLimit}
+                  onChange={(e) => setFormData({ ...formData, tokenLimit: e.target.value })}
+                  placeholder="Monthly AI token allowance"
+                />
+              </div>
+            </div>
+            
+            {/* Linked Group */}
+            <div className="space-y-2">
+              <Label htmlFor="linkedGroupId">Linked Permission Group</Label>
+              <Select 
+                value={formData.linkedGroupId || 'none'} 
+                onValueChange={(value) => setFormData({ ...formData, linkedGroupId: value === 'none' ? '' : value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a group (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
+                  {groups.map((group) => (
+                    <SelectItem key={group.id} value={group.id.toString()}>
+                      {group.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Users subscribing to this plan will inherit the group's permissions
+              </p>
+            </div>
+            
+            {/* Billing Restrictions */}
+            <div className="space-y-3 p-3 border rounded-lg bg-muted/30">
+              <h4 className="text-sm font-medium">Billing Restrictions</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="allowAnnualBilling"
+                    checked={formData.allowAnnualBilling}
+                    onCheckedChange={(checked) => setFormData({ ...formData, allowAnnualBilling: checked })}
+                  />
+                  <Label htmlFor="allowAnnualBilling" className="text-sm">Allow Annual Billing</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="renewalAllowed"
+                    checked={formData.renewalAllowed}
+                    onCheckedChange={(checked) => setFormData({ ...formData, renewalAllowed: checked })}
+                  />
+                  <Label htmlFor="renewalAllowed" className="text-sm">Allow Renewal</Label>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="maxBillingCycles" className="text-sm">Max Billing Cycles (empty = unlimited)</Label>
+                <Input
+                  id="maxBillingCycles"
+                  type="number"
+                  value={formData.maxBillingCycles}
+                  onChange={(e) => setFormData({ ...formData, maxBillingCycles: e.target.value })}
+                  placeholder="e.g., 1 for one-time purchase"
+                  className="h-8"
+                />
+              </div>
+            </div>
+            
+            {/* Display Settings */}
+            <div className="space-y-3 p-3 border rounded-lg bg-muted/30">
+              <h4 className="text-sm font-medium">Display Settings</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="featured"
+                    checked={formData.isFeatured}
+                    onCheckedChange={(checked) => setFormData({ ...formData, isFeatured: checked })}
+                  />
+                  <Label htmlFor="featured" className="text-sm">Featured (Popular)</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="watermark"
+                    checked={formData.watermark}
+                    onCheckedChange={(checked) => setFormData({ ...formData, watermark: checked })}
+                  />
+                  <Label htmlFor="watermark" className="text-sm">Show Watermark</Label>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="sortOrder" className="text-sm">Sort Order</Label>
+                <Input
+                  id="sortOrder"
+                  type="number"
+                  value={formData.sortOrder}
+                  onChange={(e) => setFormData({ ...formData, sortOrder: e.target.value })}
+                  className="h-8 w-24"
+                />
+              </div>
             </div>
           </div>
 

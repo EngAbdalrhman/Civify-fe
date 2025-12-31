@@ -4,6 +4,11 @@ import { useState, useCallback, useEffect } from 'react';
 import { adminService, type AdminUser, type PagedResponse, type FilterCriteria, FilterOperation } from '@/services/admin.service';
 import { toast } from 'sonner';
 
+interface SortItem {
+  fieldName: string;
+  direction: 'ASC' | 'DESC';
+}
+
 interface UseAdminUsersOptions {
   initialPage?: number;
   pageSize?: number;
@@ -19,9 +24,11 @@ interface UseAdminUsersReturn {
     totalElements: number;
     totalPages: number;
   };
+  currentSort: SortItem;
   fetchUsers: (page?: number) => Promise<void>;
   searchUsers: (searchTerm: string) => Promise<void>;
   filterUsers: (filters: FilterCriteria[]) => Promise<void>;
+  setSortState: (sort: SortItem) => void;
   updateUserLimits: (userId: number, cvLimit?: number) => Promise<void>;
   refresh: () => Promise<void>;
 }
@@ -39,6 +46,7 @@ export function useAdminUsers(options: UseAdminUsersOptions = {}): UseAdminUsers
     totalPages: 0,
   });
   const [currentFilters, setCurrentFilters] = useState<FilterCriteria[]>([]);
+  const [currentSort, setCurrentSort] = useState<SortItem>({ fieldName: 'createdAt', direction: 'DESC' });
 
   const fetchUsers = useCallback(async (page = pagination.page) => {
     setIsLoading(true);
@@ -49,7 +57,7 @@ export function useAdminUsers(options: UseAdminUsersOptions = {}): UseAdminUsers
         filters: currentFilters,
         page,
         size: pagination.size,
-        sorts: [{ fieldName: 'createdAt', direction: 'DESC' }],
+        sorts: [currentSort],
       });
 
       setUsers(response.data.content);
@@ -66,7 +74,7 @@ export function useAdminUsers(options: UseAdminUsersOptions = {}): UseAdminUsers
     } finally {
       setIsLoading(false);
     }
-  }, [currentFilters, pagination.page, pagination.size]);
+  }, [currentFilters, currentSort, pagination.page, pagination.size]);
 
   const searchUsers = useCallback(async (searchTerm: string) => {
     const filters: FilterCriteria[] = searchTerm
@@ -87,7 +95,7 @@ export function useAdminUsers(options: UseAdminUsersOptions = {}): UseAdminUsers
         filters,
         page: 0,
         size: pagination.size,
-        sorts: [{ fieldName: 'createdAt', direction: 'DESC' }],
+        sorts: [currentSort],
       });
 
       setUsers(response.data.content);
@@ -104,7 +112,7 @@ export function useAdminUsers(options: UseAdminUsersOptions = {}): UseAdminUsers
     } finally {
       setIsLoading(false);
     }
-  }, [pagination.size]);
+  }, [currentSort, pagination.size]);
 
   const filterUsers = useCallback(async (filters: FilterCriteria[]) => {
     setCurrentFilters(filters);
@@ -115,7 +123,7 @@ export function useAdminUsers(options: UseAdminUsersOptions = {}): UseAdminUsers
         filters,
         page: 0,
         size: pagination.size,
-        sorts: [{ fieldName: 'createdAt', direction: 'DESC' }],
+        sorts: [currentSort],
       });
 
       setUsers(response.data.content);
@@ -132,7 +140,19 @@ export function useAdminUsers(options: UseAdminUsersOptions = {}): UseAdminUsers
     } finally {
       setIsLoading(false);
     }
-  }, [pagination.size]);
+  }, [currentSort, pagination.size]);
+
+  const setSortState = useCallback((sort: SortItem) => {
+    setCurrentSort(sort);
+  }, []);
+
+  // Refetch when sort changes
+  useEffect(() => {
+    if (!isLoading) {
+      fetchUsers(0);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSort]);
 
   const updateUserLimits = useCallback(async (
     userId: number,
@@ -156,6 +176,7 @@ export function useAdminUsers(options: UseAdminUsersOptions = {}): UseAdminUsers
   // Initial fetch
   useEffect(() => {
     fetchUsers(initialPage);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
@@ -163,9 +184,11 @@ export function useAdminUsers(options: UseAdminUsersOptions = {}): UseAdminUsers
     isLoading,
     error,
     pagination,
+    currentSort,
     fetchUsers,
     searchUsers,
     filterUsers,
+    setSortState,
     updateUserLimits,
     refresh,
   };

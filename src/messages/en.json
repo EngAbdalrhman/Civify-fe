@@ -42,6 +42,7 @@
     "groups": "Groups",
     "subscriptions": "Subscriptions",
     "notifications": "Notifications",
+    "auditMonitor": "Audit Monitor",
     "logout": "Logout",
     "language": {
       "switch": "Switch Language"

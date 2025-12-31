@@ -7,6 +7,7 @@ import {
   Shield,
   Bell,
   TrendingUp,
+  FileSearch,
   LucideIcon 
 } from 'lucide-react';
 
@@ -71,6 +72,12 @@ export const ADMIN_MENU_ITEMS: AdminMenuItem[] = [
     icon: Bell, 
     labelKey: 'notifications', 
     permission: 'NOTIF.SEND' 
+  },
+  { 
+    path: '/admin/audit-monitor', 
+    icon: FileSearch, 
+    labelKey: 'auditMonitor', 
+    permission: 'SYSTEM.LOGS.VIEW' 
   },
 ];
 

@@ -24,7 +24,9 @@ export default function UsersPage() {
     users,
     isLoading,
     pagination,
+    currentSort,
     filterUsers,
+    setSortState,
     refresh,
     fetchUsers
   } = useAdminUsers({ pageSize: 10 });
@@ -62,12 +64,14 @@ export default function UsersPage() {
   const handleEditUser = (user: AdminUser) => {
     setDialogMode('edit');
     setSelectedUser({
-         id: String(user.id),
-         name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
-         email: user.email,
-         role: 'user', // Default since not in AdminUser
-         plan: user.currentPlan || 'free',
-         credits: user.customCvLimit || 0
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      email: user.email,
+      phoneNumber: user.phoneNumber || '',
+      groupId: user.groupId?.toString() || '',
+      cvLimit: user.cvLimit?.toString() || '',
+      extraTokens: user.extraTokens?.toString() || '0',
+      accountLocked: user.accountLocked || false,
     });
     setDialogOpen(true);
   };
@@ -165,8 +169,10 @@ export default function UsersPage() {
       filterUsers(model.filters || []); // Ensure we pass array
   };
 
-  const handleSortChange = (sort: any) => {
-      console.log("Sort changed", sort);
+  const handleSortChange = (sort: { field: string; direction: 'ASC' | 'DESC' }) => {
+    if (sort.field) {
+      setSortState({ fieldName: sort.field, direction: sort.direction });
+    }
   };
 
   const handlePageChange = (page: number) => {

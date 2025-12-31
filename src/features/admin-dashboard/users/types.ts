@@ -1,20 +1,28 @@
 export interface User {
   id: string;
+  firstName?: string;
+  lastName?: string;
   name: string;
   email: string;
-  isActive: boolean;
-  plan: string;
-  role: string;
-  credits: number;
+  phoneNumber?: string;
+  groupId?: number;
+  groupName?: string;
+  cvLimit?: number;
+  extraTokens: number;
+  accountLocked: boolean;
+  isEmailVerified: boolean;
   createdAt: string;
+  lastLoginAt?: string;
+  currentPlan?: string;
 }
 
 export interface UserFormData {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  password: string;
-  isActive: boolean;
-  plan: string;
-  role: string;
-  credits: number;
+  phoneNumber: string;
+  groupId: string;
+  cvLimit: string;
+  extraTokens: string;
+  accountLocked: boolean;
 }

@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select';
 import { useUserForm } from '../hooks/useUserForm';
 import { UserFormData } from '../types';
+import { useGroups } from '@/features/admin-dashboard/groups';
 
 interface UserFormProps {
   initialData?: Partial<UserFormData>;
@@ -20,18 +21,6 @@ interface UserFormProps {
   onCancel?: () => void;
   submitLabel?: string;
 }
-
-const PLANS = [
-  { value: 'free', label: 'Free' },
-  { value: 'basic', label: 'Basic' },
-  { value: 'pro', label: 'Pro' },
-  { value: 'enterprise', label: 'Enterprise' },
-];
-
-const ROLES = [
-  { value: 'user', label: 'User' },
-  { value: 'admin', label: 'Admin' },
-];
 
 export function UserForm({ 
   initialData, 
@@ -43,24 +32,37 @@ export function UserForm({
     initialData,
     onSubmit,
   });
+  
+  const { data: groups = [] } = useGroups();
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Name Field */}
-      <div className="space-y-2">
-        <Label htmlFor="name">
-          Name <span className="text-destructive">*</span>
-        </Label>
-        <Input
-          id="name"
-          value={formData.name}
-          onChange={(e) => updateField('name', e.target.value)}
-          placeholder="Enter user name"
-          className={errors.name ? 'border-destructive' : ''}
-        />
-        {errors.name && (
-          <p className="text-sm text-destructive">{errors.name}</p>
-        )}
+      {/* Name Fields */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="firstName">
+            First Name <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            id="firstName"
+            value={formData.firstName}
+            onChange={(e) => updateField('firstName', e.target.value)}
+            placeholder="Enter first name"
+            className={errors.firstName ? 'border-destructive' : ''}
+          />
+          {errors.firstName && (
+            <p className="text-sm text-destructive">{errors.firstName}</p>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="lastName">Last Name</Label>
+          <Input
+            id="lastName"
+            value={formData.lastName}
+            onChange={(e) => updateField('lastName', e.target.value)}
+            placeholder="Enter last name"
+          />
+        </div>
       </div>
 
       {/* Email Field */}
@@ -81,98 +83,92 @@ export function UserForm({
         )}
       </div>
 
-      {/* Password Field */}
+      {/* Phone Number Field */}
       <div className="space-y-2">
-        <Label htmlFor="password">
-          Password <span className="text-destructive">*</span>
-        </Label>
+        <Label htmlFor="phoneNumber">Phone Number</Label>
         <Input
-          id="password"
-          type="password"
-          value={formData.password}
-          onChange={(e) => updateField('password', e.target.value)}
-          placeholder="Enter password (min. 8 characters)"
-          className={errors.password ? 'border-destructive' : ''}
+          id="phoneNumber"
+          type="tel"
+          value={formData.phoneNumber}
+          onChange={(e) => updateField('phoneNumber', e.target.value)}
+          placeholder="+1234567890"
         />
-        {errors.password && (
-          <p className="text-sm text-destructive">{errors.password}</p>
-        )}
       </div>
 
-      {/* Role Field */}
+      {/* Group Field */}
       <div className="space-y-2">
-        <Label htmlFor="role">Role</Label>
+        <Label htmlFor="groupId">Permission Group</Label>
         <Select
-          value={formData.role}
-          onValueChange={(value: string) => updateField('role', value)}
+          value={formData.groupId || 'none'}
+          onValueChange={(value) => updateField('groupId', value === 'none' ? '' : value)}
         >
-          <SelectTrigger id="role" className="w-full">
-            <SelectValue placeholder="Select a role" />
+          <SelectTrigger id="groupId" className="w-full">
+            <SelectValue placeholder="Select a group" />
           </SelectTrigger>
           <SelectContent>
-            {ROLES.map((role) => (
-              <SelectItem key={role.value} value={role.value}>
-                {role.label}
+            <SelectItem value="none">None</SelectItem>
+            {groups.map((group) => (
+              <SelectItem key={group.id} value={group.id.toString()}>
+                {group.name}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-      </div>
-
-      {/* Plan Field */}
-      <div className="space-y-2">
-        <Label htmlFor="plan">Plan</Label>
-        <Select
-          value={formData.plan}
-          onValueChange={(value: string) => updateField('plan', value)}
-        >
-          <SelectTrigger id="plan" className="w-full">
-            <SelectValue placeholder="Select a plan" />
-          </SelectTrigger>
-          <SelectContent>
-            {PLANS.map((plan) => (
-              <SelectItem key={plan.value} value={plan.value}>
-                {plan.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Credits Field */}
-      <div className="space-y-2">
-        <Label htmlFor="credits">Credits</Label>
-        <Input
-          id="credits"
-          type="number"
-          min="0"
-          value={formData.credits}
-          onChange={(e) => updateField('credits', parseInt(e.target.value) || 0)}
-          placeholder="0"
-          className={errors.credits ? 'border-destructive' : ''}
-        />
-        {errors.credits && (
-          <p className="text-sm text-destructive">{errors.credits}</p>
-        )}
-        <p className="text-sm text-muted-foreground">
-          Set custom credits for this user
+        <p className="text-xs text-muted-foreground">
+          Assign user to a permission group
         </p>
       </div>
 
-      {/* Active Status */}
+      {/* Limits Section */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="cvLimit">CV Limit Override</Label>
+          <Input
+            id="cvLimit"
+            type="number"
+            min="0"
+            value={formData.cvLimit}
+            onChange={(e) => updateField('cvLimit', e.target.value)}
+            placeholder="Leave empty for plan default"
+          />
+          <p className="text-xs text-muted-foreground">
+            Overrides plan CV limit
+          </p>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="extraTokens">Extra Tokens (Wallet)</Label>
+          <Input
+            id="extraTokens"
+            type="number"
+            min="0"
+            value={formData.extraTokens}
+            onChange={(e) => updateField('extraTokens', e.target.value)}
+            placeholder="0"
+            className={errors.extraTokens ? 'border-destructive' : ''}
+          />
+          {errors.extraTokens && (
+            <p className="text-sm text-destructive">{errors.extraTokens}</p>
+          )}
+          <p className="text-xs text-muted-foreground">
+            Purchased tokens that never expire
+          </p>
+        </div>
+      </div>
+
+      {/* Account Status */}
       <div className="flex items-center justify-between rounded-lg border p-4">
         <div className="space-y-0.5">
-          <Label htmlFor="isActive" className="text-base">
-            Active Status
+          <Label htmlFor="accountLocked" className="text-base">
+            Account Locked
           </Label>
           <p className="text-sm text-muted-foreground">
-            Enable or disable user access
+            Locked accounts cannot log in
           </p>
         </div>
         <Switch
-          id="isActive"
-          checked={formData.isActive}
-          onCheckedChange={(checked: boolean) => updateField('isActive', checked)}
+          id="accountLocked"
+          checked={formData.accountLocked}
+          onCheckedChange={(checked) => updateField('accountLocked', checked)}
         />
       </div>
 

@@ -10,13 +10,14 @@ interface UseUserFormProps {
 
 export function useUserForm({ initialData, onSubmit }: UseUserFormProps) {
   const [formData, setFormData] = useState<UserFormData>({
-    name: initialData?.name || '',
+    firstName: initialData?.firstName || '',
+    lastName: initialData?.lastName || '',
     email: initialData?.email || '',
-    password: initialData?.password || '',
-    isActive: initialData?.isActive ?? true,
-    plan: initialData?.plan || 'free',
-    role: initialData?.role || 'user',
-    credits: initialData?.credits || 0,
+    phoneNumber: initialData?.phoneNumber || '',
+    groupId: initialData?.groupId || '',
+    cvLimit: initialData?.cvLimit || '',
+    extraTokens: initialData?.extraTokens || '0',
+    accountLocked: initialData?.accountLocked ?? false,
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof UserFormData, string>>>({});
@@ -25,8 +26,8 @@ export function useUserForm({ initialData, onSubmit }: UseUserFormProps) {
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof UserFormData, string>> = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
     }
 
     if (!formData.email.trim()) {
@@ -35,14 +36,9 @@ export function useUserForm({ initialData, onSubmit }: UseUserFormProps) {
       newErrors.email = 'Invalid email format';
     }
 
-    if (!formData.password.trim()) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-    }
-
-    if (formData.credits < 0) {
-      newErrors.credits = 'Credits cannot be negative';
+    const tokens = parseInt(formData.extraTokens);
+    if (!isNaN(tokens) && tokens < 0) {
+      newErrors.extraTokens = 'Tokens cannot be negative';
     }
 
     setErrors(newErrors);

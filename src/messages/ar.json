@@ -42,6 +42,7 @@
     "groups": "المجموعات",
     "subscriptions": "الاشتراكات",
     "notifications": "الإشعارات",
+    "auditMonitor": "مراقب السجلات",
     "logout": "تسجيل الخروج",
     "language": {
       "switch": "تغيير اللغة"

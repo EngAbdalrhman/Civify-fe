@@ -38,6 +38,14 @@ import { tokenPackageService, type TokenPackage } from '@/services/token-package
 import apiClient from '@/api/client';
 import { usePermissions } from '@/contexts/PermissionContext';
 import { ADMIN_ACTION_PERMISSIONS } from '@/config/adminMenuConfig';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useGroups } from '@/features/admin-dashboard/groups';
 
 function getPlanIcon(name: string) {
   const lower = name.toLowerCase();
@@ -120,8 +128,19 @@ export default function BillingPage() {
     description: '',
     monthlyPrice: '',
     annualPrice: '',
+    cvLimit: '',
+    tokenLimit: '',
+    watermark: true,
+    linkedGroupId: '',
+    allowAnnualBilling: true,
+    renewalAllowed: true,
+    maxBillingCycles: '',
     isFeatured: false,
+    sortOrder: '0',
   });
+  
+  // Groups for dropdown
+  const { data: groups = [] } = useGroups();
 
   // Token package form state
   const [tokenFormData, setTokenFormData] = useState({
@@ -183,7 +202,15 @@ export default function BillingPage() {
       description: '',
       monthlyPrice: '',
       annualPrice: '',
+      cvLimit: '',
+      tokenLimit: '',
+      watermark: true,
+      linkedGroupId: '',
+      allowAnnualBilling: true,
+      renewalAllowed: true,
+      maxBillingCycles: '',
       isFeatured: false,
+      sortOrder: '0',
     });
     setIsPlanDialogOpen(true);
   };
@@ -195,7 +222,15 @@ export default function BillingPage() {
       description: plan.description || '',
       monthlyPrice: plan.monthlyPrice,
       annualPrice: plan.annualPrice,
-      isFeatured: plan.isFeatured,
+      cvLimit: plan.cvLimit?.toString() || '',
+      tokenLimit: plan.tokenLimit?.toString() || '',
+      watermark: plan.watermark ?? true,
+      linkedGroupId: plan.linkedGroupId?.toString() || '',
+      allowAnnualBilling: plan.allowAnnualBilling ?? true,
+      renewalAllowed: plan.renewalAllowed ?? true,
+      maxBillingCycles: plan.maxBillingCycles?.toString() || '',
+      isFeatured: plan.isFeatured ?? false,
+      sortOrder: plan.sortOrder?.toString() || '0',
     });
     setIsPlanDialogOpen(true);
   };
@@ -203,24 +238,27 @@ export default function BillingPage() {
   const handleSavePlan = async () => {
     setIsSavingPlan(true);
     try {
+      const planPayload = {
+        name: planFormData.name,
+        description: planFormData.description,
+        monthlyPrice: parseFloat(planFormData.monthlyPrice),
+        annualPrice: parseFloat(planFormData.annualPrice),
+        cvLimit: planFormData.cvLimit ? parseInt(planFormData.cvLimit) : undefined,
+        tokenLimit: planFormData.tokenLimit ? parseInt(planFormData.tokenLimit) : undefined,
+        watermark: planFormData.watermark,
+        linkedGroupId: planFormData.linkedGroupId ? parseInt(planFormData.linkedGroupId) : undefined,
+        allowAnnualBilling: planFormData.allowAnnualBilling,
+        renewalAllowed: planFormData.renewalAllowed,
+        maxBillingCycles: planFormData.maxBillingCycles ? parseInt(planFormData.maxBillingCycles) : undefined,
+        isFeatured: planFormData.isFeatured,
+        sortOrder: parseInt(planFormData.sortOrder) || 0,
+      };
+      
       if (editingPlan) {
-        await adminService.updatePlan(editingPlan.id, {
-          name: planFormData.name,
-          description: planFormData.description,
-          monthlyPrice: parseFloat(planFormData.monthlyPrice),
-          annualPrice: parseFloat(planFormData.annualPrice),
-          isFeatured: planFormData.isFeatured,
-        });
+        await adminService.updatePlan(editingPlan.id, planPayload);
         toast.success('Plan updated successfully');
       } else {
-        await adminService.createPlan({
-          name: planFormData.name,
-          description: planFormData.description,
-          monthlyPrice: parseFloat(planFormData.monthlyPrice),
-          annualPrice: parseFloat(planFormData.annualPrice),
-          features: [],
-          isFeatured: planFormData.isFeatured,
-        });
+        await adminService.createPlan(planPayload);
         toast.success('Plan created successfully');
       }
       setIsPlanDialogOpen(false);
@@ -578,13 +616,14 @@ export default function BillingPage() {
             </DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-4 py-4">
+          <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto">
             <div className="space-y-2">
-              <Label htmlFor="planName">Name</Label>
+              <Label htmlFor="planName">Name *</Label>
               <Input
                 id="planName"
                 value={planFormData.name}
                 onChange={(e) => setPlanFormData({ ...planFormData, name: e.target.value })}
+                placeholder="e.g., Pro Plan"
               />
             </div>
             <div className="space-y-2">
@@ -593,11 +632,14 @@ export default function BillingPage() {
                 id="planDescription"
                 value={planFormData.description}
                 onChange={(e) => setPlanFormData({ ...planFormData, description: e.target.value })}
+                placeholder="Brief description of the plan"
               />
             </div>
+            
+            {/* Pricing */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="monthlyPrice">Monthly Price ($)</Label>
+                <Label htmlFor="monthlyPrice">Monthly Price ($) *</Label>
                 <Input
                   id="monthlyPrice"
                   type="number"
@@ -606,7 +648,7 @@ export default function BillingPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="annualPrice">Annual Price ($)</Label>
+                <Label htmlFor="annualPrice">Annual Price ($) *</Label>
                 <Input
                   id="annualPrice"
                   type="number"
@@ -615,13 +657,120 @@ export default function BillingPage() {
                 />
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="featured"
-                checked={planFormData.isFeatured}
-                onCheckedChange={(checked) => setPlanFormData({ ...planFormData, isFeatured: checked })}
-              />
-              <Label htmlFor="featured">Featured (Popular)</Label>
+            
+            {/* Limits */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="cvLimit">CV Limit (empty = unlimited)</Label>
+                <Input
+                  id="cvLimit"
+                  type="number"
+                  value={planFormData.cvLimit}
+                  onChange={(e) => setPlanFormData({ ...planFormData, cvLimit: e.target.value })}
+                  placeholder="Leave empty for unlimited"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="tokenLimit">Token Limit (empty = unlimited)</Label>
+                <Input
+                  id="tokenLimit"
+                  type="number"
+                  value={planFormData.tokenLimit}
+                  onChange={(e) => setPlanFormData({ ...planFormData, tokenLimit: e.target.value })}
+                  placeholder="Monthly AI token allowance"
+                />
+              </div>
+            </div>
+            
+            {/* Linked Group */}
+            <div className="space-y-2">
+              <Label htmlFor="linkedGroupId">Linked Permission Group</Label>
+              <Select 
+                value={planFormData.linkedGroupId || 'none'} 
+                onValueChange={(value) => setPlanFormData({ ...planFormData, linkedGroupId: value === 'none' ? '' : value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a group (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
+                  {groups.map((group) => (
+                    <SelectItem key={group.id} value={group.id.toString()}>
+                      {group.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Users subscribing to this plan will inherit the group's permissions
+              </p>
+            </div>
+            
+            {/* Billing Restrictions */}
+            <div className="space-y-3 p-3 border rounded-lg bg-muted/30">
+              <h4 className="text-sm font-medium">Billing Restrictions</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="allowAnnual"
+                    checked={planFormData.allowAnnualBilling}
+                    onCheckedChange={(checked) => setPlanFormData({ ...planFormData, allowAnnualBilling: checked })}
+                  />
+                  <Label htmlFor="allowAnnual" className="text-sm">Allow Annual Billing</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="renewal"
+                    checked={planFormData.renewalAllowed}
+                    onCheckedChange={(checked) => setPlanFormData({ ...planFormData, renewalAllowed: checked })}
+                  />
+                  <Label htmlFor="renewal" className="text-sm">Allow Renewal</Label>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="maxBillingCycles" className="text-sm">Max Billing Cycles (empty = unlimited)</Label>
+                <Input
+                  id="maxBillingCycles"
+                  type="number"
+                  value={planFormData.maxBillingCycles}
+                  onChange={(e) => setPlanFormData({ ...planFormData, maxBillingCycles: e.target.value })}
+                  placeholder="e.g., 1 for one-time purchase"
+                  className="h-8"
+                />
+              </div>
+            </div>
+            
+            {/* Display Settings */}
+            <div className="space-y-3 p-3 border rounded-lg bg-muted/30">
+              <h4 className="text-sm font-medium">Display Settings</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="featured"
+                    checked={planFormData.isFeatured}
+                    onCheckedChange={(checked) => setPlanFormData({ ...planFormData, isFeatured: checked })}
+                  />
+                  <Label htmlFor="featured" className="text-sm">Featured (Popular)</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="watermark"
+                    checked={planFormData.watermark}
+                    onCheckedChange={(checked) => setPlanFormData({ ...planFormData, watermark: checked })}
+                  />
+                  <Label htmlFor="watermark" className="text-sm">Show Watermark</Label>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="sortOrder" className="text-sm">Sort Order</Label>
+                <Input
+                  id="sortOrder"
+                  type="number"
+                  value={planFormData.sortOrder}
+                  onChange={(e) => setPlanFormData({ ...planFormData, sortOrder: e.target.value })}
+                  className="h-8 w-24"
+                />
+              </div>
             </div>
           </div>
 
