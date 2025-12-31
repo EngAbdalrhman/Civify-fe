@@ -126,8 +126,24 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
            {personalInfo.city && <span>• {[personalInfo.city, personalInfo.country].filter(Boolean).join(', ')}</span>}
          </div>
           <div className="text-sm text-gray-600 flex flex-wrap justify-center gap-x-4 mt-1">
-           {personalInfo.linkedin && <span>LinkedIn: {personalInfo.linkedin}</span>}
-           {personalInfo.website && <span>{personalInfo.website}</span>}
+           {personalInfo.linkedin && (
+             <a href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} 
+                target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+               LinkedIn
+             </a>
+           )}
+           {personalInfo.github && (
+             <a href={personalInfo.github.startsWith('http') ? personalInfo.github : `https://github.com/${personalInfo.github}`} 
+                target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+               GitHub
+             </a>
+           )}
+           {personalInfo.website && (
+             <a href={personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`} 
+                target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+               {personalInfo.website}
+             </a>
+           )}
          </div>
        </header>
 

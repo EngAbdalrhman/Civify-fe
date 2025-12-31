@@ -143,9 +143,24 @@ export function ModernTemplate({ data, color }: TemplateProps) {
           {personalInfo.email && <div className="flex items-center gap-1"><Mail className="w-3 h-3" /> {personalInfo.email}</div>}
           {personalInfo.phone && <div className="flex items-center gap-1"><Phone className="w-3 h-3" /> {personalInfo.phone}</div>}
           {personalInfo.city && <div className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {[personalInfo.city, personalInfo.country].filter(Boolean).join(', ')}</div>}
-          {personalInfo.linkedin && <div className="flex items-center gap-1"><Linkedin className="w-3 h-3" /> {personalInfo.linkedin}</div>}
-          {personalInfo.github && <div className="flex items-center gap-1"><Github className="w-3 h-3" /> {personalInfo.github}</div>}
-          {personalInfo.website && <div className="flex items-center gap-1"><Globe className="w-3 h-3" /> {personalInfo.website}</div>}
+          {personalInfo.linkedin && (
+            <a href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} 
+               target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-blue-600 hover:underline">
+              <Linkedin className="w-3 h-3" /> LinkedIn
+            </a>
+          )}
+          {personalInfo.github && (
+            <a href={personalInfo.github.startsWith('http') ? personalInfo.github : `https://github.com/${personalInfo.github}`} 
+               target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-blue-600 hover:underline">
+              <Github className="w-3 h-3" /> GitHub
+            </a>
+          )}
+          {personalInfo.website && (
+            <a href={personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`} 
+               target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-blue-600 hover:underline">
+              <Globe className="w-3 h-3" /> {personalInfo.website}
+            </a>
+          )}
         </div>
       </header>
 
