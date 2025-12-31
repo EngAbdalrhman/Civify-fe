@@ -287,5 +287,110 @@
   "terms": {
     "title": "Terms and Conditions",
     "lastUpdated": "Last updated: {date}"
+  },
+  "resume": {
+    "sections": {
+      "summary": "Professional Summary",
+      "experience": "Experience",
+      "education": "Education",
+      "skills": "Skills",
+      "languages": "Languages",
+      "courses": "Courses & Certifications",
+      "projects": "Projects",
+      "activities": "Activities & Volunteering",
+      "contact": "Contact",
+      "links": "Links"
+    },
+    "levels": {
+      "native": "Native",
+      "fluent": "Fluent",
+      "expert": "Expert",
+      "advanced": "Advanced",
+      "intermediate": "Intermediate",
+      "beginner": "Beginner"
+    }
+  },
+  "builder": {
+    "title": "Civify Builder",
+    "tabs": {
+      "content": "Content",
+      "design": "Design",
+      "export": "Export"
+    },
+    "actions": {
+      "upload": "Upload CV",
+      "parsing": "Parsing...",
+      "save": "Save",
+      "saving": "Saving...",
+      "reset": "Reset to original",
+      "fullscreen": "Full Screen",
+      "exitFullscreen": "Exit Full Screen"
+    },
+    "saveDialog": {
+      "title": "Save Resume",
+      "description": "Enter a title for your resume. This will help you identify it later.",
+      "label": "Resume Title",
+      "placeholder": "e.g., Software Engineer Resume",
+      "cancel": "Cancel",
+      "confirm": "Save Resume"
+    },
+    "exportPanel": {
+      "title": "Ready to download?",
+      "subtitle": "Select a format to export your resume.",
+      "pdf": {
+        "title": "PDF Document",
+        "description": "Best for sharing and printing. Preserves layout."
+      },
+      "docx": {
+        "title": "Word Document",
+        "description": "Editable in Microsoft Word or Google Docs."
+      },
+      "tip": "Tip: Review your resume in the preview panel before downloading to ensure everything looks perfect."
+    }
+  },
+  "editor": {
+    "sections": {
+      "personal": "Personal Information",
+      "add": "Add Section",
+      "rename": "Rename Section",
+      "custom": "Custom"
+    },
+    "dialog": {
+      "title": "Add New Section",
+      "description": "Create a new section for your resume. Choose a type to inherit its layout.",
+      "nameLabel": "Section Name",
+      "namePlaceholder": "e.g., Volunteer Work, Awards, Publications...",
+      "typeLabel": "Section Type (inherits layout)",
+      "cancel": "Cancel",
+      "confirm": "Add Section"
+    }
+  },
+  "design": {
+    "template": {
+      "title": "Template",
+      "modern": { "name": "Modern", "description": "Clean and professional" },
+      "classic": { "name": "Classic", "description": "Timeless and traditional" },
+      "creative": { "name": "Creative", "description": "Bold and standout" }
+    },
+    "colors": "Accent Color",
+    "typography": "Typography",
+    "sectionStyles": {
+      "skills": "Skills Display",
+      "languages": "Languages Display",
+      "courses": "Courses / Certifications Display",
+      "tags": "Tags",
+      "level": "Level",
+      "dots": "Dots",
+      "bar": "Bar",
+      "detailed": { "name": "Detailed", "description": "Full cards" },
+      "simple": { "name": "Simple", "description": "Bullet list" }
+    },
+    "layoutDirection": {
+      "title": "Layout Direction",
+      "auto": "Auto",
+      "matchLocale": "Match Locale",
+      "ltr": "LTR",
+      "rtl": "RTL"
+    }
   }
 }

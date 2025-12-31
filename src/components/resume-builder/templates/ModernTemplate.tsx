@@ -25,6 +25,13 @@ export function ModernTemplate({ data, color }: TemplateProps) {
   const languagesStyle: LanguagesDisplayStyle = metadata?.languagesDisplayStyle || 'level';
   const coursesStyle: CoursesDisplayStyle = metadata?.coursesDisplayStyle || 'detailed';
 
+  // Determine direction
+  const direction = metadata?.layoutDirection === 'ltr' ? 'ltr' : 
+                   metadata?.layoutDirection === 'rtl' ? 'rtl' : 
+                   (metadata?.language === 'ar' ? 'rtl' : 'ltr');
+  
+  const isRtl = direction === 'rtl';
+
   const renderSectionItem = (item: any) => (
     <div key={item.id} className="mb-4 break-inside-avoid">
        <div className="flex justify-between items-baseline">
@@ -35,7 +42,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
       </div>
       {item.subtitle && <div className="text-sm font-semibold text-gray-700 mb-1">{item.subtitle}</div>}
       {item.description && (
-        <div className="text-sm text-gray-600 whitespace-pre-wrap leading-snug">
+        <div className={`text-sm text-gray-600 whitespace-pre-wrap leading-snug ${isRtl ? 'text-right' : 'text-justify'}`}>
            {item.description}
         </div>
       )}
@@ -131,8 +138,15 @@ export function ModernTemplate({ data, color }: TemplateProps) {
 
   const visibleSections = sections.filter(s => s.visible !== false && s.items && s.items.length > 0);
 
+
+  const labels = {
+    summary: metadata?.language === 'ar' ? "الملخص المهني" : "Professional Summary",
+    linkedin: metadata?.language === 'ar' ? "لينكد إن" : "LinkedIn",
+    github: metadata?.language === 'ar' ? "جيت هب" : "GitHub",
+  };
+
   return (
-    <div className="p-8 h-full bg-white text-gray-900">
+    <div className="p-8 h-full bg-white text-gray-900" dir={direction}>
       {/* Header */}
       <header className="border-b-2 pb-6 mb-6" style={{ borderColor: color }}>
         <h1 className="text-4xl font-bold uppercase tracking-tight mb-2" style={{ color }}>
@@ -146,13 +160,13 @@ export function ModernTemplate({ data, color }: TemplateProps) {
           {personalInfo.linkedin && (
             <a href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} 
                target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-blue-600 hover:underline">
-              <Linkedin className="w-3 h-3" /> LinkedIn
+              <Linkedin className="w-3 h-3" /> {labels.linkedin}
             </a>
           )}
           {personalInfo.github && (
             <a href={personalInfo.github.startsWith('http') ? personalInfo.github : `https://github.com/${personalInfo.github}`} 
                target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-blue-600 hover:underline">
-              <Github className="w-3 h-3" /> GitHub
+              <Github className="w-3 h-3" /> {labels.github}
             </a>
           )}
           {personalInfo.website && (
@@ -168,7 +182,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
       {personalInfo.summary && (
         <section className="mb-6">
           <h3 className="text-xs font-bold uppercase tracking-wider mb-3 border-b pb-1" style={{ color, borderColor: color + '40' }}>
-            Professional Summary
+            {labels.summary}
           </h3>
           <p className="text-sm text-gray-700 leading-relaxed text-justify">{personalInfo.summary}</p>
         </section>

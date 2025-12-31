@@ -287,5 +287,110 @@
   "terms": {
     "title": "الشروط والأحكام",
     "lastUpdated": "آخر تحديث: {date}"
+  },
+  "resume": {
+    "sections": {
+      "summary": "الملف الشخصي",
+      "experience": "الخبرة المهنية",
+      "education": "التعليم والمؤهلات",
+      "skills": "المهارات",
+      "languages": "اللغات",
+      "courses": "الدورات والشهادات",
+      "projects": "المشاريع",
+      "activities": "الأنشطة والتطوع",
+      "contact": "معلومات الاتصال",
+      "links": "الروابط"
+    },
+    "levels": {
+      "native": "لغة أم",
+      "fluent": "طلاقة",
+      "expert": "خبير",
+      "advanced": "متقدم",
+      "intermediate": "متوسط",
+      "beginner": "مبتدئ"
+    }
+  },
+  "builder": {
+    "title": "منشئ السيرة الذاتية",
+    "tabs": {
+      "content": "المحتوى",
+      "design": "التصميم",
+      "export": "التصدير"
+    },
+    "actions": {
+      "upload": "رفع سيرة ذاتية",
+      "parsing": "جاري التحليل...",
+      "save": "حفظ",
+      "saving": "جاري الحفظ...",
+      "reset": "استعادة الأصل",
+      "fullscreen": "ملء الشاشة",
+      "exitFullscreen": "خروج من ملء الشاشة"
+    },
+    "saveDialog": {
+      "title": "حفظ السيرة الذاتية",
+      "description": "أدخل عنواناً لسيرتك الذاتية. سيساعدك هذا في التعرف عليها لاحقاً.",
+      "label": "عنوان السيرة الذاتية",
+      "placeholder": "مثال: سيرة ذاتية لمهندس برمجيات",
+      "cancel": "إلغاء",
+      "confirm": "حفظ"
+    },
+    "exportPanel": {
+      "title": "جاهز للتحميل؟",
+      "subtitle": "اختر صيغة لتصدير سيرتك الذاتية.",
+      "pdf": {
+        "title": "ملف PDF",
+        "description": "الأفضل للمشاركة والطباعة. يحافظ على التنسيق."
+      },
+      "docx": {
+        "title": "ملف Word",
+        "description": "قابل للتعديل في Microsoft Word أو Google Docs."
+      },
+      "tip": "نصيحة: راجع سيرتك الذاتية في لوحة المعاينة قبل التحميل للتأكد من أن كل شيء يبدو مثالياً."
+    }
+  },
+  "editor": {
+    "sections": {
+      "personal": "المعلومات الشخصية",
+      "add": "إضافة قسم",
+      "rename": "إعادة تسمية القسم",
+      "custom": "مخصص"
+    },
+    "dialog": {
+      "title": "إضافة قسم جديد",
+      "description": "أنشئ قسماً جديداً لسيرتك الذاتية. اختر نوعاً ليرث تخطيطه.",
+      "nameLabel": "اسم القسم",
+      "namePlaceholder": "مثال: العمل التطوعي، الجوائز، المنشورات...",
+      "typeLabel": "نوع القسم (يرث التخطيط)",
+      "cancel": "إلغاء",
+      "confirm": "إضافة قسم"
+    }
+  },
+  "design": {
+    "template": {
+      "title": "القالب",
+      "modern": { "name": "حديث", "description": "نظيف واحترافي" },
+      "classic": { "name": "كلاسيكي", "description": "خالد وتقليدي" },
+      "creative": { "name": "إبداعي", "description": "جريء ومتميز" }
+    },
+    "colors": "اللون الأساسي",
+    "typography": "الخطوط",
+    "sectionStyles": {
+      "skills": "عرض المهارات",
+      "languages": "عرض اللغات",
+      "courses": "عرض الدورات / الشهادات",
+      "tags": "وسوم",
+      "level": "مستوى",
+      "dots": "نقاط",
+      "bar": "شريط",
+      "detailed": { "name": "مفصل", "description": "بطاقات كاملة" },
+      "simple": { "name": "بسيط", "description": "قائمة نقطية" }
+    },
+    "layoutDirection": {
+      "title": "اتجاه التخطيط",
+      "auto": "تلقائي",
+      "matchLocale": "حسب اللغة",
+      "ltr": "من اليسار لليمين",
+      "rtl": "من اليمين لليسار"
+    }
   }
 }
