@@ -1,6 +1,6 @@
 "use client";
 
-import { ResumeData, SkillLevel, SkillsDisplayStyle, LanguagesDisplayStyle } from '@/features/upload-cv/types';
+import { ResumeData, SkillLevel, SkillsDisplayStyle, LanguagesDisplayStyle, CoursesDisplayStyle } from '@/features/upload-cv/types';
 import { LevelVisualizer } from './LevelVisualizer';
 
 interface TemplateProps {
@@ -8,7 +8,6 @@ interface TemplateProps {
   color: string;
 }
 
-// Map subtitle/level strings to SkillLevel
 function parseLevel(value?: string): SkillLevel {
   if (!value) return 'intermediate';
   const lower = value.toLowerCase();
@@ -23,11 +22,10 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
   const { personalInfo, sections, metadata } = data;
   const skillsStyle: SkillsDisplayStyle = metadata?.skillsDisplayStyle || 'tags';
   const languagesStyle: LanguagesDisplayStyle = metadata?.languagesDisplayStyle || 'level';
+  const coursesStyle: CoursesDisplayStyle = metadata?.coursesDisplayStyle || 'detailed';
 
   const renderSkills = (section: any) => {
     const items = section.items.filter((item: any) => item.visible !== false);
-    
-    // Tags style
     if (skillsStyle === 'tags') {
       return (
         <div className="flex flex-wrap gap-2 text-sm">
@@ -39,10 +37,7 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
         </div>
       );
     }
-
-    // Level/Dots/Bar styles
     const displayStyle = skillsStyle === 'dots' ? 'dots' : skillsStyle === 'bar' ? 'bar' : 'text';
-    
     return (
       <div className="grid grid-cols-2 gap-x-8 gap-y-2">
         {items.map((item: any) => {
@@ -60,7 +55,6 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
 
   const renderLanguages = (section: any) => {
     const items = section.items.filter((item: any) => item.visible !== false);
-    
     if (languagesStyle === 'level') {
       return (
         <div className="space-y-1">
@@ -73,9 +67,7 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
         </div>
       );
     }
-
     const displayStyle = languagesStyle === 'dots' ? 'dots' : 'bar';
-    
     return (
       <div className="space-y-2">
         {items.map((item: any) => {
@@ -91,18 +83,43 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
     );
   };
 
-  // Filter out empty sections
+  // Simple bullet list for courses/certifications
+  const renderSimpleCourses = (section: any) => {
+    const items = section.items.filter((item: any) => item.visible !== false);
+    const columnCount = 3;
+    const itemsPerColumn = Math.ceil(items.length / columnCount);
+    const columns: any[][] = [];
+    for (let i = 0; i < columnCount; i++) {
+      columns.push(items.slice(i * itemsPerColumn, (i + 1) * itemsPerColumn));
+    }
+    
+    return (
+      <div className="grid grid-cols-3 gap-4 text-sm">
+        {columns.map((column, colIdx) => (
+          <ul key={colIdx} className="list-disc list-inside space-y-1">
+            {column.map((item: any) => (
+              <li key={item.id} className="text-gray-700">{item.title}</li>
+            ))}
+          </ul>
+        ))}
+      </div>
+    );
+  };
+
+  const isCertOrCourse = (type: string, title: string) => {
+    const lowerTitle = title.toLowerCase();
+    return type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
+  };
+
   const visibleSections = sections.filter(s => s.visible !== false && s.items && s.items.length > 0);
 
   return (
     <div className="p-10 h-full bg-white text-gray-900 font-serif leading-relaxed">
-       {/* Centered Header */}
        <header className="text-center mb-8 border-b-2 border-double border-gray-300 pb-6">
          <h1 className="text-3xl font-bold uppercase mb-2 tracking-wide text-gray-900">
            {personalInfo.fullName}
          </h1>
          <div className="text-gray-600 italic mb-3">{personalInfo.jobTitle}</div>
-         
          <div className="text-sm text-gray-600 flex flex-wrap justify-center gap-x-4">
            {personalInfo.email && <span>{personalInfo.email}</span>}
            {personalInfo.phone && <span>• {personalInfo.phone}</span>}
@@ -114,17 +131,13 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
          </div>
        </header>
 
-       {/* Summary */}
        {personalInfo.summary && (
          <section className="mb-6 text-center max-w-2xl mx-auto">
            <h3 className="text-sm font-bold uppercase mb-2 border-b border-gray-300 inline-block px-4">Summary</h3>
-           <p className="text-sm text-justify">
-             {personalInfo.summary}
-           </p>
+           <p className="text-sm text-justify">{personalInfo.summary}</p>
          </section>
        )}
 
-       {/* Sections */}
        {visibleSections.map(section => (
          <section key={section.id} className="mb-6">
            <h3 className="text-lg font-bold uppercase border-b border-gray-800 mb-4 flex items-center">
@@ -138,6 +151,8 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
              renderSkills(section)
            ) : section.type === 'languages' ? (
              renderLanguages(section)
+           ) : isCertOrCourse(section.type, section.title) && coursesStyle === 'simple' ? (
+             renderSimpleCourses(section)
            ) : (
              <div className="space-y-4">
                {section.items.filter((i: any) => i.visible !== false).map((item: any) => (
@@ -150,9 +165,7 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
                       <span>{item.subtitle}</span>
                       <span>{item.location}</span>
                    </div>
-                   <div className="text-sm text-gray-700">
-                     {item.description}
-                   </div>
+                   {item.description && <div className="text-sm text-gray-700">{item.description}</div>}
                  </div>
                ))}
              </div>
