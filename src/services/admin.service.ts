@@ -312,9 +312,24 @@ class AdminService {
     return response.data;
   }
 
+  async toggleUserLock(userId: number): Promise<ApiResponse<AdminUser>> {
+    const response = await apiClient.patch<ApiResponse<AdminUser>>(
+      `${ADMIN_API.USERS}/${userId}/toggle-lock`,
+      {}
+    );
+    return response.data;
+  }
+
   // ==========================================
   // Plans (Client-side filtering - fetch all)
   // ==========================================
+
+  async getPlanLookup(): Promise<{ id: number; name: string }[]> {
+    const response = await apiClient.get<{ id: number; name: string }[]>(
+      `${ADMIN_API.PLANS}/lookup`
+    );
+    return response.data;
+  }
 
   async getAllPlans(): Promise<AdminPlan[]> {
     const response = await apiClient.get<ApiResponse<AdminPlan[]> | AdminPlan[]>(ADMIN_API.PLANS);
