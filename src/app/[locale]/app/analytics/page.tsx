@@ -31,6 +31,7 @@ import { GenericList, buildInputDataModel } from '@/components/generic-list/Gene
 import { ColumnDef, FilterOperation } from '@/components/generic-list/types';
 
 import type { UserSubscription } from '@/features/plans/types';
+import { PermissionGuard } from '@/components/auth/PermissionGuard';
 
 export default function AnalyticsPage() {
   const t = useTranslations('analytics');
@@ -227,183 +228,185 @@ export default function AnalyticsPage() {
   const daysUntilReset = getDaysUntilReset();
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Analytics & Usage</h1>
-        <p className="text-muted-foreground mt-2">
-          Track your CV generations and API usage. Usage resets {daysUntilReset !== null ? `in ${daysUntilReset} days` : 'monthly'}.
-        </p>
-      </div>
+    <PermissionGuard permissions={['STATS.VIEW', 'API_USAGE.VIEW']}>
+      <div className="space-y-8">
+        {/* Header */}
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Analytics & Usage</h1>
+          <p className="text-muted-foreground mt-2">
+            Track your CV generations and API usage. Usage resets {daysUntilReset !== null ? `in ${daysUntilReset} days` : 'monthly'}.
+          </p>
+        </div>
 
-      <Tabs defaultValue="stats" className="w-full">
-        <TabsList>
-          <TabsTrigger value="stats">General Statistics</TabsTrigger>
-          {canViewApiLogs && <TabsTrigger value="logs">API Logs</TabsTrigger>}
-        </TabsList>
+        <Tabs defaultValue="stats" className="w-full">
+          <TabsList>
+            <TabsTrigger value="stats">General Statistics</TabsTrigger>
+            {canViewApiLogs && <TabsTrigger value="logs">API Logs</TabsTrigger>}
+          </TabsList>
 
-        <TabsContent value="stats" className="space-y-6">
-          {/* Usage Cards */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">CV Generations</CardTitle>
-                <FileText className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{subscription?.currentCvCount ?? 0}</div>
-                <p className="text-xs text-muted-foreground">
-                  {subscription?.cvLimit 
-                    ? `of ${subscription.cvLimit} this month`
-                    : subscription ? 'Unlimited' : 'No active plan'}
-                </p>
-              </CardContent>
-            </Card>
+          <TabsContent value="stats" className="space-y-6">
+            {/* Usage Cards */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">CV Generations</CardTitle>
+                  <FileText className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{subscription?.currentCvCount ?? 0}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {subscription?.cvLimit 
+                      ? `of ${subscription.cvLimit} this month`
+                      : subscription ? 'Unlimited' : 'No active plan'}
+                  </p>
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Remaining CVs</CardTitle>
-                <Zap className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {subscription?.cvLimit 
-                    ? Math.max(0, subscription.cvLimit - (subscription.currentCvCount ?? 0))
-                    : '∞'}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {subscription?.cvLimit ? `${cvUsagePercent}% used` : 'Unlimited plan'}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Token Usage</CardTitle>
-                <Activity className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{subscription?.currentTokenUsage ?? 0}</div>
-                <p className="text-xs text-muted-foreground">
-                  {subscription ? 'Tokens used this month' : 'No active plan'}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Current Plan</CardTitle>
-                <Zap className="h-4 w-4 text-yellow-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{subscription?.planName ?? 'None'}</div>
-                <Button variant="link" className="px-0 h-auto text-xs text-primary" asChild>
-                  <Link href="/plans">
-                    {subscription ? 'Manage Subscription' : 'Subscribe Now'} <ArrowUpRight className="ml-1 h-3 w-3" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Charts */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-4">
-              <CardHeader>
-                <CardTitle>This Month's Usage</CardTitle>
-                <CardDescription>
-                  Weekly breakdown of CVs generated this month.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pl-2">
-                <div className="h-[350px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={mockGenerationsData}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                      <XAxis 
-                        dataKey="name" 
-                        stroke="#888888" 
-                        fontSize={12} 
-                        tickLine={false} 
-                        axisLine={false} 
-                      />
-                      <YAxis 
-                        stroke="#888888" 
-                        fontSize={12} 
-                        tickLine={false} 
-                        axisLine={false} 
-                        tickFormatter={(value) => `${value}`}
-                      />
-                      <Tooltip 
-                        cursor={{ fill: 'transparent' }}
-                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                      />
-                      <Bar dataKey="generations" fill="currentColor" radius={[4, 4, 0, 0]} className="fill-primary" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="col-span-3">
-              <CardHeader>
-                <CardTitle>Subscription Status</CardTitle>
-                <CardDescription>
-                  Your current plan details and status.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Status</span>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      subscription?.status === 'ACTIVE' 
-                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                        : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-                    }`}>
-                      {subscription?.status ?? 'INACTIVE'}
-                    </span>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Remaining CVs</CardTitle>
+                  <Zap className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {subscription?.cvLimit 
+                      ? Math.max(0, subscription.cvLimit - (subscription.currentCvCount ?? 0))
+                      : '∞'}
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Start Date</span>
-                    <span className="text-sm">{subscription ? new Date(subscription.startDate).toLocaleDateString() : '-'}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">End Date</span>
-                    <span className="text-sm">{subscription ? new Date(subscription.endDate).toLocaleDateString() : '-'}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Usage Resets</span>
-                    <span className="text-sm">{subscription?.usageResetDate ? new Date(subscription.usageResetDate).toLocaleDateString() : 'Monthly'}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
+                  <p className="text-xs text-muted-foreground">
+                    {subscription?.cvLimit ? `${cvUsagePercent}% used` : 'Unlimited plan'}
+                  </p>
+                </CardContent>
+              </Card>
 
-        {canViewApiLogs && (
-          <TabsContent value="logs">
-            <Card>
-              <CardHeader>
-                <CardTitle>API Usage Logs</CardTitle>
-                <CardDescription>Detailed logs of your API activity.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <GenericList 
-                  data={apiLogs}
-                  columns={logsColumns}
-                  meta={logsPagination} 
-                  isLoading={isLoading}
-                  onPageChange={handleLogsPageChange}
-                  // Filter not fully implemented on backend user endpoint yet, 
-                  // but if it were, we would use onFilterChange
-                />
-              </CardContent>
-            </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Token Usage</CardTitle>
+                  <Activity className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{subscription?.currentTokenUsage ?? 0}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {subscription ? 'Tokens used this month' : 'No active plan'}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Current Plan</CardTitle>
+                  <Zap className="h-4 w-4 text-yellow-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{subscription?.planName ?? 'None'}</div>
+                  <Button variant="link" className="px-0 h-auto text-xs text-primary" asChild>
+                    <Link href="/plans">
+                      {subscription ? 'Manage Subscription' : 'Subscribe Now'} <ArrowUpRight className="ml-1 h-3 w-3" />
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Charts */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+              <Card className="col-span-4">
+                <CardHeader>
+                  <CardTitle>This Month's Usage</CardTitle>
+                  <CardDescription>
+                    Weekly breakdown of CVs generated this month.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pl-2">
+                  <div className="h-[350px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={mockGenerationsData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis 
+                          dataKey="name" 
+                          stroke="#888888" 
+                          fontSize={12} 
+                          tickLine={false} 
+                          axisLine={false} 
+                        />
+                        <YAxis 
+                          stroke="#888888" 
+                          fontSize={12} 
+                          tickLine={false} 
+                          axisLine={false} 
+                          tickFormatter={(value) => `${value}`}
+                        />
+                        <Tooltip 
+                          cursor={{ fill: 'transparent' }}
+                          contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        />
+                        <Bar dataKey="generations" fill="currentColor" radius={[4, 4, 0, 0]} className="fill-primary" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="col-span-3">
+                <CardHeader>
+                  <CardTitle>Subscription Status</CardTitle>
+                  <CardDescription>
+                    Your current plan details and status.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Status</span>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        subscription?.status === 'ACTIVE' 
+                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                          : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                      }`}>
+                        {subscription?.status ?? 'INACTIVE'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Start Date</span>
+                      <span className="text-sm">{subscription ? new Date(subscription.startDate).toLocaleDateString() : '-'}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">End Date</span>
+                      <span className="text-sm">{subscription ? new Date(subscription.endDate).toLocaleDateString() : '-'}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Usage Resets</span>
+                      <span className="text-sm">{subscription?.usageResetDate ? new Date(subscription.usageResetDate).toLocaleDateString() : 'Monthly'}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
-        )}
-      </Tabs>
-    </div>
+
+          {canViewApiLogs && (
+            <TabsContent value="logs">
+              <Card>
+                <CardHeader>
+                  <CardTitle>API Usage Logs</CardTitle>
+                  <CardDescription>Detailed logs of your API activity.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <GenericList 
+                    data={apiLogs}
+                    columns={logsColumns}
+                    meta={logsPagination} 
+                    isLoading={isLoading}
+                    onPageChange={handleLogsPageChange}
+                    // Filter not fully implemented on backend user endpoint yet, 
+                    // but if it were, we would use onFilterChange
+                  />
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+        </Tabs>
+      </div>
+    </PermissionGuard>
   );
 }

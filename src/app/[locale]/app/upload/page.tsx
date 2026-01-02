@@ -66,9 +66,11 @@ import {
   PII_FIELDS 
 } from '@/features/upload-cv/types';
 import { exportToPdf, exportToDocx } from '@/features/upload-cv/utils/exportCv';
+import { useRouter } from 'next/navigation';
 
 export default function UploadPage() {
   const t = useTranslations('upload');
+  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cvPreviewRef = useRef<HTMLDivElement>(null);
   
@@ -96,6 +98,15 @@ export default function UploadPage() {
     const file = event.target.files?.[0];
     if (!file) return;
     
+    
+    // Auth check
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      toast.error(t('authRequired'));
+      router.push('/login?redirect=/app/upload');
+      return;
+    }
+
     const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
     if (!validTypes.includes(file.type)) {
       toast.error('Please upload a PDF or DOCX file');
@@ -119,7 +130,7 @@ export default function UploadPage() {
         }
       },
     });
-  }, [uploadCv]);
+  }, [uploadCv, router, t]);
 
   const handleManualEntry = useCallback(() => {
     setResumeData(emptyResumeData);

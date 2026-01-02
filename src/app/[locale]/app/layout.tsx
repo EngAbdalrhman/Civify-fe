@@ -149,16 +149,14 @@ export default function UserDashboardLayout({
               Resume Builder
             </Link>
             
-            {/* Upload CV */}
-            {isAuthenticated && (
-              <Link 
+            {/* Upload CV - visible for all (guests redirected on action) */}
+            <Link 
               href="/app/upload" 
               className={getLinkClasses('/app/upload')}
             >
               <UploadCloud className="h-4 w-4" />
               {t('upload')}
             </Link>
-          )}
         
             {/* Analytics - requires STATS.VIEW or API_USAGE.VIEW */}
             {isAuthenticated && canViewAnalytics && (
