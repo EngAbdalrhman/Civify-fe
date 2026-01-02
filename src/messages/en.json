@@ -31,7 +31,7 @@
     "dashboard": "Dashboard",
     "analytics": "Analytics",
     "settings": "Settings",
-    "upload": "Upload CV",
+    "upload": "Tailor CV",
     "plans": "Plans",
     "billing": "Billing",
     "admin": "Admin",
@@ -96,14 +96,15 @@
     }
   },
   "upload": {
-    "title": "Upload CV",
+    "title": "Tailor CV",
     "dragDrop": "Drag and drop your CV here",
     "or": "or",
     "browse": "Browse Files",
     "supportedFormats": "Supported formats: PDF, DOC, DOCX",
     "maxSize": "Maximum file size: 5MB",
     "processing": "Processing your CV...",
-    "success": "CV uploaded successfully!"
+    "success": "CV uploaded successfully!",
+    "authRequired": "Please sign in to upload and tailor your CV"
   },
   "plans": {
     "title": "Choose Your Plan",
