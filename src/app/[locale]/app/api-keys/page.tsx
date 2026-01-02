@@ -38,6 +38,7 @@ import { Link } from '@/i18n/routing';
 import { Book } from 'lucide-react';
 import { apiKeyService, type ApiKey } from '@/services/api-key.service';
 import { toast } from 'sonner';
+import { PermissionGuard } from '@/components/auth/PermissionGuard';
 
 export default function ApiKeysPage() {
   const [keys, setKeys] = useState<ApiKey[]>([]);
@@ -111,148 +112,150 @@ export default function ApiKeysPage() {
   };
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">API Keys</h1>
-        <p className="text-muted-foreground mt-2">
-          Manage your API keys for accessing the Civify API programmatically.
-        </p>
-      </div>
-
-      {/* Generate Key Button */}
-      <div className="flex items-center justify-between mb-6">
+    <PermissionGuard permissions={['API.ACCESS', 'API.KEY.CREATE']}>
+      <div className="space-y-8">
         <div>
-          <h2 className="text-xl font-semibold">Your API Keys</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Manage API keys to access the Civify API programmatically
+          <h1 className="text-3xl font-bold tracking-tight">API Keys</h1>
+          <p className="text-muted-foreground mt-2">
+            Manage your API keys for accessing the Civify API programmatically.
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" asChild>
-            <Link href="/app/api-documentation">
-              <Book className="h-4 w-4 mr-2" />
-              View Documentation
-            </Link>
-          </Button>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Generate New Key
-              </Button>
-            </DialogTrigger>
-          
-            <DialogContent className="sm:max-w-md">
-               {!generatedKey ? (
-                <>
-                  <DialogHeader>
-                    <DialogTitle>Create API Key</DialogTitle>
-                    <DialogDescription>
-                      Enter a name for your new API key to help you identify it later.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Input 
-                        id="name" 
-                        placeholder="e.g. Website Checkout" 
-                        className="col-span-4" 
-                        value={newKeyName}
-                        onChange={(e) => setNewKeyName(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button onClick={handleGenerateKey} disabled={isGenerating || !newKeyName}>
-                      {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                      Generate Key
-                    </Button>
-                  </DialogFooter>
-                </>
-               ) : (
-                <>
-                  <DialogHeader>
-                    <DialogTitle>API Key Generated</DialogTitle>
-                    <DialogDescription className="text-red-500 font-medium bg-red-50 dark:bg-red-950/20 p-2 rounded-md mt-2 flex items-center gap-2">
-                      <ShieldAlert className="h-4 w-4" />
-                      Please copy this key now. You won't be able to see it again!
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="flex items-center space-x-2 my-4">
-                    <Input value={generatedKey} readOnly className="font-mono bg-muted" />
-                    <Button size="icon" variant="outline" onClick={() => handleCopy(generatedKey)}>
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <DialogFooter>
-                    <Button onClick={handleDialogClose}>Done</Button>
-                  </DialogFooter>
-                </>
-               )}
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
 
-      {/* Existing Keys Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Existing Keys</CardTitle>
-          <CardDescription>
-            A list of all API keys associated with your account.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : keys.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>No API keys found. Generate your first key to get started.</p>
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Key ID</TableHead>
-                  <TableHead>Masked Key</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead>Last Used</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {keys.map((key) => (
-                  <TableRow key={key.id}>
-                    <TableCell className="font-medium">#{key.id}</TableCell>
-                    <TableCell className="font-mono text-xs">{key.keyPreview}</TableCell>
-                    <TableCell>{new Date(key.createdAt).toLocaleDateString()}</TableCell>
-                    <TableCell>
-                      {key.lastUsedAt 
-                        ? new Date(key.lastUsedAt).toLocaleDateString()
-                        : 'Never'}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={!key.revoked ? 'default' : 'destructive'} className={!key.revoked ? 'bg-green-600 hover:bg-green-700' : ''}>
-                        {!key.revoked ? 'Active' : 'Revoked'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {!key.revoked && (
-                        <Button variant="ghost" size="sm" onClick={() => handleRevoke(key.id)} className="text-destructive hover:text-destructive/90 hover:bg-destructive/10">
-                           Revoke
-                        </Button>
-                      )}
-                    </TableCell>
+        {/* Generate Key Button */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-xl font-semibold">Your API Keys</h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Manage API keys to access the Civify API programmatically
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" asChild>
+              <Link href="/app/api-documentation">
+                <Book className="h-4 w-4 mr-2" />
+                View Documentation
+              </Link>
+            </Button>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Generate New Key
+                </Button>
+              </DialogTrigger>
+            
+              <DialogContent className="sm:max-w-md">
+                 {!generatedKey ? (
+                  <>
+                    <DialogHeader>
+                      <DialogTitle>Create API Key</DialogTitle>
+                      <DialogDescription>
+                        Enter a name for your new API key to help you identify it later.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Input 
+                          id="name" 
+                          placeholder="e.g. Website Checkout" 
+                          className="col-span-4" 
+                          value={newKeyName}
+                          onChange={(e) => setNewKeyName(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button onClick={handleGenerateKey} disabled={isGenerating || !newKeyName}>
+                        {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        Generate Key
+                      </Button>
+                    </DialogFooter>
+                  </>
+                 ) : (
+                  <>
+                    <DialogHeader>
+                      <DialogTitle>API Key Generated</DialogTitle>
+                      <DialogDescription className="text-red-500 font-medium bg-red-50 dark:bg-red-950/20 p-2 rounded-md mt-2 flex items-center gap-2">
+                        <ShieldAlert className="h-4 w-4" />
+                        Please copy this key now. You won't be able to see it again!
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex items-center space-x-2 my-4">
+                      <Input value={generatedKey} readOnly className="font-mono bg-muted" />
+                      <Button size="icon" variant="outline" onClick={() => handleCopy(generatedKey)}>
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <DialogFooter>
+                      <Button onClick={handleDialogClose}>Done</Button>
+                    </DialogFooter>
+                  </>
+                 )}
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
+
+        {/* Existing Keys Table */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Existing Keys</CardTitle>
+            <CardDescription>
+              A list of all API keys associated with your account.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : keys.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>No API keys found. Generate your first key to get started.</p>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Key ID</TableHead>
+                    <TableHead>Masked Key</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead>Last Used</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+                </TableHeader>
+                <TableBody>
+                  {keys.map((key) => (
+                    <TableRow key={key.id}>
+                      <TableCell className="font-medium">#{key.id}</TableCell>
+                      <TableCell className="font-mono text-xs">{key.keyPreview}</TableCell>
+                      <TableCell>{new Date(key.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        {key.lastUsedAt 
+                          ? new Date(key.lastUsedAt).toLocaleDateString()
+                          : 'Never'}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={!key.revoked ? 'default' : 'destructive'} className={!key.revoked ? 'bg-green-600 hover:bg-green-700' : ''}>
+                          {!key.revoked ? 'Active' : 'Revoked'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {!key.revoked && (
+                          <Button variant="ghost" size="sm" onClick={() => handleRevoke(key.id)} className="text-destructive hover:text-destructive/90 hover:bg-destructive/10">
+                             Revoke
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </PermissionGuard>
   );
 }
