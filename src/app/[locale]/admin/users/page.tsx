@@ -11,6 +11,7 @@ import { GenericList, buildInputDataModel } from '@/components/generic-list/Gene
 import { ColumnDef, ActionDef, FilterOperation } from '@/components/generic-list/types';
 import type { AdminUser } from '@/services/admin.service';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 
 export default function UsersPage() {
   const t = useTranslations('admin.users');
@@ -37,21 +38,27 @@ export default function UsersPage() {
       newUsers: 0
   });
 
-  // Fetch stats on mount only
+  const [planOptions, setPlanOptions] = useState<{ label: string; value: string }[]>([]);
+
+  // Fetch stats and plan lookup on mount only
   useEffect(() => {
-      const loadStats = async () => {
+      const loadInitialData = async () => {
           try {
-              const stats = await adminService.getStats('MONTHLY');
+              const [stats, plans] = await Promise.all([
+                  adminService.getStats('MONTHLY'),
+                  adminService.getPlanLookup().catch(() => [])
+              ]);
               setMetrics({
                   totalUsers: stats.totalUsers,
                   activeUsers: stats.subscribedUsers,
                   newUsers: 0
               });
+              setPlanOptions(plans.map(p => ({ label: p.name, value: p.name })));
           } catch (error) {
-              console.error("Failed to load stats", error);
+              console.error("Failed to load initial data", error);
           }
       };
-      loadStats();
+      loadInitialData();
   }, []); // Empty dependency array = run once on mount
 
 
@@ -77,8 +84,14 @@ export default function UsersPage() {
   };
 
   const handleToggleBan = async (user: AdminUser) => {
-    console.log('Toggle ban for user:', user.id);
-    await refresh();
+    try {
+      await adminService.toggleUserLock(user.id);
+      toast.success(user.accountLocked ? 'User unbanned successfully' : 'User banned successfully');
+      await refresh();
+    } catch (error) {
+      console.error('Failed to toggle ban:', error);
+      toast.error('Failed to toggle user ban status');
+    }
   };
 
   // Define Columns
@@ -118,8 +131,9 @@ export default function UsersPage() {
         ),
       sortable: true,
       filterable: true,
-      filterType: 'text',
-      filterOperation: FilterOperation.MATCH
+      filterType: 'dropdown',
+      filterOperation: FilterOperation.MATCH,
+      filterOptions: planOptions.length > 0 ? planOptions : [{ label: 'Free', value: 'Free' }]
     },
     {
       key: 'accountLocked', 
@@ -146,7 +160,7 @@ export default function UsersPage() {
         filterType: 'date',
         filterOperation: FilterOperation.DATE_BETWEEN 
     }
-  ], [t]);
+  ], [t, planOptions]);
 
   // Define Actions
   const actions: ActionDef<AdminUser>[] = [

@@ -75,7 +75,7 @@ export function ColumnFilter({ column, value, onChange }: ColumnFilterProps) {
           <span className="sr-only">Filter {column.label}</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-4" align="start">
+      <PopoverContent className="w-56 p-4" align="start">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="font-medium leading-none">Filter {column.label}</h4>
