@@ -55,7 +55,7 @@ export default function PromosPage() {
     page: 0,
     size: 10,
     filters: {} as Record<string, unknown>,
-    sort: null as { key: string; direction: 'asc' | 'desc' } | null,
+    sort: null as { field: string; direction: 'ASC' | 'DESC' } | null,
   });
 
   // Form state
@@ -81,7 +81,7 @@ export default function PromosPage() {
       sortable: true,
       filterable: true,
       filterType: 'text',
-      filterOperation: FilterOperation.LIKE,
+      filterOperation: FilterOperation.MATCH,
       render: (_, item) => (
         <div className="flex items-center gap-2">
           <Tag className="h-4 w-4 text-primary" />
