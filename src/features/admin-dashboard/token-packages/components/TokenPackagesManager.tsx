@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -28,7 +29,6 @@ import { tokenPackageService, type TokenPackage } from '@/services/token-package
 import apiClient from '@/api/client';
 
 // Token Package Admin API
-// Internal to this component or could be moved to services
 const tokenPackageAdminApi = {
   getAll: async (): Promise<TokenPackage[]> => {
     const response = await apiClient.get('/v1/tokens/packages/all');
@@ -48,6 +48,8 @@ const tokenPackageAdminApi = {
 };
 
 export function TokenPackagesManager() {
+  const t = useTranslations('admin.billing');
+  const tc = useTranslations('admin.common');
   const { hasPermission } = usePermissions();
   const canModifyTokens = hasPermission(ADMIN_ACTION_PERMISSIONS.TOKEN_PACKAGE_EDIT);
 
@@ -158,12 +160,12 @@ export function TokenPackagesManager() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <p className="text-sm text-muted-foreground">
-          Configure token packages that users can purchase for additional usage
+          {t('tokensDesc')}
         </p>
         {canModifyTokens && (
           <Button onClick={handleCreateTokenPackage}>
-            <Plus className="h-4 w-4 mr-2" />
-            Create Package
+            <Plus className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
+            {t('createPackage')}
           </Button>
         )}
       </div>
@@ -205,7 +207,7 @@ export function TokenPackagesManager() {
                     <CardTitle className="text-lg">{pkg.name}</CardTitle>
                   </div>
                   <Badge variant={pkg.active ? 'secondary' : 'destructive'} className="text-xs">
-                    {pkg.active ? 'Active' : 'Inactive'}
+                    {pkg.active ? tc('active') : tc('inactive')}
                   </Badge>
                 </div>
                 {pkg.description && (
@@ -230,8 +232,8 @@ export function TokenPackagesManager() {
                         className="flex-1"
                         onClick={() => handleEditTokenPackage(pkg)}
                       >
-                        <Edit2 className="h-3 w-3 mr-1" />
-                        Edit
+                        <Edit2 className="h-3 w-3 ltr:mr-1 rtl:ml-1" />
+                        {tc('edit')}
                       </Button>
                       {pkg.active && (
                         <Button 

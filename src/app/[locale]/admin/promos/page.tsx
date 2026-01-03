@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,10 +9,7 @@ import {
   Plus, 
   Loader2, 
   Edit2, 
-  Trash2,
-  AlertCircle,
-  Copy,
-  Check
+  Trash2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { adminService, type PromoCode, type PromoApplicabilityType } from '@/services/admin.service';
@@ -23,14 +20,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -40,22 +29,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { GenericList, buildInputDataModel } from '@/components/generic-list/GenericList';
+import { ColumnDef, FilterOperation, ActionDef } from '@/components/generic-list/types';
 
 export default function PromosPage() {
   const t = useTranslations('admin.promos');
   const tc = useTranslations('admin.common');
   const common = useTranslations('common');
 
-  const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
-  const [filteredCodes, setFilteredCodes] = useState<PromoCode[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  // Dialog state
   const [editingPromo, setEditingPromo] = useState<PromoCode | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [copiedId, setCopiedId] = useState<number | null>(null);
+
+  // GenericList state
+  const [data, setData] = useState<PromoCode[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+    page: 0,
+    size: 10,
+    totalElements: 0,
+    totalPages: 0,
+  });
+  const [params, setParams] = useState({
+    page: 0,
+    size: 10,
+    filters: {} as Record<string, unknown>,
+    sort: null as { key: string; direction: 'asc' | 'desc' } | null,
+  });
 
   // Form state
   const [formData, setFormData] = useState({
@@ -67,46 +68,131 @@ export default function PromosPage() {
     applicabilityType: 'ALL' as PromoApplicabilityType,
   });
 
-  const fetchPromoCodes = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
+  // Column definitions
+  const columns: ColumnDef<PromoCode>[] = useMemo(() => [
+    {
+      key: 'id',
+      label: 'ID',
+      sortable: true,
+    },
+    {
+      key: 'code',
+      label: t('code'),
+      sortable: true,
+      filterable: true,
+      filterType: 'text',
+      filterOperation: FilterOperation.LIKE,
+      render: (_, item) => (
+        <div className="flex items-center gap-2">
+          <Tag className="h-4 w-4 text-primary" />
+          <code className="font-mono font-bold">{item.code}</code>
+        </div>
+      ),
+    },
+    {
+      key: 'discountValue',
+      label: t('discount'),
+      sortable: true,
+      render: (_, item) => (
+        <span className="font-semibold">
+          {item.discountType === 'PERCENTAGE' 
+            ? `${item.discountValue}%` 
+            : `$${item.discountValue}`}
+        </span>
+      ),
+    },
+    {
+      key: 'applicabilityType',
+      label: t('appliesTo'),
+      sortable: true,
+      filterable: true,
+      filterType: 'select',
+      filterOptions: [
+        { label: 'All', value: 'ALL' },
+        { label: 'Plan', value: 'PLAN' },
+        { label: 'Token', value: 'TOKEN' },
+      ],
+    },
+    {
+      key: 'usedCount',
+      label: t('usage'),
+      sortable: true,
+      render: (_, item) => (
+        <span className="text-muted-foreground">
+          {item.usedCount}/{item.usageLimit || '∞'}
+        </span>
+      ),
+    },
+    {
+      key: 'expiresAt',
+      label: t('expires'),
+      sortable: true,
+      render: (value) => {
+        if (!value) return <span className="text-muted-foreground">{t('noExpiry')}</span>;
+        return new Date(value as string).toLocaleDateString();
+      },
+    },
+    {
+      key: 'active',
+      label: t('status'),
+      sortable: true,
+      filterable: true,
+      filterType: 'select',
+      filterOptions: [
+        { label: tc('active'), value: 'true' },
+        { label: tc('inactive'), value: 'false' },
+      ],
+      render: (value) => (
+        <Badge variant={value ? 'default' : 'secondary'} className={value ? 'bg-green-600' : ''}>
+          {value ? tc('active') : tc('inactive')}
+        </Badge>
+      ),
+    },
+  ], [t, tc]);
+
+  // Actions
+  const actions: ActionDef<PromoCode>[] = useMemo(() => [
+    {
+      label: tc('edit'),
+      icon: <Edit2 className="h-4 w-4" />,
+      onClick: (promo) => handleEditPromo(promo),
+    },
+    {
+      label: tc('deactivate'),
+      icon: <Trash2 className="h-4 w-4" />,
+      onClick: (promo) => handleDeactivate(promo),
+      variant: 'destructive' as const,
+      condition: (promo) => promo.active,
+    },
+  ], [tc]);
+
+  // Load data
+  const loadData = useCallback(async () => {
+    setLoading(true);
     try {
-      const data = await adminService.getAllPromoCodes();
-      setPromoCodes(data);
-      setFilteredCodes(data);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to fetch promo codes';
-      setError(message);
-      toast.error(message);
+      const model = buildInputDataModel(params.filters, columns, params.sort, params.page, params.size);
+      const res = await adminService.filterPromoCodes(model);
+      setData(res.content);
+      setPagination({
+        page: res.page,
+        size: res.size,
+        totalElements: res.totalElements,
+        totalPages: res.totalPages,
+      });
+    } catch (e) {
+      console.error(e);
+      toast.error('Failed to load promo codes');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  }, []);
+  }, [params, columns]);
 
   useEffect(() => {
-    fetchPromoCodes();
-  }, [fetchPromoCodes]);
+    loadData();
+  }, [loadData]);
 
-  // Client-side filtering
-  useEffect(() => {
-    let result = promoCodes;
-
-    if (searchTerm) {
-      result = result.filter(p => 
-        p.code.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    if (statusFilter !== 'all') {
-      result = result.filter(p => 
-        statusFilter === 'active' ? p.active : !p.active
-      );
-    }
-
-    setFilteredCodes(result);
-  }, [promoCodes, searchTerm, statusFilter]);
-
-  const handleCreatePromo = () => {
+  // Handlers
+  const handleCreate = () => {
     setEditingPromo(null);
     setFormData({
       code: '',
@@ -124,15 +210,50 @@ export default function PromosPage() {
     setFormData({
       code: promo.code,
       discountType: promo.discountType,
-      discountValue: String(promo.discountValue),
-      usageLimit: promo.usageLimit ? String(promo.usageLimit) : '',
+      discountValue: promo.discountValue.toString(),
+      usageLimit: promo.usageLimit?.toString() || '',
       expiresAt: promo.expiresAt ? promo.expiresAt.split('T')[0] : '',
-      applicabilityType: promo.applicabilityType || 'ALL',
+      applicabilityType: promo.applicabilityType,
     });
     setIsDialogOpen(true);
   };
 
-  const handleSavePromo = async () => {
+  const handleDeactivate = async (promo: PromoCode) => {
+    if (!confirm(`Are you sure you want to deactivate "${promo.code}"?`)) return;
+    
+    try {
+      await adminService.deactivatePromoCode(promo.id);
+      toast.success('Promo code deactivated');
+      loadData();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to deactivate';
+      toast.error(message);
+    }
+  };
+
+  const handleDelete = async (promo: PromoCode) => {
+    if (!confirm(`Are you sure you want to delete "${promo.code}"?`)) return;
+    
+    try {
+      await adminService.deletePromoCode(promo.id);
+      toast.success('Promo code deleted');
+      loadData();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to delete';
+      toast.error(message);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!formData.code.trim()) {
+      toast.error('Code is required');
+      return;
+    }
+    if (!formData.discountValue || parseFloat(formData.discountValue) <= 0) {
+      toast.error('Discount value must be greater than 0');
+      return;
+    }
+
     setIsSaving(true);
     try {
       const payload = {
@@ -140,9 +261,9 @@ export default function PromosPage() {
         discountType: formData.discountType,
         discountValue: parseFloat(formData.discountValue),
         usageLimit: formData.usageLimit ? parseInt(formData.usageLimit) : undefined,
-        expiresAt: formData.expiresAt ? `${formData.expiresAt}T23:59:59` : undefined,
-        active: true,
+        expiresAt: formData.expiresAt ? new Date(formData.expiresAt).toISOString() : undefined,
         applicabilityType: formData.applicabilityType,
+        active: true,
       };
 
       if (editingPromo) {
@@ -153,222 +274,72 @@ export default function PromosPage() {
         toast.success('Promo code created');
       }
       setIsDialogOpen(false);
-      fetchPromoCodes();
+      loadData();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to save promo code';
+      const message = err instanceof Error ? err.message : 'Failed to save';
       toast.error(message);
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleDeletePromo = async (promo: PromoCode) => {
-    if (!confirm(`Delete promo code "${promo.code}"?`)) return;
-    
-    try {
-      await adminService.deletePromoCode(promo.id);
-      toast.success('Promo code deleted');
-      fetchPromoCodes();
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to delete promo code';
-      toast.error(message);
-    }
-  };
-
-  const handleDeactivate = async (promo: PromoCode) => {
-    try {
-      await adminService.deactivatePromoCode(promo.id);
-      toast.success('Promo code deactivated');
-      fetchPromoCodes();
-    } catch (err) {
-      toast.error('Failed to deactivate promo code');
-    }
-  };
-
-  const copyCode = (promo: PromoCode) => {
-    navigator.clipboard.writeText(promo.code);
-    setCopiedId(promo.id);
-    setTimeout(() => setCopiedId(null), 2000);
-  };
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-4 py-12">
-        <AlertCircle className="h-12 w-12 text-destructive" />
-        <p className="text-lg text-muted-foreground">{error}</p>
-        <Button onClick={fetchPromoCodes}>Retry</Button>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
-        <Button onClick={handleCreatePromo}>
+        <Button onClick={handleCreate}>
           <Plus className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
           {t('createPromo')}
         </Button>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-4">
-        <Input
-          placeholder="Search codes..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-xs"
+      {/* GenericList Table */}
+      <div className="bg-card rounded-lg border shadow-sm">
+        <GenericList<PromoCode>
+          data={data}
+          columns={columns}
+          meta={pagination}
+          isLoading={loading}
+          actions={actions}
+          onFilterChange={(filters) => setParams(prev => ({ ...prev, filters, page: 0 }))}
+          onSortChange={(sort) => setParams(prev => ({ ...prev, sort }))}
+          onPageChange={(page) => setParams(prev => ({ ...prev, page }))}
+          onRefresh={loadData}
+          emptyMessage={t('noPromos')}
         />
-        <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as typeof statusFilter)}>
-          <SelectTrigger className="w-32">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="inactive">Inactive</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
-      {isLoading ? (
-        <div className="flex justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      ) : (
-        <div className="rounded-lg border shadow-sm">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Code</TableHead>
-                <TableHead>Discount</TableHead>
-                <TableHead>Applies To</TableHead>
-                <TableHead>Usage</TableHead>
-                <TableHead>Expires</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredCodes.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                    No promo codes found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredCodes.map((promo) => (
-                  <TableRow key={promo.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Tag className="h-4 w-4 text-primary" />
-                        <code className="font-mono font-bold">{promo.code}</code>
-                        <button 
-                          onClick={() => copyCode(promo)}
-                          className="p-1 hover:bg-muted rounded"
-                        >
-                          {copiedId === promo.id ? (
-                            <Check className="h-3 w-3 text-green-500" />
-                          ) : (
-                            <Copy className="h-3 w-3 text-muted-foreground" />
-                          )}
-                        </button>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {promo.discountType === 'PERCENTAGE' 
-                        ? `${promo.discountValue}%` 
-                        : `$${promo.discountValue}`}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{promo.applicabilityType || 'ALL'}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      {promo.usedCount}/{promo.usageLimit || '∞'}
-                    </TableCell>
-                    <TableCell>
-                      {promo.expiresAt 
-                        ? new Date(promo.expiresAt).toLocaleDateString()
-                        : t('noExpiry')}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={promo.active ? 'default' : 'secondary'}>
-                        {promo.active ? tc('active') : tc('inactive')}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button variant="ghost" size="sm" onClick={() => handleEditPromo(promo)}>
-                          <Edit2 className="h-3 w-3" />
-                        </Button>
-                        {promo.active && (
-                          <Button variant="ghost" size="sm" onClick={() => handleDeactivate(promo)}>
-                            Deactivate
-                          </Button>
-                        )}
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="text-destructive"
-                          onClick={() => handleDeletePromo(promo)}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      )}
-
-      {/* Promo Create/Edit Dialog */}
+      {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingPromo ? 'Edit Promo Code' : 'Create Promo Code'}
+              {editingPromo ? tc('edit') + ' ' + t('code') : t('createPromo')}
             </DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="code">Code</Label>
+              <Label htmlFor="code">{t('code')} *</Label>
               <Input
                 id="code"
                 value={formData.code}
                 onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                placeholder="SUMMER20"
+                placeholder="e.g., SUMMER20"
+                disabled={!!editingPromo}
               />
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Applicability</Label>
-                <Select 
-                  value={formData.applicabilityType} 
-                  onValueChange={(v) => setFormData({ ...formData, applicabilityType: v as PromoApplicabilityType })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ALL">All (Plans & Tokens)</SelectItem>
-                    <SelectItem value="PLAN">Plans Only</SelectItem>
-                    <SelectItem value="TOKEN">Tokens Only</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
                 <Label>Discount Type</Label>
                 <Select 
                   value={formData.discountType} 
-                  onValueChange={(v) => setFormData({ ...formData, discountType: v as 'PERCENTAGE' | 'FIXED_AMOUNT' })}
+                  onValueChange={(v: 'PERCENTAGE' | 'FIXED_AMOUNT') => setFormData({ ...formData, discountType: v })}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -379,51 +350,65 @@ export default function PromosPage() {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="discountValue">
-                  {formData.discountType === 'PERCENTAGE' ? 'Percentage' : 'Amount'}
-                </Label>
+                <Label htmlFor="discountValue">{t('discount')} *</Label>
                 <Input
                   id="discountValue"
                   type="number"
                   value={formData.discountValue}
                   onChange={(e) => setFormData({ ...formData, discountValue: e.target.value })}
-                  placeholder={formData.discountType === 'PERCENTAGE' ? '20' : '10'}
+                  placeholder={formData.discountType === 'PERCENTAGE' ? 'e.g., 20' : 'e.g., 10.00'}
                 />
               </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="usageLimit">Max Uses (optional)</Label>
+                <Label htmlFor="usageLimit">{t('usage')} Limit</Label>
                 <Input
                   id="usageLimit"
                   type="number"
                   value={formData.usageLimit}
                   onChange={(e) => setFormData({ ...formData, usageLimit: e.target.value })}
-                  placeholder="100"
+                  placeholder="Leave empty for unlimited"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="expiresAt">{t('expires')}</Label>
+                <Input
+                  id="expiresAt"
+                  type="date"
+                  value={formData.expiresAt}
+                  onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="expiresAt">Expires On (optional)</Label>
-              <Input
-                id="expiresAt"
-                type="date"
-                value={formData.expiresAt}
-                onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
-              />
+              <Label>{t('appliesTo')}</Label>
+              <Select 
+                value={formData.applicabilityType} 
+                onValueChange={(v: PromoApplicabilityType) => setFormData({ ...formData, applicabilityType: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Products</SelectItem>
+                  <SelectItem value="PLAN">Subscription Plans Only</SelectItem>
+                  <SelectItem value="TOKEN">Token Packages Only</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-              Cancel
+              {tc('cancel')}
             </Button>
-            <Button onClick={handleSavePromo} disabled={isSaving || !formData.code || !formData.discountValue}>
-              {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {editingPromo ? 'Update' : 'Create'}
+            <Button onClick={handleSave} disabled={isSaving}>
+              {isSaving && <Loader2 className="h-4 w-4 ltr:mr-2 rtl:ml-2 animate-spin" />}
+              {editingPromo ? tc('save') : common('create')}
             </Button>
           </DialogFooter>
         </DialogContent>

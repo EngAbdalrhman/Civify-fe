@@ -318,7 +318,15 @@
       "subscribedUsers": "Subscribed Users",
       "free": "Free",
       "never": "Never",
-      "noData": "No data available"
+      "noData": "No data available",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deactivate": "Deactivate",
+      "activate": "Activate",
+      "actions": "Actions",
+      "save": "Save",
+      "cancel": "Cancel",
+      "retry": "Retry"
     },
     "users": {
       "title": "User Management",
@@ -354,7 +362,12 @@
       "title": "Billing Management",
       "subtitle": "Manage plans and token packages",
       "plans": "Plans",
-      "tokenPackages": "Token Packages"
+      "tokenPackages": "Token Packages",
+      "plansDesc": "Configure subscription plans that users can purchase",
+      "tokensDesc": "Configure token packages that users can purchase for additional usage",
+      "createPlan": "Create Plan",
+      "createPackage": "Create Package",
+      "popular": "Popular"
     },
     "plans": {
       "title": "Plan Management",
@@ -363,12 +376,17 @@
     },
     "promos": {
       "title": "Promotion Management",
-      "subtitle": "Manage promotional codes",
+      "subtitle": "Manage discount codes and promotions",
       "createPromo": "Create Promotion",
-      "code": "Promo Code",
+      "code": "Code",
       "discount": "Discount",
+      "appliesTo": "Applies To",
+      "usage": "Usage",
+      "expires": "Expires",
+      "status": "Status",
       "expiryDate": "Expiry Date",
-      "noExpiry": "No Expiry"
+      "noExpiry": "No Expiry",
+      "noPromos": "No promo codes found"
     },
     "stats": {
       "title": "Statistics",
@@ -402,9 +420,20 @@
     },
     "auditMonitor": {
       "title": "Audit Monitor",
-      "subtitle": "Track system activities and logs",
+      "subtitle": "View and search system audit logs",
       "cvLogs": "CV Operation Logs",
-      "apiLogs": "API Logs"
+      "apiLogs": "API Logs",
+      "tabs": {
+        "users": "Users",
+        "plans": "Plans",
+        "promos": "Promos",
+        "cvLogs": "CV Logs",
+        "all": "All"
+      },
+      "sections": {
+        "userLogs": "User Activity Logs",
+        "userLogsDesc": "Logs for user entity changes"
+      }
     },
     "groups": {
       "title": "Group Management",

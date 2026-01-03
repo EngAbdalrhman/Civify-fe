@@ -451,14 +451,16 @@ function CvLogTabContent() {
 }
 
 export default function AuditMonitorPage() {
+  const t = useTranslations('admin.auditMonitor');
+  
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
         <FileSearch className="h-8 w-8 text-primary" />
         <div>
-          <h1 className="text-3xl font-bold">Audit Monitor</h1>
-          <p className="text-muted-foreground">View and search system audit logs</p>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
       </div>
 
@@ -467,30 +469,30 @@ export default function AuditMonitorPage() {
         <TabsList className="grid w-full grid-cols-5 max-w-2xl">
           <TabsTrigger value="users" className="gap-2">
             <Users className="h-4 w-4" />
-            Users
+            {t('tabs.users')}
           </TabsTrigger>
           <TabsTrigger value="plans" className="gap-2">
             <CreditCard className="h-4 w-4" />
-            Plans
+            {t('tabs.plans')}
           </TabsTrigger>
           <TabsTrigger value="promos" className="gap-2">
             <Settings className="h-4 w-4" />
-            Promos
+            {t('tabs.promos')}
           </TabsTrigger>
           <TabsTrigger value="cv-logs" className="gap-2">
             <FileSearch className="h-4 w-4" />
-            CV Logs
+            {t('tabs.cvLogs')}
           </TabsTrigger>
           <TabsTrigger value="all" className="gap-2">
             <FileSearch className="h-4 w-4" />
-            All
+            {t('tabs.all')}
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="users" className="mt-6">
           <div className="rounded-lg border bg-card p-6">
-            <h3 className="text-lg font-semibold mb-4">User Activity Logs</h3>
-            <p className="text-sm text-muted-foreground mb-4">Logs for User entity changes</p>
+            <h3 className="text-lg font-semibold mb-4">{t('sections.userLogs')}</h3>
+            <p className="text-sm text-muted-foreground mb-4">{t('sections.userLogsDesc')}</p>
             <AuditTabContent entityTypes={['User']} />
           </div>
         </TabsContent>
