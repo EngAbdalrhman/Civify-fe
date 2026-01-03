@@ -43,6 +43,7 @@ import {
 
 export default function PromosPage() {
   const t = useTranslations('admin.promos');
+  const tc = useTranslations('admin.common');
   const common = useTranslations('common');
 
   const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
@@ -205,10 +206,10 @@ export default function PromosPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">{t('title')}</h1>
-          <p className="text-muted-foreground">Manage discount codes and promotions</p>
+          <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
         <Button onClick={handleCreatePromo}>
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
           {t('createPromo')}
         </Button>
       </div>
@@ -291,11 +292,11 @@ export default function PromosPage() {
                     <TableCell>
                       {promo.expiresAt 
                         ? new Date(promo.expiresAt).toLocaleDateString()
-                        : 'Never'}
+                        : t('noExpiry')}
                     </TableCell>
                     <TableCell>
                       <Badge variant={promo.active ? 'default' : 'secondary'}>
-                        {promo.active ? 'Active' : 'Inactive'}
+                        {promo.active ? tc('active') : tc('inactive')}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">

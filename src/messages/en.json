@@ -309,11 +309,26 @@
     }
   },
   "admin": {
+    "common": {
+      "subtitle": "Manage platform data",
+      "active": "Active",
+      "disabled": "Disabled",
+      "inactive": "Inactive",
+      "banUnban": "Ban/Unban",
+      "subscribedUsers": "Subscribed Users",
+      "free": "Free",
+      "never": "Never",
+      "noData": "No data available"
+    },
     "users": {
       "title": "User Management",
+      "subtitle": "Manage platform users and roles",
       "totalUsers": "Total Users",
       "activeUsers": "Active Users",
       "newUsers": "New Users",
+      "enableSuccess": "User enabled successfully",
+      "disableSuccess": "User disabled successfully",
+      "toggleError": "Failed to toggle user status",
       "columns": {
         "id": "ID",
         "email": "Email",
@@ -326,6 +341,7 @@
     },
     "subscriptions": {
       "title": "Subscription Management",
+      "subtitle": "Manage user subscriptions",
       "user": "User",
       "plan": "Plan",
       "billingCycle": "Billing Cycle",
@@ -334,6 +350,12 @@
       "endDate": "End Date",
       "renew": "Auto Renew"
     },
+    "billing": {
+      "title": "Billing Management",
+      "subtitle": "Manage plans and token packages",
+      "plans": "Plans",
+      "tokenPackages": "Token Packages"
+    },
     "plans": {
       "title": "Plan Management",
       "createPlan": "Create Plan",
@@ -341,23 +363,55 @@
     },
     "promos": {
       "title": "Promotion Management",
+      "subtitle": "Manage promotional codes",
       "createPromo": "Create Promotion",
       "code": "Promo Code",
       "discount": "Discount",
-      "expiryDate": "Expiry Date"
+      "expiryDate": "Expiry Date",
+      "noExpiry": "No Expiry"
     },
     "stats": {
       "title": "Statistics",
+      "subtitle": "Platform analytics and insights",
+      "period": "Period",
       "totalUsers": "Total Users",
       "revenue": "Revenue",
       "conversions": "Conversions",
       "growth": "Growth"
     },
     "apiUsage": {
-      "title": "API Usage",
+      "title": "API Logs",
+      "subtitle": "Monitor system API usage",
+      "monthlyApiCalls": "Monthly API Calls",
       "requests": "Requests",
       "limit": "Limit",
       "remaining": "Remaining"
+    },
+    "notifications": {
+      "title": "Notification Management",
+      "subtitle": "Send push notifications to users",
+      "broadcast": "Broadcast",
+      "targeted": "Targeted",
+      "broadcastToAll": "Broadcast to All Users",
+      "broadcastDesc": "Send a notification to all registered users at once",
+      "sendToAll": "Send to All Users",
+      "sendToSpecific": "Send to Specific Users",
+      "selectUsersDesc": "Select users to receive this notification",
+      "send": "Send Notification",
+      "templates": "Templates"
+    },
+    "auditMonitor": {
+      "title": "Audit Monitor",
+      "subtitle": "Track system activities and logs",
+      "cvLogs": "CV Operation Logs",
+      "apiLogs": "API Logs"
+    },
+    "groups": {
+      "title": "Group Management",
+      "subtitle": "Manage user groups and permissions",
+      "totalGroups": "Total Groups",
+      "systemGroups": "System Groups",
+      "totalPermissions": "Total Permissions"
     }
   },
   "footer": {

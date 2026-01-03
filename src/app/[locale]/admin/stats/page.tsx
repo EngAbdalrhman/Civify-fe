@@ -96,7 +96,7 @@ export default function StatsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">{t('title')}</h1>
-          <p className="text-muted-foreground">Platform performance and usage statistics</p>
+          <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
         
         {/* Period Selector */}
@@ -122,9 +122,9 @@ export default function StatsPage() {
       {/* Period indicator */}
       {stats?.periodStart && (
         <p className="text-sm text-muted-foreground">
-          Showing data for: <span className="font-medium">{getPeriodLabel()}</span>
+          {t('period')}: <span className="font-medium">{getPeriodLabel()}</span>
           {stats.periodStart && stats.periodEnd && (
-            <span className="ml-2 text-xs">
+            <span className="ltr:ml-2 rtl:mr-2 text-xs">
               ({new Date(stats.periodStart).toLocaleDateString()} - {new Date(stats.periodEnd).toLocaleDateString()})
             </span>
           )}

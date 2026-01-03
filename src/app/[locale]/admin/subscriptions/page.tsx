@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button } from '@/components/ui/button';
 import { CreditCard, Shield } from 'lucide-react';
 import { adminService } from '@/services/admin.service';
 import { GenericList, buildInputDataModel } from '@/components/generic-list/GenericList';
@@ -10,8 +9,8 @@ import { ColumnDef, FilterOperation } from '@/components/generic-list/types';
 import { Badge } from '@/components/ui/badge';
 
 export default function SubscriptionsPage() {
-  const t = useTranslations('admin.subscriptions'); // You might need to add this namespace
-  const common = useTranslations('common');
+  const t = useTranslations('admin.subscriptions');
+  const tc = useTranslations('admin.common');
   
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
@@ -69,17 +68,17 @@ export default function SubscriptionsPage() {
           )
       },
       {
-          key: 'planName', // Changed from plan.name to flattened planName
-          label: 'Plan',
+          key: 'planName',
+          label: t('plan'),
           render: (_, item) => <Badge variant="outline">{item.planName}</Badge>
       },
       {
           key: 'status',
-          label: 'Status',
+          label: t('status'),
           filterable: true,
           filterType: 'dropdown',
           filterOptions: [
-              { label: 'Active', value: 'ACTIVE' },
+              { label: tc('active'), value: 'ACTIVE' },
               { label: 'Expired', value: 'EXPIRED' },
               { label: 'Cancelled', value: 'CANCELLED' },
               { label: 'Pending', value: 'PENDING' }
@@ -93,15 +92,15 @@ export default function SubscriptionsPage() {
       },
       {
           key: 'startDate',
-          label: 'Start Date',
+          label: t('startDate'),
           render: (_, item) => new Date(item.startDate).toLocaleDateString()
       },
       {
           key: 'endDate',
-          label: 'End Date',
+          label: t('endDate'),
            render: (_, item) => new Date(item.endDate).toLocaleDateString()
       }
-  ], []);
+  ], [t, tc]);
 
   // State for GenericList interaction
   const [params, setParams] = useState({
@@ -137,8 +136,8 @@ export default function SubscriptionsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{t('title') || 'Subscriptions'}</h1>
-          <p className="text-muted-foreground">Manage user subscriptions</p>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
       </div>
 

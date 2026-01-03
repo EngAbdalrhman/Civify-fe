@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 
 export default function UsersPage() {
   const t = useTranslations('admin.users');
+  const tc = useTranslations('admin.common');
   const common = useTranslations('common');
   
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -86,11 +87,11 @@ export default function UsersPage() {
   const handleToggleBan = async (user: AdminUser) => {
     try {
       await adminService.toggleUserLock(user.id);
-      toast.success(user.status === 'DISABLED' ? 'User enabled successfully' : 'User disabled successfully');
+      toast.success(user.status === 'DISABLED' ? t('enableSuccess') : t('disableSuccess'));
       await refresh();
     } catch (error) {
       console.error('Failed to toggle status:', error);
-      toast.error('Failed to toggle user status');
+      toast.error(t('toggleError'));
     }
   };
 
@@ -140,7 +141,7 @@ export default function UsersPage() {
       label: t('columns.status'),
       render: (_: unknown, item: AdminUser) => (
         <Badge variant={item.status === 'ACTIVE' ? 'default' : 'destructive'}>
-          {item.status === 'ACTIVE' ? 'Active' : 'Disabled'}
+          {item.status === 'ACTIVE' ? tc('active') : tc('disabled')}
         </Badge>
       ),
       filterable: true,
@@ -160,7 +161,7 @@ export default function UsersPage() {
         filterType: 'date',
         filterOperation: FilterOperation.DATE_BETWEEN 
     }
-  ], [t, planOptions]);
+  ], [t, tc, planOptions]);
 
   // Define Actions
   const actions: ActionDef<AdminUser>[] = [
@@ -171,7 +172,7 @@ export default function UsersPage() {
       variant: 'ghost'
     },
     {
-      label: 'Ban/Unban',
+      label: tc('banUnban'),
       icon: <Ban className="h-4 w-4" />,
       onClick: handleToggleBan,
       variant: 'ghost'
@@ -200,10 +201,10 @@ export default function UsersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">{t('title')}</h1>
-          <p className="text-muted-foreground">Manage platform users and roles</p>
+          <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
         <Button onClick={handleCreateUser}>
-          <UserPlus className="h-4 w-4 mr-2" />
+          <UserPlus className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
           {common('create')}
         </Button>
       </div>
@@ -220,7 +221,7 @@ export default function UsersPage() {
         </div>
         <div className="rounded-lg border bg-card p-6 shadow-sm">
           <div className="flex items-center justify-between space-y-0 pb-2">
-            <h3 className="text-sm font-medium text-muted-foreground">Subscribed Users</h3>
+            <h3 className="text-sm font-medium text-muted-foreground">{tc('subscribedUsers')}</h3>
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </div>
           <div className="text-2xl font-bold">
