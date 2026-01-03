@@ -10,3 +10,4 @@ export { FAQSection } from "./FAQSection";
 export { IntegrationsSection } from "./IntegrationsSection";
 export { BlogPreviewSection } from "./BlogPreviewSection";
 export { CTASection } from "./CTASection";
+export * from "./ResumeBuilderSection";
