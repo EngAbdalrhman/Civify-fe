@@ -30,7 +30,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { GenericList, buildInputDataModel } from '@/components/generic-list/GenericList';
-import { ColumnDef, FilterOperation, ActionDef } from '@/components/generic-list/types';
+import { ColumnDef, FilterOperation, ActionDef, FilterState } from '@/components/generic-list/types';
 
 export default function PromosPage() {
   const t = useTranslations('admin.promos');
@@ -54,7 +54,7 @@ export default function PromosPage() {
   const [params, setParams] = useState({
     page: 0,
     size: 10,
-    filters: {} as Record<string, unknown>,
+    filters: {} as FilterState,
     sort: null as { field: string; direction: 'ASC' | 'DESC' } | null,
   });
 
@@ -170,7 +170,7 @@ export default function PromosPage() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const model = buildInputDataModel(params.filters, columns, params.sort, params.page, params.size);
+      const model = buildInputDataModel(params.filters, columns as any, params.sort, params.page, params.size);
       const res = await adminService.filterPromoCodes(model);
       setData(res.content);
       setPagination({
