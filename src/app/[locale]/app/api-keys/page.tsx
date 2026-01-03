@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { 
   Plus, 
   Copy, 
@@ -41,6 +42,7 @@ import { toast } from 'sonner';
 import { PermissionGuard } from '@/components/auth/PermissionGuard';
 
 export default function ApiKeysPage() {
+  const t = useTranslations('apiKeys');
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -48,7 +50,6 @@ export default function ApiKeysPage() {
   const [generatedKey, setGeneratedKey] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // Fetch API keys on mount
   useEffect(() => {
     fetchApiKeys();
   }, []);
@@ -60,7 +61,7 @@ export default function ApiKeysPage() {
       setKeys(data);
     } catch (error) {
       console.error('Failed to fetch API keys:', error);
-      toast.error('Failed to load API keys');
+      toast.error(t('loadError'));
     } finally {
       setIsLoading(false);
     }
@@ -73,13 +74,12 @@ export default function ApiKeysPage() {
     try {
       const rawKey = await apiKeyService.createApiKey();
       setGeneratedKey(rawKey);
-      toast.success('API key generated successfully');
-      // Refresh the list
+      toast.success(t('generateSuccess'));
       await fetchApiKeys();
       setNewKeyName('');
     } catch (error) {
       console.error('Failed to generate API key:', error);
-      toast.error('Failed to generate API key');
+      toast.error(t('generateError'));
     } finally {
       setIsGenerating(false);
     }
@@ -87,21 +87,21 @@ export default function ApiKeysPage() {
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success('Copied to clipboard');
+    toast.success(t('copied'));
   };
 
   const handleRevoke = async (id: number) => {
-    if (!confirm('Are you sure you want to revoke this API key? This action cannot be undone.')) {
+    if (!confirm(t('revokeConfirm'))) {
       return;
     }
 
     try {
       await apiKeyService.revokeApiKey(id);
-      toast.success('API key revoked successfully');
+      toast.success(t('revokeSuccess'));
       await fetchApiKeys();
     } catch (error) {
       console.error('Failed to revoke API key:', error);
-      toast.error('Failed to revoke API key');  
+      toast.error(t('revokeError'));  
     }
   };
 
@@ -115,32 +115,32 @@ export default function ApiKeysPage() {
     <PermissionGuard permissions={['API.ACCESS', 'API.KEY.CREATE']}>
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">API Keys</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
           <p className="text-muted-foreground mt-2">
-            Manage your API keys for accessing the Civify API programmatically.
+            {t('subtitle')}
           </p>
         </div>
 
         {/* Generate Key Button */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-xl font-semibold">Your API Keys</h2>
+            <h2 className="text-xl font-semibold">{t('yourKeys')}</h2>
             <p className="text-sm text-muted-foreground mt-1">
-              Manage API keys to access the Civify API programmatically
+              {t('manageKeys')}
             </p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" asChild>
               <Link href="/app/api-documentation">
-                <Book className="h-4 w-4 mr-2" />
-                View Documentation
+                <Book className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
+                {t('viewDocs')}
               </Link>
             </Button>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Generate New Key
+                  <Plus className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
+                  {t('generateNew')}
                 </Button>
               </DialogTrigger>
             
@@ -148,16 +148,16 @@ export default function ApiKeysPage() {
                  {!generatedKey ? (
                   <>
                     <DialogHeader>
-                      <DialogTitle>Create API Key</DialogTitle>
+                      <DialogTitle>{t('createTitle')}</DialogTitle>
                       <DialogDescription>
-                        Enter a name for your new API key to help you identify it later.
+                        {t('createDesc')}
                       </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                       <div className="grid grid-cols-4 items-center gap-4">
                         <Input 
                           id="name" 
-                          placeholder="e.g. Website Checkout" 
+                          placeholder={t('namePlaceholder')} 
                           className="col-span-4" 
                           value={newKeyName}
                           onChange={(e) => setNewKeyName(e.target.value)}
@@ -166,18 +166,18 @@ export default function ApiKeysPage() {
                     </div>
                     <DialogFooter>
                       <Button onClick={handleGenerateKey} disabled={isGenerating || !newKeyName}>
-                        {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                        Generate Key
+                        {isGenerating ? <Loader2 className="ltr:mr-2 rtl:ml-2 h-4 w-4 animate-spin" /> : null}
+                        {t('generateKey')}
                       </Button>
                     </DialogFooter>
                   </>
                  ) : (
                   <>
                     <DialogHeader>
-                      <DialogTitle>API Key Generated</DialogTitle>
+                      <DialogTitle>{t('keyGenerated')}</DialogTitle>
                       <DialogDescription className="text-red-500 font-medium bg-red-50 dark:bg-red-950/20 p-2 rounded-md mt-2 flex items-center gap-2">
                         <ShieldAlert className="h-4 w-4" />
-                        Please copy this key now. You won't be able to see it again!
+                        {t('copyWarning')}
                       </DialogDescription>
                     </DialogHeader>
                     <div className="flex items-center space-x-2 my-4">
@@ -187,7 +187,7 @@ export default function ApiKeysPage() {
                       </Button>
                     </div>
                     <DialogFooter>
-                      <Button onClick={handleDialogClose}>Done</Button>
+                      <Button onClick={handleDialogClose}>{t('done')}</Button>
                     </DialogFooter>
                   </>
                  )}
@@ -199,9 +199,9 @@ export default function ApiKeysPage() {
         {/* Existing Keys Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Existing Keys</CardTitle>
+            <CardTitle>{t('existingKeys')}</CardTitle>
             <CardDescription>
-              A list of all API keys associated with your account.
+              {t('existingKeysDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -211,18 +211,18 @@ export default function ApiKeysPage() {
               </div>
             ) : keys.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                <p>No API keys found. Generate your first key to get started.</p>
+                <p>{t('noKeys')}</p>
               </div>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Key ID</TableHead>
-                    <TableHead>Masked Key</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead>Last Used</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>{t('keyId')}</TableHead>
+                    <TableHead>{t('maskedKey')}</TableHead>
+                    <TableHead>{t('created')}</TableHead>
+                    <TableHead>{t('lastUsed')}</TableHead>
+                    <TableHead>{t('status')}</TableHead>
+                    <TableHead className="text-right">{t('actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -234,17 +234,17 @@ export default function ApiKeysPage() {
                       <TableCell>
                         {key.lastUsedAt 
                           ? new Date(key.lastUsedAt).toLocaleDateString()
-                          : 'Never'}
+                          : t('never')}
                       </TableCell>
                       <TableCell>
                         <Badge variant={!key.revoked ? 'default' : 'destructive'} className={!key.revoked ? 'bg-green-600 hover:bg-green-700' : ''}>
-                          {!key.revoked ? 'Active' : 'Revoked'}
+                          {!key.revoked ? t('active') : t('revoked')}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
                         {!key.revoked && (
                           <Button variant="ghost" size="sm" onClick={() => handleRevoke(key.id)} className="text-destructive hover:text-destructive/90 hover:bg-destructive/10">
-                             Revoke
+                             {t('revoke')}
                           </Button>
                         )}
                       </TableCell>

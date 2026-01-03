@@ -44,6 +44,15 @@
     "notifications": "Notifications",
     "auditMonitor": "Audit Monitor",
     "logout": "Logout",
+    "resumeBuilder": "Resume Builder",
+    "apiKeys": "API Keys",
+    "buyTokens": "Buy Tokens",
+    "helpCenter": "Help Center",
+    "adminDashboard": "Admin Dashboard",
+    "freePlan": "Free Plan",
+    "guest": "Guest",
+    "apiDocumentation": "API Documentation",
+    "apiDocSubtitle": "Complete guide to integrating Civify CV API into your applications",
     "language": {
       "switch": "Switch Language"
     }
@@ -76,9 +85,12 @@
   "dashboard": {
     "personalPage": {
       "title": "Personal Page",
+      "subtitle": "Manage your profile and view your CVs",
       "profile": "Profile",
+      "profileDesc": "Update your personal information",
       "cvs": "My CVs",
-      "recent": "Recent Activity"
+      "recent": "Recent Activity",
+      "recentDesc": "Your recent activity"
     },
     "analytics": {
       "title": "Analytics",
@@ -93,6 +105,14 @@
       "preferences": "Preferences",
       "notifications": "Notifications",
       "security": "Security"
+    },
+    "resumes": {
+      "myResumes": "My Resumes",
+      "viewAll": "View All",
+      "createNew": "Create New Resume",
+      "loadError": "Failed to load your resumes",
+      "deleted": "Resume deleted",
+      "deleteError": "Failed to delete resume"
     }
   },
   "upload": {
@@ -127,7 +147,129 @@
     "total": "Total",
     "paymentMethod": "Payment Method",
     "pay": "Pay",
-    "processing": "Processing..."
+    "processing": "Processing...",
+    "backToPlans": "Back to Plans",
+    "planNotFound": "Plan not found",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "perMonth": "per month",
+    "perYear": "per year",
+    "save20": "Save 20%",
+    "enterPromoCode": "Enter promo code",
+    "apply": "Apply",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "securePayment": "Secure Payment",
+    "securePaymentDesc": "Your payment information is encrypted and secure. We never store your card details.",
+    "fawaterak": "Fawaterak",
+    "fawaterakDesc": "Credit/Debit Card, Fawry, Wallets",
+    "paymob": "Paymob",
+    "paymobDesc": "Credit/Debit Card, Mobile Wallets",
+    "termsAgreement": "By confirming, you agree to our",
+    "termsOfService": "Terms of Service",
+    "and": "and",
+    "privacyPolicy": "Privacy Policy"
+  },
+  "apiKeys": {
+    "title": "API Keys",
+    "subtitle": "Manage your API keys for accessing the Civify API programmatically.",
+    "yourKeys": "Your API Keys",
+    "manageKeys": "Manage API keys to access the Civify API programmatically",
+    "viewDocs": "View Documentation",
+    "generateNew": "Generate New Key",
+    "createTitle": "Create API Key",
+    "createDesc": "Enter a name for your new API key to help you identify it later.",
+    "namePlaceholder": "e.g. Website Checkout",
+    "generateKey": "Generate Key",
+    "keyGenerated": "API Key Generated",
+    "copyWarning": "Please copy this key now. You won't be able to see it again!",
+    "done": "Done",
+    "existingKeys": "Existing Keys",
+    "existingKeysDesc": "A list of all API keys associated with your account.",
+    "noKeys": "No API keys found. Generate your first key to get started.",
+    "keyId": "Key ID",
+    "maskedKey": "Masked Key",
+    "created": "Created",
+    "lastUsed": "Last Used",
+    "never": "Never",
+    "status": "Status",
+    "active": "Active",
+    "revoked": "Revoked",
+    "actions": "Actions",
+    "revoke": "Revoke",
+    "revokeConfirm": "Are you sure you want to revoke this API key? This action cannot be undone.",
+    "copied": "Copied to clipboard",
+    "loadError": "Failed to load API keys",
+    "generateError": "Failed to generate API key",
+    "generateSuccess": "API key generated successfully",
+    "revokeError": "Failed to revoke API key",
+    "revokeSuccess": "API key revoked successfully"
+  },
+  "tokens": {
+    "title": "Buy Tokens",
+    "subtitle": "Purchase additional tokens to continue using AI features",
+    "backToDashboard": "Back to Dashboard",
+    "walletBalance": "Wallet Balance",
+    "walletDesc": "Purchased tokens (never expire)",
+    "monthlyLimit": "Monthly Limit",
+    "monthlyLimitDesc": "From your subscription plan",
+    "usedThisMonth": "Used This Month",
+    "usedDesc": "Resets monthly",
+    "totalAvailable": "Total Available",
+    "totalDesc": "Monthly + Wallet",
+    "noPackages": "No Token Packages Available",
+    "noPackagesDesc": "Token packages are not available at the moment.",
+    "upgradeYourPlan": "Upgrade Your Plan",
+    "instantActivation": "Instant Activation",
+    "neverExpire": "Never Expire",
+    "securePayment": "Secure Payment",
+    "bestValue": "Best Value",
+    "tokens": "tokens",
+    "perToken": "per token",
+    "buyNow": "Buy Now",
+    "lookingForMore": "Looking for more tokens?",
+    "upgradePrompt": "Upgrade your subscription plan for higher monthly token allowances",
+    "viewPlans": "View Plans",
+    "loadError": "Failed to load token packages"
+  },
+  "help": {
+    "title": "Help Center",
+    "subtitle": "Find answers to common questions and learn how to get the most out of Civify",
+    "gettingStarted": {
+      "title": "Getting Started",
+      "desc": "Learn the basics of uploading and tailoring your CV",
+      "createFirstCv": "Create your first CV",
+      "tailorFirstCv": "Tailoring your first CV",
+      "howTailoringWorks": "How CV tailoring works",
+      "understandingAts": "Understanding ATS scores"
+    },
+    "features": {
+      "title": "Features",
+      "desc": "Explore all the tools available to optimize your CV",
+      "aiOptimization": "AI-powered optimization",
+      "infoMasking": "Personal info masking",
+      "exportOptions": "Export options (PDF/DOCX)"
+    },
+    "account": {
+      "title": "Account & Security",
+      "desc": "Manage your account settings and security",
+      "changePassword": "Change password",
+      "twoFactor": "Two-factor authentication",
+      "apiKeyManagement": "API key management"
+    },
+    "apiDocs": {
+      "title": "API Documentation",
+      "desc": "For developers integrating with our API",
+      "apiReference": "API reference",
+      "authGuide": "Authentication guide",
+      "rateLimits": "Rate limits"
+    },
+    "contact": {
+      "title": "Still need help?",
+      "desc": "Our support team is here to assist you with any questions",
+      "contactSupport": "Contact Support",
+      "liveChat": "Live Chat"
+    }
   },
   "payment": {
     "success": {
@@ -484,8 +626,25 @@
       "monthly": "Monthly",
       "yearly": "Yearly",
       "save": "Save 20%",
+      "mostPopular": "Most Popular",
+      "selectPlan": "Select Plan",
+      "getStarted": "Get Started",
       "noCreditCard": "No credit card needed for free plan",
-      "cancelAnytime": "Cancel anytime"
+      "cancelAnytime": "Cancel anytime",
+      "errorLoading": "Failed to load pricing plans",
+      "errorContact": "Please try again later or contact support",
+      "features": {
+        "cvStorageUnlimited": "Unlimited CV storage",
+        "cvStorage": "{count} CVs storage",
+        "aiTailoring": "AI-powered CV tailoring",
+        "masking": "Personal information masking",
+        "pdfExport": "PDF export",
+        "noWatermark": "No watermark",
+        "dashboardAccess": "Dashboard access",
+        "prioritySupport": "Priority support",
+        "advancedAi": "Advanced AI features",
+        "basicSupport": "Basic support"
+      }
     },
     "faq": {
       "title": "Frequently Asked Questions",

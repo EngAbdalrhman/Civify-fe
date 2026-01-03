@@ -166,8 +166,8 @@ function CheckoutContent() {
         {/* Back Button */}
         <Button variant="ghost" asChild className="mb-8">
           <Link href="/plans">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Plans
+            <ArrowLeft className="ltr:mr-2 rtl:ml-2 h-4 w-4" />
+            {t('backToPlans')}
           </Link>
         </Button>
 
@@ -196,9 +196,9 @@ function CheckoutContent() {
                         : 'border-muted hover:border-primary/50'
                     }`}
                   >
-                    <div className="font-semibold">Monthly</div>
-                    <div className="text-2xl font-bold mt-1">${parseFloat(plan.monthlyPrice).toFixed(2)}</div>
-                    <div className="text-xs text-muted-foreground">per month</div>
+                    <div className="font-semibold">{t('monthly')}</div>
+                    <div className="text-2xl font-bold mt-1">{parseFloat(plan.monthlyPrice).toFixed(2)} EGP</div>
+                    <div className="text-xs text-muted-foreground">{t('perMonth')}</div>
                   </button>
                   <button
                     onClick={() => setIsAnnual(true)}
@@ -208,12 +208,12 @@ function CheckoutContent() {
                         : 'border-muted hover:border-primary/50'
                     }`}
                   >
-                    <span className="absolute -top-2 right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
-                      Save 20%
+                    <span className="absolute -top-2 ltr:right-2 rtl:left-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
+                      {t('save20')}
                     </span>
-                    <div className="font-semibold">Yearly</div>
-                    <div className="text-2xl font-bold mt-1">${parseFloat(plan.annualPrice).toFixed(2)}</div>
-                    <div className="text-xs text-muted-foreground">per year</div>
+                    <div className="font-semibold">{t('yearly')}</div>
+                    <div className="text-2xl font-bold mt-1">{parseFloat(plan.annualPrice).toFixed(2)} EGP</div>
+                    <div className="text-xs text-muted-foreground">{t('perYear')}</div>
                   </button>
                 </div>
               </div>
@@ -244,7 +244,7 @@ function CheckoutContent() {
                     <div className="flex gap-2">
                       <Input
                         id="promo"
-                        placeholder="Enter promo code"
+                        placeholder={t('enterPromoCode')}
                         value={promoCode}
                         onChange={(e) => {
                           setPromoCode(e.target.value.toUpperCase());
@@ -259,7 +259,7 @@ function CheckoutContent() {
                         {isValidatingPromo ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
-                          'Apply'
+                          t('apply')
                         )}
                       </Button>
                     </div>
@@ -273,12 +273,12 @@ function CheckoutContent() {
               {/* Total */}
               <div className="border-t pt-4 space-y-2">
                 <div className="flex justify-between items-center text-sm text-muted-foreground">
-                  <span>Subtotal</span>
-                  <span>${originalPrice.toFixed(2)}</span>
+                  <span>{t('subtotal')}</span>
+                  <span>{originalPrice.toFixed(2)} EGP</span>
                 </div>
                 {priceCalculation && (
                   <div className="flex justify-between items-center text-sm text-green-600">
-                    <span>Discount</span>
+                    <span>{t('discount')}</span>
                     <span>-{priceCalculation.currency} {discountAmount.toFixed(2)}</span>
                   </div>
                 )}
@@ -293,7 +293,7 @@ function CheckoutContent() {
                         <span className="text-green-600">{priceCalculation.currency} {finalPrice.toFixed(2)}</span>
                       </>
                     ) : (
-                      <span>${originalPrice.toFixed(2)}</span>
+                      <span>{originalPrice.toFixed(2)} EGP</span>
                     )}
                     <span className="text-sm font-normal text-muted-foreground"> / {period}</span>
                   </div>
@@ -326,9 +326,9 @@ function CheckoutContent() {
                       {gateway === 'fawaterak' && <Check className="h-3 w-3 text-primary-foreground" />}
                     </div>
                     <div className="flex-1">
-                      <div className="font-medium">Fawaterak</div>
+                      <div className="font-medium">{t('fawaterak')}</div>
                       <div className="text-sm text-muted-foreground">
-                        Credit/Debit Card, Fawry, Wallets
+                        {t('fawaterakDesc')}
                       </div>
                     </div>
                     <div className="flex gap-1">
@@ -354,9 +354,9 @@ function CheckoutContent() {
                       {gateway === 'paymob' && <Check className="h-3 w-3 text-primary-foreground" />}
                     </div>
                     <div className="flex-1">
-                      <div className="font-medium">Paymob</div>
+                      <div className="font-medium">{t('paymob')}</div>
                       <div className="text-sm text-muted-foreground">
-                        Credit/Debit Card, Mobile Wallets
+                        {t('paymobDesc')}
                       </div>
                     </div>
                   </button>
@@ -367,9 +367,9 @@ function CheckoutContent() {
               <div className="flex items-start gap-3 p-4 rounded-lg bg-green-50 dark:bg-green-950/20 text-green-800 dark:text-green-400">
                 <Shield className="h-5 w-5 flex-shrink-0 mt-0.5" />
                 <div className="text-sm">
-                  <div className="font-medium">Secure Payment</div>
+                  <div className="font-medium">{t('securePayment')}</div>
                   <p className="text-green-700 dark:text-green-500">
-                    Your payment information is encrypted and secure. We never store your card details.
+                    {t('securePaymentDesc')}
                   </p>
                 </div>
               </div>
@@ -388,16 +388,16 @@ function CheckoutContent() {
                   </>
                 ) : (
                   <>
-                    Pay ${finalPrice.toFixed(2)}
+                    {t('pay')} {finalPrice.toFixed(2)} EGP
                   </>
                 )}
               </Button>
 
               <p className="text-xs text-center text-muted-foreground">
-                By confirming, you agree to our{' '}
-                <a href="/terms" className="underline hover:text-foreground">Terms of Service</a>
-                {' '}and{' '}
-                <a href="/privacy" className="underline hover:text-foreground">Privacy Policy</a>
+                {t('termsAgreement')}{' '}
+                <a href="/terms" className="underline hover:text-foreground">{t('termsOfService')}</a>
+                {' '}{t('and')}{' '}
+                <a href="/privacy" className="underline hover:text-foreground">{t('privacyPolicy')}</a>
               </p>
             </CardContent>
           </Card>

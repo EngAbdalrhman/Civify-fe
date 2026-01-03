@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl';
-import { User as UserIcon, FileText, Activity as ActivityIcon } from 'lucide-react';
+import { User as UserIcon, Activity as ActivityIcon } from 'lucide-react';
 import { ResumeCarousel } from '@/components/dashboard/ResumeCarousel';
 
 export default function PersonalPage() {
@@ -10,7 +10,7 @@ export default function PersonalPage() {
       <div>
         <h1 className="text-3xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground">
-          Manage your profile and view your CVs
+          {t('subtitle')}
         </p>
       </div>
 
@@ -26,7 +26,7 @@ export default function PersonalPage() {
               {t('profile')}
             </h3>
             <p className="text-sm text-muted-foreground">
-              Update your personal information
+              {t('profileDesc')}
             </p>
           </div>
           
@@ -36,7 +36,7 @@ export default function PersonalPage() {
               {t('recent')}
             </h3>
             <p className="text-sm text-muted-foreground">
-              Your recent activity
+              {t('recentDesc')}
             </p>
           </div>
         </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Loader2, Zap, Coins, ArrowLeft, CheckCircle, Sparkles, CreditCard, Wallet } from 'lucide-react';
@@ -13,6 +14,7 @@ import { PermissionGuard } from '@/components/auth/PermissionGuard';
 
 export default function AppTokensPage() {
   const router = useRouter();
+  const t = useTranslations('tokens');
   const [packages, setPackages] = useState<TokenPackage[]>([]);
   const [balance, setBalance] = useState<TokenBalanceResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,13 +30,13 @@ export default function AppTokensPage() {
       setIsLoading(true);
       const [packagesData, balanceData] = await Promise.all([
         tokenPackageService.getPackages(),
-        tokenPackageService.getBalance().catch(() => null), // Don't fail if not authenticated
+        tokenPackageService.getBalance().catch(() => null),
       ]);
       setPackages(packagesData);
       setBalance(balanceData);
     } catch (error) {
       console.error('Error loading token data:', error);
-      toast.error('Failed to load token packages');
+      toast.error(t('loadError'));
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +55,7 @@ export default function AppTokensPage() {
 
   const formatTokens = (tokens: number | null | undefined): string => {
     if (tokens === null || tokens === undefined) return '0';
-    if (tokens === 2147483647) return '∞'; // Integer.MAX_VALUE means unlimited
+    if (tokens === 2147483647) return '∞';
     return tokenPackageService.formatTokens(tokens);
   };
 
@@ -75,16 +77,16 @@ export default function AppTokensPage() {
           <div>
             <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
               <Zap className="h-6 w-6 text-amber-500" />
-              Buy Tokens
+              {t('title')}
             </h1>
             <p className="text-muted-foreground mt-1">
-              Purchase additional tokens to continue using AI features
+              {t('subtitle')}
             </p>
           </div>
           <Link href="/app">
             <Button variant="outline" size="sm">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
+              <ArrowLeft className="ltr:mr-2 rtl:ml-2 h-4 w-4" />
+              {t('backToDashboard')}
             </Button>
           </Link>
         </div>
@@ -92,63 +94,63 @@ export default function AppTokensPage() {
         {/* Token Balance Card */}
         {balance && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-amber-200 dark:border-amber-800">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Wallet Balance</p>
-                    <p className="text-2xl font-bold text-amber-600">{formatTokens(balance.walletTokens)}</p>
-                  </div>
-                  <div className="p-3 bg-amber-100 dark:bg-amber-900/30 rounded-full">
-                    <Wallet className="h-5 w-5 text-amber-600" />
-                  </div>
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">Purchased tokens (never expire)</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Monthly Limit</p>
-                    <p className="text-2xl font-bold">{formatTokens(balance.monthlyLimit)}</p>
-                  </div>
-                  <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                    <Zap className="h-5 w-5 text-blue-600" />
-                  </div>
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">From your subscription plan</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Used This Month</p>
-                    <p className="text-2xl font-bold">{formatTokens(balance.monthlyUsed)}</p>
-                  </div>
-                  <div className="p-3 bg-gray-100 dark:bg-gray-900/30 rounded-full">
-                    <Coins className="h-5 w-5 text-gray-600" />
-                  </div>
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">Resets monthly</p>
-              </CardContent>
-            </Card>
-
             <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-200 dark:border-green-800">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Total Available</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t('totalAvailable')}</p>
                     <p className="text-2xl font-bold text-green-600">{formatTokens(balance.totalAvailable)}</p>
                   </div>
                   <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full">
                     <CheckCircle className="h-5 w-5 text-green-600" />
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">Monthly + Wallet</p>
+                <p className="text-xs text-muted-foreground mt-2">{t('totalDesc')}</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">{t('usedThisMonth')}</p>
+                    <p className="text-2xl font-bold">{formatTokens(balance.monthlyUsed)}</p>
+                  </div>
+                  <div className="p-3 bg-gray-100 dark:bg-gray-900/30 rounded-full">
+                    <Coins className="h-5 w-5 text-gray-600" />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">{t('usedDesc')}</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">{t('monthlyLimit')}</p>
+                    <p className="text-2xl font-bold">{formatTokens(balance.monthlyLimit)}</p>
+                  </div>
+                  <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                    <Zap className="h-5 w-5 text-blue-600" />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">{t('monthlyLimitDesc')}</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-amber-200 dark:border-amber-800">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">{t('walletBalance')}</p>
+                    <p className="text-2xl font-bold text-amber-600">{formatTokens(balance.walletTokens)}</p>
+                  </div>
+                  <div className="p-3 bg-amber-100 dark:bg-amber-900/30 rounded-full">
+                    <Wallet className="h-5 w-5 text-amber-600" />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">{t('walletDesc')}</p>
               </CardContent>
             </Card>
           </div>
@@ -158,14 +160,14 @@ export default function AppTokensPage() {
           <Card>
             <CardContent className="py-12 text-center">
               <Coins className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h2 className="text-lg font-semibold mb-2">No Token Packages Available</h2>
+              <h2 className="text-lg font-semibold mb-2">{t('noPackages')}</h2>
               <p className="text-muted-foreground mb-6">
-                Token packages are not available at the moment.
+                {t('noPackagesDesc')}
               </p>
               <Link href="/plans">
                 <Button>
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Upgrade Your Plan
+                  <Sparkles className="ltr:mr-2 rtl:ml-2 h-4 w-4" />
+                  {t('upgradeYourPlan')}
                 </Button>
               </Link>
             </CardContent>
@@ -176,15 +178,15 @@ export default function AppTokensPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-900">
                 <CheckCircle className="h-4 w-4 text-green-600" />
-                <span className="text-sm font-medium">Instant Activation</span>
+                <span className="text-sm font-medium">{t('instantActivation')}</span>
               </div>
               <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-900">
                 <CheckCircle className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-medium">Never Expire</span>
+                <span className="text-sm font-medium">{t('neverExpire')}</span>
               </div>
               <div className="flex items-center gap-2 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200 dark:border-purple-900">
                 <CreditCard className="h-4 w-4 text-purple-600" />
-                <span className="text-sm font-medium">Secure Payment</span>
+                <span className="text-sm font-medium">{t('securePayment')}</span>
               </div>
             </div>
 
@@ -206,8 +208,8 @@ export default function AppTokensPage() {
                     {isFeatured && (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                         <span className="inline-flex items-center px-3 py-1 text-xs font-semibold bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full shadow-md">
-                          <Sparkles className="h-3 w-3 mr-1" />
-                          Best Value
+                          <Sparkles className="h-3 w-3 ltr:mr-1 rtl:ml-1" />
+                          {t('bestValue')}
                         </span>
                       </div>
                     )}
@@ -224,7 +226,7 @@ export default function AppTokensPage() {
                       <div className="text-center mb-3">
                         <div className="flex items-baseline justify-center gap-1">
                           <span className="text-3xl font-bold text-primary">{formattedTokens}</span>
-                          <span className="text-sm text-muted-foreground">tokens</span>
+                          <span className="text-sm text-muted-foreground">{t('tokens')}</span>
                         </div>
                       </div>
 
@@ -235,7 +237,7 @@ export default function AppTokensPage() {
                           <span className="text-sm text-muted-foreground">{pkg.currency}</span>
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {tokenPackageService.getPricePerToken(pkg.price, pkg.tokens)} per token
+                          {tokenPackageService.getPricePerToken(pkg.price, pkg.tokens)} {t('perToken')}
                         </p>
                       </div>
 
@@ -248,8 +250,8 @@ export default function AppTokensPage() {
                         }`}
                         onClick={() => openPurchaseDialog(pkg)}
                       >
-                        <Zap className="mr-2 h-4 w-4" />
-                        Buy Now
+                        <Zap className="ltr:mr-2 rtl:ml-2 h-4 w-4" />
+                        {t('buyNow')}
                       </Button>
                     </CardContent>
                   </Card>
@@ -261,15 +263,15 @@ export default function AppTokensPage() {
             <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
               <CardContent className="py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="text-center sm:text-left">
-                  <h3 className="font-semibold">Looking for more tokens?</h3>
+                  <h3 className="font-semibold">{t('lookingForMore')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Upgrade your subscription plan for higher monthly token allowances
+                    {t('upgradePrompt')}
                   </p>
                 </div>
                 <Link href="/plans">
                   <Button variant="outline">
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    View Plans
+                    <Sparkles className="ltr:mr-2 rtl:ml-2 h-4 w-4" />
+                    {t('viewPlans')}
                   </Button>
                 </Link>
               </CardContent>

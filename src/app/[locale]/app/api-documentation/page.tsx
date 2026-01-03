@@ -4,8 +4,11 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Book } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { ApiDocumentation } from '@/components/api-docs/ApiDocumentation';
+import { useTranslations } from 'next-intl';
 
 export default function ApiDocumentationPage() {
+  const t = useTranslations('nav');
+  
   return (
     <div className="space-y-6">
       {/* Header with Back Button */}
@@ -18,10 +21,10 @@ export default function ApiDocumentationPage() {
         <div>
           <div className="flex items-center gap-2">
             <Book className="h-6 w-6" />
-            <h1 className="text-3xl font-bold tracking-tight">API Documentation</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{t('apiDocumentation')}</h1>
           </div>
           <p className="text-muted-foreground mt-2">
-            Complete guide to integrating Civify CV API into your applications
+            {t('apiDocSubtitle')}
           </p>
         </div>
       </div>

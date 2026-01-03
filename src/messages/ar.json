@@ -44,6 +44,15 @@
     "notifications": "الإشعارات",
     "auditMonitor": "مراقب السجلات",
     "logout": "تسجيل الخروج",
+    "resumeBuilder": "منشئ السيرة الذاتية",
+    "apiKeys": "مفاتيح API",
+    "buyTokens": "شراء الرموز",
+    "helpCenter": "مركز المساعدة",
+    "adminDashboard": "لوحة تحكم المسؤول",
+    "freePlan": "الخطة المجانية",
+    "guest": "زائر",
+    "apiDocumentation": "وثائق API",
+    "apiDocSubtitle": "دليل شامل لدمج واجهة برمجة تطبيقات السيرة الذاتية في تطبيقاتك",
     "language": {
       "switch": "تغيير اللغة"
     }
@@ -76,9 +85,12 @@
   "dashboard": {
     "personalPage": {
       "title": "الصفحة الشخصية",
+      "subtitle": "إدارة ملفك الشخصي وعرض سيرك الذاتية",
       "profile": "الملف الشخصي",
+      "profileDesc": "تحديث معلوماتك الشخصية",
       "cvs": "سيرتي الذاتية",
-      "recent": "النشاط الأخير"
+      "recent": "النشاط الأخير",
+      "recentDesc": "نشاطك الأخير"
     },
     "analytics": {
       "title": "التحليلات",
@@ -93,6 +105,14 @@
       "preferences": "التفضيلات",
       "notifications": "الإشعارات",
       "security": "الأمان"
+    },
+    "resumes": {
+      "myResumes": "سيري الذاتية",
+      "viewAll": "عرض الكل",
+      "createNew": "إنشاء سيرة ذاتية جديدة",
+      "loadError": "فشل تحميل سيرك الذاتية",
+      "deleted": "تم حذف السيرة الذاتية",
+      "deleteError": "فشل حذف السيرة الذاتية"
     }
   },
   "upload": {
@@ -127,7 +147,129 @@
     "total": "الإجمالي",
     "paymentMethod": "طريقة الدفع",
     "pay": "ادفع",
-    "processing": "جاري المعالجة..."
+    "processing": "جاري المعالجة...",
+    "backToPlans": "العودة إلى الخطط",
+    "planNotFound": "الخطة غير موجودة",
+    "monthly": "شهري",
+    "yearly": "سنوي",
+    "perMonth": "شهرياً",
+    "perYear": "سنوياً",
+    "save20": "وفر 20%",
+    "enterPromoCode": "أدخل رمز الخصم",
+    "apply": "تطبيق",
+    "subtotal": "المجموع الفرعي",
+    "discount": "الخصم",
+    "securePayment": "دفع آمن",
+    "securePaymentDesc": "معلومات الدفع الخاصة بك مشفرة وآمنة. نحن لا نخزن بيانات بطاقتك أبداً.",
+    "fawaterak": "فواتيرك",
+    "fawaterakDesc": "بطاقة ائتمان/خصم، فوري، المحافظ",
+    "paymob": "باي موب",
+    "paymobDesc": "بطاقة ائتمان/خصم، المحافظ الإلكترونية",
+    "termsAgreement": "بالمتابعة، أنت توافق على",
+    "termsOfService": "شروط الخدمة",
+    "and": "و",
+    "privacyPolicy": "سياسة الخصوصية"
+  },
+  "apiKeys": {
+    "title": "مفاتيح API",
+    "subtitle": "إدارة مفاتيح API الخاصة بك للوصول إلى واجهة برمجة تطبيقات Civify.",
+    "yourKeys": "مفاتيح API الخاصة بك",
+    "manageKeys": "إدارة مفاتيح API للوصول إلى واجهة البرمجة برمجياً",
+    "viewDocs": "عرض الوثائق",
+    "generateNew": "إنشاء مفتاح جديد",
+    "createTitle": "إنشاء مفتاح API",
+    "createDesc": "أدخل اسماً للمفتاح الجديد لمساعدتك على التعرف عليه لاحقاً.",
+    "namePlaceholder": "مثال: موقع الدفع",
+    "generateKey": "إنشاء المفتاح",
+    "keyGenerated": "تم إنشاء مفتاح API",
+    "copyWarning": "يرجى نسخ هذا المفتاح الآن. لن تتمكن من رؤيته مرة أخرى!",
+    "done": "تم",
+    "existingKeys": "المفاتيح الموجودة",
+    "existingKeysDesc": "قائمة بجميع مفاتيح API المرتبطة بحسابك.",
+    "noKeys": "لم يتم العثور على مفاتيح API. أنشئ أول مفتاح للبدء.",
+    "keyId": "معرف المفتاح",
+    "maskedKey": "المفتاح المخفي",
+    "created": "تاريخ الإنشاء",
+    "lastUsed": "آخر استخدام",
+    "never": "أبداً",
+    "status": "الحالة",
+    "active": "نشط",
+    "revoked": "ملغي",
+    "actions": "الإجراءات",
+    "revoke": "إلغاء",
+    "revokeConfirm": "هل أنت متأكد من إلغاء هذا المفتاح؟ لا يمكن التراجع عن هذا الإجراء.",
+    "copied": "تم النسخ إلى الحافظة",
+    "loadError": "فشل تحميل مفاتيح API",
+    "generateError": "فشل إنشاء مفتاح API",
+    "generateSuccess": "تم إنشاء مفتاح API بنجاح",
+    "revokeError": "فشل إلغاء مفتاح API",
+    "revokeSuccess": "تم إلغاء مفتاح API بنجاح"
+  },
+  "tokens": {
+    "title": "شراء الرموز",
+    "subtitle": "اشتر رموزاً إضافية لمتابعة استخدام ميزات الذكاء الاصطناعي",
+    "backToDashboard": "العودة إلى لوحة التحكم",
+    "walletBalance": "رصيد المحفظة",
+    "walletDesc": "الرموز المشتراة (لا تنتهي صلاحيتها)",
+    "monthlyLimit": "الحد الشهري",
+    "monthlyLimitDesc": "من خطة اشتراكك",
+    "usedThisMonth": "المستخدم هذا الشهر",
+    "usedDesc": "يتجدد شهرياً",
+    "totalAvailable": "الإجمالي المتاح",
+    "totalDesc": "الشهري + المحفظة",
+    "noPackages": "لا تتوفر حزم رموز",
+    "noPackagesDesc": "حزم الرموز غير متاحة في الوقت الحالي.",
+    "upgradeYourPlan": "ترقية خطتك",
+    "instantActivation": "تفعيل فوري",
+    "neverExpire": "لا تنتهي صلاحيتها",
+    "securePayment": "دفع آمن",
+    "bestValue": "أفضل قيمة",
+    "tokens": "رمز",
+    "perToken": "لكل رمز",
+    "buyNow": "اشتر الآن",
+    "lookingForMore": "تبحث عن المزيد من الرموز؟",
+    "upgradePrompt": "قم بترقية خطة اشتراكك للحصول على حصص شهرية أعلى من الرموز",
+    "viewPlans": "عرض الخطط",
+    "loadError": "فشل تحميل حزم الرموز"
+  },
+  "help": {
+    "title": "مركز المساعدة",
+    "subtitle": "اعثر على إجابات للأسئلة الشائعة وتعلم كيفية الاستفادة القصوى من Civify",
+    "gettingStarted": {
+      "title": "البدء",
+      "desc": "تعلم أساسيات رفع وتخصيص سيرتك الذاتية",
+      "createFirstCv": "إنشاء أول سيرة ذاتية",
+      "tailorFirstCv": "تخصيص أول سيرة ذاتية",
+      "howTailoringWorks": "كيف يعمل تخصيص السيرة الذاتية",
+      "understandingAts": "فهم درجات ATS"
+    },
+    "features": {
+      "title": "الميزات",
+      "desc": "استكشف جميع الأدوات المتاحة لتحسين سيرتك الذاتية",
+      "aiOptimization": "التحسين بالذكاء الاصطناعي",
+      "infoMasking": "إخفاء المعلومات الشخصية",
+      "exportOptions": "خيارات التصدير (PDF/DOCX)"
+    },
+    "account": {
+      "title": "الحساب والأمان",
+      "desc": "إدارة إعدادات حسابك والأمان",
+      "changePassword": "تغيير كلمة المرور",
+      "twoFactor": "المصادقة الثنائية",
+      "apiKeyManagement": "إدارة مفاتيح API"
+    },
+    "apiDocs": {
+      "title": "وثائق API",
+      "desc": "للمطورين الذين يتكاملون مع API الخاص بنا",
+      "apiReference": "مرجع API",
+      "authGuide": "دليل المصادقة",
+      "rateLimits": "حدود المعدل"
+    },
+    "contact": {
+      "title": "هل تحتاج لمزيد من المساعدة؟",
+      "desc": "فريق الدعم لدينا هنا لمساعدتك في أي أسئلة",
+      "contactSupport": "اتصل بالدعم",
+      "liveChat": "الدردشة المباشرة"
+    }
   },
   "payment": {
     "success": {
@@ -484,8 +626,25 @@
       "monthly": "شهري",
       "yearly": "سنوي",
       "save": "وفر 20%",
+      "mostPopular": "الأكثر شعبية",
+      "selectPlan": "اختر الخطة",
+      "getStarted": "ابدأ الآن",
       "noCreditCard": "لا حاجة لبطاقة ائتمان للخطة المجانية",
-      "cancelAnytime": "إلغاء في أي وقت"
+      "cancelAnytime": "إلغاء في أي وقت",
+      "errorLoading": "فشل تحميل خطط الأسعار",
+      "errorContact": "يرجى المحاولة مرة أخرى لاحقاً أو الاتصال بالدعم",
+      "features": {
+        "cvStorageUnlimited": "تخزين سير ذاتية غير محدود",
+        "cvStorage": "تخزين {count} سيرة ذاتية",
+        "aiTailoring": "تخصيص السيرة الذاتية بالذكاء الاصطناعي",
+        "masking": "إخفاء المعلومات الشخصية",
+        "pdfExport": "تصدير PDF",
+        "noWatermark": "بدون علامة مائية",
+        "dashboardAccess": "الوصول إلى لوحة التحكم",
+        "prioritySupport": "دعم ذو أولوية",
+        "advancedAi": "ميزات الذكاء الاصطناعي المتقدمة",
+        "basicSupport": "دعم أساسي"
+      }
     },
     "faq": {
       "title": "الأسئلة الشائعة",
