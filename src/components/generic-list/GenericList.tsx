@@ -264,7 +264,14 @@ export function GenericList<T extends { id?: string | number } = Record<string, 
             <TableRow className="hover:bg-transparent">
               {columns.map((column) => (
                 <TableHead key={column.key} className="h-12">
-                  <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    {column.filterable && (
+                      <ColumnFilter
+                        column={column}
+                        value={filters[column.key]}
+                        onChange={(val) => handleFilterChange(column.key, val)}
+                      />
+                    )}
                     <div
                       className={cn(
                         'flex items-center gap-1.5 cursor-pointer select-none text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors',
@@ -287,13 +294,6 @@ export function GenericList<T extends { id?: string | number } = Record<string, 
                         </span>
                       )}
                     </div>
-                    {column.filterable && (
-                      <ColumnFilter
-                        column={column}
-                        value={filters[column.key]}
-                        onChange={(val) => handleFilterChange(column.key, val)}
-                      />
-                    )}
                   </div>
                 </TableHead>
               ))}

@@ -75,11 +75,34 @@ export function ColumnFilter({ column, value, onChange }: ColumnFilterProps) {
           <span className="sr-only">Filter {column.label}</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-56 p-4" align="start">
+      <PopoverContent 
+        className={cn(
+          "p-4",
+          column.filterType === 'date' ? 'w-auto' : 'w-56'
+        )} 
+        align="start"
+      >
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h4 className="font-medium leading-none">Filter {column.label}</h4>
-            {isActive && (
+          {/* Only show header for non-date filters to avoid overlapping with calendar nav */}
+          {column.filterType !== 'date' && (
+            <div className="flex items-center justify-between">
+              <h4 className="font-medium leading-none">Filter {column.label}</h4>
+              {isActive && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 text-muted-foreground hover:text-foreground"
+                  onClick={handleClear}
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Clear
+                </Button>
+              )}
+            </div>
+          )}
+          {/* Show clear button for date filter at the bottom */}
+          {column.filterType === 'date' && isActive && (
+            <div className="flex justify-end">
               <Button
                 variant="ghost"
                 size="sm"
@@ -89,8 +112,8 @@ export function ColumnFilter({ column, value, onChange }: ColumnFilterProps) {
                 <X className="h-4 w-4 mr-1" />
                 Clear
               </Button>
-            )}
-          </div>
+            </div>
+          )}
 
           <div className="grid gap-2">
             {(column.filterType === 'dropdown' || column.filterType === 'select') && column.filterOptions ? (
@@ -117,6 +140,7 @@ export function ColumnFilter({ column, value, onChange }: ColumnFilterProps) {
                   onSelect={(date) =>
                     setLocalValue(date ? format(date, 'yyyy-MM-dd') : undefined)
                   }
+                  className="rounded-md border-0"
                 />
               </div>
             ) : column.filterType === 'number' ? (
