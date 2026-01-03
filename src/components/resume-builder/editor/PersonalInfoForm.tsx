@@ -96,7 +96,7 @@ export function PersonalInfoForm({ data, onChange }: PersonalInfoFormProps) {
           <Input 
             value={data.website || ''} 
             onChange={e => handleChange('website', e.target.value)} 
-            placeholder="johndoe.com"
+            placeholder="speedy.com"
           />
         </div>
       </div>

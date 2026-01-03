@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BetaBadge } from "@/components/BetaBadge";
 
+import { useTranslations } from "next-intl";
+
 export function HeroSection() {
+  const t = useTranslations('landing.hero');
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900">
       {/* Background decoration */}
@@ -31,34 +35,34 @@ export function HeroSection() {
               English
             </Badge>
             <Badge variant="secondary" className="px-3 py-1.5 text-sm font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
-              🇸🇦 العربية - Full Arabic Support
+              🇸🇦 العربية - {t('badge')}
             </Badge>
           </div>
 
           {/* Problem-Focused Headline */}
           <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-            <span className="text-red-500 dark:text-red-400">75% of CVs</span>
-            {" "}Never Get Seen.{" "}
+            <span className="text-red-500 dark:text-red-400">{t('titlePart1')}</span>
+            {" "}{t('titlePart2')}{" "}
             <br className="hidden sm:block" />
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Make Yours the Exception.
+              {t('titlePart3')}
             </span>
           </h1>
 
           {/* Solution Subtext */}
           <p className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground md:text-xl">
-            Civify uses AI to analyze job descriptions and tailor your CV for ATS systems.
+            {t('subtitle')}
             <br />
             <span className="font-semibold text-foreground">
-              92% average match score. 3x more interviews.
+              {t('matchScore')} {t('interviews')}
             </span>
           </p>
 
           {/* CTAs */}
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button asChild size="lg" className="group h-12 px-8 text-base font-semibold">
-              <Link href="/app/resume-builder">
-                Start Free — No Credit Card
+              <Link href="/app/upload">
+                {t('cta')}
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
             </Button>

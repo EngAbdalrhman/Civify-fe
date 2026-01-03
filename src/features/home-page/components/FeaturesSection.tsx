@@ -11,37 +11,41 @@ import {
   Globe,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { features } from "../data";
+
+import { useTranslations } from "next-intl";
 
 const iconMap = {
-  Search,
-  Target,
-  LayoutTemplate,
-  Wand2,
-  TrendingUp,
-  Download,
-  Gauge,
-  Globe,
+  "parser": Search,
+  "ats": Target,
+  "templates": LayoutTemplate,
+  "aiRewrite": Wand2,
+  "skills": TrendingUp,
+  "score": Gauge,
+  "arabic": Globe,
+  "privacy": Download // Using Download as a fallback/placeholder, check data map
 };
 
 export function FeaturesSection() {
+  const t = useTranslations('landing.features');
+  const featureKeys = ['parser', 'ats', 'templates', 'aiRewrite', 'skills', 'arabic', 'score', 'privacy'];
+
   return (
     <section className="bg-gradient-to-b from-background to-blue-50/30 py-20 dark:to-gray-900 md:py-32">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="mx-auto mb-16 max-w-3xl text-center">
           <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-            Powerful Features
+            {t('title')}
           </h2>
           <p className="text-lg text-muted-foreground">
-            Everything you need to create a job-winning CV
+            {t('subtitle')}
           </p>
         </div>
 
         {/* Features Grid */}
         <div className="mx-auto grid max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((feature, index) => {
-            const Icon = iconMap[feature.icon as keyof typeof iconMap];
+          {featureKeys.map((key, index) => {
+            const Icon = iconMap[key as keyof typeof iconMap] || Globe;
 
             return (
               <Card
@@ -55,10 +59,10 @@ export function FeaturesSection() {
                   </div>
 
                   {/* Title */}
-                  <h3 className="mb-2 text-xl font-bold">{feature.title}</h3>
+                  <h3 className="mb-2 text-xl font-bold">{t(`items.${key}.title`)}</h3>
 
                   {/* Description */}
-                  <p className="text-muted-foreground">{feature.description}</p>
+                  <p className="text-muted-foreground">{t(`items.${key}.description`)}</p>
 
                   {/* Hover gradient effect */}
                   <div className="absolute inset-0 -z-10 bg-gradient-to-br from-blue-600/5 to-purple-600/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />

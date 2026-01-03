@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from '@/i18n/routing';
 import { usePlans } from "@/features/plans/hooks/usePlans";
-import { pricingTiers as fallbackTiers } from "../data";
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 export function PricingSection() {
   const router = useRouter();

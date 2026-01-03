@@ -9,19 +9,23 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { templates } from "../data";
+
+import { useTranslations } from "next-intl";
 
 export function TemplatesSection() {
+  const t = useTranslations('landing.templates');
+  const templateKeys = ['ats-clean', 'professional', 'minimalist', 'modern', 'technical', 'creative'];
+
   return (
     <section className="bg-gradient-to-b from-blue-50/30 to-background py-20 dark:from-gray-900 dark:to-background md:py-32">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="mx-auto mb-16 max-w-3xl text-center">
           <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-            Professional CV Templates
+            {t('title')}
           </h2>
           <p className="text-lg text-muted-foreground">
-            Choose from our collection of ATS-optimized templates designed for every industry
+            {t('subtitle')}
           </p>
         </div>
 
@@ -35,8 +39,8 @@ export function TemplatesSection() {
             className="w-full"
           >
             <CarouselContent className="-ml-4">
-              {templates.map((template) => (
-                <CarouselItem key={template.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
+              {templateKeys.map((key) => (
+                <CarouselItem key={key} className="pl-4 md:basis-1/2 lg:basis-1/3">
                   <Card className="group overflow-hidden border-2 transition-all duration-300 hover:border-primary hover:shadow-xl hover:shadow-primary/10">
                     <CardContent className="p-0">
                       {/* Template Preview */}
@@ -55,12 +59,10 @@ export function TemplatesSection() {
                           </div>
                         </div>
 
-                        {/* ATS Badge */}
-                        {template.atsCompliant && (
-                          <Badge className="absolute right-4 top-4 bg-green-600 hover:bg-green-700">
-                            ✓ ATS Compliant
-                          </Badge>
-                        )}
+                        {/* ATS Badge - All are compliant now so show always */}
+                        <Badge className="absolute right-4 top-4 bg-green-600 hover:bg-green-700">
+                          ✓ {t('badge')}
+                        </Badge>
 
                         {/* Hover overlay */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
@@ -69,10 +71,10 @@ export function TemplatesSection() {
                       {/* Template Info */}
                       <div className="p-6">
                         <div className="mb-2 flex items-center justify-between">
-                          <h3 className="text-xl font-bold">{template.name}</h3>
-                          <Badge variant="secondary">{template.category}</Badge>
+                          <h3 className="text-xl font-bold">{t(`items.${key}.name`)}</h3>
+                          <Badge variant="secondary">{t(`items.${key}.category`)}</Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground">{template.description}</p>
+                        <p className="text-sm text-muted-foreground">{t(`items.${key}.description`)}</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -87,8 +89,8 @@ export function TemplatesSection() {
         {/* Note */}
         <div className="mt-12 text-center">
           <p className="text-sm text-muted-foreground">
-            <span className="font-semibold text-foreground">All templates are 100% ATS compliant</span>
-            {" "}— Optimized to pass applicant tracking systems
+            <span className="font-semibold text-foreground">{t('note.bold')}</span>
+            {" "}{t('note.text')}
           </p>
         </div>
       </div>

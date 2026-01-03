@@ -5,26 +5,29 @@ import { motion, useInView } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/routing";
 import { ArrowRight, CheckCircle2, Sparkles, Wand2, Languages, Layout } from "lucide-react";
+import { useTranslations } from "next-intl";
+import Image from "next/image";
 
 export function ResumeBuilderSection() {
+  const t = useTranslations('landing.resumeBuilder');
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   const features = [
     {
       icon: Layout,
-      title: "Real-time Preview",
-      description: "See your changes instantly as you type. No more guessing how your CV will look.",
+      title: t('features.preview.title'),
+      description: t('features.preview.description'),
     },
     {
       icon: Wand2,
-      title: "AI Enhancement",
-      description: "One-click polish for your bullet points to make them sound professional and impactful.",
+      title: t('features.ai.title'),
+      description: t('features.ai.description'),
     },
     {
       icon: Languages,
-      title: "Multi-language",
-      description: "Seamlessly switch between English and Arabic layouts with perfect RTL support.",
+      title: t('features.multiLang.title'),
+      description: t('features.multiLang.description'),
     },
   ];
 
@@ -44,17 +47,16 @@ export function ResumeBuilderSection() {
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 text-sm font-medium">
               <Sparkles className="w-4 h-4" />
-              <span>Next-Gen Builder</span>
+              <span>{t('badge')}</span>
             </div>
             
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
-              Build Your CV <br />
-              <span className="text-primary">Like a Pro</span>
+              {t('title')} <br />
+              <span className="text-primary">{t('titleAccent')}</span>
             </h2>
             
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Experience the most intuitive resume builder designed for modern professionals. 
-              Drag, drop, and customize every aspect of your CV without fighting with formatting.
+              {t('description')}
             </p>
 
             <div className="grid sm:grid-cols-2 gap-6">
@@ -74,7 +76,7 @@ export function ResumeBuilderSection() {
             <div className="pt-4">
               <Button asChild size="lg" className="h-12 px-8 text-base shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all">
                 <Link href="/app/resume-builder">
-                  Try the Builder Now
+                  {t('cta')}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -105,12 +107,12 @@ export function ResumeBuilderSection() {
 
               {/* YouTube Iframe Container */}
               <div className="aspect-video w-full bg-black/5 relative group-hover:bg-black/10 transition-colors">
-                <iframe
-                  className="w-full h-full"
-                  src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&mute=1&controls=0&loop=1" 
-                  title="Civify Resume Builder Demo"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
+                <Image 
+                  src="/civify-builder.png" 
+                  alt="Preview" 
+                  fill 
+                  className="object-cover object-left-top"
+                  sizes="(max-width: 768px) 100vw, 50vw"
                 />
                 
                 {/* Overlay gradient to blend with design */}
