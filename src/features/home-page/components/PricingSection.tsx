@@ -6,21 +6,82 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from '@/i18n/routing';
 import { usePlans } from "@/features/plans/hooks/usePlans";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslations } from "next-intl";
 
 export function PricingSection() {
   const t = useTranslations('landing.pricing');
   const router = useRouter();
-  const { displayPlans, isLoading, error, isAnnual, setIsAnnual } = usePlans();
+  const { plans, isLoading, error, isAnnual, setIsAnnual } = usePlans();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     setIsAuthenticated(!!localStorage.getItem('auth_token'));
   }, []);
 
-  // Show error state if API fails - don't use fallback mock data
-  const plans = displayPlans;
+  // Transform plans to display format with localized features
+  const displayPlans = useMemo(() => {
+    if (!plans || plans.length === 0) return [];
+
+    return plans.map(plan => {
+      const features: string[] = [];
+      const name = plan.name.toLowerCase();
+
+      // CV Limit (Storage)
+      if (plan.cvLimit === null) {
+        features.push(t('features.cvStorageUnlimited'));
+      } else {
+        features.push(t('features.cvStorage', { count: plan.cvLimit }));
+      }
+
+      // Standard features
+      features.push(t('features.aiTailoring'));
+      features.push(t('features.masking'));
+      features.push(t('features.pdfExport'));
+
+      // Watermark
+      if (!plan.watermark) {
+        features.push(t('features.noWatermark'));
+      }
+
+      // Dashboard access
+      if (plan.dashboard) {
+        features.push(t('features.dashboardAccess'));
+        features.push(t('features.prioritySupport'));
+        features.push(t('features.advancedAi'));
+      } else {
+        features.push(t('features.basicSupport'));
+      }
+
+      const price = isAnnual ? parseFloat(plan.annualPrice) : parseFloat(plan.monthlyPrice);
+      const isPopular = name.includes('premium') || name.includes('pro') || name.includes('beta');
+      const isFreePlan = name === 'free';
+
+      // Capitalize first letter of each word for display
+      const displayName = plan.name
+        .split(' ')
+        .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+
+      return {
+        id: name.replace(/\s+/g, '-').toLowerCase(),
+        planId: plan.id,
+        name: displayName,
+        price,
+        period: isAnnual ? t('yearly').toLowerCase() : t('monthly').toLowerCase(),
+        description: plan.description,
+        features,
+        highlighted: isPopular,
+        cta: isFreePlan ? t('getStarted') : t('selectPlan'),
+        ctaLink: isFreePlan ? '/signup' : `/checkout?planId=${plan.id}`,
+      };
+    }).sort((a, b) => {
+      const order = ['free', 'pro', 'premium', 'enterprise', 'lifetime'];
+      const aIndex = order.findIndex(o => a.name.toLowerCase().includes(o));
+      const bIndex = order.findIndex(o => b.name.toLowerCase().includes(o));
+      return (aIndex === -1 ? 99 : aIndex) - (bIndex === -1 ? 99 : bIndex);
+    });
+  }, [plans, isAnnual, t]);
 
   const handlePlanSelect = (ctaLink: string) => {
     // If it's a signup link (free plan), just go there
@@ -62,7 +123,7 @@ export function PricingSection() {
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              Monthly
+              {t('monthly')}
             </button>
             <button
               onClick={() => setIsAnnual(true)}
@@ -72,7 +133,7 @@ export function PricingSection() {
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              Yearly <span className="text-xs text-green-600 font-bold">(Save 20%)</span>
+              {t('yearly')} <span className="text-xs text-green-600 font-bold">({t('save')})</span>
             </button>
           </div>
         </div>
@@ -87,15 +148,15 @@ export function PricingSection() {
         {/* Error State */}
         {error && !isLoading && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <p className="text-destructive text-lg font-medium mb-2">Failed to load pricing plans</p>
-            <p className="text-muted-foreground text-sm">Please try again later or contact support</p>
+            <p className="text-destructive text-lg font-medium mb-2">{t('errorLoading')}</p>
+            <p className="text-muted-foreground text-sm">{t('errorContact')}</p>
           </div>
         )}
 
         {/* Pricing Cards */}
-        {!isLoading && !error && plans.length > 0 && (
+        {!isLoading && !error && displayPlans.length > 0 && (
           <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-3">
-            {plans.map((tier) => (
+            {displayPlans.map((tier) => (
               <Card
                 key={tier.id}
                 className={`relative flex flex-col border-2 transition-all duration-300 ${
@@ -106,7 +167,7 @@ export function PricingSection() {
               >
                 {tier.highlighted && (
                   <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-600 to-purple-600">
-                    Most Popular
+                    {t('mostPopular')}
                   </Badge>
                 )}
 
@@ -158,8 +219,8 @@ export function PricingSection() {
         {/* Note */}
         <div className="mt-12 text-center">
           <p className="text-sm text-muted-foreground">
-            <span className="font-semibold text-foreground">No credit card needed for free plan</span>
-            {" "}• Cancel anytime
+            <span className="font-semibold text-foreground">{t('noCreditCard')}</span>
+            {" "}• {t('cancelAnytime')}
           </p>
         </div>
       </div>

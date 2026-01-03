@@ -123,7 +123,7 @@ export default function UserDashboardLayout({
             <div className="grid flex-1 ltr:text-left rtl:text-right text-sm leading-tight">
                <span className="truncate font-semibold">Civify</span>
                <span className="truncate text-xs text-muted-foreground">
-                 {groupName || planName || (isAuthenticated ? 'Free Plan' : 'Guest')}
+                 {groupName || planName || (isAuthenticated ? t('freePlan') : t('guest'))}
                </span>
             </div>
           </div>
@@ -146,7 +146,7 @@ export default function UserDashboardLayout({
               className={getLinkClasses('/app/resume-builder')}
             >
               <FileEdit className="h-4 w-4" />
-              Resume Builder
+              {t('resumeBuilder')}
             </Link>
             
             {/* Upload CV - visible for all (guests redirected on action) */}
@@ -176,7 +176,7 @@ export default function UserDashboardLayout({
                  className={getLinkClasses('/app/api-keys')}
               >
                 <Key className="h-4 w-4" />
-                API Keys
+                {t('apiKeys')}
               </Link>
             )}
             
@@ -201,7 +201,7 @@ export default function UserDashboardLayout({
                  className={getLinkClasses('/app/tokens')}
               >
                 <Zap className="h-4 w-4" />
-                Buy Tokens
+                {t('buyTokens')}
               </Link>
             )}
             
@@ -211,7 +211,7 @@ export default function UserDashboardLayout({
                className={`${getLinkClasses('/app/help')} mt-4`}
             >
               <HelpCircle className="h-4 w-4" />
-              Help Center
+              {t('helpCenter')}
             </Link>
 
             {isAdmin && (
@@ -220,7 +220,7 @@ export default function UserDashboardLayout({
                 className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted/50 transition-colors text-muted-foreground hover:text-foreground mt-4 border-t pt-4"
               >
                 <Shield className="h-4 w-4" />
-                Admin Dashboard
+                {t('adminDashboard')}
               </Link>
             )}
           </nav>

@@ -7,11 +7,13 @@ import { Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 import { ResumeService, ResumeSummary } from '@/services/resume.service';
 import { ResumeCard } from './ResumeCard';
 
 export function ResumeCarousel() {
+  const t = useTranslations('dashboard.resumes');
   const router = useRouter();
   const [resumes, setResumes] = useState<ResumeSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -23,14 +25,14 @@ export function ResumeCarousel() {
         setResumes(data);
       } catch (e) {
         console.error("Failed to fetch resumes", e);
-        toast.error("Failed to load your resumes");
+        toast.error(t('loadError'));
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchResumes();
-  }, []);
+  }, [t]);
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -38,9 +40,9 @@ export function ResumeCarousel() {
     try {
         await ResumeService.delete(id);
         setResumes(prev => prev.filter(r => r.id !== id));
-        toast.success("Resume deleted");
+        toast.success(t('deleted'));
     } catch (error) {
-        toast.error("Failed to delete resume");
+        toast.error(t('deleteError'));
     }
   };
 
@@ -53,9 +55,9 @@ export function ResumeCarousel() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold tracking-tight">My Resumes</h2>
+        <h2 className="text-xl font-bold tracking-tight">{t('myResumes')}</h2>
         <Button variant="link" asChild>
-          <Link href="/app/resumes">View All</Link>
+          <Link href="/app/resumes">{t('viewAll')}</Link>
         </Button>
       </div>
 
@@ -66,7 +68,7 @@ export function ResumeCarousel() {
             <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
               <Plus className="h-6 w-6 text-primary" />
             </div>
-            <span className="mt-4 font-semibold text-primary">Create New Resume</span>
+            <span className="mt-4 font-semibold text-primary">{t('createNew')}</span>
           </Card>
         </Link>
 
