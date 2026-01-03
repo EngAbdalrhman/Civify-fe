@@ -344,6 +344,20 @@ const cvLogColumns: ColumnDef<any>[] = [
     ),
   },
   {
+    key: 'errorMessage',
+    label: 'Error Description',
+    sortable: false,
+    render: (value) => {
+      const msg = value as string;
+      if (!msg) return '-';
+      return (
+        <span className="text-xs text-destructive max-w-[200px] truncate block" title={msg}>
+          {msg}
+        </span>
+      );
+    },
+  },
+  {
     key: 'user.email', // Dot notation for generic filter
     label: 'User',
     sortable: false,

@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 
 export function PricingSection() {
+  const t = useTranslations('landing.pricing');
   const router = useRouter();
   const { displayPlans, isLoading, error, isAnnual, setIsAnnual } = usePlans();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -45,10 +46,10 @@ export function PricingSection() {
         {/* Section Header */}
         <div className="mx-auto mb-16 max-w-3xl text-center">
           <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-            Simple, Transparent Pricing
+            {t('title')}
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Choose the plan that fits your job search needs
+            {t('subtitle')}
           </p>
 
           {/* Billing Toggle */}
@@ -117,7 +118,8 @@ export function PricingSection() {
 
                   <div className="mt-4 text-center">
                     <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-5xl font-bold">${tier.price}</span>
+                      <span className="text-5xl font-bold">{tier.price}</span>
+                      <span className="text-xl font-bold text-muted-foreground">EGP</span>
                       <span className="text-muted-foreground">/{tier.period}</span>
                     </div>
                   </div>
