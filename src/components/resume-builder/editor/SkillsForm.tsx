@@ -15,14 +15,18 @@ interface SkillsFormProps {
   onChange: (items: SectionItem[]) => void;
 }
 
-const SKILL_LEVELS: { value: SkillLevel; label: string }[] = [
-  { value: 'expert', label: 'Expert' },
-  { value: 'advanced', label: 'Advanced' },
-  { value: 'intermediate', label: 'Intermediate' },
-  { value: 'beginner', label: 'Beginner' },
+import { useTranslations } from 'next-intl';
+
+const SKILL_LEVELS: { value: SkillLevel; labelKey: string }[] = [
+  { value: 'expert', labelKey: 'expert' },
+  { value: 'advanced', labelKey: 'advanced' },
+  { value: 'intermediate', labelKey: 'intermediate' },
+  { value: 'beginner', labelKey: 'beginner' },
 ];
 
 export function SkillsForm({ items = [], onChange }: SkillsFormProps) {
+  const t = useTranslations('editor.skills');
+  const tLevels = useTranslations('resume.levels');
   const [newSkill, setNewSkill] = useState('');
   const [newLevel, setNewLevel] = useState<SkillLevel>('intermediate');
   
@@ -59,7 +63,7 @@ export function SkillsForm({ items = [], onChange }: SkillsFormProps) {
           value={newSkill} 
           onChange={e => setNewSkill(e.target.value)} 
           onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddSkill())}
-          placeholder="Skill name..."
+          placeholder={t('addPlaceholder')}
           className="flex-1"
         />
         <Select value={newLevel} onValueChange={(v) => setNewLevel(v as SkillLevel)}>
@@ -69,7 +73,7 @@ export function SkillsForm({ items = [], onChange }: SkillsFormProps) {
           <SelectContent>
             {SKILL_LEVELS.map(level => (
               <SelectItem key={level.value} value={level.value}>
-                {level.label}
+                {tLevels(level.labelKey)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -95,7 +99,7 @@ export function SkillsForm({ items = [], onChange }: SkillsFormProps) {
                 <SelectContent>
                   {SKILL_LEVELS.map(level => (
                     <SelectItem key={level.value} value={level.value}>
-                      {level.label}
+                      {tLevels(level.labelKey)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -113,7 +117,7 @@ export function SkillsForm({ items = [], onChange }: SkillsFormProps) {
         ))}
         {items.length === 0 && (
           <div className="text-muted-foreground text-sm text-center py-8 bg-muted/30 rounded-lg">
-            No skills added yet
+            {t('noItems')}
           </div>
         )}
       </div>

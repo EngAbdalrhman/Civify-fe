@@ -439,8 +439,35 @@
       "plansDesc": "Configure subscription plans that users can purchase",
       "tokensDesc": "Configure token packages that users can purchase for additional usage",
       "createPlan": "Create Plan",
+      "editPlan": "Edit Plan",
       "createPackage": "Create Package",
-      "popular": "Popular"
+      "popular": "Popular",
+      "form": {
+        "name": "Name",
+        "namePlaceholder": "e.g., Pro Plan",
+        "description": "Description",
+        "descriptionPlaceholder": "Brief description of the plan",
+        "monthlyPrice": "Monthly Price ($)",
+        "annualPrice": "Annual Price ($)",
+        "cvLimit": "CV Limit (empty = unlimited)",
+        "cvLimitPlaceholder": "Leave empty for unlimited",
+        "tokenLimit": "Token Limit (empty = unlimited)",
+        "tokenLimitPlaceholder": "Monthly AI token allowance",
+        "linkedGroup": "Linked Permission Group",
+        "linkedGroupPlaceholder": "Select a group (optional)",
+        "linkedGroupHint": "Users subscribing to this plan will inherit the group's permissions",
+        "none": "None",
+        "billingRestrictions": "Billing Restrictions",
+        "allowAnnualBilling": "Allow Annual Billing",
+        "allowRenewal": "Allow Renewal",
+        "maxBillingCycles": "Max Billing Cycles (empty = unlimited)",
+        "maxBillingCyclesPlaceholder": "e.g., 1 for one-time purchase",
+        "displaySettings": "Display Settings",
+        "featured": "Featured (Popular)",
+        "showWatermark": "Show Watermark",
+        "sortOrder": "Sort Order",
+        "update": "Update"
+      }
     },
     "plans": {
       "title": "Plan Management",
@@ -645,6 +672,18 @@
         "description": "Editable in Microsoft Word or Google Docs."
       },
       "tip": "Tip: Review your resume in the preview panel before downloading to ensure everything looks perfect."
+    },
+    "toasts": {
+      "enterTitle": "Please enter a title for your resume",
+      "saveSuccess": "Resume saved successfully",
+      "saveError": "Failed to save resume",
+      "resetInfo": "Resume reset to original state",
+      "uploadError": "Please upload a PDF or Word document",
+      "parseSuccess": "CV parsed successfully!",
+      "parseError": "Failed to parse CV. Please try again.",
+      "fullscreenError": "Fullscreen not supported",
+      "guestUpload": "Please sign in to upload a CV",
+      "loginAction": "Login"
     }
   },
   "editor": {
@@ -653,6 +692,87 @@
       "add": "Add Section",
       "rename": "Rename Section",
       "custom": "Custom"
+    },
+    "personalForm": {
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "John Doe",
+      "jobTitle": "Job Title",
+      "jobTitlePlaceholder": "Software Engineer",
+      "email": "Email",
+      "emailPlaceholder": "john@example.com",
+      "phone": "Phone",
+      "phonePlaceholder": "+1 234 567 890",
+      "address": "Address / Location",
+      "addressPlaceholder": "New York, NY",
+      "summary": "Summary",
+      "summaryPlaceholder": "Brief professional summary...",
+      "linkedin": "LinkedIn",
+      "linkedinPlaceholder": "linkedin.com/in/speedy",
+      "github": "GitHub",
+      "githubPlaceholder": "github.com/speedy",
+      "website": "Website",
+      "websitePlaceholder": "speedy.com"
+    },
+    "experience": {
+      "add": "Add Experience",
+      "company": "Company Name",
+      "companyPlaceholder": "Company Inc.",
+      "position": "Job Title",
+      "positionPlaceholder": "Senior Developer",
+      "location": "Location",
+      "locationPlaceholder": "Remote / City, Country",
+      "description": "Description",
+      "descriptionPlaceholder": "• Achieved X results...",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "present": "Present / Current"
+    },
+    "education": {
+      "add": "Add Education",
+      "school": "School / University",
+      "schoolPlaceholder": "Harvard University",
+      "degree": "Degree / Field",
+      "degreePlaceholder": "BSc Computer Science",
+      "location": "Location",
+      "locationPlaceholder": "Cambridge, MA",
+      "gpa": "GPA / Notes (Optional)",
+      "gpaPlaceholder": "GPA 3.8 / Honors",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "present": "Present / Currently studying"
+    },
+    "skills": {
+      "addPlaceholder": "Skill name...",
+      "noItems": "No skills added yet"
+    },
+    "languages": {
+      "addPlaceholder": "Language name...",
+      "noItems": "No languages added yet",
+      "none": "None",
+      "levels": {
+        "native": "Native",
+        "fluent": "Fluent",
+        "advanced": "Advanced",
+        "intermediate": "Intermediate",
+        "beginner": "Beginner"
+      }
+    },
+    "generic": {
+      "item": "Item",
+      "title": "Title *",
+      "titlePlaceholder": "e.g., Project Name, Course Title...",
+      "subtitle": "Subtitle / Organization",
+      "subtitlePlaceholder": "e.g., Role, Organization...",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "present": "Present / Ongoing",
+      "description": "Description",
+      "descriptionPlaceholder": "Brief description...",
+      "addItem": "Add Item",
+      "addSimplePlaceholder": "e.g. Reading, Chess, Photography...",
+      "noItems": "No items added yet",
+      "newItemTitle": "New item title...",
+      "add": "Add"
     },
     "dialog": {
       "title": "Add New Section",

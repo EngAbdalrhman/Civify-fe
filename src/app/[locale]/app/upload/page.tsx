@@ -567,7 +567,7 @@ export default function UploadPage() {
                   <Input 
                     value={resumeData.personalInfo.website || ''} 
                     onChange={(e) => updatePersonalInfo('website', e.target.value)}
-                    placeholder="yourwebsite.com"
+                    placeholder="speedy.com"
                   />
                 </div>
               </div>

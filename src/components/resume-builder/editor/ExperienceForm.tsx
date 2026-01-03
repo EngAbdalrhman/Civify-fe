@@ -88,6 +88,8 @@ function SortableExperienceItem({
     transition,
     isDragging,
   } = useSortable({ id: item.id });
+  
+  const t = useTranslations('editor.experience');
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -121,26 +123,26 @@ function SortableExperienceItem({
       <div className="pl-8">
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label>Company Name</Label>
+            <Label>{t('company')}</Label>
             <Input 
               value={item.title || ''} 
               onChange={e => updateItem(item.id, { title: e.target.value })} 
-              placeholder="Company Inc."
+              placeholder={t('companyPlaceholder')}
             />
           </div>
           <div className="space-y-2">
-            <Label>Job Title</Label>
+            <Label>{t('position')}</Label>
             <Input 
               value={item.subtitle || ''} 
               onChange={e => updateItem(item.id, { subtitle: e.target.value })} 
-              placeholder="Senior Developer"
+              placeholder={t('positionPlaceholder')}
             />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 mt-4">
           <div className="space-y-2">
-            <Label>Start Date</Label>
+            <Label>{t('startDate')}</Label>
             <Input 
               type="month"
               value={displayStartDate !== 'Present' ? displayStartDate : ''} 
@@ -148,7 +150,7 @@ function SortableExperienceItem({
             />
           </div>
           <div className="space-y-2">
-            <Label>End Date</Label>
+            <Label>{t('endDate')}</Label>
             <Input 
               type="month"
               value={isPresent ? '' : displayEndDate} 
@@ -164,27 +166,27 @@ function SortableExperienceItem({
                 }}
               />
               <Label htmlFor={`present-${item.id}`} className="text-xs text-muted-foreground cursor-pointer">
-                Present / Current
+                {t('present')}
               </Label>
             </div>
           </div>
         </div>
 
         <div className="space-y-2 mt-4">
-          <Label>Location</Label>
+          <Label>{t('location')}</Label>
           <Input 
             value={item.location || ''} 
             onChange={e => updateItem(item.id, { location: e.target.value })} 
-            placeholder="Remote / City, Country"
+            placeholder={t('locationPlaceholder')}
           />
         </div>
 
         <div className="space-y-2 mt-4">
-          <Label>Description</Label>
+          <Label>{t('description')}</Label>
           <Textarea 
             value={item.description || ''} 
             onChange={e => updateItem(item.id, { description: e.target.value })} 
-            placeholder="• Achieved X results..."
+            placeholder={t('descriptionPlaceholder')}
             className="min-h-[100px]"
           />
         </div>
@@ -193,7 +195,10 @@ function SortableExperienceItem({
   );
 }
 
+import { useTranslations } from 'next-intl';
+
 export function ExperienceForm({ items = [], onChange }: ExperienceFormProps) {
+  const t = useTranslations('editor.experience');
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -276,7 +281,7 @@ export function ExperienceForm({ items = [], onChange }: ExperienceFormProps) {
 
       <Button variant="outline" onClick={addItem} className="w-full border-dashed">
         <Plus className="h-4 w-4 mr-2" />
-        Add Experience
+        {t('add')}
       </Button>
     </div>
   );

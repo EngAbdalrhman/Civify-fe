@@ -14,7 +14,10 @@ interface EducationFormProps {
   onChange: (items: SectionItem[]) => void;
 }
 
+import { useTranslations } from 'next-intl';
+
 export function EducationForm({ items = [], onChange }: EducationFormProps) {
+  const t = useTranslations('editor.education');
   
   const addItem = () => {
     onChange([
@@ -64,26 +67,26 @@ export function EducationForm({ items = [], onChange }: EducationFormProps) {
 
           <div className="grid grid-cols-2 gap-4">
              <div className="space-y-2">
-              <Label>School / University</Label>
+              <Label>{t('school')}</Label>
               <Input 
                 value={item.title || ''} 
                 onChange={e => updateItem(item.id, { title: e.target.value })} 
-                placeholder="Harvard University"
+                placeholder={t('schoolPlaceholder')}
               />
             </div>
             <div className="space-y-2">
-              <Label>Degree / Field</Label>
+              <Label>{t('degree')}</Label>
               <Input 
                 value={item.subtitle || ''} 
                 onChange={e => updateItem(item.id, { subtitle: e.target.value })} 
-                placeholder="BSc Computer Science"
+                placeholder={t('degreePlaceholder')}
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
              <div className="space-y-2">
-              <Label>Start Date</Label>
+              <Label>{t('startDate')}</Label>
               <Input 
                 type="month"
                 value={item.startDate || ''} 
@@ -91,7 +94,7 @@ export function EducationForm({ items = [], onChange }: EducationFormProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label>End Date</Label>
+              <Label>{t('endDate')}</Label>
               <Input 
                 type="month"
                 value={item.endDate === 'Present' ? '' : (item.endDate || '')} 
@@ -107,27 +110,27 @@ export function EducationForm({ items = [], onChange }: EducationFormProps) {
                   }}
                 />
                 <Label htmlFor={`present-edu-${item.id}`} className="text-xs text-muted-foreground cursor-pointer">
-                  Present / Currently studying
+                  {t('present')}
                 </Label>
               </div>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label>Location</Label>
+            <Label>{t('location')}</Label>
             <Input 
               value={item.location || ''} 
               onChange={e => updateItem(item.id, { location: e.target.value })} 
-              placeholder="Cambridge, MA"
+              placeholder={t('locationPlaceholder')}
             />
           </div>
 
           <div className="space-y-2">
-            <Label>GPA / Notes (Optional)</Label>
+            <Label>{t('gpa')}</Label>
             <Input 
               value={item.description || ''} 
               onChange={e => updateItem(item.id, { description: e.target.value })} 
-              placeholder="GPA 3.8 / Honors"
+              placeholder={t('gpaPlaceholder')}
             />
           </div>
         </div>
@@ -135,7 +138,7 @@ export function EducationForm({ items = [], onChange }: EducationFormProps) {
 
       <Button variant="outline" onClick={addItem} className="w-full border-dashed">
         <Plus className="h-4 w-4 mr-2" />
-        Add Education
+        {t('add')}
       </Button>
     </div>
   );

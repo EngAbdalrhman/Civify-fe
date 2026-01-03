@@ -305,34 +305,34 @@ export function PlansManager() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingPlan ? 'Edit Plan' : 'Create Plan'}
+              {editingPlan ? t('editPlan') : t('createPlan')}
             </DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto">
             <div className="space-y-2">
-              <Label htmlFor="planName">Name *</Label>
+              <Label htmlFor="planName">{t('form.name')} *</Label>
               <Input
                 id="planName"
                 value={planFormData.name}
                 onChange={(e) => setPlanFormData({ ...planFormData, name: e.target.value })}
-                placeholder="e.g., Pro Plan"
+                placeholder={t('form.namePlaceholder')}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="planDescription">Description</Label>
+              <Label htmlFor="planDescription">{t('form.description')}</Label>
               <Textarea
                 id="planDescription"
                 value={planFormData.description}
                 onChange={(e) => setPlanFormData({ ...planFormData, description: e.target.value })}
-                placeholder="Brief description of the plan"
+                placeholder={t('form.descriptionPlaceholder')}
               />
             </div>
             
             {/* Pricing */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="monthlyPrice">Monthly Price ($) *</Label>
+                <Label htmlFor="monthlyPrice">{t('form.monthlyPrice')} *</Label>
                 <Input
                   id="monthlyPrice"
                   type="number"
@@ -341,7 +341,7 @@ export function PlansManager() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="annualPrice">Annual Price ($) *</Label>
+                <Label htmlFor="annualPrice">{t('form.annualPrice')} *</Label>
                 <Input
                   id="annualPrice"
                   type="number"
@@ -354,39 +354,39 @@ export function PlansManager() {
             {/* Limits */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="cvLimit">CV Limit (empty = unlimited)</Label>
+                <Label htmlFor="cvLimit">{t('form.cvLimit')}</Label>
                 <Input
                   id="cvLimit"
                   type="number"
                   value={planFormData.cvLimit}
                   onChange={(e) => setPlanFormData({ ...planFormData, cvLimit: e.target.value })}
-                  placeholder="Leave empty for unlimited"
+                  placeholder={t('form.cvLimitPlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="tokenLimit">Token Limit (empty = unlimited)</Label>
+                <Label htmlFor="tokenLimit">{t('form.tokenLimit')}</Label>
                 <Input
                   id="tokenLimit"
                   type="number"
                   value={planFormData.tokenLimit}
                   onChange={(e) => setPlanFormData({ ...planFormData, tokenLimit: e.target.value })}
-                  placeholder="Monthly AI token allowance"
+                  placeholder={t('form.tokenLimitPlaceholder')}
                 />
               </div>
             </div>
             
             {/* Linked Group */}
             <div className="space-y-2">
-              <Label htmlFor="linkedGroupId">Linked Permission Group</Label>
+              <Label htmlFor="linkedGroupId">{t('form.linkedGroup')}</Label>
               <Select 
                 value={planFormData.linkedGroupId || 'none'} 
                 onValueChange={(value) => setPlanFormData({ ...planFormData, linkedGroupId: value === 'none' ? '' : value })}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a group (optional)" />
+                  <SelectValue placeholder={t('form.linkedGroupPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">None</SelectItem>
+                  <SelectItem value="none">{t('form.none')}</SelectItem>
                   {groups.map((group) => (
                     <SelectItem key={group.id} value={group.id.toString()}>
                       {group.name}
@@ -395,13 +395,13 @@ export function PlansManager() {
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                Users subscribing to this plan will inherit the group's permissions
+                {t('form.linkedGroupHint')}
               </p>
             </div>
             
             {/* Billing Restrictions */}
             <div className="space-y-3 p-3 border rounded-lg bg-muted/30">
-              <h4 className="text-sm font-medium">Billing Restrictions</h4>
+              <h4 className="text-sm font-medium">{t('form.billingRestrictions')}</h4>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center space-x-2">
                   <Switch
@@ -409,7 +409,7 @@ export function PlansManager() {
                     checked={planFormData.allowAnnualBilling}
                     onCheckedChange={(checked) => setPlanFormData({ ...planFormData, allowAnnualBilling: checked })}
                   />
-                  <Label htmlFor="allowAnnual" className="text-sm">Allow Annual Billing</Label>
+                  <Label htmlFor="allowAnnual" className="text-sm">{t('form.allowAnnualBilling')}</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Switch
@@ -417,17 +417,17 @@ export function PlansManager() {
                     checked={planFormData.renewalAllowed}
                     onCheckedChange={(checked) => setPlanFormData({ ...planFormData, renewalAllowed: checked })}
                   />
-                  <Label htmlFor="renewal" className="text-sm">Allow Renewal</Label>
+                  <Label htmlFor="renewal" className="text-sm">{t('form.allowRenewal')}</Label>
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="maxBillingCycles" className="text-sm">Max Billing Cycles (empty = unlimited)</Label>
+                <Label htmlFor="maxBillingCycles" className="text-sm">{t('form.maxBillingCycles')}</Label>
                 <Input
                   id="maxBillingCycles"
                   type="number"
                   value={planFormData.maxBillingCycles}
                   onChange={(e) => setPlanFormData({ ...planFormData, maxBillingCycles: e.target.value })}
-                  placeholder="e.g., 1 for one-time purchase"
+                  placeholder={t('form.maxBillingCyclesPlaceholder')}
                   className="h-8"
                 />
               </div>
@@ -435,7 +435,7 @@ export function PlansManager() {
             
             {/* Display Settings */}
             <div className="space-y-3 p-3 border rounded-lg bg-muted/30">
-              <h4 className="text-sm font-medium">Display Settings</h4>
+              <h4 className="text-sm font-medium">{t('form.displaySettings')}</h4>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center space-x-2">
                   <Switch
@@ -443,7 +443,7 @@ export function PlansManager() {
                     checked={planFormData.isFeatured}
                     onCheckedChange={(checked) => setPlanFormData({ ...planFormData, isFeatured: checked })}
                   />
-                  <Label htmlFor="featured" className="text-sm">Featured (Popular)</Label>
+                  <Label htmlFor="featured" className="text-sm">{t('form.featured')}</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Switch
@@ -451,11 +451,11 @@ export function PlansManager() {
                     checked={planFormData.watermark}
                     onCheckedChange={(checked) => setPlanFormData({ ...planFormData, watermark: checked })}
                   />
-                  <Label htmlFor="watermark" className="text-sm">Show Watermark</Label>
+                  <Label htmlFor="watermark" className="text-sm">{t('form.showWatermark')}</Label>
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="sortOrder" className="text-sm">Sort Order</Label>
+                <Label htmlFor="sortOrder" className="text-sm">{t('form.sortOrder')}</Label>
                 <Input
                   id="sortOrder"
                   type="number"
@@ -469,11 +469,11 @@ export function PlansManager() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsPlanDialogOpen(false)}>
-              Cancel
+              {tc('cancel')}
             </Button>
             <Button onClick={handleSavePlan} disabled={isSavingPlan}>
               {isSavingPlan && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {editingPlan ? 'Update' : 'Create'}
+              {editingPlan ? t('form.update') : t('createPlan')}
             </Button>
           </DialogFooter>
         </DialogContent>
