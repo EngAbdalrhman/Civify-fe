@@ -392,6 +392,14 @@ class AdminService {
   // Promo Codes (Client-side filtering)
   // ==========================================
 
+  async filterPromoCodes(data: InputDataModel): Promise<PagedResponse<PromoCode>> {
+    const response = await apiClient.post<ApiResponse<PagedResponse<PromoCode>>>(
+      `${ADMIN_API.PROMO_CODES}/filter`,
+      data
+    );
+    return response.data.data;
+  }
+
   async getAllPromoCodes(): Promise<PromoCode[]> {
     const inputData: InputDataModel = {
       filters: [],

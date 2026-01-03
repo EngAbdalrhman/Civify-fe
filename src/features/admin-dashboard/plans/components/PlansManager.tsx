@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -51,6 +52,8 @@ function getPlanIcon(name: string) {
 }
 
 export function PlansManager() {
+  const t = useTranslations('admin.billing');
+  const tc = useTranslations('admin.common');
   const { hasPermission } = usePermissions();
   
   const canModifyPlans = hasPermission(ADMIN_ACTION_PERMISSIONS.PLAN_EDIT);
@@ -213,12 +216,12 @@ export function PlansManager() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <p className="text-sm text-muted-foreground">
-          Configure subscription plans that users can purchase
+          {t('plansDesc')}
         </p>
         {canModifyPlans && (
           <Button onClick={handleCreatePlan}>
-            <Plus className="h-4 w-4 mr-2" />
-            Create Plan
+            <Plus className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
+            {t('createPlan')}
           </Button>
         )}
       </div>
@@ -252,10 +255,10 @@ export function PlansManager() {
                 </div>
                 <div className="flex gap-1">
                   {plan.isFeatured && (
-                    <Badge variant="default" className="text-xs">Popular</Badge>
+                    <Badge variant="default" className="text-xs">{t('popular')}</Badge>
                   )}
                   <Badge variant={plan.active ? 'secondary' : 'destructive'} className="text-xs">
-                    {plan.active ? 'Active' : 'Inactive'}
+                    {plan.active ? tc('active') : tc('inactive')}
                   </Badge>
                 </div>
               </div>
@@ -268,8 +271,8 @@ export function PlansManager() {
               {canModifyPlans && (
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" onClick={() => handleEditPlan(plan)}>
-                    <Edit2 className="h-3 w-3 mr-1" />
-                    Edit
+                    <Edit2 className="h-3 w-3 ltr:mr-1 rtl:ml-1" />
+                    {tc('edit')}
                   </Button>
                   <Button 
                     variant="outline" 
@@ -277,9 +280,9 @@ export function PlansManager() {
                     onClick={() => handleTogglePlanActive(plan)}
                   >
                     {plan.active ? (
-                      <><PowerOff className="h-3 w-3 mr-1" />Deactivate</>
+                      <><PowerOff className="h-3 w-3 ltr:mr-1 rtl:ml-1" />{tc('deactivate')}</>
                     ) : (
-                      <><Power className="h-3 w-3 mr-1" />Activate</>
+                      <><Power className="h-3 w-3 ltr:mr-1 rtl:ml-1" />{tc('activate')}</>
                     )}
                   </Button>
                   <Button 
