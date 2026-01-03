@@ -1,7 +1,8 @@
 "use client";
 
 import { Upload, FileText, Sparkles, Download } from "lucide-react";
-import { howItWorksSteps } from "../data";
+
+import { useTranslations } from "next-intl";
 
 const iconMap = {
   Upload,
@@ -11,16 +12,24 @@ const iconMap = {
 };
 
 export function HowItWorksSection() {
+  const t = useTranslations('landing.howItWorks');
+  const steps = [
+    { step: 1, icon: 'Upload', key: 'step1' },
+    { step: 2, icon: 'FileText', key: 'step2' },
+    { step: 3, icon: 'Sparkles', key: 'step3' },
+    { step: 4, icon: 'Download', key: 'step4' }
+  ];
+
   return (
     <section className="py-20 md:py-32">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="mx-auto mb-16 max-w-3xl text-center">
           <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-            How Civify Works
+            {t('title')}
           </h2>
           <p className="text-lg text-muted-foreground">
-            From upload to download in just 4 simple steps
+            {t('subtitle')}
           </p>
         </div>
 
@@ -30,7 +39,7 @@ export function HowItWorksSection() {
           <div className="absolute left-8 top-12 hidden h-[calc(100%-6rem)] w-0.5 bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 md:block md:left-1/2 md:-translate-x-1/2" />
 
           <div className="space-y-12 md:space-y-20">
-            {howItWorksSteps.map((step, index) => {
+            {steps.map((step, index) => {
               const Icon = iconMap[step.icon as keyof typeof iconMap];
               const isEven = index % 2 === 0;
 
@@ -51,8 +60,8 @@ export function HowItWorksSection() {
                       <div className="mb-2 text-sm font-semibold text-primary">
                         Step {step.step}
                       </div>
-                      <h3 className="mb-3 text-2xl font-bold">{step.title}</h3>
-                      <p className="text-muted-foreground">{step.description}</p>
+                      <h3 className="mb-3 text-2xl font-bold">{t(`steps.${step.key}.title`)}</h3>
+                      <p className="text-muted-foreground">{t(`steps.${step.key}.description`)}</p>
                     </div>
                   </div>
 

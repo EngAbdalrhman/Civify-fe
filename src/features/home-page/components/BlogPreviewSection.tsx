@@ -4,27 +4,30 @@ import { ArrowRight, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/routing";
-import { blogPosts } from "../data";
+import { useTranslations } from "next-intl";
 
 export function BlogPreviewSection() {
+  const t = useTranslations('landing.blog');
+  const postKeys = ['post1', 'post2', 'post3'];
+
   return (
     <section className="bg-gradient-to-b from-blue-50/30 to-background py-20 dark:from-gray-900 dark:to-background md:py-32">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="mx-auto mb-16 max-w-3xl text-center">
           <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-            Career Resources
+            {t('title')}
           </h2>
           <p className="text-lg text-muted-foreground">
-            Expert tips and guides to boost your job search
+            {t('subtitle')}
           </p>
         </div>
 
         {/* Blog Posts Grid */}
         <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-3">
-          {blogPosts.map((post) => (
+          {postKeys.map((key) => (
             <Card
-              key={post.id}
+              key={key}
               className="group overflow-hidden border-2 transition-all duration-300 hover:border-primary hover:shadow-xl hover:shadow-primary/10"
             >
               <CardContent className="p-0">
@@ -46,25 +49,25 @@ export function BlogPreviewSection() {
                   {/* Read Time */}
                   <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
                     <Clock className="h-4 w-4" />
-                    <span>{post.readTime}</span>
+                    <span>{t(`posts.${key}.readTime`)}</span>
                   </div>
 
                   {/* Title */}
                   <h3 className="mb-3 text-xl font-bold line-clamp-2 group-hover:text-primary transition-colors">
-                    {post.title}
+                    {t(`posts.${key}.title`)}
                   </h3>
 
                   {/* Excerpt */}
                   <p className="mb-4 text-sm text-muted-foreground line-clamp-3">
-                    {post.excerpt}
+                    {t(`posts.${key}.excerpt`)}
                   </p>
 
                   {/* Read More */}
                   <Link
-                    href={`/blog/${post.slug}`}
+                    href={`/blog/${t(`posts.${key}.slug`)}`}
                     className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
                   >
-                    Read more
+                    {t('readMore')}
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </div>
@@ -77,7 +80,7 @@ export function BlogPreviewSection() {
         <div className="mt-12 text-center">
           <Button asChild variant="outline" size="lg">
             <Link href="/blog">
-              View All Articles
+              {t('viewAll')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
