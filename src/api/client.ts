@@ -39,16 +39,16 @@ const clearAuthAndRedirect = () => {
     console.log("[Auth] Clearing tokens");
     localStorage.removeItem("auth_token");
     localStorage.removeItem("refresh_token");
-    
+
     // Check if we are on a public page where we shouldn't redirect
     const path = window.location.pathname;
-    
+
     // Whitelist of paths that should NOT redirect to login on 401
     // Includes landing page (/), legacy upload (/app/upload), and plans (/plans)
     // Also include locale prefixes
-    const isPublicPage = 
-      path === "/" || 
-      path === "/en" || 
+    const isPublicPage =
+      path === "/" ||
+      path === "/en" ||
       path === "/ar" ||
       path.includes("/plans") ||
       path.includes("/app/upload");
@@ -81,11 +81,6 @@ apiClient.interceptors.request.use(
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
-
-      // Add Accept-Language header based on current locale from URL
-      const pathLocale = window.location.pathname.split('/')[1];
-      const locale = ['en', 'ar'].includes(pathLocale) ? pathLocale : 'en';
-      config.headers['Accept-Language'] = locale;
     }
 
     return config;
@@ -106,7 +101,7 @@ apiClient.interceptors.response.use(
     if (data?.refreshToken && typeof window !== "undefined") {
       localStorage.setItem("refresh_token", data.refreshToken);
     }
-    
+
     // Also check Authorization header (legacy support)
     const authHeader = response.headers["authorization"];
     if (authHeader && typeof window !== "undefined") {
@@ -118,17 +113,26 @@ apiClient.interceptors.response.use(
     return response;
   },
   async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+    };
 
     // Handle 401 Unauthorized
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
-      const errorCode = (error.response?.data as { errorCode?: string })?.errorCode;
-      
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry
+    ) {
+      const errorCode = (error.response?.data as { errorCode?: string })
+        ?.errorCode;
+
       // Skip refresh for email verification errors - let component handle it
       if (errorCode === "AUTH_001") {
         return Promise.reject({
           status: error.response?.status,
-          message: (error.response?.data as { message?: string })?.message || "Email not verified",
+          message:
+            (error.response?.data as { message?: string })?.message ||
+            "Email not verified",
           errorCode,
           data: error.response?.data,
         });
@@ -137,7 +141,9 @@ apiClient.interceptors.response.use(
       // Skip refresh for login/refresh endpoints themselves
       const url = originalRequest.url || "";
       if (url.includes("/login") || url.includes("/auth/refresh")) {
-        console.log("[Auth] 401 on login/refresh endpoint, redirecting to login");
+        console.log(
+          "[Auth] 401 on login/refresh endpoint, redirecting to login"
+        );
         clearAuthAndRedirect();
         return Promise.reject(error);
       }
@@ -162,9 +168,10 @@ apiClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const refreshToken = typeof window !== "undefined" 
-          ? localStorage.getItem("refresh_token") 
-          : null;
+        const refreshToken =
+          typeof window !== "undefined"
+            ? localStorage.getItem("refresh_token")
+            : null;
 
         if (!refreshToken) {
           console.log("[Auth] No refresh token available");
@@ -172,7 +179,7 @@ apiClient.interceptors.response.use(
         }
 
         console.log("[Auth] Attempting token refresh...");
-        
+
         // Call refresh endpoint
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
@@ -204,7 +211,11 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         console.log("[Auth] Token refresh failed:", refreshError);
         isRefreshing = false;
-        onTokenRefreshFailed(refreshError instanceof Error ? refreshError : new Error("Refresh failed"));
+        onTokenRefreshFailed(
+          refreshError instanceof Error
+            ? refreshError
+            : new Error("Refresh failed")
+        );
         clearAuthAndRedirect();
         return Promise.reject(refreshError);
       }

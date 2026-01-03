@@ -1,27 +1,27 @@
-'use client';
+"use client";
 
-import { useTranslations } from 'next-intl';
-import { Button } from '@/components/ui/button';
-import { Check, Loader2 } from 'lucide-react';
-import { Link, useRouter } from '@/i18n/routing';
-import { usePlans } from '@/features/plans/hooks/usePlans';
-import { Badge } from '@/components/ui/badge';
+import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+import { Check, Loader2 } from "lucide-react";
+import { useRouter } from "@/i18n/routing";
+import { usePlans } from "@/features/plans/hooks/usePlans";
+import { Badge } from "@/components/ui/badge";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export default function PlansPage() {
-  const t = useTranslations('plans');
+  const t = useTranslations("plans");
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { displayPlans, isLoading, error, isAnnual, setIsAnnual } = usePlans();
 
   useEffect(() => {
-    setIsAuthenticated(!!localStorage.getItem('auth_token'));
+    setIsAuthenticated(!!localStorage.getItem("auth_token"));
   }, []);
 
   const handlePlanSelect = (ctaLink: string) => {
     // If it's a signup link (free plan), just go there
-    if (ctaLink.startsWith('/signup')) {
+    if (ctaLink.startsWith("/signup")) {
       router.push(ctaLink);
       return;
     }
@@ -48,9 +48,9 @@ export default function PlansPage() {
   if (error) {
     return (
       <div className="py-20 px-4 text-center">
-        <p className="text-destructive">{t('errorLoading')}</p>
+        <p className="text-destructive">{t("errorLoading")}</p>
         <Button onClick={() => window.location.reload()} className="mt-4">
-          {t('retry')}
+          {t("retry")}
         </Button>
       </div>
     );
@@ -59,7 +59,9 @@ export default function PlansPage() {
   return (
     <div className="py-20 px-4">
       <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">{t('title')}</h1>
+        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+          {t("title")}
+        </h1>
         <p className="text-xl text-muted-foreground">
           Choose the perfect plan for your career journey
         </p>
@@ -84,17 +86,20 @@ export default function PlansPage() {
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            Yearly <span className="text-xs text-green-600 font-bold">(Save 20%)</span>
+            Yearly{" "}
+            <span className="text-xs text-green-600 font-bold">(Save 20%)</span>
           </button>
         </div>
       </div>
 
       <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
         {displayPlans.map((plan) => (
-          <div 
-            key={plan.id} 
+          <div
+            key={plan.id}
             className={`relative rounded-2xl border p-8 shadow-sm flex flex-col ${
-              plan.highlighted ? 'border-primary ring-1 ring-primary shadow-lg scale-105 bg-primary/5' : 'bg-card'
+              plan.highlighted
+                ? "border-primary ring-1 ring-primary shadow-lg scale-105 bg-primary/5"
+                : "bg-card"
             }`}
           >
             {plan.highlighted && (
@@ -102,13 +107,19 @@ export default function PlansPage() {
                 Most Popular
               </Badge>
             )}
-            
+
             <div className="mb-8">
               <h3 className="text-xl font-bold">{plan.name}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{plan.description}</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {plan.description}
+              </p>
               <div className="mt-4 flex items-baseline">
-                <span className="text-4xl font-bold tracking-tight">${plan.price}</span>
-                <span className="ml-1 text-muted-foreground">/{plan.period}</span>
+                <span className="text-4xl font-bold tracking-tight">
+                  ${plan.price}
+                </span>
+                <span className="ml-1 text-muted-foreground">
+                  /{plan.period}
+                </span>
               </div>
             </div>
 
@@ -121,9 +132,9 @@ export default function PlansPage() {
               ))}
             </ul>
 
-            <Button 
-              className="w-full" 
-              variant={plan.highlighted ? 'default' : 'outline'}
+            <Button
+              className="w-full"
+              variant={plan.highlighted ? "default" : "outline"}
               size="lg"
               onClick={() => handlePlanSelect(plan.ctaLink)}
             >
@@ -157,7 +168,10 @@ export default function PlansPage() {
             //   a: "We offer a 14-day money-back guarantee if you are not satisfied with our service.",
             // },
           ].map((faq, i) => (
-            <div key={i} className="rounded-lg border bg-card p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div
+              key={i}
+              className="rounded-lg border bg-card p-6 shadow-sm hover:shadow-md transition-shadow"
+            >
               <h4 className="text-lg font-medium mb-2">{faq.q}</h4>
               <p className="text-muted-foreground">{faq.a}</p>
             </div>
@@ -169,11 +183,17 @@ export default function PlansPage() {
       <div className="text-center mt-16 text-muted-foreground text-sm">
         <p>Prices are in USD. Local taxes may apply.</p>
         <div className="mt-4 flex justify-center gap-4">
-          <a href="#" className="hover:text-foreground">Terms of Service</a>
+          <a href="#" className="hover:text-foreground">
+            Terms of Service
+          </a>
           <span>•</span>
-          <a href="#" className="hover:text-foreground">Privacy Policy</a>
+          <a href="#" className="hover:text-foreground">
+            Privacy Policy
+          </a>
           <span>•</span>
-          <a href="#" className="hover:text-foreground">Contact Support</a>
+          <a href="#" className="hover:text-foreground">
+            Contact Support
+          </a>
         </div>
       </div>
     </div>
