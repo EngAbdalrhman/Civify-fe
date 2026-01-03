@@ -11,6 +11,7 @@ import {
   IntegrationsSection,
   BlogPreviewSection,
   CTASection,
+  ResumeBuilderSection,
 } from "@/features/home-page/components";
 
 const Homepage = () => {
@@ -18,6 +19,7 @@ const Homepage = () => {
     <>
       <HeroSection />
       <HowItWorksSection />
+      <ResumeBuilderSection />
       <FeaturesSection />
       <BeforeAfterSection />
       {/* <TemplatesSection /> */}
