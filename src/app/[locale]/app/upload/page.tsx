@@ -67,6 +67,9 @@ import {
 } from '@/features/upload-cv/types';
 import { exportToPdf, exportToDocx } from '@/features/upload-cv/utils/exportCv';
 import { useRouter } from 'next/navigation';
+import { ResumeService } from '@/services/resume.service';
+import { JobApplicationService } from '@/services/job-application.service';
+import { Save, Bookmark } from 'lucide-react';
 
 export default function UploadPage() {
   const t = useTranslations('upload');
@@ -88,6 +91,11 @@ export default function UploadPage() {
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
   const [showTokenLimitModal, setShowTokenLimitModal] = useState(false);
+  const [jobDescriptionError, setJobDescriptionError] = useState('');
+  const [isSavingResume, setIsSavingResume] = useState(false);
+  const [isTrackingApplication, setIsTrackingApplication] = useState(false);
+  const [savedResumeId, setSavedResumeId] = useState<string | null>(null);
+  const [trackedApplicationId, setTrackedApplicationId] = useState<number | null>(null);
   
   // API Hooks
   const { mutate: uploadCv, isPending: isUploading } = useUploadCv();
@@ -170,12 +178,62 @@ export default function UploadPage() {
     }
   }, [tailorResponse]);
 
+  // Save tailored CV to My Resumes
+  const handleSaveToResumes = useCallback(async () => {
+    if (!tailorResponse?.tailoredCv) return;
+    
+    setIsSavingResume(true);
+    try {
+      const title = `${tailorResponse.tailoredCv.personalInfo.fullName || 'My CV'} - ${jobTitle || 'Tailored'}`;
+      const saved = await ResumeService.create(title, tailorResponse.tailoredCv);
+      setSavedResumeId(saved.id);
+      toast.success('CV saved to My Resumes!');
+    } catch (error) {
+      console.error('Save to resumes failed:', error);
+      toast.error('Failed to save CV. Please try again.');
+    } finally {
+      setIsSavingResume(false);
+    }
+  }, [tailorResponse, jobTitle]);
+
+  // Track as Job Application
+  const handleTrackApplication = useCallback(async () => {
+    if (!tailorResponse) return;
+    
+    setIsTrackingApplication(true);
+    try {
+      const application = await JobApplicationService.create({
+        jobTitle: jobTitle || 'Unknown Position',
+        company: companyName || 'Unknown Company',
+        jobDescription: jobDescription,
+        tailoredCV: JSON.stringify(tailorResponse.tailoredCv),
+        coverLetter: tailorResponse.coverLetter || undefined,
+        applicationStatus: 'draft',
+      });
+      setTrackedApplicationId(application.id);
+      toast.success('Added to Job Tracker!');
+    } catch (error) {
+      console.error('Track application failed:', error);
+      toast.error('Failed to track application. Please try again.');
+    } finally {
+      setIsTrackingApplication(false);
+    }
+  }, [tailorResponse, jobTitle, companyName, jobDescription]);
+
   const handleGenerate = useCallback(() => {
     if (!resumeData) return;
-    if (!jobDescription.trim()) {
-      toast.error('Please enter a job description');
+    
+    // Validate job description
+    const trimmedDesc = jobDescription.trim();
+    if (!trimmedDesc) {
+      setJobDescriptionError('Job description is required');
       return;
     }
+    if (trimmedDesc.length < 50) {
+      setJobDescriptionError('Job description must be at least 50 characters for accurate tailoring');
+      return;
+    }
+    setJobDescriptionError('');
     
     tailorCv({
       resumeData,
@@ -851,10 +909,19 @@ export default function UploadPage() {
                 <Label>Job Description *</Label>
                 <Textarea 
                   value={jobDescription}
-                  onChange={(e) => setJobDescription(e.target.value)}
+                  onChange={(e) => {
+                    setJobDescription(e.target.value);
+                    if (jobDescriptionError) setJobDescriptionError('');
+                  }}
                   placeholder="Paste the full job description here..."
-                  className="min-h-[200px]"
+                  className={`min-h-[200px] ${jobDescriptionError ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                 />
+                {jobDescriptionError && (
+                  <p className="text-sm text-red-500">{jobDescriptionError}</p>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  {jobDescription.length}/50 characters minimum
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -903,7 +970,7 @@ export default function UploadPage() {
             <Button variant="outline" onClick={() => setCurrentStep(2)}>
               <ArrowLeft className="mr-2 h-4 w-4" /> Back
             </Button>
-            <Button onClick={handleGenerate} disabled={isTailoring || !jobDescription.trim()}>
+            <Button onClick={handleGenerate} disabled={isTailoring || jobDescription.trim().length < 50}>
               {isTailoring ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -957,6 +1024,31 @@ export default function UploadPage() {
                     >
                       <Download className="mr-2 h-4 w-4" />
                       {isExportingDocx ? 'Exporting DOCX...' : 'Download DOCX'}
+                    </Button>
+                  </div>
+                  
+                  <Separator className="my-3" />
+                  
+                  <div className="space-y-2">
+                    <Button 
+                      variant="outline" 
+                      className="w-full" 
+                      size="sm"
+                      onClick={handleSaveToResumes}
+                      disabled={isSavingResume || !!savedResumeId}
+                    >
+                      <Save className="mr-2 h-4 w-4" />
+                      {savedResumeId ? 'Saved to Resumes' : isSavingResume ? 'Saving...' : 'Save to My Resumes'}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full" 
+                      size="sm"
+                      onClick={handleTrackApplication}
+                      disabled={isTrackingApplication || !!trackedApplicationId}
+                    >
+                      <Bookmark className="mr-2 h-4 w-4" />
+                      {trackedApplicationId ? 'Added to Tracker' : isTrackingApplication ? 'Adding...' : 'Track Application'}
                     </Button>
                   </div>
                 </CardContent>
