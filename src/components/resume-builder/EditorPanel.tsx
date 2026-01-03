@@ -320,9 +320,8 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
     }
   };
 
-  // Helper to get translated label for section types
   const getSectionTypeLabel = (type: string) => {
-    if (type === 'custom') return tResume('projects'); 
+    if (type === 'custom') return t('sections.custom'); 
     return tResume(type as any) || type;
   };
 
@@ -406,7 +405,7 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
                     <SelectItem key={type.value} value={type.value}>
                       <div className="flex items-center gap-2">
                         {getIcon(type.value)}
-                        {type.value === 'custom' ? 'Custom' : tResume(type.value as any)}
+                        {type.value === 'custom' ? t('sections.custom') : tResume(type.value as any)}
                       </div>
                     </SelectItem>
                   ))}
