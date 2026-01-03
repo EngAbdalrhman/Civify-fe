@@ -117,14 +117,87 @@
   },
   "upload": {
     "title": "Tailor CV",
+    "pageTitle": "Build Your ATS-Friendly CV",
+    "pageSubtitle": "Upload your current CV, review the extracted data, and let AI tailor it to your dream job.",
     "dragDrop": "Drag and drop your CV here",
-    "or": "or",
+    "or": "Or",
     "browse": "Browse Files",
+    "selectFile": "Select File",
+    "addManually": "Add Details Manually",
     "supportedFormats": "Supported formats: PDF, DOC, DOCX",
     "maxSize": "Maximum file size: 5MB",
     "processing": "Processing your CV...",
+    "analyzing": "Analyzing...",
     "success": "CV uploaded successfully!",
-    "authRequired": "Please sign in to upload and tailor your CV"
+    "authRequired": "Please sign in to upload and tailor your CV",
+    "uploadCv": "Upload your CV",
+    "uploadCvDesc": "Drag and drop a PDF or DOCX file, or click to browse. We'll extract your details automatically.",
+    "steps": {
+      "uploadCv": "Upload CV",
+      "reviewData": "Review Data",
+      "generate": "Generate",
+      "result": "Result"
+    },
+    "personalInfo": {
+      "title": "Personal Information",
+      "subtitle": "Your contact details (required fields marked with *)",
+      "fullName": "Full Name",
+      "email": "Email",
+      "phone": "Phone",
+      "jobTitle": "Job Title",
+      "summary": "Professional Summary",
+      "summaryPlaceholder": "Brief overview of your experience and skills...",
+      "linkedin": "LinkedIn",
+      "github": "GitHub",
+      "website": "Website"
+    },
+    "sections": {
+      "skills": "Skills",
+      "skillsPlaceholder": "Java, Spring Boot, Angular, TypeScript, React...",
+      "noItems": "No items yet. Click \"Add\" to add your",
+      "add": "Add"
+    },
+    "jobDetails": {
+      "title": "Job Details",
+      "subtitle": "Paste the job description to tailor your CV",
+      "jobTitle": "Job Title (optional)",
+      "jobTitlePlaceholder": "e.g., Senior Software Engineer",
+      "company": "Company Name (optional)",
+      "companyPlaceholder": "e.g., Google",
+      "description": "Job Description",
+      "descriptionPlaceholder": "Paste the job description here...",
+      "descriptionRequired": "Job description is required",
+      "descriptionMinLength": "Job description must be at least 50 characters for accurate tailoring"
+    },
+    "options": {
+      "title": "Additional Options",
+      "coverLetter": "Generate Cover Letter",
+      "coverLetterDesc": "AI-generated cover letter tailored to the job",
+      "interviewQuestions": "Interview Prep Questions",
+      "interviewDesc": "Practice questions based on your CV and the job",
+      "roadmap": "Learning Roadmap",
+      "roadmapDesc": "Skills gap analysis and recommended courses"
+    },
+    "actions": {
+      "back": "Back",
+      "next": "Next",
+      "generate": "Generate Tailored CV",
+      "generating": "Generating...",
+      "downloadPdf": "Download PDF",
+      "downloadDocx": "Download DOCX",
+      "saveToResumes": "Save to My Resumes",
+      "trackApplication": "Track Application",
+      "startOver": "Start Over"
+    },
+    "result": {
+      "title": "Your Tailored CV",
+      "matchScore": "Match Score",
+      "atsScore": "ATS Score",
+      "suggestions": "Improvement Suggestions",
+      "coverLetter": "Cover Letter",
+      "interviewPrep": "Interview Prep",
+      "roadmap": "Learning Roadmap"
+    }
   },
   "plans": {
     "title": "Choose Your Plan",

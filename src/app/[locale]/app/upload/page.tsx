@@ -379,10 +379,10 @@ export default function UploadPage() {
   }, [tailorResponse]);
 
   const steps = [
-    { id: 1, title: 'Upload CV', icon: UploadCloud },
-    { id: 2, title: 'Review Data', icon: FileText },
-    { id: 3, title: 'Generate', icon: Sparkles },
-    { id: 4, title: 'Result', icon: CheckCircle2 },
+    { id: 1, title: t('steps.uploadCv'), icon: UploadCloud },
+    { id: 2, title: t('steps.reviewData'), icon: FileText },
+    { id: 3, title: t('steps.generate'), icon: Sparkles },
+    { id: 4, title: t('steps.result'), icon: CheckCircle2 },
   ];
 
   // Get score color
@@ -402,9 +402,9 @@ export default function UploadPage() {
     <div className='max-w-7xl mx-auto space-y-6 pb-12'>
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Build Your ATS-Friendly CV</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t('pageTitle')}</h1>
         <p className="text-muted-foreground mt-2">
-          Upload your current CV, review the extracted data, and let AI tailor it to your dream job.
+          {t('pageSubtitle')}
         </p>
       </div>
 
@@ -441,9 +441,9 @@ export default function UploadPage() {
                 <UploadCloud className="w-12 h-12 text-primary" />
               </div>
               <div className="space-y-2">
-                <h3 className="text-xl font-semibold">Upload your CV</h3>
+                <h3 className="text-xl font-semibold">{t('uploadCv')}</h3>
                 <p className="text-sm text-muted-foreground max-w-sm">
-                  Drag and drop a PDF or DOCX file, or click to browse. We'll extract your details automatically.
+                  {t('uploadCvDesc')}
                 </p>
               </div>
               <input
@@ -460,11 +460,11 @@ export default function UploadPage() {
               >
                 {isUploading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Analyzing...
+                    <Loader2 className="ltr:mr-2 rtl:ml-2 h-4 w-4 animate-spin" />
+                    {t('analyzing')}
                   </>
                 ) : (
-                  'Select File'
+                  t('selectFile')
                 )}
               </Button>
             </CardContent>
@@ -475,7 +475,7 @@ export default function UploadPage() {
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or</span>
+              <span className="bg-background px-2 text-muted-foreground">{t('or')}</span>
             </div>
           </div>
 
@@ -485,11 +485,11 @@ export default function UploadPage() {
             size="lg"
             onClick={handleManualEntry}
           >
-            <FileEdit className="mr-2 h-4 w-4" />
-            Add Details Manually
+            <FileEdit className="ltr:mr-2 rtl:ml-2 h-4 w-4" />
+            {t('addManually')}
           </Button>
         </div>
-      )}
+      )}  
 
       {/* Step 2: Review/Edit Data */}
       {currentStep === 2 && resumeData && (
@@ -497,13 +497,13 @@ export default function UploadPage() {
           {/* Personal Info */}
           <Card>
             <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
-              <CardDescription>Your contact details (required fields marked with *)</CardDescription>
+              <CardTitle>{t('personalInfo.title')}</CardTitle>
+              <CardDescription>{t('personalInfo.subtitle')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Full Name *</Label>
+                  <Label>{t('personalInfo.fullName')} *</Label>
                   <Input 
                     value={resumeData.personalInfo.fullName} 
                     onChange={(e) => updatePersonalInfo('fullName', e.target.value)}
@@ -511,7 +511,7 @@ export default function UploadPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Email *</Label>
+                  <Label>{t('personalInfo.email')} *</Label>
                   <Input 
                     type="email"
                     value={resumeData.personalInfo.email} 
@@ -520,7 +520,7 @@ export default function UploadPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Phone</Label>
+                  <Label>{t('personalInfo.phone')}</Label>
                   <Input 
                     value={resumeData.personalInfo.phone || ''} 
                     onChange={(e) => updatePersonalInfo('phone', e.target.value)}
@@ -528,7 +528,7 @@ export default function UploadPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Job Title</Label>
+                  <Label>{t('personalInfo.jobTitle')}</Label>
                   <Input 
                     value={resumeData.personalInfo.jobTitle || ''} 
                     onChange={(e) => updatePersonalInfo('jobTitle', e.target.value)}
@@ -537,17 +537,17 @@ export default function UploadPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Professional Summary</Label>
+                <Label>{t('personalInfo.summary')}</Label>
                 <Textarea 
                   value={resumeData.personalInfo.summary || ''} 
                   onChange={(e) => updatePersonalInfo('summary', e.target.value)}
-                  placeholder="Brief overview of your experience and skills..."
+                  placeholder={t('personalInfo.summaryPlaceholder')}
                   rows={3}
                 />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label>LinkedIn</Label>
+                  <Label>{t('personalInfo.linkedin')}</Label>
                   <Input 
                     value={resumeData.personalInfo.linkedin || ''} 
                     onChange={(e) => updatePersonalInfo('linkedin', e.target.value)}
@@ -555,7 +555,7 @@ export default function UploadPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>GitHub</Label>
+                  <Label>{t('personalInfo.github')}</Label>
                   <Input 
                     value={resumeData.personalInfo.github || ''} 
                     onChange={(e) => updatePersonalInfo('github', e.target.value)}
@@ -563,7 +563,7 @@ export default function UploadPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Website</Label>
+                  <Label>{t('personalInfo.website')}</Label>
                   <Input 
                     value={resumeData.personalInfo.website || ''} 
                     onChange={(e) => updatePersonalInfo('website', e.target.value)}

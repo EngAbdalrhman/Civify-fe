@@ -242,32 +242,6 @@ export default function UserDashboardLayout({
               </div>
             )}
           </main>
-
-          {/* Right Utility Panel */}
-          {isUploadPage && (
-            <aside className="w-80 border-l bg-muted/10 p-6 hidden xl:block overflow-y-auto">
-              <div className="space-y-6">
-                <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-4">
-                  <div className="flex flex-col space-y-1.5 p-0">
-                    <h3 className="font-semibold leading-none tracking-tight">AI Assistant</h3>
-                    <p className="text-sm text-muted-foreground">Ready to help you optimize.</p>
-                  </div>
-                  <div className="p-0 pt-4 text-sm">
-                    <p className="text-muted-foreground">Select a resume section to get started with AI optimization tips.</p>
-                  </div>
-                </div>
-                
-                <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-4">
-                   <h3 className="font-semibold mb-2">Quick Tips</h3>
-                   <ul className="text-sm space-y-2 text-muted-foreground list-disc pl-4">
-                      <li>Use action verbs</li>
-                      <li>Quantify achievements</li>
-                      <li>Tailor to the job post</li>
-                   </ul>
-                </div>
-              </div>
-            </aside>
-          )}
         </div>
       </div>
     </div>
