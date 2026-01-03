@@ -54,9 +54,9 @@ import {
 } from "@/components/ui/tooltip";
 
 export default function GroupsPage() {
-  const t = useTranslations('admin');
+  const t = useTranslations('admin.groups');
+  const tc = useTranslations('admin.common');
   const common = useTranslations('common');
-  const nav = useTranslations('nav');
   
   // State
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -161,12 +161,12 @@ export default function GroupsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{nav('groups')}</h1>
-          <p className="text-muted-foreground">Manage user groups and their permissions</p>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
         <PermissionGate permission={ADMIN_ACTION_PERMISSIONS.GROUP_CREATE}>
           <Button onClick={handleCreate}>
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
             {common('create')}
           </Button>
         </PermissionGate>
@@ -176,21 +176,21 @@ export default function GroupsPage() {
       <div className="grid gap-6 md:grid-cols-3">
         <div className="rounded-lg border bg-card p-6 shadow-sm">
           <div className="flex items-center justify-between space-y-0 pb-2">
-            <h3 className="text-sm font-medium text-muted-foreground">Total Groups</h3>
+            <h3 className="text-sm font-medium text-muted-foreground">{t('totalGroups')}</h3>
             <Shield className="h-4 w-4 text-muted-foreground" />
           </div>
           <div className="text-2xl font-bold">{groups.length}</div>
         </div>
         <div className="rounded-lg border bg-card p-6 shadow-sm">
           <div className="flex items-center justify-between space-y-0 pb-2">
-            <h3 className="text-sm font-medium text-muted-foreground">System Groups</h3>
+            <h3 className="text-sm font-medium text-muted-foreground">{t('systemGroups')}</h3>
             <Users className="h-4 w-4 text-muted-foreground" />
           </div>
           <div className="text-2xl font-bold">{groups.filter(g => g.isSystemGroup).length}</div>
         </div>
         <div className="rounded-lg border bg-card p-6 shadow-sm">
           <div className="flex items-center justify-between space-y-0 pb-2">
-            <h3 className="text-sm font-medium text-muted-foreground">Total Permissions</h3>
+            <h3 className="text-sm font-medium text-muted-foreground">{t('totalPermissions')}</h3>
             <Check className="h-4 w-4 text-muted-foreground" />
           </div>
           <div className="text-2xl font-bold">{allPermissions.length}</div>
@@ -243,9 +243,9 @@ export default function GroupsPage() {
                   <TableCell>
                     <div className="flex items-center gap-2">
                       {group.isActive ? (
-                        <Badge variant="default" className="text-xs bg-green-600">Active</Badge>
+                        <Badge variant="default" className="text-xs bg-green-600">{tc('active')}</Badge>
                       ) : (
-                        <Badge variant="secondary" className="text-xs">Inactive</Badge>
+                        <Badge variant="secondary" className="text-xs">{tc('inactive')}</Badge>
                       )}
                       <PermissionGate permission={ADMIN_ACTION_PERMISSIONS.GROUP_EDIT}>
                         <Button

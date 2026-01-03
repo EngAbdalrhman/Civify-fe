@@ -2,7 +2,6 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button } from '@/components/ui/button';
 import { Activity } from 'lucide-react';
 import { adminService } from '@/services/admin.service';
 import { GenericList, buildInputDataModel } from '@/components/generic-list/GenericList';
@@ -10,6 +9,7 @@ import { ColumnDef, FilterOperation } from '@/components/generic-list/types';
 import { Badge } from '@/components/ui/badge';
 
 export default function ApiUsagePage() {
+  const t = useTranslations('admin.apiUsage');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const [pagination, setPagination] = useState({
@@ -148,15 +148,15 @@ export default function ApiUsagePage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">API Logs</h1>
-          <p className="text-muted-foreground">Monitor system API usage</p>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3 mb-6">
         <div className="rounded-lg border bg-card p-6 shadow-sm">
           <div className="flex items-center justify-between space-y-0 pb-2">
-            <h3 className="text-sm font-medium text-muted-foreground">Monthly API Calls</h3>
+            <h3 className="text-sm font-medium text-muted-foreground">{t('monthlyApiCalls')}</h3>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </div>
           <div className="text-2xl font-bold">{metrics.totalApiCalls}</div>

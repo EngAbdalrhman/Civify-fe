@@ -309,11 +309,26 @@
     }
   },
   "admin": {
+    "common": {
+      "subtitle": "إدارة بيانات المنصة",
+      "active": "نشط",
+      "disabled": "معطل",
+      "inactive": "غير نشط",
+      "banUnban": "حظر/إلغاء الحظر",
+      "subscribedUsers": "المستخدمون المشتركون",
+      "free": "مجاني",
+      "never": "أبداً",
+      "noData": "لا توجد بيانات"
+    },
     "users": {
       "title": "إدارة المستخدمين",
+      "subtitle": "إدارة مستخدمي المنصة والأدوار",
       "totalUsers": "إجمالي المستخدمين",
       "activeUsers": "المستخدمون النشطون",
       "newUsers": "مستخدمون جدد",
+      "enableSuccess": "تم تفعيل المستخدم بنجاح",
+      "disableSuccess": "تم تعطيل المستخدم بنجاح",
+      "toggleError": "فشل تغيير حالة المستخدم",
       "columns": {
         "id": "المعرف",
         "email": "البريد الإلكتروني",
@@ -326,6 +341,7 @@
     },
     "subscriptions": {
       "title": "إدارة الاشتراكات",
+      "subtitle": "إدارة اشتراكات المستخدمين",
       "user": "المستخدم",
       "plan": "الخطة",
       "billingCycle": "دورة الفوترة",
@@ -334,6 +350,12 @@
       "endDate": "تاريخ الانتهاء",
       "renew": "تجديد تلقائي"
     },
+    "billing": {
+      "title": "إدارة الفواتير",
+      "subtitle": "إدارة الخطط وحزم الرموز",
+      "plans": "الخطط",
+      "tokenPackages": "حزم الرموز"
+    },
     "plans": {
       "title": "إدارة الخطط",
       "createPlan": "إنشاء خطة",
@@ -341,23 +363,55 @@
     },
     "promos": {
       "title": "إدارة العروض الترويجية",
+      "subtitle": "إدارة رموز العروض",
       "createPromo": "إنشاء عرض ترويجي",
       "code": "رمز العرض",
       "discount": "الخصم",
-      "expiryDate": "تاريخ الانتهاء"
+      "expiryDate": "تاريخ الانتهاء",
+      "noExpiry": "بدون انتهاء"
     },
     "stats": {
       "title": "الإحصائيات",
+      "subtitle": "تحليلات ورؤى المنصة",
+      "period": "الفترة",
       "totalUsers": "إجمالي المستخدمين",
       "revenue": "الإيرادات",
       "conversions": "التحويلات",
       "growth": "النمو"
     },
     "apiUsage": {
-      "title": "استخدام API",
+      "title": "سجلات API",
+      "subtitle": "مراقبة استخدام API في النظام",
+      "monthlyApiCalls": "استدعاءات API الشهرية",
       "requests": "الطلبات",
       "limit": "الحد الأقصى",
       "remaining": "المتبقي"
+    },
+    "notifications": {
+      "title": "إدارة الإشعارات",
+      "subtitle": "إرسال إشعارات للمستخدمين",
+      "broadcast": "بث عام",
+      "targeted": "مستهدف",
+      "broadcastToAll": "بث لجميع المستخدمين",
+      "broadcastDesc": "إرسال إشعار لجميع المستخدمين المسجلين دفعة واحدة",
+      "sendToAll": "إرسال للجميع",
+      "sendToSpecific": "إرسال لمستخدمين محددين",
+      "selectUsersDesc": "اختر المستخدمين لاستلام هذا الإشعار",
+      "send": "إرسال إشعار",
+      "templates": "القوالب"
+    },
+    "auditMonitor": {
+      "title": "مراقب السجلات",
+      "subtitle": "تتبع أنشطة النظام والسجلات",
+      "cvLogs": "سجلات عمليات السيرة الذاتية",
+      "apiLogs": "سجلات API"
+    },
+    "groups": {
+      "title": "إدارة المجموعات",
+      "subtitle": "إدارة مجموعات المستخدمين والصلاحيات",
+      "totalGroups": "إجمالي المجموعات",
+      "systemGroups": "المجموعات النظامية",
+      "totalPermissions": "إجمالي الصلاحيات"
     }
   },
   "footer": {

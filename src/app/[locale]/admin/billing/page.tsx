@@ -16,6 +16,7 @@ import { PlansManager } from '@/features/admin-dashboard/plans/components/PlansM
 import { TokenPackagesManager } from '@/features/admin-dashboard/token-packages/components/TokenPackagesManager';
 
 export default function BillingPage() {
+  const t = useTranslations('admin.billing');
   const { hasPermission, isLoading: isLoadingPermissions } = usePermissions();
 
   // Permissions
@@ -66,9 +67,9 @@ export default function BillingPage() {
       <div>
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <CreditCard className="h-8 w-8" />
-          Billing Management
+          {t('title')}
         </h1>
-        <p className="text-muted-foreground">Manage subscription plans and token packages</p>
+        <p className="text-muted-foreground">{t('subtitle')}</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -76,13 +77,13 @@ export default function BillingPage() {
           {canViewPlans && (
             <TabsTrigger value="plans" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
-              Subscription Plans
+              {t('plans')}
             </TabsTrigger>
           )}
           {canViewTokens && (
             <TabsTrigger value="tokens" className="flex items-center gap-2">
               <Coins className="h-4 w-4" />
-              Token Packages
+              {t('tokenPackages')}
             </TabsTrigger>
           )}
         </TabsList>

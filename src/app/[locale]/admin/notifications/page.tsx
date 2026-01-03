@@ -34,7 +34,7 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function NotificationsPage() {
-  const t = useTranslations('admin');
+  const t = useTranslations('admin.notifications');
 
   // Form state
   const [title, setTitle] = useState('');
@@ -173,19 +173,19 @@ export default function NotificationsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Notification Management</h1>
-        <p className="text-muted-foreground">Send push notifications to users</p>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
+        <p className="text-muted-foreground">{t('subtitle')}</p>
       </div>
 
       <Tabs defaultValue="broadcast" className="space-y-6">
         <TabsList>
           <TabsTrigger value="broadcast" className="flex items-center gap-2">
             <Globe className="h-4 w-4" />
-            Broadcast
+            {t('broadcast')}
           </TabsTrigger>
           <TabsTrigger value="targeted" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
-            Targeted
+            {t('targeted')}
           </TabsTrigger>
           {hasPermission('NEWSLETTER.BROADCAST') && (
             <TabsTrigger value="newsletter" className="flex items-center gap-2">
@@ -201,10 +201,10 @@ export default function NotificationsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Globe className="h-5 w-5" />
-                Broadcast to All Users
+                {t('broadcastToAll')}
               </CardTitle>
               <CardDescription>
-                Send a notification to all registered users at once
+                {t('broadcastDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -270,11 +270,11 @@ export default function NotificationsPage() {
                 className="w-full"
               >
                 {isSending ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="h-4 w-4 ltr:mr-2 rtl:ml-2 animate-spin" />
                 ) : (
-                  <Send className="h-4 w-4 mr-2" />
+                  <Send className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
                 )}
-                Send to All Users
+                {t('sendToAll')}
               </Button>
             </CardContent>
           </Card>
@@ -286,10 +286,10 @@ export default function NotificationsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
-                Send to Specific Users
+                {t('sendToSpecific')}
               </CardTitle>
               <CardDescription>
-                Select users to receive this notification
+                {t('selectUsersDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
