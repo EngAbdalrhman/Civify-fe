@@ -78,7 +78,7 @@ export default function UsersPage() {
       groupId: user.groupId?.toString() || '',
       cvLimit: user.cvLimit?.toString() || '',
       extraTokens: user.extraTokens?.toString() || '0',
-      accountLocked: user.accountLocked || false,
+      status: user.status || 'ACTIVE',
     });
     setDialogOpen(true);
   };
@@ -86,11 +86,11 @@ export default function UsersPage() {
   const handleToggleBan = async (user: AdminUser) => {
     try {
       await adminService.toggleUserLock(user.id);
-      toast.success(user.accountLocked ? 'User unbanned successfully' : 'User banned successfully');
+      toast.success(user.status === 'DISABLED' ? 'User enabled successfully' : 'User disabled successfully');
       await refresh();
     } catch (error) {
-      console.error('Failed to toggle ban:', error);
-      toast.error('Failed to toggle user ban status');
+      console.error('Failed to toggle status:', error);
+      toast.error('Failed to toggle user status');
     }
   };
 
@@ -136,19 +136,19 @@ export default function UsersPage() {
       filterOptions: planOptions.length > 0 ? planOptions : [{ label: 'Free', value: 'Free' }]
     },
     {
-      key: 'accountLocked', 
+      key: 'status', 
       label: t('columns.status'),
       render: (_: unknown, item: AdminUser) => (
-        <Badge variant={!item.accountLocked ? 'default' : 'destructive'}>
-          {!item.accountLocked ? 'Active' : 'Banned'}
+        <Badge variant={item.status === 'ACTIVE' ? 'default' : 'destructive'}>
+          {item.status === 'ACTIVE' ? 'Active' : 'Disabled'}
         </Badge>
       ),
       filterable: true,
       filterType: 'select',
       filterOperation: FilterOperation.EQUAL,
       filterOptions: [
-        { label: 'Active', value: 'false' },
-        { label: 'Banned', value: 'true' }
+        { label: 'Active', value: 'ACTIVE' },
+        { label: 'Disabled', value: 'DISABLED' }
       ]
     },
     {
