@@ -53,7 +53,7 @@ export interface AdminUser {
   profilePictureUrl?: string;
   isEmailVerified: boolean;
   twoFactorEnabled: boolean;
-  accountLocked: boolean;
+  status: 'ACTIVE' | 'DISABLED';
   createdAt: string;
   lastLoginAt?: string;
   // Limits
