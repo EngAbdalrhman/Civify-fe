@@ -117,14 +117,87 @@
   },
   "upload": {
     "title": "تخصيص السيرة الذاتية",
+    "pageTitle": "أنشئ سيرتك الذاتية المتوافقة مع ATS",
+    "pageSubtitle": "ارفع سيرتك الذاتية الحالية، راجع البيانات المستخرجة، ودع الذكاء الاصطناعي يخصصها لوظيفة أحلامك.",
     "dragDrop": "اسحب وأفلت سيرتك الذاتية هنا",
     "or": "أو",
     "browse": "تصفح الملفات",
+    "selectFile": "اختر ملف",
+    "addManually": "أضف البيانات يدوياً",
     "supportedFormats": "الصيغ المدعومة: PDF, DOC, DOCX",
     "maxSize": "الحد الأقصى لحجم الملف: 5 ميجابايت",
     "processing": "جاري معالجة سيرتك الذاتية...",
+    "analyzing": "جاري التحليل...",
     "success": "تم رفع السيرة الذاتية بنجاح!",
-    "authRequired": "يرجى تسجيل الدخول لرفع وتخصيص سيرتك الذاتية"
+    "authRequired": "يرجى تسجيل الدخول لرفع وتخصيص سيرتك الذاتية",
+    "uploadCv": "ارفع سيرتك الذاتية",
+    "uploadCvDesc": "اسحب وأفلت ملف PDF أو DOCX، أو انقر للتصفح. سنستخرج بياناتك تلقائياً.",
+    "steps": {
+      "uploadCv": "رفع السيرة الذاتية",
+      "reviewData": "مراجعة البيانات",
+      "generate": "توليد",
+      "result": "النتيجة"
+    },
+    "personalInfo": {
+      "title": "المعلومات الشخصية",
+      "subtitle": "بيانات الاتصال الخاصة بك (الحقول المطلوبة معلمة بـ *)",
+      "fullName": "الاسم الكامل",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "jobTitle": "المسمى الوظيفي",
+      "summary": "الملخص المهني",
+      "summaryPlaceholder": "نبذة مختصرة عن خبرتك ومهاراتك...",
+      "linkedin": "لينكد إن",
+      "github": "جيت هب",
+      "website": "الموقع الإلكتروني"
+    },
+    "sections": {
+      "skills": "المهارات",
+      "skillsPlaceholder": "Java, Spring Boot, Angular, TypeScript, React...",
+      "noItems": "لا توجد عناصر بعد. انقر \"إضافة\" لإضافة",
+      "add": "إضافة"
+    },
+    "jobDetails": {
+      "title": "تفاصيل الوظيفة",
+      "subtitle": "الصق وصف الوظيفة لتخصيص سيرتك الذاتية",
+      "jobTitle": "المسمى الوظيفي (اختياري)",
+      "jobTitlePlaceholder": "مثال: مهندس برمجيات أول",
+      "company": "اسم الشركة (اختياري)",
+      "companyPlaceholder": "مثال: جوجل",
+      "description": "وصف الوظيفة",
+      "descriptionPlaceholder": "الصق وصف الوظيفة هنا...",
+      "descriptionRequired": "وصف الوظيفة مطلوب",
+      "descriptionMinLength": "يجب أن يكون وصف الوظيفة 50 حرفاً على الأقل للتخصيص الدقيق"
+    },
+    "options": {
+      "title": "خيارات إضافية",
+      "coverLetter": "إنشاء خطاب تقديمي",
+      "coverLetterDesc": "خطاب تقديمي بالذكاء الاصطناعي مخصص للوظيفة",
+      "interviewQuestions": "أسئلة التحضير للمقابلة",
+      "interviewDesc": "أسئلة تدريبية بناءً على سيرتك الذاتية والوظيفة",
+      "roadmap": "خارطة التعلم",
+      "roadmapDesc": "تحليل فجوة المهارات والدورات الموصى بها"
+    },
+    "actions": {
+      "back": "رجوع",
+      "next": "التالي",
+      "generate": "إنشاء سيرة ذاتية مخصصة",
+      "generating": "جاري الإنشاء...",
+      "downloadPdf": "تحميل PDF",
+      "downloadDocx": "تحميل DOCX",
+      "saveToResumes": "حفظ في سيري الذاتية",
+      "trackApplication": "تتبع الطلب",
+      "startOver": "ابدأ من جديد"
+    },
+    "result": {
+      "title": "سيرتك الذاتية المخصصة",
+      "matchScore": "نسبة التطابق",
+      "atsScore": "نقاط ATS",
+      "suggestions": "اقتراحات التحسين",
+      "coverLetter": "خطاب التقديم",
+      "interviewPrep": "التحضير للمقابلة",
+      "roadmap": "خارطة التعلم"
+    }
   },
   "plans": {
     "title": "اختر خطتك",
