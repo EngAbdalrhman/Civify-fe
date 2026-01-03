@@ -4,20 +4,28 @@ import { ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+import { useTranslations } from "next-intl";
+
 export function BeforeAfterSection() {
+  const t = useTranslations('landing.beforeAfter');
+  const beforeKeys = ['item1', 'item2', 'item3'];
+  const issuesKeys = ['item1', 'item2', 'item3', 'item4'];
+  const afterKeys = ['item1', 'item2', 'item3'];
+  const improvementsKeys = ['item1', 'item2', 'item3', 'item4'];
+
   return (
     <section className="py-20 md:py-32">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="mx-auto mb-16 max-w-3xl text-center">
           <Badge variant="secondary" className="mb-4 px-4 py-2">
-            ✨ See the Transformation
+            {t('badge')}
           </Badge>
           <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-            From Generic to Game-Changing
+            {t('title')}
           </h2>
           <p className="text-lg text-muted-foreground">
-            Watch how our AI transforms ordinary bullet points into powerful achievements
+            {t('subtitle')}
           </p>
         </div>
 
@@ -28,39 +36,32 @@ export function BeforeAfterSection() {
             <CardContent className="p-8">
               <div className="mb-4 flex items-center justify-between">
                 <Badge variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300">
-                  ⚪ Before
+                  {t('before.badge')}
                 </Badge>
                 <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">
-                  Match Score: 45%
+                  {t('before.score')}
                 </span>
               </div>
 
               <div className="rounded-lg bg-slate-50 p-6 dark:bg-slate-900/50">
                 <ul className="space-y-3 text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
-                    <span>Responsible for managing team projects and meetings</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
-                    <span>Worked on improving customer satisfaction</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
-                    <span>Helped with various marketing tasks</span>
-                  </li>
+                  {beforeKeys.map((key) => (
+                    <li key={key} className="flex items-start gap-2">
+                      <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
+                      <span>{t(`before.items.${key}`)}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
 
               <div className="mt-4 space-y-2">
                 <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">
-                  Issues detected:
+                  {t('before.issuesTitle')}
                 </p>
                 <ul className="space-y-1 text-sm text-muted-foreground">
-                  <li>• No quantifiable metrics</li>
-                  <li>• Vague responsibilities</li>
-                  <li>• Missing keywords</li>
-                  <li>• Weak action verbs</li>
+                  {issuesKeys.map((key) => (
+                    <li key={key}>• {t(`before.issues.${key}`)}</li>
+                  ))}
                 </ul>
               </div>
             </CardContent>
@@ -78,50 +79,38 @@ export function BeforeAfterSection() {
             <CardContent className="p-8">
               <div className="mb-4 flex items-center justify-between">
                 <Badge className="bg-purple-600 text-sm hover:bg-purple-700">
-                  ✨ After
+                  {t('after.badge')}
                 </Badge>
                 <span className="text-sm font-semibold text-purple-600 dark:text-purple-400">
-                  Match Score: 92%
+                  {t('after.score')}
                 </span>
               </div>
 
               <div className="rounded-lg bg-purple-50 p-6 dark:bg-purple-950/20">
                 <ul className="space-y-3 text-foreground">
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-purple-600" />
-                    <span>
-                      <strong>Led</strong> cross-functional team of 8 members to deliver{" "}
-                      <strong>15+ projects</strong> on time, increasing client satisfaction by{" "}
-                      <strong>35%</strong> through improved stakeholder communication
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-purple-600" />
-                    <span>
-                      <strong>Implemented</strong> customer feedback system that boosted NPS score
-                      from 42 to <strong>78</strong>, resulting in <strong>25% increase</strong> in
-                      customer retention
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-purple-600" />
-                    <span>
-                      <strong>Executed</strong> multi-channel marketing campaigns generating{" "}
-                      <strong>$500K</strong> in revenue and <strong>10,000+</strong> qualified leads
-                    </span>
-                  </li>
+                  {afterKeys.map((key) => (
+                    <li key={key} className="flex items-start gap-2">
+                      <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-purple-600" />
+                      <span>
+                        {t.rich(`after.items.${key}`, {
+                          strong1: (chunks) => <strong>{chunks}</strong>,
+                          strong2: (chunks) => <strong>{chunks}</strong>,
+                          strong3: (chunks) => <strong>{chunks}</strong>,
+                        })}
+                      </span>
+                    </li>
+                  ))}
                 </ul>
               </div>
 
               <div className="mt-4 space-y-2">
                 <p className="text-sm font-semibold text-purple-600 dark:text-purple-400">
-                  Improvements made:
+                  {t('after.improvementsTitle')}
                 </p>
                 <ul className="space-y-1 text-sm text-muted-foreground">
-                  <li>✓ Quantified achievements with metrics</li>
-                  <li>✓ Strong action verbs (Led, Implemented)</li>
-                  <li>✓ Industry-specific keywords</li>
-                  <li>✓ Clear business impact</li>
+                  {improvementsKeys.map((key) => (
+                    <li key={key}>✓ {t(`after.improvements.${key}`)}</li>
+                  ))}
                 </ul>
               </div>
             </CardContent>

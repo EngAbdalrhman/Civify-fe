@@ -660,6 +660,50 @@
         }
       }
     },
+    "beforeAfter": {
+      "badge": "✨ See the Transformation",
+      "title": "From Generic to Game-Changing",
+      "subtitle": "Watch how our AI transforms ordinary bullet points into powerful achievements",
+      "before": {
+        "badge": "⚪ Before",
+        "score": "Match Score: 45%",
+        "items": {
+          "item1": "Responsible for managing team projects and meetings",
+          "item2": "Worked on improving customer satisfaction",
+          "item3": "Helped with various marketing tasks"
+        },
+        "issuesTitle": "Issues detected:",
+        "issues": {
+          "item1": "No quantifiable metrics",
+          "item2": "Vague responsibilities",
+          "item3": "Missing keywords",
+          "item4": "Weak action verbs"
+        }
+      },
+      "after": {
+        "badge": "✨ After",
+        "score": "Match Score: 92%",
+        "items": {
+          "item1": "<strong1>Led</strong1> cross-functional team of 8 members to deliver <strong2>15+ projects</strong2> on time, increasing client satisfaction by <strong3>35%</strong3> through improved stakeholder communication",
+          "item2": "<strong1>Implemented</strong1> customer feedback system that boosted NPS score from 42 to <strong2>78</strong2>, resulting in <strong3>25% increase</strong3> in customer retention",
+          "item3": "<strong1>Executed</strong1> multi-channel marketing campaigns generating <strong2>$500K</strong2> in revenue and <strong3>10,000+</strong3> qualified leads"
+        },
+        "improvementsTitle": "Improvements made:",
+        "improvements": {
+          "item1": "Quantified achievements with metrics",
+          "item2": "Strong action verbs (Led, Implemented)",
+          "item3": "Industry-specific keywords",
+          "item4": "Clear business impact"
+        }
+      }
+    },
+    "ctaSection": {
+      "title": "Stop Sending CVs Into the Void",
+      "subtitle": "Join our Beta and be among the first to experience AI-powered CV optimization.",
+      "highlight": "Full Arabic support. 92% match rate. Free to start.",
+      "cta": "Create Your CV Now",
+      "trust": "Free to start"
+    },
     "blog": {
       "title": "Career Resources",
       "subtitle": "Expert tips and guides to boost your job search",
