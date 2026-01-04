@@ -56,7 +56,6 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-semibold text-foreground mb-1">{t("info.address")}</h3>
                   <p className="text-sm text-muted-foreground">
-                    123 Business Street<br />
                     Cairo, Egypt
                   </p>
                 </div>
@@ -67,14 +66,6 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-semibold text-foreground mb-1">{t("info.email")}</h3>
                   <p className="text-sm text-muted-foreground">support@civify.com</p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4">
-                <Phone className="w-6 h-6 text-primary flex-shrink-0" />
-                <div>
-                  <h3 className="font-semibold text-foreground mb-1">{t("info.phone")}</h3>
-                  <p className="text-sm text-muted-foreground">+20 123 456 7890</p>
                 </div>
               </div>
             </div>
