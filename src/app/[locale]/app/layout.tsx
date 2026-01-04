@@ -133,7 +133,7 @@ export default function UserDashboardLayout({
                 <Link href="/" className="flex items-center space-x-2">
                   <div className="flex items-center">
                     <Image
-                      src={isSidebarCollapsed ? '/civify-logo-simple.png' : logoSrc}
+                      src={logoSrc}
                       alt="Civify Logo"
                       width={isSidebarCollapsed ? 32 : 75}
                       height={isSidebarCollapsed ? 32 : 35}
