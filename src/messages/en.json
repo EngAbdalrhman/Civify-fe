@@ -197,6 +197,17 @@
       "coverLetter": "Cover Letter",
       "interviewPrep": "Interview Prep",
       "roadmap": "Learning Roadmap"
+    },
+    "fillFromResumes": "Fill from My Resumes",
+    "selectResume": {
+      "title": "Select a Resume",
+      "subtitle": "Choose a resume to use as a starting point",
+      "noResumes": "No saved resumes found",
+      "noResumesDesc": "Create a resume first to use this feature",
+      "createNew": "Create New Resume",
+      "loading": "Loading your resumes...",
+      "loadError": "Failed to load resumes",
+      "selected": "Resume selected!"
     }
   },
   "plans": {
