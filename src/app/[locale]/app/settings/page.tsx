@@ -416,7 +416,7 @@ export default function SettingsPage() {
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
                           <p className="text-muted-foreground">CV Usage</p>
-                          <p className="font-medium">{subscription.currentCvCount} / {subscription.cvLimit}</p>
+                          <p className="font-medium">{subscription.currentCvCount} / {subscription.cvLimit ?? '∞'}</p>
                         </div>
                         <div>
                           <p className="text-muted-foreground">Auto Renew</p>

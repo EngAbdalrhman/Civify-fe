@@ -268,6 +268,16 @@ export function PlansManager() {
                 <span className="text-sm font-normal text-muted-foreground">/mo</span>
               </div>
 
+              {/* Limits */}
+              <div className="flex gap-4 mb-4 text-sm text-muted-foreground">
+                <div>
+                  <span className="font-medium text-foreground">{plan.cvLimit ?? '∞'}</span> CVs
+                </div>
+                <div>
+                  <span className="font-medium text-foreground">{plan.tokenLimit ?? '∞'}</span> Tokens
+                </div>
+              </div>
+
               {canModifyPlans && (
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" onClick={() => handleEditPlan(plan)}>
