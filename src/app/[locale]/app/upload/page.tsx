@@ -53,9 +53,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import Link from 'next/link';
-import { Zap, CreditCard } from 'lucide-react';
+import { Zap, CreditCard, FolderOpen } from 'lucide-react';
 import { useUploadCv, useTailorCv } from '@/features/upload-cv/hooks';
 import { 
   type ResumeData, 
@@ -67,7 +74,7 @@ import {
 } from '@/features/upload-cv/types';
 import { exportToPdf, exportToDocx } from '@/features/upload-cv/utils/exportCv';
 import { useRouter } from 'next/navigation';
-import { ResumeService } from '@/services/resume.service';
+import { ResumeService, ResumeSummary } from '@/services/resume.service';
 import { JobApplicationService } from '@/services/job-application.service';
 import { Save, Bookmark } from 'lucide-react';
 
@@ -96,6 +103,11 @@ export default function UploadPage() {
   const [isTrackingApplication, setIsTrackingApplication] = useState(false);
   const [savedResumeId, setSavedResumeId] = useState<string | null>(null);
   const [trackedApplicationId, setTrackedApplicationId] = useState<number | null>(null);
+  
+  // Resume selector state
+  const [showResumeSelector, setShowResumeSelector] = useState(false);
+  const [storedResumes, setStoredResumes] = useState<ResumeSummary[]>([]);
+  const [isLoadingResumes, setIsLoadingResumes] = useState(false);
   
   // API Hooks
   const { mutate: uploadCv, isPending: isUploading } = useUploadCv();
@@ -144,6 +156,37 @@ export default function UploadPage() {
     setResumeData(emptyResumeData);
     setCurrentStep(2);
   }, []);
+
+  // Handler for opening resume selector
+  const handleOpenResumeSelector = useCallback(async () => {
+    // Auth check
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      toast.error(t('authRequired'));
+      router.push('/login?redirect=/app/upload');
+      return;
+    }
+
+    setShowResumeSelector(true);
+    setIsLoadingResumes(true);
+    try {
+      const resumes = await ResumeService.getAll();
+      setStoredResumes(resumes);
+    } catch (error) {
+      console.error('Failed to fetch resumes:', error);
+      toast.error(t('selectResume.loadError') || 'Failed to load resumes');
+    } finally {
+      setIsLoadingResumes(false);
+    }
+  }, [router, t]);
+
+  // Handler for selecting a stored resume
+  const handleSelectStoredResume = useCallback((resume: ResumeSummary) => {
+    setResumeData(resume.data);
+    setShowResumeSelector(false);
+    setCurrentStep(2);
+    toast.success(t('selectResume.selected'));
+  }, [t]);
 
   // Download handlers
   const handleDownloadPdf = useCallback(async () => {
@@ -479,17 +522,86 @@ export default function UploadPage() {
             </div>
           </div>
 
-          <Button 
-            variant="outline" 
-            className="w-full" 
-            size="lg"
-            onClick={handleManualEntry}
-          >
-            <FileEdit className="ltr:mr-2 rtl:ml-2 h-4 w-4" />
-            {t('addManually')}
-          </Button>
+          {/* Side by side buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Button 
+              variant="outline" 
+              className="w-full" 
+              size="lg"
+              onClick={handleManualEntry}
+            >
+              <FileEdit className="ltr:mr-2 rtl:ml-2 h-4 w-4" />
+              {t('addManually')}
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="w-full" 
+              size="lg"
+              onClick={handleOpenResumeSelector}
+            >
+              <FolderOpen className="ltr:mr-2 rtl:ml-2 h-4 w-4" />
+              {t('fillFromResumes')}
+            </Button>
+          </div>
         </div>
-      )}  
+      )}
+
+      {/* Resume Selector Dialog */}
+      <Dialog open={showResumeSelector} onOpenChange={setShowResumeSelector}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('selectResume.title')}</DialogTitle>
+            <DialogDescription>{t('selectResume.subtitle')}</DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            {isLoadingResumes ? (
+              <div className="flex flex-col items-center justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                <p className="mt-2 text-sm text-muted-foreground">{t('selectResume.loading')}</p>
+              </div>
+            ) : storedResumes.length === 0 ? (
+              <div className="text-center py-8">
+                <FileText className="h-12 w-12 mx-auto text-muted-foreground/50" />
+                <p className="mt-4 font-medium">{t('selectResume.noResumes')}</p>
+                <p className="text-sm text-muted-foreground">{t('selectResume.noResumesDesc')}</p>
+                <Button 
+                  variant="outline" 
+                  className="mt-4"
+                  onClick={() => {
+                    setShowResumeSelector(false);
+                    router.push('/app/resume-builder');
+                  }}
+                >
+                  {t('selectResume.createNew')}
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                {storedResumes.map((resume) => (
+                  <button
+                    key={resume.id}
+                    className="w-full flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors text-left"
+                    onClick={() => handleSelectStoredResume(resume)}
+                  >
+                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <FileText className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">{resume.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(resume.updatedAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>  
 
       {/* Step 2: Review/Edit Data */}
       {currentStep === 2 && resumeData && (
