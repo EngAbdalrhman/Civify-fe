@@ -1,19 +1,30 @@
-'use client';
+"use client";
 
-import { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { useTranslations } from 'next-intl';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Loader2, XCircle, ArrowLeft, RefreshCw, MessageCircle } from 'lucide-react';
-import { Link } from '@/i18n/routing';
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Loader2,
+  XCircle,
+  ArrowLeft,
+  RefreshCw,
+  MessageCircle,
+} from "lucide-react";
+import { Link } from "@/i18n/routing";
 
 function PaymentFailureContent() {
   const searchParams = useSearchParams();
-  const t = useTranslations('payment.failure');
+  const t = useTranslations("payment.failure");
 
-  const errorMessage = searchParams.get('error') || 'Payment was not completed';
-  const gateway = searchParams.get('gateway') || 'fawaterak';
+  const errorMessage = searchParams.get("error") || "Payment was not completed";
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
@@ -24,9 +35,9 @@ function PaymentFailureContent() {
               <XCircle className="h-16 w-16 text-red-600" />
             </div>
           </div>
-          <CardTitle className="text-3xl">{t('title')}</CardTitle>
+          <CardTitle className="text-3xl">{t("title")}</CardTitle>
           <CardDescription className="text-base">
-            {t('subtitle')}
+            {t("subtitle")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -39,7 +50,7 @@ function PaymentFailureContent() {
 
           {/* Troubleshooting Tips */}
           <div className="bg-muted rounded-lg p-4">
-            <h4 className="font-semibold mb-3">{t('whatYouCanDo')}</h4>
+            <h4 className="font-semibold mb-3">{t("whatYouCanDo")}</h4>
             <ul className="text-sm text-muted-foreground space-y-2">
               <li className="flex items-start gap-2">
                 <span className="text-primary mt-0.5">•</span>
@@ -65,19 +76,19 @@ function PaymentFailureContent() {
             <Button asChild className="w-full" size="lg">
               <Link href="/plans">
                 <RefreshCw className="mr-2 h-4 w-4" />
-                {t('tryAgain')}
+                {t("tryAgain")}
               </Link>
             </Button>
             <Button variant="outline" asChild className="w-full" size="lg">
               <Link href="/app">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                {t('backToDashboard')}
+                {t("backToDashboard")}
               </Link>
             </Button>
             <Button variant="ghost" asChild className="w-full" size="lg">
               <a href="mailto:support@civify.cv">
                 <MessageCircle className="mr-2 h-4 w-4" />
-                {t('contactSupport')}
+                {t("contactSupport")}
               </a>
             </Button>
           </div>
