@@ -35,7 +35,7 @@ export function HeroSection() {
               English
             </Badge>
             <Badge variant="secondary" className="px-3 py-1.5 text-sm font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
-              🇸🇦 العربية - {t('badge')}
+              🇪🇬 العربية - {t('badge')}
             </Badge>
           </div>
 
@@ -120,7 +120,7 @@ export function HeroSection() {
             <div className="h-8 w-px bg-border hidden sm:block" />
 
             <div className="text-center sm:text-left">
-              <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">🇸🇦</p>
+              <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">🇪🇬</p>
               <p className="text-sm text-muted-foreground">Arabic OCR</p>
             </div>
           </div>
