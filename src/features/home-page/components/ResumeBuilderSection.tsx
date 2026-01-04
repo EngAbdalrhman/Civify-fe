@@ -121,8 +121,8 @@ export function ResumeBuilderSection() {
             </div>
 
             {/* Floating generic tags decoration */}
-            <div className="absolute -z-10 -bottom-10 -right-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
-            <div className="absolute -z-10 -top-10 -left-10 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl" />
+            <div className="absolute -z-10 -bottom-10 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
+            <div className="absolute -z-10 -top-10 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl" />
           </div>
         </div>
       </div>
