@@ -7,13 +7,14 @@ const GROUPS_QUERY_KEY = "admin-groups";
 const PERMISSIONS_QUERY_KEY = "admin-permissions";
 
 // Fetch all groups
-export const useGroups = () => {
+export const useGroups = (options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: [GROUPS_QUERY_KEY],
     queryFn: async (): Promise<Group[]> => {
       const response = await apiClient.get("/v1/admin/groups");
       return response.data.data || [];
     },
+    enabled: options?.enabled !== false, // Default to true if not specified
   });
 };
 
