@@ -7,53 +7,104 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { UserForm } from './UserForm';
-import { UserFormData } from '../types';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { AdminUser } from '@/services/admin.service';
 
 interface UserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  initialData?: Partial<UserFormData>;
-  mode: 'create' | 'edit';
+  user: AdminUser | null;
 }
 
 export function UserDialog({ 
   open, 
   onOpenChange, 
-  initialData,
-  mode 
+  user
 }: UserDialogProps) {
-  const handleSubmit = async (data: UserFormData) => {
-    // TODO: Implement API call to create/update user
-    console.log('Submitting user data:', data);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Close dialog on success
-    onOpenChange(false);
-  };
+  if (!user) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>
-            {mode === 'create' ? 'Create New User' : 'Edit User'}
-          </DialogTitle>
-          <DialogDescription>
-            {mode === 'create' 
-              ? 'Add a new user to the platform. Fill in the required information below.'
-              : 'Update user information. Changes will be saved immediately.'}
-          </DialogDescription>
+          <DialogTitle>User Details</DialogTitle>
+          {/* <DialogDescription>
+            View user information. Use actions menu to modify group, limits, or tokens.
+          </DialogDescription> */}
         </DialogHeader>
         
-        <UserForm
-          initialData={initialData}
-          onSubmit={handleSubmit}
-          onCancel={() => onOpenChange(false)}
-          submitLabel={mode === 'create' ? 'Create User' : 'Save Changes'}
-        />
+        <div className="space-y-4">
+          {/* Basic Info */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">Name</p>
+              <p className="font-medium">
+                {user.firstName || ''} {user.lastName || ''} 
+                {!user.firstName && !user.lastName && user.username}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">Status</p>
+              <Badge variant={user.status === 'ACTIVE' ? 'default' : 'destructive'}>
+                {user.status}
+              </Badge>
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground">Email</p>
+            <p className="font-medium">{user.email}</p>
+          </div>
+
+          {user.phoneNumber && (
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">Phone</p>
+              <p className="font-medium">{user.phoneNumber}</p>
+            </div>
+          )}
+
+          <Separator />
+
+          {/* Subscription & Limits */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">Current Plan</p>
+              <Badge variant="outline">{user.currentPlan || 'Free'}</Badge>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">Group</p>
+              <p className="font-medium">{user.groupName || 'None'}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">CV Limit Override</p>
+              <p className="font-medium">{user.cvLimit ?? 'Plan Default'}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">Extra Tokens</p>
+              <p className="font-medium">{user.extraTokens || 0}</p>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Meta */}
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="space-y-1">
+              <p className="text-muted-foreground">Registered</p>
+              <p>{new Date(user.createdAt).toLocaleDateString()}</p>
+            </div>
+            {user.lastLoginAt && (
+              <div className="space-y-1">
+                <p className="text-muted-foreground">Last Login</p>
+                <p>{new Date(user.lastLoginAt).toLocaleDateString()}</p>
+              </div>
+            )}
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );

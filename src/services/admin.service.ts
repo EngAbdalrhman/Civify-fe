@@ -320,6 +320,22 @@ class AdminService {
     return response.data;
   }
 
+  async updateUserGroup(userId: number, groupId: number): Promise<ApiResponse<AdminUser>> {
+    const response = await apiClient.patch<ApiResponse<AdminUser>>(
+      `${ADMIN_API.USERS}/${userId}/group?groupId=${groupId}`,
+      {}
+    );
+    return response.data;
+  }
+
+  async updateUserTokens(userId: number, extraTokens: number): Promise<ApiResponse<AdminUser>> {
+    const response = await apiClient.patch<ApiResponse<AdminUser>>(
+      `${ADMIN_API.USERS}/${userId}/tokens?extraTokens=${extraTokens}`,
+      {}
+    );
+    return response.data;
+  }
+
   // ==========================================
   // Plans (Client-side filtering - fetch all)
   // ==========================================

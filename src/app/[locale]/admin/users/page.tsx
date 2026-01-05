@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
-import { UserPlus, Ban, Edit, Users, UserCheck } from 'lucide-react';
+import { UserPlus, Ban, Eye, Users, UserCheck, MoreHorizontal, Shield, Coins, FileText } from 'lucide-react';
 import { UserDialog } from '@/features/admin-dashboard/users';
 import { adminService } from '@/services/admin.service';
 import { useAdminUsers } from '@/features/admin-dashboard/users/hooks/useAdminUsers';
@@ -12,6 +12,34 @@ import { ColumnDef, ActionDef, FilterOperation } from '@/components/generic-list
 import type { AdminUser } from '@/services/admin.service';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useGroups } from '@/features/admin-dashboard/groups';
+import { usePermissions } from '@/contexts/PermissionContext';
+import { ADMIN_ACTION_PERMISSIONS } from '@/config/adminMenuConfig';
 
 export default function UsersPage() {
   const t = useTranslations('admin.users');
@@ -19,8 +47,18 @@ export default function UsersPage() {
   const common = useTranslations('common');
   
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
-  const [selectedUser, setSelectedUser] = useState<any>(undefined);
+  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
+  
+  // Action dialogs
+  const [actionDialog, setActionDialog] = useState<{
+    type: 'group' | 'limits' | 'tokens' | null;
+    user: AdminUser | null;
+    value: string;
+  }>({ type: null, user: null, value: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { data: groups = [] } = useGroups();
+  const { hasPermission } = usePermissions();
 
   const {
     users,
@@ -60,27 +98,11 @@ export default function UsersPage() {
           }
       };
       loadInitialData();
-  }, []); // Empty dependency array = run once on mount
+  }, []);
 
 
-  const handleCreateUser = () => {
-    setDialogMode('create');
-    setSelectedUser(undefined);
-    setDialogOpen(true);
-  };
-
-  const handleEditUser = (user: AdminUser) => {
-    setDialogMode('edit');
-    setSelectedUser({
-      firstName: user.firstName || '',
-      lastName: user.lastName || '',
-      email: user.email,
-      phoneNumber: user.phoneNumber || '',
-      groupId: user.groupId?.toString() || '',
-      cvLimit: user.cvLimit?.toString() || '',
-      extraTokens: user.extraTokens?.toString() || '0',
-      status: user.status || 'ACTIVE',
-    });
+  const handleViewUser = (user: AdminUser) => {
+    setSelectedUser(user);
     setDialogOpen(true);
   };
 
@@ -92,6 +114,48 @@ export default function UsersPage() {
     } catch (error) {
       console.error('Failed to toggle status:', error);
       toast.error(t('toggleError'));
+    }
+  };
+
+  const openActionDialog = (type: 'group' | 'limits' | 'tokens', user: AdminUser) => {
+    let initialValue = '';
+    if (type === 'group') {
+      initialValue = user.groupId?.toString() || '';
+    } else if (type === 'limits') {
+      initialValue = user.cvLimit?.toString() || '';
+    } else if (type === 'tokens') {
+      initialValue = user.extraTokens?.toString() || '0';
+    }
+    setActionDialog({ type, user, value: initialValue });
+  };
+
+  const handleActionSubmit = async () => {
+    if (!actionDialog.user || !actionDialog.type) return;
+    
+    setIsSubmitting(true);
+    try {
+      if (actionDialog.type === 'group') {
+        const groupId = parseInt(actionDialog.value);
+        if (!isNaN(groupId)) {
+          await adminService.updateUserGroup(actionDialog.user.id, groupId);
+          toast.success('User group updated');
+        }
+      } else if (actionDialog.type === 'limits') {
+        const cvLimit = actionDialog.value ? parseInt(actionDialog.value) : undefined;
+        await adminService.updateUserLimits(actionDialog.user.id, cvLimit);
+        toast.success('User limits updated');
+      } else if (actionDialog.type === 'tokens') {
+        const tokens = parseInt(actionDialog.value) || 0;
+        await adminService.updateUserTokens(actionDialog.user.id, tokens);
+        toast.success('User tokens updated');
+      }
+      await refresh();
+      setActionDialog({ type: null, user: null, value: '' });
+    } catch (error) {
+      console.error('Action failed:', error);
+      toast.error('Failed to update user');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -160,15 +224,70 @@ export default function UsersPage() {
         filterable: true,
         filterType: 'date',
         filterOperation: FilterOperation.DATE_BETWEEN 
+    },
+    {
+        key: 'actions',
+        label: tc('actions'),
+        render: (_: unknown, item: AdminUser) => {
+          const canModifyGroup = hasPermission(ADMIN_ACTION_PERMISSIONS.USER_MODIFY_GROUP);
+          const canModifyLimits = hasPermission(ADMIN_ACTION_PERMISSIONS.USER_MODIFY_LIMITS);
+          const canModifyTokens = hasPermission(ADMIN_ACTION_PERMISSIONS.USER_MODIFY_TOKENS);
+          const canModify = hasPermission(ADMIN_ACTION_PERMISSIONS.USER_EDIT);
+          const showDropdown = canModifyGroup || canModifyLimits || canModifyTokens;
+          
+          return (
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="sm" onClick={() => handleViewUser(item)}>
+                <Eye className="h-4 w-4" />
+              </Button>
+              {canModify && (
+                <Button variant="ghost" size="sm" onClick={() => handleToggleBan(item)}>
+                  <Ban className="h-4 w-4" />
+                </Button>
+              )}
+              {showDropdown && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Admin Actions</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {canModifyGroup && (
+                      <DropdownMenuItem onClick={() => openActionDialog('group', item)}>
+                        <Shield className="h-4 w-4 mr-2" />
+                        Change Group
+                      </DropdownMenuItem>
+                    )}
+                    {canModifyLimits && (
+                      <DropdownMenuItem onClick={() => openActionDialog('limits', item)}>
+                        <FileText className="h-4 w-4 mr-2" />
+                        Update CV Limit
+                      </DropdownMenuItem>
+                    )}
+                    {canModifyTokens && (
+                      <DropdownMenuItem onClick={() => openActionDialog('tokens', item)}>
+                        <Coins className="h-4 w-4 mr-2" />
+                        Update Tokens
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
+          );
+        }
     }
-  ], [t, tc, planOptions]);
+  ], [t, tc, planOptions, handleViewUser, handleToggleBan, openActionDialog, hasPermission]);
 
-  // Define Actions
+  // Define Actions with dropdown
   const actions: ActionDef<AdminUser>[] = [
     {
-      label: common('edit'),
-      icon: <Edit className="h-4 w-4" />,
-      onClick: handleEditUser,
+      label: common('view'),
+      icon: <Eye className="h-4 w-4" />,
+      onClick: handleViewUser,
       variant: 'ghost'
     },
     {
@@ -178,6 +297,41 @@ export default function UsersPage() {
       variant: 'ghost'
     }
   ];
+
+  // Custom render for actions column with dropdown
+  const renderActionsCell = (item: AdminUser) => (
+    <div className="flex items-center gap-1">
+      <Button variant="ghost" size="sm" onClick={() => handleViewUser(item)}>
+        <Eye className="h-4 w-4" />
+      </Button>
+      <Button variant="ghost" size="sm" onClick={() => handleToggleBan(item)}>
+        <Ban className="h-4 w-4" />
+      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm">
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Admin Actions</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => openActionDialog('group', item)}>
+            <Shield className="h-4 w-4 mr-2" />
+            Change Group
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => openActionDialog('limits', item)}>
+            <FileText className="h-4 w-4 mr-2" />
+            Update CV Limit
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => openActionDialog('tokens', item)}>
+            <Coins className="h-4 w-4 mr-2" />
+            Update Tokens
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
 
   const handleFilterChange = (filters: any) => {
       const model = buildInputDataModel(filters, columns as any[], null, 0, 10);
@@ -203,10 +357,6 @@ export default function UsersPage() {
           <h1 className="text-3xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
-        <Button onClick={handleCreateUser}>
-          <UserPlus className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
-          {common('create')}
-        </Button>
       </div>
 
        <div className="grid gap-6 md:grid-cols-3">
@@ -228,7 +378,6 @@ export default function UsersPage() {
             {metrics.activeUsers}
           </div>
         </div>
-        {/* Removed New Users card until backend supports it specifically, or use pagination count as proxy? */}
       </div>
 
       <div className="bg-card rounded-lg border shadow-sm">
@@ -237,7 +386,6 @@ export default function UsersPage() {
             columns={columns as any}
             meta={pagination}
             isLoading={isLoading}
-            actions={actions as any}
             onFilterChange={handleFilterChange}
             onSortChange={handleSortChange}
             onPageChange={handlePageChange}
@@ -245,12 +393,91 @@ export default function UsersPage() {
          />
       </div>
 
+      {/* View User Dialog */}
       <UserDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        mode={dialogMode}
-        initialData={selectedUser}
+        user={selectedUser}
       />
+
+      {/* Action Dialog */}
+      <Dialog open={!!actionDialog.type} onOpenChange={() => setActionDialog({ type: null, user: null, value: '' })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {actionDialog.type === 'group' && 'Change Permission Group'}
+              {actionDialog.type === 'limits' && 'Update CV Limit'}
+              {actionDialog.type === 'tokens' && 'Update Extra Tokens'}
+            </DialogTitle>
+            <DialogDescription>
+              {actionDialog.user && `Updating: ${actionDialog.user.email}`}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            {actionDialog.type === 'group' && (
+              <div className="space-y-2">
+                <Label>Permission Group</Label>
+                <Select
+                  value={actionDialog.value || 'none'}
+                  onValueChange={(value) => setActionDialog(prev => ({ ...prev, value: value === 'none' ? '' : value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a group" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    {groups.map((group: any) => (
+                      <SelectItem key={group.id} value={group.id.toString()}>
+                        {group.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            
+            {actionDialog.type === 'limits' && (
+              <div className="space-y-2">
+                <Label>CV Limit Override</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={actionDialog.value}
+                  onChange={(e) => setActionDialog(prev => ({ ...prev, value: e.target.value }))}
+                  placeholder="Leave empty for plan default"
+                />
+              </div>
+            )}
+            
+            {actionDialog.type === 'tokens' && (
+              <div className="space-y-2">
+                <Label>Extra Tokens (Wallet)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={actionDialog.value}
+                  onChange={(e) => setActionDialog(prev => ({ ...prev, value: e.target.value }))}
+                  placeholder="0"
+                />
+              </div>
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setActionDialog({ type: null, user: null, value: '' })}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleActionSubmit} disabled={isSubmitting}>
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
