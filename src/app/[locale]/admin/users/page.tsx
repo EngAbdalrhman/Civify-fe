@@ -57,8 +57,10 @@ export default function UsersPage() {
   }>({ type: null, user: null, value: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { data: groups = [] } = useGroups();
   const { hasPermission } = usePermissions();
+
+  const canModifyGroup = hasPermission(ADMIN_ACTION_PERMISSIONS.USER_MODIFY_GROUP);
+  const { data: groups = [] } = useGroups({ enabled: canModifyGroup });
 
   const {
     users,
@@ -83,16 +85,25 @@ export default function UsersPage() {
   useEffect(() => {
       const loadInitialData = async () => {
           try {
+              const shouldFetchStats = hasPermission(ADMIN_ACTION_PERMISSIONS.ADMIN_STATS_VIEW);
+              const shouldFetchPlans = hasPermission(ADMIN_ACTION_PERMISSIONS.PLAN_VIEW);
+
               const [stats, plans] = await Promise.all([
-                  adminService.getStats('MONTHLY'),
-                  adminService.getPlanLookup().catch(() => [])
-              ]);
-              setMetrics({
-                  totalUsers: stats.totalUsers,
-                  activeUsers: stats.subscribedUsers,
-                  newUsers: 0
-              });
-              setPlanOptions(plans.map(p => ({ label: p.name, value: p.name })));
+                shouldFetchStats ? adminService.getStats('MONTHLY').catch(() => null) : Promise.resolve(null),
+                shouldFetchPlans ? adminService.getPlanLookup().catch(() => []) : Promise.resolve([])
+              ]) as [any, any[]];
+              
+              if (stats) {
+                  setMetrics({
+                      totalUsers: stats.totalUsers || 0,
+                      activeUsers: stats.subscribedUsers || 0,
+                      newUsers: 0
+                  });
+              }
+              
+              if (plans && Array.isArray(plans)) {
+                  setPlanOptions(plans.map((p: any) => ({ label: p.name, value: p.name })));
+              }
           } catch (error) {
               console.error("Failed to load initial data", error);
           }
@@ -359,27 +370,31 @@ export default function UsersPage() {
         </div>
       </div>
 
-       <div className="grid gap-6 md:grid-cols-3">
-        <div className="rounded-lg border bg-card p-6 shadow-sm">
-          <div className="flex items-center justify-between space-y-0 pb-2">
-            <h3 className="text-sm font-medium text-muted-foreground">{t('totalUsers')}</h3>
-            <Users className="h-4 w-4 text-muted-foreground" />
+        <div className="grid gap-6 md:grid-cols-3">
+            <div className="rounded-lg border bg-card p-6 shadow-sm">
+              <div className="flex items-center justify-between space-y-0 pb-2">
+                <h3 className="text-sm font-medium text-muted-foreground">{t('totalUsers')}</h3>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <div className="text-2xl font-bold">
+                  {metrics.totalUsers || pagination?.totalElements || 0}
+              </div>
+            </div>
+            {
+              hasPermission(ADMIN_ACTION_PERMISSIONS.ADMIN_STATS_VIEW) && (
+                <div className="rounded-lg border bg-card p-6 shadow-sm">
+                  <div className="flex items-center justify-between space-y-0 pb-2">
+                    <h3 className="text-sm font-medium text-muted-foreground">{tc('subscribedUsers')}</h3>
+                    <UserCheck className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div className="text-2xl font-bold">
+                    {metrics.activeUsers}
+                  </div>
+                </div>
+              )
+            }
           </div>
-          <div className="text-2xl font-bold">
-            {metrics.totalUsers}
-          </div>
-        </div>
-        <div className="rounded-lg border bg-card p-6 shadow-sm">
-          <div className="flex items-center justify-between space-y-0 pb-2">
-            <h3 className="text-sm font-medium text-muted-foreground">{tc('subscribedUsers')}</h3>
-            <UserCheck className="h-4 w-4 text-muted-foreground" />
-          </div>
-          <div className="text-2xl font-bold">
-            {metrics.activeUsers}
-          </div>
-        </div>
-      </div>
-
+    
       <div className="bg-card rounded-lg border shadow-sm">
          <GenericList
             data={users}
