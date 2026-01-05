@@ -8,7 +8,10 @@ import {
   Bell, 
   Eye,
   EyeOff,
-  Loader2
+  Loader2,
+  Settings,
+  Globe,
+  Palette
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -57,6 +60,11 @@ interface Subscription {
   autoRenew?: boolean;
 }
 
+interface UserPreferences {
+  preferredLanguage: 'EN' | 'AR';
+  preferredTheme: 'LIGHT' | 'DARK';
+}
+
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("profile");
   
@@ -88,6 +96,14 @@ export default function SettingsPage() {
   // Subscription state
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isSubLoading, setIsSubLoading] = useState(true);
+
+  // Preferences state
+  const [preferences, setPreferences] = useState<UserPreferences>({
+    preferredLanguage: 'EN',
+    preferredTheme: 'LIGHT'
+  });
+  const [isPrefsLoading, setIsPrefsLoading] = useState(true);
+  const [isSavingPrefs, setIsSavingPrefs] = useState(false);
 
   // Fetch user profile on mount
   useEffect(() => {
@@ -122,6 +138,21 @@ export default function SettingsPage() {
       }
     };
     fetchSubscription();
+  }, []);
+
+  // Fetch preferences
+  useEffect(() => {
+    const fetchPreferences = async () => {
+      try {
+        const response = await apiClient.get<UserPreferences>('/v1/users/me/preferences');
+        setPreferences(response.data);
+      } catch {
+        // Use defaults if preferences not set
+      } finally {
+        setIsPrefsLoading(false);
+      }
+    };
+    fetchPreferences();
   }, []);
 
   // Save profile
@@ -181,6 +212,20 @@ export default function SettingsPage() {
     }
   };
 
+  // Save preferences
+  const handleSavePreferences = async () => {
+    setIsSavingPrefs(true);
+    try {
+      const response = await apiClient.put<UserPreferences>('/v1/users/me/preferences', preferences);
+      setPreferences(response.data);
+      toast.success('Preferences saved successfully');
+    } catch {
+      toast.error('Failed to save preferences');
+    } finally {
+      setIsSavingPrefs(false);
+    }
+  };
+
   // Get user initials
   const getInitials = () => {
     if (!user) return 'U';
@@ -200,10 +245,14 @@ export default function SettingsPage() {
         </div>
 
         <Tabs defaultValue="profile" className="space-y-4" onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:grid-cols-none lg:inline-flex">
+          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:grid-cols-none lg:inline-flex">
             <TabsTrigger value="profile" className="gap-2">
               <User className="h-4 w-4 hidden sm:block" />
               Profile
+            </TabsTrigger>
+            <TabsTrigger value="preferences" className="gap-2">
+              <Settings className="h-4 w-4 hidden sm:block" />
+              Preferences
             </TabsTrigger>
             <TabsTrigger value="security" className="gap-2">
               <Shield className="h-4 w-4 hidden sm:block" />
@@ -282,6 +331,89 @@ export default function SettingsPage() {
                 <Button onClick={handleSaveProfile} disabled={isSavingProfile || isProfileLoading}>
                   {isSavingProfile && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Save Changes
+                </Button>
+              </CardFooter>
+            </Card>
+          </TabsContent>
+
+          {/* Preferences Tab */}
+          <TabsContent value="preferences" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Language & Theme Preferences</CardTitle>
+                <CardDescription>
+                  Customize your experience with language and email theme settings.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {isPrefsLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                  </div>
+                ) : (
+                  <>
+                    {/* Language Preference */}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Globe className="h-5 w-5 text-muted-foreground" />
+                        <Label className="text-base font-medium">Preferred Language</Label>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Choose your preferred language for the application and emails.
+                      </p>
+                      <div className="flex gap-3">
+                        <Button
+                          variant={preferences.preferredLanguage === 'EN' ? 'default' : 'outline'}
+                          className="flex-1"
+                          onClick={() => setPreferences({...preferences, preferredLanguage: 'EN'})}
+                        >
+                          English
+                        </Button>
+                        <Button
+                          variant={preferences.preferredLanguage === 'AR' ? 'default' : 'outline'}
+                          className="flex-1"
+                          onClick={() => setPreferences({...preferences, preferredLanguage: 'AR'})}
+                        >
+                          العربية
+                        </Button>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Email Theme Preference */}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Palette className="h-5 w-5 text-muted-foreground" />
+                        <Label className="text-base font-medium">Email Theme</Label>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Choose the theme for emails you receive from Civify.
+                      </p>
+                      <div className="flex gap-3">
+                        <Button
+                          variant={preferences.preferredTheme === 'LIGHT' ? 'default' : 'outline'}
+                          className="flex-1"
+                          onClick={() => setPreferences({...preferences, preferredTheme: 'LIGHT'})}
+                        >
+                          ☀️ Light
+                        </Button>
+                        <Button
+                          variant={preferences.preferredTheme === 'DARK' ? 'default' : 'outline'}
+                          className="flex-1"
+                          onClick={() => setPreferences({...preferences, preferredTheme: 'DARK'})}
+                        >
+                          🌙 Dark
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+              <CardFooter>
+                <Button onClick={handleSavePreferences} disabled={isSavingPrefs || isPrefsLoading}>
+                  {isSavingPrefs && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Save Preferences
                 </Button>
               </CardFooter>
             </Card>
