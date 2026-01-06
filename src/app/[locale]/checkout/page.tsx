@@ -7,10 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, CreditCard, ArrowLeft, Shield, Tag, Check, X } from 'lucide-react';
+import { Loader2, CreditCard, ArrowLeft, Shield, Tag, Check, X, Receipt } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { subscriptionService } from '@/services/subscription.service';
 import { paymentService } from '@/services/payment.service';
+import { billingService, type Invoice } from '@/services/billing.service';
 import { adminService, type PriceCalculationResponse } from '@/services/admin.service';
 import type { SubscriptionPlan } from '@/features/plans/types';
 import { toast } from 'sonner';
@@ -21,9 +22,11 @@ function CheckoutContent() {
   const t = useTranslations('checkout');
 
   const planId = searchParams.get('planId');
+  const invoiceUuid = searchParams.get('invoice');
   const initialIsAnnual = searchParams.get('annual') === 'true';
 
   const [plan, setPlan] = useState<SubscriptionPlan | null>(null);
+  const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAnnual, setIsAnnual] = useState(initialIsAnnual);
@@ -36,14 +39,17 @@ function CheckoutContent() {
   const [priceCalculation, setPriceCalculation] = useState<PriceCalculationResponse | null>(null);
   const [promoError, setPromoError] = useState<string | null>(null);
 
+  // Mode: invoice (renewal) or plan (initial)
+  const isInvoiceMode = !!invoiceUuid;
+
   useEffect(() => {
-    if (!planId) {
+    if (!planId && !invoiceUuid) {
       router.push('/plans');
       return;
     }
 
     loadData();
-  }, [planId]);
+  }, [planId, invoiceUuid]);
 
   // Reset promo validation when billing cycle changes
   useEffect(() => {
@@ -57,11 +63,7 @@ function CheckoutContent() {
     try {
       setIsLoading(true);
 
-      // Fetch plan details
-      const fetchedPlan = await subscriptionService.getPlanById(Number(planId));
-      setPlan(fetchedPlan);
-
-      // Fetch enabled gateways
+      // Load enabled gateways first
       try {
         const gateways = await paymentService.getEnabledGateways();
         setEnabledGateways(gateways);
@@ -69,12 +71,29 @@ function CheckoutContent() {
           setGateway(gateways[0]);
         }
       } catch {
-        // Default to fawaterak if config endpoint fails
         setEnabledGateways(['fawaterak']);
+      }
+
+      // Invoice mode (renewal from email link)
+      if (invoiceUuid) {
+        const fetchedInvoice = await billingService.getInvoiceByUuid(invoiceUuid);
+        setInvoice(fetchedInvoice);
+        
+        // If invoice already has a payment URL, use it
+        if (fetchedInvoice.paymentUrl && fetchedInvoice.status === 'PENDING') {
+          // Invoice already processed, can redirect or show
+        }
+        return;
+      }
+
+      // Plan mode (initial checkout)
+      if (planId) {
+        const fetchedPlan = await subscriptionService.getPlanById(Number(planId));
+        setPlan(fetchedPlan);
       }
     } catch (error) {
       console.error('Error loading checkout data:', error);
-      toast.error('Failed to load plan details');
+      toast.error('Failed to load checkout details');
       router.push('/plans');
     } finally {
       setIsLoading(false);
@@ -113,10 +132,23 @@ function CheckoutContent() {
   };
 
   const handleCheckout = async () => {
-    if (!plan) return;
-
     try {
       setIsProcessing(true);
+
+      // Invoice mode (renewal) - use billing service
+      if (isInvoiceMode && invoice) {
+        const response = await billingService.payInvoice(invoice.uuid, gateway);
+        
+        if (response.paymentUrl) {
+          window.location.href = response.paymentUrl;
+        } else {
+          toast.error('Failed to get payment URL');
+        }
+        return;
+      }
+
+      // Plan mode (initial) - use payment service
+      if (!plan) return;
 
       const response = await paymentService.initiatePayment(
         plan.id,
@@ -126,7 +158,6 @@ function CheckoutContent() {
       );
 
       if (response.paymentUrl) {
-        // Redirect to payment gateway
         window.location.href = response.paymentUrl;
       } else {
         toast.error('Failed to get payment URL');
@@ -147,18 +178,30 @@ function CheckoutContent() {
     );
   }
 
-  if (!plan) {
+  // For invoice mode, check invoice; for plan mode, check plan
+  if (isInvoiceMode ? !invoice : !plan) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-muted-foreground">Plan not found</p>
+        <p className="text-muted-foreground">{isInvoiceMode ? 'Invoice not found' : 'Plan not found'}</p>
       </div>
     );
   }
 
-  const originalPrice = isAnnual ? parseFloat(plan.annualPrice) : parseFloat(plan.monthlyPrice);
-  const discountAmount = priceCalculation?.discount || 0;
-  const finalPrice = priceCalculation?.totalPrice || originalPrice;
-  const period = isAnnual ? 'year' : 'month';
+  // Calculate prices based on mode
+  const displayPlanName = isInvoiceMode ? invoice!.planName : plan!.name;
+  const displayDescription = isInvoiceMode ? invoice!.description : plan!.description;
+  const originalPrice = isInvoiceMode 
+    ? invoice!.originalAmount 
+    : (isAnnual ? parseFloat(plan!.annualPrice) : parseFloat(plan!.monthlyPrice));
+  const discountAmount = isInvoiceMode 
+    ? (invoice!.discountAmount || 0) 
+    : (priceCalculation?.discount || 0);
+  const finalPrice = isInvoiceMode 
+    ? invoice!.finalAmount 
+    : (priceCalculation?.totalPrice || originalPrice);
+  const period = isInvoiceMode 
+    ? (invoice!.billingType === 'RENEWAL' ? 'renewal' : 'month')
+    : (isAnnual ? 'year' : 'month');
 
   return (
     <div className="min-h-screen py-12 px-4 bg-muted/20">
@@ -180,45 +223,56 @@ function CheckoutContent() {
             <CardContent className="space-y-6">
               {/* Plan Details */}
               <div className="rounded-lg border p-4 bg-background">
-                <h3 className="text-xl font-bold">{plan.name}</h3>
-                <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
-              </div>
-
-              {/* Billing Cycle */}
-              <div>
-                <Label className="text-sm font-medium mb-3 block">{t('billingCycle')}</Label>
-                <div className="flex gap-4">
-                  <button
-                    onClick={() => setIsAnnual(false)}
-                    className={`flex-1 p-4 rounded-lg border-2 transition-all ${
-                      !isAnnual
-                        ? 'border-primary bg-primary/5'
-                        : 'border-muted hover:border-primary/50'
-                    }`}
-                  >
-                    <div className="font-semibold">{t('monthly')}</div>
-                    <div className="text-2xl font-bold mt-1">{parseFloat(plan.monthlyPrice).toFixed(2)} EGP</div>
-                    <div className="text-xs text-muted-foreground">{t('perMonth')}</div>
-                  </button>
-                  <button
-                    onClick={() => setIsAnnual(true)}
-                    className={`flex-1 p-4 rounded-lg border-2 transition-all relative ${
-                      isAnnual
-                        ? 'border-primary bg-primary/5'
-                        : 'border-muted hover:border-primary/50'
-                    }`}
-                  >
-                    <span className="absolute -top-2 ltr:right-2 rtl:left-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
-                      {t('save20')}
-                    </span>
-                    <div className="font-semibold">{t('yearly')}</div>
-                    <div className="text-2xl font-bold mt-1">{parseFloat(plan.annualPrice).toFixed(2)} EGP</div>
-                    <div className="text-xs text-muted-foreground">{t('perYear')}</div>
-                  </button>
+                <div className="flex items-center gap-2">
+                  {isInvoiceMode && <Receipt className="h-5 w-5 text-primary" />}
+                  <h3 className="text-xl font-bold">{displayPlanName}</h3>
                 </div>
+                <p className="text-sm text-muted-foreground mt-1">{displayDescription}</p>
+                {isInvoiceMode && invoice && (
+                  <div className="mt-2 text-xs text-muted-foreground">
+                    Invoice created: {new Date(invoice.createdAt).toLocaleDateString()}
+                  </div>
+                )}
               </div>
 
-              {/* Promo Code */}
+              {/* Billing Cycle - only show in plan mode */}
+              {!isInvoiceMode && plan && (
+                <div>
+                  <Label className="text-sm font-medium mb-3 block">{t('billingCycle')}</Label>
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => setIsAnnual(false)}
+                      className={`flex-1 p-4 rounded-lg border-2 transition-all ${
+                        !isAnnual
+                          ? 'border-primary bg-primary/5'
+                          : 'border-muted hover:border-primary/50'
+                      }`}
+                    >
+                      <div className="font-semibold">{t('monthly')}</div>
+                      <div className="text-2xl font-bold mt-1">{parseFloat(plan.monthlyPrice).toFixed(2)} EGP</div>
+                      <div className="text-xs text-muted-foreground">{t('perMonth')}</div>
+                    </button>
+                    <button
+                      onClick={() => setIsAnnual(true)}
+                      className={`flex-1 p-4 rounded-lg border-2 transition-all relative ${
+                        isAnnual
+                          ? 'border-primary bg-primary/5'
+                          : 'border-muted hover:border-primary/50'
+                      }`}
+                    >
+                      <span className="absolute -top-2 ltr:right-2 rtl:left-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
+                        {t('save20')}
+                      </span>
+                      <div className="font-semibold">{t('yearly')}</div>
+                      <div className="text-2xl font-bold mt-1">{parseFloat(plan.annualPrice).toFixed(2)} EGP</div>
+                      <div className="text-xs text-muted-foreground">{t('perYear')}</div>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Promo Code - only show in plan mode */}
+              {!isInvoiceMode && (
               <div>
                 <Label htmlFor="promo" className="text-sm font-medium mb-2 block">
                   <Tag className="h-4 w-4 inline mr-1" />
@@ -269,6 +323,7 @@ function CheckoutContent() {
                   </>
                 )}
               </div>
+              )}
 
               {/* Total */}
               <div className="border-t pt-4 space-y-2">
@@ -276,24 +331,24 @@ function CheckoutContent() {
                   <span>{t('subtotal')}</span>
                   <span>{originalPrice.toFixed(2)} EGP</span>
                 </div>
-                {priceCalculation && (
+                {(discountAmount > 0) && (
                   <div className="flex justify-between items-center text-sm text-green-600">
                     <span>{t('discount')}</span>
-                    <span>-{priceCalculation.currency} {discountAmount.toFixed(2)}</span>
+                    <span>-{discountAmount.toFixed(2)} EGP</span>
                   </div>
                 )}
                 <div className="flex justify-between items-center text-lg font-bold">
                   <span>{t('total')}</span>
                   <div className="text-right">
-                    {priceCalculation ? (
+                    {discountAmount > 0 ? (
                       <>
                         <span className="line-through text-muted-foreground text-sm mr-2">
-                          {priceCalculation.currency} {originalPrice.toFixed(2)}
+                          {originalPrice.toFixed(2)} EGP
                         </span>
-                        <span className="text-green-600">{priceCalculation.currency} {finalPrice.toFixed(2)}</span>
+                        <span className="text-green-600">{finalPrice.toFixed(2)} EGP</span>
                       </>
                     ) : (
-                      <span>{originalPrice.toFixed(2)} EGP</span>
+                      <span>{finalPrice.toFixed(2)} EGP</span>
                     )}
                     <span className="text-sm font-normal text-muted-foreground"> / {period}</span>
                   </div>

@@ -11,7 +11,9 @@ import {
   Loader2,
   Settings,
   Globe,
-  Palette
+  Palette,
+  Receipt,
+  ExternalLink
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -65,6 +67,18 @@ interface UserPreferences {
   preferredTheme: 'LIGHT' | 'DARK';
 }
 
+interface Invoice {
+  id: number;
+  uuid: string;
+  planName: string;
+  finalAmount: number;
+  currency: string;
+  status: 'PENDING' | 'PAID' | 'EXPIRED' | 'CANCELLED';
+  billingType: string;
+  createdAt: string;
+  paidAt: string | null;
+}
+
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("profile");
   
@@ -104,6 +118,10 @@ export default function SettingsPage() {
   });
   const [isPrefsLoading, setIsPrefsLoading] = useState(true);
   const [isSavingPrefs, setIsSavingPrefs] = useState(false);
+
+  // Invoice history state
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [isInvoicesLoading, setIsInvoicesLoading] = useState(true);
 
   // Fetch user profile on mount
   useEffect(() => {
@@ -153,6 +171,21 @@ export default function SettingsPage() {
       }
     };
     fetchPreferences();
+  }, []);
+
+  // Fetch invoices
+  useEffect(() => {
+    const fetchInvoices = async () => {
+      try {
+        const response = await apiClient.get<Invoice[]>('/v1/billing/invoices');
+        setInvoices(response.data);
+      } catch {
+        // User might not have invoices
+      } finally {
+        setIsInvoicesLoading(false);
+      }
+    };
+    fetchInvoices();
   }, []);
 
   // Save profile
@@ -577,6 +610,67 @@ export default function SettingsPage() {
                       <Button>View Plans</Button>
                     </Link>
                   </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Invoice History */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Receipt className="h-5 w-5" />
+                  Invoice History
+                </CardTitle>
+                <CardDescription>
+                  View your past invoices and payment history.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isInvoicesLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                  </div>
+                ) : invoices.length > 0 ? (
+                  <div className="space-y-3">
+                    {invoices.map((invoice) => (
+                      <div
+                        key={invoice.id}
+                        className="flex items-center justify-between p-4 rounded-lg border bg-muted/30"
+                      >
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium">{invoice.planName}</p>
+                            <span className={`px-2 py-0.5 text-xs rounded-full ${
+                              invoice.status === 'PAID'
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                                : invoice.status === 'PENDING'
+                                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400'
+                            }`}>
+                              {invoice.status}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {invoice.billingType} • {new Date(invoice.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold">{invoice.finalAmount.toFixed(2)} {invoice.currency}</p>
+                          {invoice.status === 'PENDING' && (
+                            <Link href={`/checkout?invoice=${invoice.uuid}`}>
+                              <Button variant="link" size="sm" className="h-auto p-0 text-primary">
+                                Pay Now <ExternalLink className="h-3 w-3 ml-1" />
+                              </Button>
+                            </Link>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-center py-8 text-muted-foreground">
+                    No invoices found.
+                  </p>
                 )}
               </CardContent>
             </Card>
