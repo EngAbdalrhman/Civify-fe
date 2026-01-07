@@ -4,16 +4,13 @@ import { useState, useEffect } from 'react';
 import { 
   User, 
   Shield, 
-  CreditCard, 
   Bell, 
   Eye,
   EyeOff,
   Loader2,
   Settings,
   Globe,
-  Palette,
-  Receipt,
-  ExternalLink
+  Palette
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -50,33 +47,9 @@ interface UserProfile {
   profilePictureUrl: string | null;
 }
 
-interface Subscription {
-  id: number;
-  planName: string;
-  planDescription: string;
-  status: string;
-  startDate: string;
-  endDate: string;
-  cvLimit: number;
-  currentCvCount: number;
-  autoRenew?: boolean;
-}
-
 interface UserPreferences {
   preferredLanguage: 'EN' | 'AR';
   preferredTheme: 'LIGHT' | 'DARK';
-}
-
-interface Invoice {
-  id: number;
-  uuid: string;
-  planName: string;
-  finalAmount: number;
-  currency: string;
-  status: 'PENDING' | 'PAID' | 'EXPIRED' | 'CANCELLED';
-  billingType: string;
-  createdAt: string;
-  paidAt: string | null;
 }
 
 export default function SettingsPage() {
@@ -107,10 +80,6 @@ export default function SettingsPage() {
   const [is2FAEnabled, setIs2FAEnabled] = useState(false);
   const [isToggling2FA, setIsToggling2FA] = useState(false);
 
-  // Subscription state
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
-  const [isSubLoading, setIsSubLoading] = useState(true);
-
   // Preferences state
   const [preferences, setPreferences] = useState<UserPreferences>({
     preferredLanguage: 'EN',
@@ -118,10 +87,6 @@ export default function SettingsPage() {
   });
   const [isPrefsLoading, setIsPrefsLoading] = useState(true);
   const [isSavingPrefs, setIsSavingPrefs] = useState(false);
-
-  // Invoice history state
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [isInvoicesLoading, setIsInvoicesLoading] = useState(true);
 
   // Fetch user profile on mount
   useEffect(() => {
@@ -143,21 +108,6 @@ export default function SettingsPage() {
     fetchProfile();
   }, []);
 
-  // Fetch subscription
-  useEffect(() => {
-    const fetchSubscription = async () => {
-      try {
-        const response = await apiClient.get<Subscription>('/v1/subscriptions/my-subscription');
-        setSubscription(response.data);
-      } catch {
-        // User might not have a subscription
-      } finally {
-        setIsSubLoading(false);
-      }
-    };
-    fetchSubscription();
-  }, []);
-
   // Fetch preferences
   useEffect(() => {
     const fetchPreferences = async () => {
@@ -171,21 +121,6 @@ export default function SettingsPage() {
       }
     };
     fetchPreferences();
-  }, []);
-
-  // Fetch invoices
-  useEffect(() => {
-    const fetchInvoices = async () => {
-      try {
-        const response = await apiClient.get<Invoice[]>('/v1/billing/invoices');
-        setInvoices(response.data);
-      } catch {
-        // User might not have invoices
-      } finally {
-        setIsInvoicesLoading(false);
-      }
-    };
-    fetchInvoices();
   }, []);
 
   // Save profile
@@ -278,7 +213,7 @@ export default function SettingsPage() {
         </div>
 
         <Tabs defaultValue="profile" className="space-y-4" onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:grid-cols-none lg:inline-flex">
+          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-flex">
             <TabsTrigger value="profile" className="gap-2">
               <User className="h-4 w-4 hidden sm:block" />
               Profile
@@ -290,10 +225,6 @@ export default function SettingsPage() {
             <TabsTrigger value="security" className="gap-2">
               <Shield className="h-4 w-4 hidden sm:block" />
               Security
-            </TabsTrigger>
-            <TabsTrigger value="billing" className="gap-2">
-              <CreditCard className="h-4 w-4 hidden sm:block" />
-              Billing
             </TabsTrigger>
             <TabsTrigger value="notifications" className="gap-2">
               <Bell className="h-4 w-4 hidden sm:block" />
@@ -539,139 +470,6 @@ export default function SettingsPage() {
                     disabled={isToggling2FA || !user}
                   />
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Billing Tab */}
-          <TabsContent value="billing" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Subscription Plan</CardTitle>
-                <CardDescription>
-                  {subscription ? (
-                    <>You are currently on the <span className="font-semibold text-primary">{subscription.planName}</span> plan.</>
-                  ) : (
-                    'View and manage your subscription.'
-                  )}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {isSubLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                  </div>
-                ) : subscription ? (
-                  <div className="space-y-4">
-                    <div className="bg-muted/50 p-4 rounded-lg space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-lg">{subscription.planName}</p>
-                          <p className="text-sm text-muted-foreground">{subscription.planDescription}</p>
-                        </div>
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          subscription.status === 'ACTIVE' 
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                            : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-                        }`}>
-                          {subscription.status}
-                        </span>
-                      </div>
-                      <Separator />
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <p className="text-muted-foreground">CV Usage</p>
-                          <p className="font-medium">{subscription.currentCvCount} / {subscription.cvLimit ?? '∞'}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">Auto Renew</p>
-                          <p className="font-medium">{subscription.autoRenew !== false ? 'Yes' : 'No'}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">Started</p>
-                          <p className="font-medium">{new Date(subscription.startDate).toLocaleDateString()}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">Renews</p>
-                          <p className="font-medium">{new Date(subscription.endDate).toLocaleDateString()}</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Link href="/plans">
-                        <Button variant="outline">View Plans</Button>
-                      </Link>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground mb-4">You don't have an active subscription.</p>
-                    <Link href="/plans">
-                      <Button>View Plans</Button>
-                    </Link>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Invoice History */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Receipt className="h-5 w-5" />
-                  Invoice History
-                </CardTitle>
-                <CardDescription>
-                  View your past invoices and payment history.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {isInvoicesLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                  </div>
-                ) : invoices.length > 0 ? (
-                  <div className="space-y-3">
-                    {invoices.map((invoice) => (
-                      <div
-                        key={invoice.id}
-                        className="flex items-center justify-between p-4 rounded-lg border bg-muted/30"
-                      >
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <p className="font-medium">{invoice.planName}</p>
-                            <span className={`px-2 py-0.5 text-xs rounded-full ${
-                              invoice.status === 'PAID'
-                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                                : invoice.status === 'PENDING'
-                                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-                                : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400'
-                            }`}>
-                              {invoice.status}
-                            </span>
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            {invoice.billingType} • {new Date(invoice.createdAt).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-semibold">{invoice.finalAmount.toFixed(2)} {invoice.currency}</p>
-                          {invoice.status === 'PENDING' && (
-                            <Link href={`/checkout?invoice=${invoice.uuid}`}>
-                              <Button variant="link" size="sm" className="h-auto p-0 text-primary">
-                                Pay Now <ExternalLink className="h-3 w-3 ml-1" />
-                              </Button>
-                            </Link>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center py-8 text-muted-foreground">
-                    No invoices found.
-                  </p>
-                )}
               </CardContent>
             </Card>
           </TabsContent>
