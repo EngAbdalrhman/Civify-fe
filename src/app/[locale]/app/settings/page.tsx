@@ -226,10 +226,10 @@ export default function SettingsPage() {
               <Shield className="h-4 w-4 hidden sm:block" />
               Security
             </TabsTrigger>
-            <TabsTrigger value="notifications" className="gap-2">
+            {/* <TabsTrigger value="notifications" className="gap-2">
               <Bell className="h-4 w-4 hidden sm:block" />
               Notifications
-            </TabsTrigger>
+            </TabsTrigger> */}
           </TabsList>
 
           {/* Profile Tab */}
@@ -475,7 +475,7 @@ export default function SettingsPage() {
           </TabsContent>
 
           {/* Notifications Tab */}
-          <TabsContent value="notifications" className="space-y-4">
+          {/* <TabsContent value="notifications" className="space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle>Email Notifications</CardTitle>
@@ -505,7 +505,7 @@ export default function SettingsPage() {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </TabsContent> */}
         </Tabs>
       </div>
     </PermissionGuard>
