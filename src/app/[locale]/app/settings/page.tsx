@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
   User, 
   Shield, 
@@ -10,7 +10,8 @@ import {
   Loader2,
   Settings,
   Globe,
-  Palette
+  Palette,
+  Camera
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -87,6 +88,9 @@ export default function SettingsPage() {
   });
   const [isPrefsLoading, setIsPrefsLoading] = useState(true);
   const [isSavingPrefs, setIsSavingPrefs] = useState(false);
+
+  // Avatar upload state
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   // Fetch user profile on mount
   useEffect(() => {
@@ -202,6 +206,55 @@ export default function SettingsPage() {
     return (first + last).toUpperCase() || 'U';
   };
 
+  // Avatar file input ref
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle avatar upload
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Image size must be less than 2MB');
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+    try {
+      // Convert to base64
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64Image = reader.result as string;
+        try {
+          const response = await apiClient.put<UserProfile>('/v1/users/me/profile-picture', {
+            image: base64Image
+          });
+          setUser(response.data);
+          toast.success('Profile picture updated!');
+        } catch {
+          toast.error('Failed to upload profile picture');
+        } finally {
+          setIsUploadingAvatar(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch {
+      toast.error('Failed to process image');
+      setIsUploadingAvatar(false);
+    }
+    // Reset input
+    if (avatarInputRef.current) {
+      avatarInputRef.current.value = '';
+    }
+  };
+
   return (
     <PermissionGuard requireAuth={true} permissions={[]}>
       <div className="space-y-6">
@@ -249,13 +302,37 @@ export default function SettingsPage() {
                 ) : (
                   <>
                     <div className="flex items-center gap-4">
-                      <Avatar className="h-20 w-20">
-                        <AvatarImage src={user?.profilePictureUrl || undefined} />
-                        <AvatarFallback className="text-lg">{getInitials()}</AvatarFallback>
-                      </Avatar>
+                      <div className="relative group">
+                        <Avatar className="h-20 w-20">
+                          <AvatarImage src={user?.profilePictureUrl || undefined} />
+                          <AvatarFallback className="text-lg">{getInitials()}</AvatarFallback>
+                        </Avatar>
+                        <button
+                          type="button"
+                          onClick={() => avatarInputRef.current?.click()}
+                          disabled={isUploadingAvatar}
+                          className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                        >
+                          {isUploadingAvatar ? (
+                            <Loader2 className="h-6 w-6 text-white animate-spin" />
+                          ) : (
+                            <Camera className="h-6 w-6 text-white" />
+                          )}
+                        </button>
+                        <input
+                          ref={avatarInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleAvatarUpload}
+                          className="hidden"
+                        />
+                      </div>
                       <div>
                         <p className="font-medium">{user?.username}</p>
                         <p className="text-sm text-muted-foreground">{user?.email}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Hover avatar to change
+                        </p>
                       </div>
                     </div>
                     <Separator />
