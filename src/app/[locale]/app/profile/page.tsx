@@ -33,7 +33,19 @@ import {
 import { Link } from '@/i18n/routing';
 import apiClient from '@/api/client';
 import { useAuth } from '@/hooks/use-auth';
-import { format } from 'date-fns';
+import { format, isValid, parseISO } from 'date-fns';
+
+// Safe date formatting helper to prevent "Invalid time value" errors
+const safeFormatDate = (dateString: string | null | undefined, formatString: string, fallback: string = 'N/A'): string => {
+  if (!dateString) return fallback;
+  try {
+    const date = typeof dateString === 'string' ? parseISO(dateString) : new Date(dateString);
+    if (!isValid(date)) return fallback;
+    return format(date, formatString);
+  } catch {
+    return fallback;
+  }
+};
 
 interface UserProfile {
   id: number;
@@ -290,9 +302,7 @@ export default function ProfilePage() {
                   <div>
                     <p className="text-sm text-muted-foreground">Member Since</p>
                     <p className="font-medium">
-                      {profile.createdAt 
-                        ? format(new Date(profile.createdAt), 'MMMM yyyy')
-                        : 'N/A'}
+                      {safeFormatDate(profile.createdAt, 'MMMM yyyy')}
                     </p>
                   </div>
                 </div>
@@ -387,11 +397,11 @@ export default function ProfilePage() {
                       </div>
                       <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">Started</p>
-                        <p className="font-semibold">{format(new Date(subscription.startDate), 'MMM dd, yyyy')}</p>
+                        <p className="font-semibold">{safeFormatDate(subscription.startDate, 'MMM dd, yyyy')}</p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">{subscription.autoRenew !== false ? 'Renews' : 'Expires'}</p>
-                        <p className="font-semibold">{format(new Date(subscription.endDate), 'MMM dd, yyyy')}</p>
+                        <p className="font-semibold">{safeFormatDate(subscription.endDate, 'MMM dd, yyyy')}</p>
                       </div>
                     </div>
                   </div>
@@ -455,7 +465,7 @@ export default function ProfilePage() {
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          {invoice.billingType} • {format(new Date(invoice.createdAt), 'MMM dd, yyyy')}
+                          {invoice.billingType} • {safeFormatDate(invoice.createdAt, 'MMM dd, yyyy')}
                         </p>
                       </div>
                       <div className="text-right">
@@ -469,7 +479,7 @@ export default function ProfilePage() {
                         )}
                         {invoice.status === 'PAID' && invoice.paidAt && (
                           <p className="text-xs text-muted-foreground">
-                            Paid {format(new Date(invoice.paidAt), 'MMM dd')}
+                            Paid {safeFormatDate(invoice.paidAt, 'MMM dd')}
                           </p>
                         )}
                       </div>
