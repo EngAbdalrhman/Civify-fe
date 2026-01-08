@@ -245,6 +245,81 @@ export interface CvOperationLog {
 }
 
 // ============================================
+// Subscription Audit Log Types
+// ============================================
+
+export type SubscriptionAuditType = 
+  | 'RENEW' 
+  | 'REMINDER_SENT' 
+  | 'DOWNGRADE' 
+  | 'EXPIRE' 
+  | 'AUTO_EXTEND' 
+  | 'INVOICE_CREATED' 
+  | 'PAYMENT_RECEIVED' 
+  | 'ACTIVATED' 
+  | 'CANCELLED';
+
+export interface SubscriptionAuditLog {
+  id: number;
+  userId: number;
+  subscriptionId?: number;
+  auditType: SubscriptionAuditType;
+  invoiceId?: number;
+  planId?: number;
+  performedBy?: string;
+  details?: string;
+  createdAt: string;
+}
+
+// ============================================
+// Billing Audit Log Types
+// ============================================
+
+export type BillingAuditType = 
+  | 'WEBHOOK_RECEIVED' 
+  | 'WEBHOOK_SUCCESS' 
+  | 'WEBHOOK_FAILED' 
+  | 'PAYMENT_COMPLETED' 
+  | 'PAYMENT_FAILED' 
+  | 'INVOICE_CANCELLED' 
+  | 'INVOICE_EXPIRED' 
+  | 'REFUND_INITIATED';
+
+export interface BillingAuditLog {
+  id: number;
+  userId?: number;
+  auditType: BillingAuditType;
+  invoiceId?: number;
+  transactionId?: string;
+  gateway?: string;
+  gatewayInvoiceId?: string;
+  gatewayStatus?: string;
+  paymentMethod?: string;
+  result?: string;
+  ipAddress?: string;
+  createdAt: string;
+}
+
+// ============================================
+// Token Usage Log Types
+// ============================================
+
+export type TokenUsageType = 'CV_PARSE' | 'CV_TAILOR' | 'CONTENT_GENERATE' | 'OTHER';
+export type TokenSource = 'SUBSCRIPTION' | 'WALLET' | 'MIXED';
+
+export interface TokenUsageLog {
+  id: number;
+  userId?: number;
+  usageType: TokenUsageType;
+  source: TokenSource;
+  tokensUsed: number;
+  fromSubscription: number;
+  fromWallet: number;
+  description?: string;
+  createdAt: string;
+}
+
+// ============================================
 // API Endpoints
 // ============================================
 
@@ -549,6 +624,49 @@ class AdminService {
     const response = await apiClient.post<PagedResponse<AuditLog>>(
       `${ADMIN_API.AUDIT}/${entityType}`,
       data
+    );
+    return response.data;
+  }
+
+  // ==========================================
+  // Subscription Audit Logs
+  // ==========================================
+
+  async filterSubscriptionAuditLogs(data: InputDataModel): Promise<PagedResponse<SubscriptionAuditLog>> {
+    const response = await apiClient.post<PagedResponse<SubscriptionAuditLog>>(
+      '/v1/admin/audit/subscription/filter',
+      data
+    );
+    return response.data;
+  }
+
+  // ==========================================
+  // Billing Audit Logs
+  // ==========================================
+
+  async filterBillingAuditLogs(data: InputDataModel): Promise<PagedResponse<BillingAuditLog>> {
+    const response = await apiClient.post<PagedResponse<BillingAuditLog>>(
+      '/v1/admin/audit/billing/filter',
+      data
+    );
+    return response.data;
+  }
+
+  // ==========================================
+  // Token Usage Logs (Admin)
+  // ==========================================
+
+  async filterTokenUsageLogs(data: InputDataModel): Promise<PagedResponse<TokenUsageLog>> {
+    const response = await apiClient.post<PagedResponse<TokenUsageLog>>(
+      '/v1/token-usage/admin/filter',
+      data
+    );
+    return response.data;
+  }
+
+  async getUserTokenUsage(userId: number, page = 0, size = 20): Promise<PagedResponse<TokenUsageLog>> {
+    const response = await apiClient.get<PagedResponse<TokenUsageLog>>(
+      `/v1/token-usage/admin/user/${userId}?page=${page}&size=${size}`
     );
     return response.data;
   }
