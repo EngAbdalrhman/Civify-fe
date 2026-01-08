@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from 'next-intl';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   BarChart, 
@@ -20,15 +20,17 @@ import {
   CardDescription 
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Zap, Activity, FileText, ArrowUpRight, Loader2, AlertTriangle } from 'lucide-react';
+import { Zap, Activity, FileText, ArrowUpRight, Loader2, AlertTriangle, Coins } from 'lucide-react';
 import { subscriptionService } from '@/services/subscription.service';
 import { apiUsageService, type ApiUsageLog, type ApiUsageStats } from '@/services/api-usage.service';
+import { tokenUsageService, type TokenUsageLog, type TokenUsageSummary } from '@/services/token-usage.service';
 import { useAuth } from '@/hooks/use-auth';
 import { Link } from '@/i18n/routing';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GenericList, buildInputDataModel } from '@/components/generic-list/GenericList';
 import { ColumnDef, FilterOperation } from '@/components/generic-list/types';
+import { format } from 'date-fns';
 
 import type { UserSubscription } from '@/features/plans/types';
 import { PermissionGuard } from '@/components/auth/PermissionGuard';
@@ -43,6 +45,16 @@ export default function AnalyticsPage() {
   const [error, setError] = useState<string | null>(null);
   const [apiLogs, setApiLogs] = useState<ApiUsageLog[]>([]);
   const [apiStats, setApiStats] = useState<ApiUsageStats | null>(null);
+  
+  // Token usage state
+  const [tokenUsage, setTokenUsage] = useState<TokenUsageLog[]>([]);
+  const [tokenUsageSummary, setTokenUsageSummary] = useState<TokenUsageSummary | null>(null);
+  const [tokenPagination, setTokenPagination] = useState({
+    page: 0,
+    size: 10,
+    totalElements: 0,
+    totalPages: 0
+  });
 
   // Pagination for logs
   const [logsPagination, setLogsPagination] = useState({
@@ -80,12 +92,14 @@ export default function AnalyticsPage() {
       }
 
       // Fetch other stats
-      const [logsData, statsData] = await Promise.all([
+      const [logsData, statsData, tokenData, tokenSummaryData] = await Promise.all([
         // Only fetch logs if user has permission
         canViewApiLogs 
-          ? apiUsageService.getMyLogs({ page: 0, size: 10 }).catch(() => ({ content: [], totalElements: 0, totalPages: 0, size: 10, page: 0 }))
-          : Promise.resolve({ content: [], totalElements: 0, totalPages: 0, size: 10, page: 0 }),
+          ? apiUsageService.getMyLogs({ page: 0, size: 10 }).catch(() => ({ content: [], totalElements: 0, totalPages: 0, size: 10, page: 0, number: 0 }))
+          : Promise.resolve({ content: [], totalElements: 0, totalPages: 0, size: 10, page: 0, number: 0 }),
         apiUsageService.getMyStats().catch(() => null),
+        tokenUsageService.getMyUsageHistory(0, 10).catch(() => ({ content: [], totalElements: 0, totalPages: 0, size: 10, number: 0 })),
+        tokenUsageService.getMySummary().catch(() => null),
       ]);
       
       setApiLogs(logsData.content || []);
@@ -97,6 +111,16 @@ export default function AnalyticsPage() {
       });
 
       setApiStats(statsData);
+      
+      // Set token usage data
+      setTokenUsage(tokenData.content || []);
+      setTokenPagination({
+        page: tokenData.number || 0,
+        size: tokenData.size || 10,
+        totalElements: tokenData.totalElements || 0,
+        totalPages: tokenData.totalPages || 0
+      });
+      setTokenUsageSummary(tokenSummaryData);
     } catch (err) {
       console.error('Error loading analytics data:', err);
       setError('Failed to load analytics data');
@@ -187,6 +211,62 @@ export default function AnalyticsPage() {
       }
   }
 
+  // Token Usage Columns
+  const tokenUsageColumns: ColumnDef<TokenUsageLog>[] = useMemo(() => [
+    {
+      key: 'usageType',
+      label: 'Type',
+      render: (_, item) => {
+        const type = item.usageType.replace('_', ' ');
+        return <Badge variant="secondary">{type}</Badge>;
+      },
+    },
+    {
+      key: 'source',
+      label: 'Source',
+      render: (_, item) => {
+        const variants: Record<string, 'default' | 'secondary' | 'outline'> = {
+          SUBSCRIPTION: 'default',
+          WALLET: 'secondary',
+          MIXED: 'outline',
+        };
+        return <Badge variant={variants[item.source] || 'outline'}>{item.source}</Badge>;
+      },
+    },
+    { key: 'tokensUsed', label: 'Tokens Used' },
+    { key: 'fromSubscription', label: 'From Plan' },
+    { key: 'fromWallet', label: 'From Wallet' },
+    {
+      key: 'description',
+      label: 'Description',
+      render: (_, item) => {
+        const desc = item.description;
+        if (!desc) return '-';
+        return desc.length > 40 ? `${desc.substring(0, 40)}...` : desc;
+      },
+    },
+    {
+      key: 'createdAt',
+      label: 'Date',
+      render: (_, item) => format(new Date(item.createdAt), 'MMM dd, HH:mm'),
+    },
+  ], []);
+
+  const handleTokenPageChange = async (newPage: number) => {
+    try {
+      const tokenData = await tokenUsageService.getMyUsageHistory(newPage, tokenPagination.size);
+      setTokenUsage(tokenData.content || []);
+      setTokenPagination(prev => ({
+        ...prev,
+        page: tokenData.number || newPage,
+        totalElements: tokenData.totalElements || 0,
+        totalPages: tokenData.totalPages || 0
+      }));
+    } catch (e) {
+      console.error("Failed to load token usage page", e);
+    }
+  };
+
 
   if (isLoading) {
     return (
@@ -241,6 +321,10 @@ export default function AnalyticsPage() {
         <Tabs defaultValue="stats" className="w-full">
           <TabsList>
             <TabsTrigger value="stats">General Statistics</TabsTrigger>
+            <TabsTrigger value="token-usage">
+              <Coins className="h-4 w-4 mr-1" />
+              Token History
+            </TabsTrigger>
             {canViewApiLogs && <TabsTrigger value="logs">API Logs</TabsTrigger>}
           </TabsList>
 
@@ -382,6 +466,62 @@ export default function AnalyticsPage() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Token Usage History Tab */}
+          <TabsContent value="token-usage" className="space-y-6">
+            {/* Token Summary Cards */}
+            {tokenUsageSummary && (
+              <div className="grid gap-4 md:grid-cols-3">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Tokens Used</CardTitle>
+                    <Coins className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{tokenUsageSummary.totalTokensUsed}</div>
+                    <p className="text-xs text-muted-foreground">This month</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">From Subscription</CardTitle>
+                    <Activity className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{tokenUsageSummary.fromSubscription}</div>
+                    <p className="text-xs text-muted-foreground">Tokens from plan</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">From Wallet</CardTitle>
+                    <Zap className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{tokenUsageSummary.fromWallet}</div>
+                    <p className="text-xs text-muted-foreground">Extra tokens used</p>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* Token Usage Log Table */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Token Usage History</CardTitle>
+                <CardDescription>Detailed log of your token consumption for CV parsing and other AI features.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <GenericList 
+                  data={tokenUsage}
+                  columns={tokenUsageColumns}
+                  meta={tokenPagination}
+                  isLoading={isLoading}
+                  onPageChange={handleTokenPageChange}
+                />
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {canViewApiLogs && (
