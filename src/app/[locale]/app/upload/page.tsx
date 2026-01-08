@@ -138,7 +138,6 @@ export default function UploadPage() {
         if (data.resumeData) {
           setResumeData(data.resumeData);
           setCurrentStep(2);
-          toast.success('CV parsed successfully!');
         } else {
           toast.error('Failed to parse CV data');
         }
@@ -185,7 +184,7 @@ export default function UploadPage() {
     setResumeData(resume.data);
     setShowResumeSelector(false);
     setCurrentStep(2);
-    toast.success(t('selectResume.selected'));
+    // toast.success(t('selectResume.selected'));
   }, [t]);
 
   // Download handlers
@@ -196,7 +195,7 @@ export default function UploadPage() {
     try {
       const filename = `${tailorResponse.tailoredCv.personalInfo.fullName || 'cv'}_tailored`;
       await exportToPdf(cvPreviewRef.current, filename, tailorResponse.tailoredCv);
-      toast.success('PDF downloaded successfully!');
+      // toast.success('PDF downloaded successfully!');
     } catch (error) {
       console.error('PDF export failed:', error);
       toast.error('Failed to download PDF. Please try again.');
@@ -212,7 +211,7 @@ export default function UploadPage() {
     try {
       const filename = `${tailorResponse.tailoredCv.personalInfo.fullName || 'cv'}_tailored`;
       await exportToDocx(tailorResponse.tailoredCv, filename);
-      toast.success('DOCX downloaded successfully!');
+      // toast.success('DOCX downloaded successfully!');
     } catch (error) {
       console.error('DOCX export failed:', error);
       toast.error('Failed to download DOCX. Please try again.');
@@ -230,7 +229,7 @@ export default function UploadPage() {
       const title = `${tailorResponse.tailoredCv.personalInfo.fullName || 'My CV'} - ${jobTitle || 'Tailored'}`;
       const saved = await ResumeService.create(title, tailorResponse.tailoredCv);
       setSavedResumeId(saved.id);
-      toast.success('CV saved to My Resumes!');
+      // toast.success('CV saved to My Resumes!');
     } catch (error) {
       console.error('Save to resumes failed:', error);
       toast.error('Failed to save CV. Please try again.');
@@ -254,7 +253,7 @@ export default function UploadPage() {
         applicationStatus: 'draft',
       });
       setTrackedApplicationId(application.id);
-      toast.success('Added to Job Tracker!');
+      // toast.success('Added to Job Tracker!');
     } catch (error) {
       console.error('Track application failed:', error);
       toast.error('Failed to track application. Please try again.');
@@ -290,7 +289,7 @@ export default function UploadPage() {
       onSuccess: (data) => {
         setTailorResponse(data);
         setCurrentStep(4);
-        toast.success('CV tailored successfully!');
+        // toast.success('CV tailored successfully!');
       },
     });
   }, [resumeData, jobDescription, jobTitle, companyName, generateCoverLetter, includeInterviewQuestions, includeRoadmap, tailorCv]);
@@ -1152,7 +1151,7 @@ export default function UploadPage() {
                       <Save className="mr-2 h-4 w-4" />
                       {savedResumeId ? 'Saved to Resumes' : isSavingResume ? 'Saving...' : 'Save to My Resumes'}
                     </Button>
-                    <Button 
+                    {/* <Button 
                       variant="outline" 
                       className="w-full" 
                       size="sm"
@@ -1161,7 +1160,7 @@ export default function UploadPage() {
                     >
                       <Bookmark className="mr-2 h-4 w-4" />
                       {trackedApplicationId ? 'Added to Tracker' : isTrackingApplication ? 'Adding...' : 'Track Application'}
-                    </Button>
+                    </Button> */}
                   </div>
                 </CardContent>
               </Card>
