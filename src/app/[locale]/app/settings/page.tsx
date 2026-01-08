@@ -11,7 +11,9 @@ import {
   Settings,
   Globe,
   Palette,
-  Camera
+  Camera,
+  Trash2,
+  AlertTriangle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,9 +35,20 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import apiClient from '@/api/client';
-import { Link } from '@/i18n/routing';
+import { Link, useRouter } from '@/i18n/routing';
 import { PermissionGuard } from '@/components/auth/PermissionGuard';
 
 interface UserProfile {
@@ -91,6 +104,12 @@ export default function SettingsPage() {
 
   // Avatar upload state
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+
+  // Delete account state
+  const [deleteAccountPassword, setDeleteAccountPassword] = useState('');
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const router = useRouter();
 
   // Fetch user profile on mount
   useEffect(() => {
@@ -252,6 +271,33 @@ export default function SettingsPage() {
     // Reset input
     if (avatarInputRef.current) {
       avatarInputRef.current.value = '';
+    }
+  };
+
+  // Delete account handler
+  const handleDeleteAccount = async () => {
+    if (!deleteAccountPassword) {
+      toast.error('Please enter your password');
+      return;
+    }
+
+    setIsDeletingAccount(true);
+    try {
+      await apiClient.delete('/v1/users/me', {
+        data: { password: deleteAccountPassword }
+      });
+      toast.success('Account deleted successfully');
+      setShowDeleteDialog(false);
+      // Clear local storage and redirect
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      router.push('/');
+    } catch (err: unknown) {
+      const error = err as { message?: string };
+      toast.error(error.message || 'Failed to delete account');
+    } finally {
+      setIsDeletingAccount(false);
+      setDeleteAccountPassword('');
     }
   };
 
@@ -546,6 +592,71 @@ export default function SettingsPage() {
                     onCheckedChange={handleToggle2FA}
                     disabled={isToggling2FA || !user}
                   />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Delete Account Danger Zone */}
+            <Card className="border-destructive/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-destructive">
+                  <AlertTriangle className="h-5 w-5" />
+                  Danger Zone
+                </CardTitle>
+                <CardDescription>
+                  Permanently delete your account and all associated data.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <div className="font-medium">Delete Account</div>
+                    <div className="text-sm text-muted-foreground">
+                      Once deleted, your account cannot be recovered. You can create a new account with the same email later.
+                    </div>
+                  </div>
+                  <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" className="gap-2">
+                        <Trash2 className="h-4 w-4" />
+                        Delete Account
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently delete your account.
+                          Your data will remain in our system but will no longer be accessible.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <div className="py-4">
+                        <Label htmlFor="delete-password">Enter your password to confirm</Label>
+                        <div className="relative mt-2">
+                          <Input
+                            id="delete-password"
+                            type="password"
+                            value={deleteAccountPassword}
+                            onChange={(e) => setDeleteAccountPassword(e.target.value)}
+                            placeholder="Your password"
+                          />
+                        </div>
+                      </div>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setDeleteAccountPassword('')}>
+                          Cancel
+                        </AlertDialogCancel>
+                        <Button
+                          variant="destructive"
+                          onClick={handleDeleteAccount}
+                          disabled={isDeletingAccount || !deleteAccountPassword}
+                        >
+                          {isDeletingAccount && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                          Delete Account
+                        </Button>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </CardContent>
             </Card>
