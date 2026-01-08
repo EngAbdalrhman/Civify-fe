@@ -2,11 +2,11 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { FileSearch, Users, CreditCard, Settings } from 'lucide-react';
+import { FileSearch, Users, CreditCard, Settings, RefreshCcw, Wallet, Coins } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GenericList } from '@/components/generic-list/GenericList';
 import type { ColumnDef, FilterState, SortState, InputDataModel, FilterOperation } from '@/components/generic-list/types';
-import { adminService, type AuditLog } from '@/services/admin.service';
+import { adminService, type AuditLog, type SubscriptionAuditLog, type BillingAuditLog, type TokenUsageLog } from '@/services/admin.service';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
@@ -90,12 +90,12 @@ const auditColumns: ColumnDef<AuditLog>[] = [
 ];
 
 // Helper to build InputDataModel
-function buildInputDataModel(
+function buildInputDataModel<T>(
   filters: FilterState,
   sort: SortState,
   page: number,
   size: number,
-  columns: ColumnDef<AuditLog>[]
+  columns: ColumnDef<T>[]
 ): InputDataModel {
   const filterItems = Object.entries(filters)
     .filter(([, value]) => value !== undefined && value !== null && value !== '')
@@ -110,7 +110,7 @@ function buildInputDataModel(
 
   return {
     filters: filterItems,
-    sorts: sort.field ? [{ fieldName: sort.field, direction: sort.direction }] : [{ fieldName: 'performedAt', direction: 'DESC' }],
+    sorts: sort.field ? [{ fieldName: sort.field, direction: sort.direction }] : [{ fieldName: 'createdAt', direction: 'DESC' }],
     page,
     size,
   };
@@ -450,6 +450,381 @@ function CvLogTabContent() {
   );
 }
 
+// ============================================
+// Subscription Audit Tab Content
+// ============================================
+
+const subscriptionAuditColumns: ColumnDef<SubscriptionAuditLog>[] = [
+  { key: 'id', label: 'ID', sortable: true },
+  { key: 'userId', label: 'User ID', sortable: true, filterable: true, filterType: 'number' },
+  {
+    key: 'auditType',
+    label: 'Event',
+    sortable: true,
+    filterable: true,
+    filterType: 'select',
+    filterOptions: [
+      { label: 'Renew', value: 'RENEW' },
+      { label: 'Reminder Sent', value: 'REMINDER_SENT' },
+      { label: 'Downgrade', value: 'DOWNGRADE' },
+      { label: 'Expire', value: 'EXPIRE' },
+      { label: 'Auto Extend', value: 'AUTO_EXTEND' },
+      { label: 'Invoice Created', value: 'INVOICE_CREATED' },
+      { label: 'Payment Received', value: 'PAYMENT_RECEIVED' },
+      { label: 'Activated', value: 'ACTIVATED' },
+      { label: 'Cancelled', value: 'CANCELLED' },
+    ],
+    render: (value) => {
+      const type = value as string;
+      const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+        RENEW: 'default',
+        AUTO_EXTEND: 'default',
+        PAYMENT_RECEIVED: 'default',
+        ACTIVATED: 'default',
+        INVOICE_CREATED: 'secondary',
+        REMINDER_SENT: 'secondary',
+        EXPIRE: 'destructive',
+        DOWNGRADE: 'destructive',
+        CANCELLED: 'destructive',
+      };
+      return <Badge variant={variants[type] || 'outline'}>{type}</Badge>;
+    },
+  },
+  { key: 'subscriptionId', label: 'Sub ID', sortable: true },
+  { key: 'invoiceId', label: 'Invoice ID', sortable: true },
+  { key: 'performedBy', label: 'By', sortable: true },
+  {
+    key: 'details',
+    label: 'Details',
+    render: (value) => {
+      const details = value as string;
+      if (!details) return '-';
+      return details.length > 40 ? `${details.substring(0, 40)}...` : details;
+    },
+  },
+  {
+    key: 'createdAt',
+    label: 'Date',
+    sortable: true,
+    render: (value) => format(new Date(value as string), 'MMM dd, HH:mm:ss'),
+  },
+];
+
+function SubscriptionAuditTabContent() {
+  const [data, setData] = useState<SubscriptionAuditLog[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalElements, setTotalElements] = useState(0);
+  const [currentSort, setCurrentSort] = useState<SortState>({ field: 'createdAt', direction: 'DESC' });
+  const [currentPage, setCurrentPage] = useState(0);
+  const [currentFilters, setCurrentFilters] = useState<FilterState>({});
+  const pageSize = 10;
+
+  const fetchData = useCallback(async (filters: FilterState, sort: SortState, page: number) => {
+    setIsLoading(true);
+    try {
+      const inputData = buildInputDataModel(filters, sort, page, pageSize, subscriptionAuditColumns);
+      const response = await adminService.filterSubscriptionAuditLogs(inputData);
+      setData(response.content || []);
+      setTotalElements(response.totalElements || 0);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to fetch subscription audit logs';
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData(currentFilters, currentSort, 0);
+  }, []);
+
+  const handleFilterChange = useCallback((filters: FilterState) => {
+    setCurrentFilters(filters);
+    setCurrentPage(0);
+    fetchData(filters, currentSort, 0);
+  }, [fetchData, currentSort]);
+
+  const handleSortChange = useCallback((sort: SortState) => {
+    setCurrentSort(sort);
+    setCurrentPage(0);
+    fetchData(currentFilters, sort, 0);
+  }, [fetchData, currentFilters]);
+
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
+    fetchData(currentFilters, currentSort, page);
+  }, [fetchData, currentSort, currentFilters]);
+
+  return (
+    <GenericList<SubscriptionAuditLog>
+      data={data}
+      columns={subscriptionAuditColumns}
+      isLoading={isLoading}
+      meta={{
+        page: currentPage,
+        size: pageSize,
+        totalElements,
+        totalPages: Math.ceil(totalElements / pageSize),
+      }}
+      onFilterChange={handleFilterChange}
+      onSortChange={handleSortChange}
+      onPageChange={handlePageChange}
+      defaultSort={currentSort}
+      emptyMessage="No subscription audit logs found"
+    />
+  );
+}
+
+// ============================================
+// Billing Audit Tab Content
+// ============================================
+
+const billingAuditColumns: ColumnDef<BillingAuditLog>[] = [
+  { key: 'id', label: 'ID', sortable: true },
+  {
+    key: 'auditType',
+    label: 'Event',
+    sortable: true,
+    filterable: true,
+    filterType: 'select',
+    filterOptions: [
+      { label: 'Webhook Success', value: 'WEBHOOK_SUCCESS' },
+      { label: 'Webhook Failed', value: 'WEBHOOK_FAILED' },
+      { label: 'Payment Completed', value: 'PAYMENT_COMPLETED' },
+      { label: 'Payment Failed', value: 'PAYMENT_FAILED' },
+      { label: 'Invoice Cancelled', value: 'INVOICE_CANCELLED' },
+      { label: 'Invoice Expired', value: 'INVOICE_EXPIRED' },
+    ],
+    render: (value) => {
+      const type = value as string;
+      const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+        WEBHOOK_SUCCESS: 'default',
+        PAYMENT_COMPLETED: 'default',
+        WEBHOOK_FAILED: 'destructive',
+        PAYMENT_FAILED: 'destructive',
+        INVOICE_CANCELLED: 'destructive',
+        INVOICE_EXPIRED: 'secondary',
+      };
+      return <Badge variant={variants[type] || 'outline'}>{type}</Badge>;
+    },
+  },
+  { key: 'gateway', label: 'Gateway', sortable: true, filterable: true, filterType: 'text' },
+  { key: 'gatewayInvoiceId', label: 'Gateway Invoice', sortable: true },
+  { key: 'gatewayStatus', label: 'Status', sortable: true },
+  { key: 'paymentMethod', label: 'Method', sortable: true },
+  { key: 'transactionId', label: 'Txn ID', sortable: true },
+  {
+    key: 'result',
+    label: 'Result',
+    render: (value) => {
+      const result = value as string;
+      if (!result) return '-';
+      return result.length > 30 ? `${result.substring(0, 30)}...` : result;
+    },
+  },
+  {
+    key: 'createdAt',
+    label: 'Date',
+    sortable: true,
+    render: (value) => format(new Date(value as string), 'MMM dd, HH:mm:ss'),
+  },
+];
+
+function BillingAuditTabContent() {
+  const [data, setData] = useState<BillingAuditLog[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalElements, setTotalElements] = useState(0);
+  const [currentSort, setCurrentSort] = useState<SortState>({ field: 'createdAt', direction: 'DESC' });
+  const [currentPage, setCurrentPage] = useState(0);
+  const [currentFilters, setCurrentFilters] = useState<FilterState>({});
+  const pageSize = 10;
+
+  const fetchData = useCallback(async (filters: FilterState, sort: SortState, page: number) => {
+    setIsLoading(true);
+    try {
+      const inputData = buildInputDataModel(filters, sort, page, pageSize, billingAuditColumns);
+      const response = await adminService.filterBillingAuditLogs(inputData);
+      setData(response.content || []);
+      setTotalElements(response.totalElements || 0);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to fetch billing audit logs';
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData(currentFilters, currentSort, 0);
+  }, []);
+
+  const handleFilterChange = useCallback((filters: FilterState) => {
+    setCurrentFilters(filters);
+    setCurrentPage(0);
+    fetchData(filters, currentSort, 0);
+  }, [fetchData, currentSort]);
+
+  const handleSortChange = useCallback((sort: SortState) => {
+    setCurrentSort(sort);
+    setCurrentPage(0);
+    fetchData(currentFilters, sort, 0);
+  }, [fetchData, currentFilters]);
+
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
+    fetchData(currentFilters, currentSort, page);
+  }, [fetchData, currentSort, currentFilters]);
+
+  return (
+    <GenericList<BillingAuditLog>
+      data={data}
+      columns={billingAuditColumns}
+      isLoading={isLoading}
+      meta={{
+        page: currentPage,
+        size: pageSize,
+        totalElements,
+        totalPages: Math.ceil(totalElements / pageSize),
+      }}
+      onFilterChange={handleFilterChange}
+      onSortChange={handleSortChange}
+      onPageChange={handlePageChange}
+      defaultSort={currentSort}
+      emptyMessage="No billing audit logs found"
+    />
+  );
+}
+
+// ============================================
+// Token Usage Tab Content
+// ============================================
+
+const tokenUsageColumns: ColumnDef<TokenUsageLog>[] = [
+  { key: 'id', label: 'ID', sortable: true },
+  { key: 'userId', label: 'User ID', sortable: true, filterable: true, filterType: 'number' },
+  {
+    key: 'usageType',
+    label: 'Type',
+    sortable: true,
+    filterable: true,
+    filterType: 'select',
+    filterOptions: [
+      { label: 'CV Parse', value: 'CV_PARSE' },
+      { label: 'CV Tailor', value: 'CV_TAILOR' },
+      { label: 'Content Generate', value: 'CONTENT_GENERATE' },
+      { label: 'Other', value: 'OTHER' },
+    ],
+    render: (value) => {
+      const type = value as string;
+      return <Badge variant="secondary">{type.replace('_', ' ')}</Badge>;
+    },
+  },
+  {
+    key: 'source',
+    label: 'Source',
+    sortable: true,
+    filterable: true,
+    filterType: 'select',
+    filterOptions: [
+      { label: 'Subscription', value: 'SUBSCRIPTION' },
+      { label: 'Wallet', value: 'WALLET' },
+      { label: 'Mixed', value: 'MIXED' },
+    ],
+    render: (value) => {
+      const source = value as string;
+      const variants: Record<string, 'default' | 'secondary' | 'outline'> = {
+        SUBSCRIPTION: 'default',
+        WALLET: 'secondary',
+        MIXED: 'outline',
+      };
+      return <Badge variant={variants[source] || 'outline'}>{source}</Badge>;
+    },
+  },
+  { key: 'tokensUsed', label: 'Total', sortable: true },
+  { key: 'fromSubscription', label: 'From Sub', sortable: true },
+  { key: 'fromWallet', label: 'From Wallet', sortable: true },
+  {
+    key: 'description',
+    label: 'Description',
+    render: (value) => {
+      const desc = value as string;
+      if (!desc) return '-';
+      return desc.length > 30 ? `${desc.substring(0, 30)}...` : desc;
+    },
+  },
+  {
+    key: 'createdAt',
+    label: 'Date',
+    sortable: true,
+    render: (value) => format(new Date(value as string), 'MMM dd, HH:mm:ss'),
+  },
+];
+
+function TokenUsageTabContent() {
+  const [data, setData] = useState<TokenUsageLog[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalElements, setTotalElements] = useState(0);
+  const [currentSort, setCurrentSort] = useState<SortState>({ field: 'createdAt', direction: 'DESC' });
+  const [currentPage, setCurrentPage] = useState(0);
+  const [currentFilters, setCurrentFilters] = useState<FilterState>({});
+  const pageSize = 10;
+
+  const fetchData = useCallback(async (filters: FilterState, sort: SortState, page: number) => {
+    setIsLoading(true);
+    try {
+      const inputData = buildInputDataModel(filters, sort, page, pageSize, tokenUsageColumns);
+      const response = await adminService.filterTokenUsageLogs(inputData);
+      setData(response.content || []);
+      setTotalElements(response.totalElements || 0);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to fetch token usage logs';
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData(currentFilters, currentSort, 0);
+  }, []);
+
+  const handleFilterChange = useCallback((filters: FilterState) => {
+    setCurrentFilters(filters);
+    setCurrentPage(0);
+    fetchData(filters, currentSort, 0);
+  }, [fetchData, currentSort]);
+
+  const handleSortChange = useCallback((sort: SortState) => {
+    setCurrentSort(sort);
+    setCurrentPage(0);
+    fetchData(currentFilters, sort, 0);
+  }, [fetchData, currentFilters]);
+
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
+    fetchData(currentFilters, currentSort, page);
+  }, [fetchData, currentSort, currentFilters]);
+
+  return (
+    <GenericList<TokenUsageLog>
+      data={data}
+      columns={tokenUsageColumns}
+      isLoading={isLoading}
+      meta={{
+        page: currentPage,
+        size: pageSize,
+        totalElements,
+        totalPages: Math.ceil(totalElements / pageSize),
+      }}
+      onFilterChange={handleFilterChange}
+      onSortChange={handleSortChange}
+      onPageChange={handlePageChange}
+      defaultSort={currentSort}
+      emptyMessage="No token usage logs found"
+    />
+  );
+}
+
 export default function AuditMonitorPage() {
   const t = useTranslations('admin.auditMonitor');
   
@@ -466,7 +841,7 @@ export default function AuditMonitorPage() {
 
       {/* Tabs */}
       <Tabs defaultValue="users" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 max-w-2xl">
+        <TabsList className="flex flex-wrap gap-1 h-auto max-w-4xl">
           <TabsTrigger value="users" className="gap-2">
             <Users className="h-4 w-4" />
             {t('tabs.users')}
@@ -482,6 +857,18 @@ export default function AuditMonitorPage() {
           <TabsTrigger value="cv-logs" className="gap-2">
             <FileSearch className="h-4 w-4" />
             {t('tabs.cvLogs')}
+          </TabsTrigger>
+          <TabsTrigger value="subscription-audit" className="gap-2">
+            <RefreshCcw className="h-4 w-4" />
+            Subscriptions
+          </TabsTrigger>
+          <TabsTrigger value="billing-audit" className="gap-2">
+            <Wallet className="h-4 w-4" />
+            Billing
+          </TabsTrigger>
+          <TabsTrigger value="token-usage" className="gap-2">
+            <Coins className="h-4 w-4" />
+            Tokens
           </TabsTrigger>
           <TabsTrigger value="all" className="gap-2">
             <FileSearch className="h-4 w-4" />
@@ -521,6 +908,30 @@ export default function AuditMonitorPage() {
           </div>
         </TabsContent>
 
+        <TabsContent value="subscription-audit" className="mt-6">
+          <div className="rounded-lg border bg-card p-6">
+            <h3 className="text-lg font-semibold mb-4">Subscription Lifecycle Audit</h3>
+            <p className="text-sm text-muted-foreground mb-4">Scheduler events: renewals, expirations, downgrades, auto-extensions</p>
+            <SubscriptionAuditTabContent />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="billing-audit" className="mt-6">
+          <div className="rounded-lg border bg-card p-6">
+            <h3 className="text-lg font-semibold mb-4">Billing & Payment Audit</h3>
+            <p className="text-sm text-muted-foreground mb-4">Payment webhooks, invoice actions, and transaction logs</p>
+            <BillingAuditTabContent />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="token-usage" className="mt-6">
+          <div className="rounded-lg border bg-card p-6">
+            <h3 className="text-lg font-semibold mb-4">Token Usage Logs</h3>
+            <p className="text-sm text-muted-foreground mb-4">Track token consumption: CV parsing, tailoring, and other AI operations</p>
+            <TokenUsageTabContent />
+          </div>
+        </TabsContent>
+
         <TabsContent value="all" className="mt-6">
           <div className="rounded-lg border bg-card p-6">
             <h3 className="text-lg font-semibold mb-4">All System Logs</h3>
@@ -532,3 +943,4 @@ export default function AuditMonitorPage() {
     </div>
   );
 }
+
