@@ -85,6 +85,9 @@
     "identifier": "Email or Username",
     "identifierPlaceholder": "your@email.com or username",
     "identifierRequired": "Please enter your email or username",
+    "name": "Full Name",
+    "namePlaceholder": "John Doe",
+    "nameMin": "Name must be at least 2 characters",
     "passwordComplexity": "Password must contain at least 8 characters, one uppercase, one lowercase, one number, and one special character",
     "passwordPwned": "This password has been found in a data breach. Please choose a different password"
   },
