@@ -8,7 +8,7 @@ import { usePermissions } from '@/contexts/PermissionContext';
 import { useEffect, useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 
-const REMEMBER_ME_KEY = 'civify_remember_email';
+const REMEMBER_ME_KEY = 'civify_remember_identifier';
 
 export default function LoginPage() {
   const t = useTranslations('auth');
@@ -46,19 +46,19 @@ export default function LoginPage() {
     setValue,
   } = form;
 
-  // Load remembered email on mount
+  // Load remembered identifier on mount
   useEffect(() => {
-    const savedEmail = localStorage.getItem(REMEMBER_ME_KEY);
-    if (savedEmail) {
-      setValue('email', savedEmail);
+    const savedIdentifier = localStorage.getItem(REMEMBER_ME_KEY);
+    if (savedIdentifier) {
+      setValue('identifier', savedIdentifier);
       setRememberMe(true);
     }
   }, [setValue]);
 
   const onSubmit: SubmitHandler<LoginSchemaType> = (data) => {
-    // Handle Remember Me - save or clear email
+    // Handle Remember Me - save or clear identifier
     if (rememberMe) {
-      localStorage.setItem(REMEMBER_ME_KEY, data.email);
+      localStorage.setItem(REMEMBER_ME_KEY, data.identifier);
     } else {
       localStorage.removeItem(REMEMBER_ME_KEY);
     }
@@ -176,16 +176,16 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="rounded-lg border p-6 space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">{t('email')}</label>
+            <label className="text-sm font-medium">{t('identifier') || 'Email or Username'}</label>
             <input 
-              type="email" 
-              {...register('email')}
+              type="text" 
+              {...register('identifier')}
               className="w-full rounded-md border px-3 py-2 bg-background"
-              placeholder="your@email.com"
+              placeholder={t('identifierPlaceholder') || "your@email.com or username"}
             />
-            {errors.email && (
+            {errors.identifier && (
               <p className="text-error text-xs mt-1">
-                {errors.email.message}
+                {errors.identifier.message}
               </p>
             )}
           </div>

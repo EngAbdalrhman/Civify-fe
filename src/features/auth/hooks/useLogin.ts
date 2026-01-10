@@ -16,7 +16,7 @@ export const useLogin = () => {
   const [loginUsername, setLoginUsername] = useState<string | null>(null);
 
   const loginSchema = z.object({
-    email: z.string().email(t("invalidEmail")),
+    identifier: z.string().min(1, t("identifierRequired") || "Please enter your email or username"),
     password: z.string().min(1, t("passwordRequired")),
   });
 
@@ -33,18 +33,21 @@ export const useLogin = () => {
     error: loginError,
   } = useMutation({
     mutationFn: async (data: LoginSchemaType) => {
-      const response = await apiClient.post("/login", {
-        email: data.email,
-        password: data.password,
-      });
+      // Detect if identifier is email (contains @) or username
+      const isEmail = data.identifier.includes("@");
+      const payload = isEmail
+        ? { email: data.identifier, password: data.password }
+        : { username: data.identifier, password: data.password };
+
+      const response = await apiClient.post("/login", payload);
       return response.data;
     },
     onSuccess: (data) => {
       // Check if 2FA is required
       if (data.requires2FA) {
         setRequires2FA(true);
-        // Store email as the username for 2FA verification
-        setLoginUsername(form.getValues("email"));
+        // Store identifier for 2FA verification
+        setLoginUsername(form.getValues("identifier"));
         toast.info(data.message || "Please enter the OTP sent to your email");
       }
       // If tokens are returned, login is complete (handled by API client storing tokens)
@@ -55,12 +58,17 @@ export const useLogin = () => {
       
       // Check if error is about email verification
       if (errorCode === "AUTH_001") {
-        const email = form.getValues("email");
-        setUnverifiedEmail(email);
-        setShowResendVerification(true);
-        resendVerification(email);
-        toast.error(t("emailNotVerified") || errorMessage);
-        toast.info(t("verificationSentAutomatically") || "Verification email sent automatically!");
+        const identifier = form.getValues("identifier");
+        // Only resend verification if it looks like an email
+        if (identifier.includes("@")) {
+          setUnverifiedEmail(identifier);
+          setShowResendVerification(true);
+          resendVerification(identifier);
+          toast.error(t("emailNotVerified") || errorMessage);
+          toast.info(t("verificationSentAutomatically") || "Verification email sent automatically!");
+        } else {
+          toast.error(t("emailNotVerified") || errorMessage);
+        }
       } else {
         toast.error(errorMessage);
       }
@@ -115,6 +123,7 @@ export const useLogin = () => {
 };
 
 export type LoginSchemaType = {
-  email: string;
+  identifier: string;
   password: string;
 };
+

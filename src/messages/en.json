@@ -81,7 +81,12 @@
     "terms": "I accept the terms and conditions",
     "orContinueWith": "Or continue with",
     "emailNotVerified": "Please verify your email before logging in.",
-    "verificationSentAutomatically": "Verification email sent automatically! Please check your inbox."
+    "verificationSentAutomatically": "Verification email sent automatically! Please check your inbox.",
+    "identifier": "Email or Username",
+    "identifierPlaceholder": "your@email.com or username",
+    "identifierRequired": "Please enter your email or username",
+    "passwordComplexity": "Password must contain at least 8 characters, one uppercase, one lowercase, one number, and one special character",
+    "passwordPwned": "This password has been found in a data breach. Please choose a different password"
   },
   "dashboard": {
     "personalPage": {
