@@ -4,6 +4,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import apiClient from "@/api/client";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
+
+// Password complexity regex: 8+ chars, uppercase, lowercase, number, special char
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&^#()\-_=+\[\]{}|;:',.<>/~`])[A-Za-z\d@$!%*?&^#()\-_=+\[\]{}|;:',.<>/~`]{8,}$/;
 
 export const useSignup = () => {
   const t = useTranslations("auth");
@@ -11,8 +15,10 @@ export const useSignup = () => {
   const signupSchema = z
     .object({
       username: z.string().min(3, t("usernameMin")),
-      email: z.email(),
-      password: z.string().min(8, t("passwordMin")),
+      email: z.string().email(t("invalidEmail")),
+      password: z.string()
+        .min(8, t("passwordMin"))
+        .regex(PASSWORD_REGEX, t("passwordComplexity")),
       confirmPassword: z.string().min(8, t("confirmPasswordMin")),
     })
     .refine((data) => data.password === data.confirmPassword, {
@@ -35,6 +41,15 @@ export const useSignup = () => {
       const response = await apiClient.post("/auth/register", data);
       return response.data;
     },
+    onSuccess: (data) => {
+      if (data.message) {
+//         toast.success(data.message);
+      }
+    },
+    onError: (error: { message?: string }) => {
+      const errorMessage = error?.message || "Registration failed";
+      toast.error(errorMessage);
+    },
   });
 
   return {
@@ -51,3 +66,4 @@ export type SignupSchemaType = {
   password: string;
   confirmPassword: string;
 };
+
