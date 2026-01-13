@@ -158,8 +158,7 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
         timeout: 120000, // 2 min timeout for file processing
       });
 
-      // Handle CommonResponse wrapper
-      const data = response.data?.data || response.data;
+      const data = response.data;
 
       if (data?.resumeData) {
         setResumeData(data.resumeData);
