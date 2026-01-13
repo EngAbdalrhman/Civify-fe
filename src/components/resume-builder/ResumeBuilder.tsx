@@ -153,13 +153,17 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await apiClient.post<CvParseResponse>('/v1/cv/parse', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+      const response = await apiClient.post<CvParseResponse>('/v1/cvs/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 120000, // 2 min timeout for file processing
       });
 
-      if (response.data?.resumeData) {
-        setResumeData(response.data.resumeData);
-        originalDataRef.current = response.data.resumeData;
+      // Handle CommonResponse wrapper
+      const data = response.data?.data || response.data;
+
+      if (data?.resumeData) {
+        setResumeData(data.resumeData);
+        originalDataRef.current = data.resumeData;
         toast.success(t('toasts.parseSuccess'));
       }
     } catch (error) {
