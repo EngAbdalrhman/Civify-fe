@@ -103,6 +103,7 @@ export default function UploadPage() {
   const [isTrackingApplication, setIsTrackingApplication] = useState(false);
   const [savedResumeId, setSavedResumeId] = useState<string | null>(null);
   const [trackedApplicationId, setTrackedApplicationId] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   
   // Resume selector state
   const [showResumeSelector, setShowResumeSelector] = useState(false);
@@ -144,6 +145,58 @@ export default function UploadPage() {
       },
       onError: (error: any) => {
         // Handle TOKEN_LIMIT_EXCEEDED error
+        if (error?.errorCode === 'TOKEN_LIMIT_EXCEEDED' || error?.message === 'TOKEN_LIMIT_EXCEEDED') {
+          setShowTokenLimitModal(true);
+        }
+      },
+    });
+  }, [uploadCv, router, t]);
+
+  // Drag and drop handlers
+  const handleDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragging(false);
+  }, []);
+
+  const handleDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragging(false);
+
+    const file = event.dataTransfer.files?.[0];
+    if (!file) return;
+
+    // Auth check
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      toast.error(t('authRequired'));
+      router.push('/login?redirect=/app/upload');
+      return;
+    }
+
+    const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!validTypes.includes(file.type)) {
+      toast.error('Please upload a PDF or DOCX file');
+      return;
+    }
+
+    uploadCv(file, {
+      onSuccess: (data) => {
+        if (data.resumeData) {
+          setResumeData(data.resumeData);
+          setCurrentStep(2);
+        } else {
+          toast.error('Failed to parse CV data');
+        }
+      },
+      onError: (error: any) => {
         if (error?.errorCode === 'TOKEN_LIMIT_EXCEEDED' || error?.message === 'TOKEN_LIMIT_EXCEEDED') {
           setShowTokenLimitModal(true);
         }
@@ -477,7 +530,12 @@ export default function UploadPage() {
       {/* Step 1: Upload */}
       {currentStep === 1 && (
         <div className="max-w-2xl mx-auto space-y-4">
-          <Card className="border-dashed border-2">
+          <Card 
+            className={`border-dashed border-2 transition-colors ${isDragging ? 'border-primary bg-primary/5' : ''}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
             <CardContent className="flex flex-col items-center justify-center py-12 sm:py-16 space-y-4 text-center">
               <div className="p-4 bg-primary/10 rounded-full">
                 <UploadCloud className="w-12 h-12 text-primary" />
