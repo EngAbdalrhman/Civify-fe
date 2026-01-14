@@ -140,7 +140,7 @@
     "success": "CV uploaded successfully!",
     "authRequired": "Please sign in to upload and tailor your CV",
     "uploadCv": "Upload your CV",
-    "uploadCvDesc": "Drag and drop a PDF or DOCX file, or click to browse. We'll extract your details automatically.",
+    "uploadCvDesc": "Drag and drop a PDF or DOCX file (max 5MB), or click to browse. We'll extract your details automatically.",
     "steps": {
       "uploadCv": "Upload CV",
       "reviewData": "Review Data",
