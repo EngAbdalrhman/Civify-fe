@@ -20,7 +20,9 @@ class PaymentService {
     planId: number,
     isAnnual: boolean = false,
     promoCode?: string,
-    gateway?: string
+    gateway?: string,
+    paymentMethod?: string,
+    currency?: string
   ): Promise<PaymentInitiationResponse> {
     const params = new URLSearchParams({
       planId: planId.toString(),
@@ -33,6 +35,14 @@ class PaymentService {
 
     if (gateway) {
       params.append('gateway', gateway);
+    }
+
+    if (paymentMethod) {
+      params.append('paymentMethod', paymentMethod);
+    }
+
+    if (currency) {
+      params.append('currency', currency);
     }
 
     const response = await apiClient.post<PaymentInitiationResponse>(
