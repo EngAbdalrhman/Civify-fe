@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, CreditCard, ArrowLeft, Shield, Tag, Check, X, Receipt } from 'lucide-react';
+import { Loader2, CreditCard, ArrowLeft, Shield, Tag, Check, X, Receipt, Smartphone, Store } from 'lucide-react';
 import { Link } from '@/i18n/routing';
+import Image from 'next/image';
 import { subscriptionService } from '@/services/subscription.service';
 import { paymentService } from '@/services/payment.service';
 import { billingService, type Invoice } from '@/services/billing.service';
@@ -32,6 +33,7 @@ function CheckoutContent() {
   const [isAnnual, setIsAnnual] = useState(initialIsAnnual);
   const [promoCode, setPromoCode] = useState('');
   const [gateway, setGateway] = useState('fawaterak');
+  const [paymentMethod, setPaymentMethod] = useState('CARD');
   const [enabledGateways, setEnabledGateways] = useState<string[]>([]);
   
   // Promo code validation state
@@ -154,7 +156,8 @@ function CheckoutContent() {
         plan.id,
         isAnnual,
         priceCalculation ? promoCode : undefined,
-        gateway
+        gateway,
+        paymentMethod
       );
 
       if (response.paymentUrl) {
@@ -417,6 +420,81 @@ function CheckoutContent() {
                   </button>
                 )}
               </div>
+
+              {/* Payment Method Selection - Only show when Fawaterak is selected */}
+              {/* Payment Method Selection - Only show when Fawaterak is selected */}
+              {gateway === 'fawaterak' && (
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium">{t('selectPaymentMethod') || 'Select Payment Method'}</Label>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {/* Visa/Card Option */}
+                    <button
+                      onClick={() => setPaymentMethod('CARD')}
+                      className={`flex flex-col items-center justify-center gap-3 p-4 rounded-lg border-2 hover:bg-muted/50 cursor-pointer transition-all text-center h-full ${
+                        paymentMethod === 'CARD' ? 'border-primary bg-primary/5' : 'border-muted'
+                      }`}
+                    >
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mb-1 ${
+                        paymentMethod === 'CARD' ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground'
+                      }`}>
+                        {paymentMethod === 'CARD' && <Check className="h-3 w-3" />}
+                      </div>
+                      <CreditCard className="h-8 w-8 text-blue-600" />
+                      <div>
+                        <div className="font-medium">{t('visa') || 'Card'}</div>
+                        <div className="text-xs text-muted-foreground mt-1">{t('visaDesc') || 'Visa, Mastercard'}</div>
+                      </div>
+                    </button>
+
+                    {/* Fawry Option */}
+                    <button
+                      onClick={() => setPaymentMethod('FAWRY')}
+                      className={`flex flex-col items-center justify-center gap-3 p-4 rounded-lg border-2 hover:bg-muted/50 cursor-pointer transition-all text-center h-full ${
+                        paymentMethod === 'FAWRY' ? 'border-primary bg-primary/5' : 'border-muted'
+                      }`}
+                    >
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mb-1 ${
+                        paymentMethod === 'FAWRY' ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground'
+                      }`}>
+                        {paymentMethod === 'FAWRY' && <Check className="h-3 w-3" />}
+                      </div>
+                      {/* Using Civify logo as placeholder for Fawry as requested */}
+                      <div className="relative h-8 w-8">
+                        <Image 
+                          src="/fawry.png" 
+                          alt="Fawry" 
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
+                      <div>
+                        <div className="font-medium">{t('fawryPay') || 'Fawry'}</div>
+                        <div className="text-xs text-muted-foreground mt-1">{t('fawryPayDesc') || 'Pay at store'}</div>
+                      </div>
+                    </button>
+
+                    {/* Mobile Wallet Option */}
+                    <button
+                      onClick={() => setPaymentMethod('MOBILE_WALLET')}
+                      className={`flex flex-col items-center justify-center gap-3 p-4 rounded-lg border-2 hover:bg-muted/50 cursor-pointer transition-all text-center h-full ${
+                        paymentMethod === 'MOBILE_WALLET' ? 'border-primary bg-primary/5' : 'border-muted'
+                      }`}
+                    >
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mb-1 ${
+                        paymentMethod === 'MOBILE_WALLET' ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground'
+                      }`}>
+                        {paymentMethod === 'MOBILE_WALLET' && <Check className="h-3 w-3" />}
+                      </div>
+                      <Smartphone className="h-8 w-8 text-green-600" />
+                      <div>
+                        <div className="font-medium">{t('mobileWallet') || 'Wallet'}</div>
+                        <div className="text-xs text-muted-foreground mt-1">{t('mobileWalletDesc') || 'Vodafone, ...'}</div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Security Note */}
               <div className="flex items-start gap-3 p-4 rounded-lg bg-green-50 dark:bg-green-950/20 text-green-800 dark:text-green-400">
