@@ -421,75 +421,67 @@ function CheckoutContent() {
                 )}
               </div>
 
-              {/* Payment Method Selection - Only show when Fawaterak is selected */}
-              {/* Payment Method Selection - Only show when Fawaterak is selected */}
-              {gateway === 'fawaterak' && (
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium">{t('selectPaymentMethod') || 'Select Payment Method'}</Label>
+             {/* Payment Method Selection */}
+              {(gateway === 'fawaterak' || gateway === 'paymob') && (
+                <div className="space-y-4">
+                  <Label className="text-sm font-medium">
+                    {t('selectPaymentMethod') || 'Select Payment Method'}
+                  </Label>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* CHANGED: grid-cols-3 to grid-cols-2 to fit 2 items evenly */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    
                     {/* Visa/Card Option */}
                     <button
                       onClick={() => setPaymentMethod('CARD')}
-                      className={`flex flex-col items-center justify-center gap-3 p-4 rounded-lg border-2 hover:bg-muted/50 cursor-pointer transition-all text-center h-full ${
-                        paymentMethod === 'CARD' ? 'border-primary bg-primary/5' : 'border-muted'
+                      className={`flex flex-col items-center justify-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all text-center h-full hover:bg-muted/50 ${
+                        paymentMethod === 'CARD' 
+                          ? 'border-primary bg-primary/5' 
+                          : 'border-muted'
                       }`}
                     >
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mb-1 ${
-                        paymentMethod === 'CARD' ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground'
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mb-1 transition-colors ${
+                        paymentMethod === 'CARD' 
+                          ? 'border-primary bg-primary text-primary-foreground' 
+                          : 'border-muted-foreground'
                       }`}>
                         {paymentMethod === 'CARD' && <Check className="h-3 w-3" />}
                       </div>
-                      <CreditCard className="h-8 w-8 text-blue-600" />
+                      
+                      <CreditCard className={`h-8 w-8 ${paymentMethod === 'CARD' ? 'text-blue-600' : 'text-muted-foreground'}`} />
+                      
                       <div>
                         <div className="font-medium">{t('visa') || 'Card'}</div>
-                        <div className="text-xs text-muted-foreground mt-1">{t('visaDesc') || 'Visa, Mastercard'}</div>
-                      </div>
-                    </button>
-
-                    {/* Fawry Option */}
-                    <button
-                      onClick={() => setPaymentMethod('FAWRY')}
-                      className={`flex flex-col items-center justify-center gap-3 p-4 rounded-lg border-2 hover:bg-muted/50 cursor-pointer transition-all text-center h-full ${
-                        paymentMethod === 'FAWRY' ? 'border-primary bg-primary/5' : 'border-muted'
-                      }`}
-                    >
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mb-1 ${
-                        paymentMethod === 'FAWRY' ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground'
-                      }`}>
-                        {paymentMethod === 'FAWRY' && <Check className="h-3 w-3" />}
-                      </div>
-                      {/* Using Civify logo as placeholder for Fawry as requested */}
-                      <div className="relative h-8 w-8">
-                        <Image 
-                          src="/fawry.png" 
-                          alt="Fawry" 
-                          fill
-                          className="object-contain"
-                        />
-                      </div>
-                      <div>
-                        <div className="font-medium">{t('fawryPay') || 'Fawry'}</div>
-                        <div className="text-xs text-muted-foreground mt-1">{t('fawryPayDesc') || 'Pay at store'}</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {t('visaDesc') || 'Visa, Mastercard'}
+                        </div>
                       </div>
                     </button>
 
                     {/* Mobile Wallet Option */}
                     <button
-                      onClick={() => setPaymentMethod('MOBILE_WALLET')}
-                      className={`flex flex-col items-center justify-center gap-3 p-4 rounded-lg border-2 hover:bg-muted/50 cursor-pointer transition-all text-center h-full ${
-                        paymentMethod === 'MOBILE_WALLET' ? 'border-primary bg-primary/5' : 'border-muted'
+                      onClick={() => setPaymentMethod('WALLET')}
+                      className={`flex flex-col items-center justify-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all text-center h-full hover:bg-muted/50 ${
+                        paymentMethod === 'WALLET' 
+                          ? 'border-primary bg-primary/5' 
+                          : 'border-muted'
                       }`}
                     >
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mb-1 ${
-                        paymentMethod === 'MOBILE_WALLET' ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground'
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mb-1 transition-colors ${
+                        paymentMethod === 'WALLET' 
+                          ? 'border-primary bg-primary text-primary-foreground' 
+                          : 'border-muted-foreground'
                       }`}>
-                        {paymentMethod === 'MOBILE_WALLET' && <Check className="h-3 w-3" />}
+                        {paymentMethod === 'WALLET' && <Check className="h-3 w-3" />}
                       </div>
-                      <Smartphone className="h-8 w-8 text-green-600" />
+                      
+                      <Smartphone className={`h-8 w-8 ${paymentMethod === 'WALLET' ? 'text-green-600' : 'text-muted-foreground'}`} />
+                      
                       <div>
                         <div className="font-medium">{t('mobileWallet') || 'Wallet'}</div>
-                        <div className="text-xs text-muted-foreground mt-1">{t('mobileWalletDesc') || 'Vodafone, ...'}</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {t('mobileWalletDesc') || 'Vodafone, Orange...'}
+                        </div>
                       </div>
                     </button>
                   </div>
