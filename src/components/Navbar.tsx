@@ -17,6 +17,7 @@ import Image from "next/image";
 import { usePermissions } from "@/contexts/PermissionContext";
 import { ThemeToggle } from "./theme-toggle";
 import { useTheme } from "next-themes";
+import { getAccessToken, clearAuthTokens } from "@/utils/cookies";
 
 type NavItem = {
   name: string;
@@ -52,7 +53,7 @@ export function Navbar() {
   // Check authentication status on mount and when window focuses
   useEffect(() => {
     const checkAuth = () => {
-      const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+      const token = getAccessToken();
       setIsAuthenticated(!!token);
     };
 
@@ -60,27 +61,27 @@ export function Navbar() {
 
     // Re-check on window focus (in case user logged in/out in another tab)
     window.addEventListener("focus", checkAuth);
-    // Also check on storage change event
-    window.addEventListener("storage", checkAuth);
+    // Also poll periodically to catch cookie changes
+    const interval = setInterval(checkAuth, 1000);
 
     return () => {
       window.removeEventListener("focus", checkAuth);
-      window.removeEventListener("storage", checkAuth);
+      clearInterval(interval);
     };
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("refresh_token");
+    clearAuthTokens();
     clearPermissions();
     setIsAuthenticated(false);
     window.location.href = "/";
   };
 
   // Determine logo based on theme
-  const logoSrc = mounted && resolvedTheme === 'dark' 
-    ? '/civfiy-logo-dark.png' 
-    : '/civify-logo-2.png';
+  const logoSrc =
+    mounted && resolvedTheme === "dark"
+      ? "/civfiy-logo-dark.png"
+      : "/civify-logo-2.png";
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -132,7 +133,7 @@ export function Navbar() {
                     {item.name}
                   </Link>
                 </Button>
-              )
+              ),
             )}
           </div>
 
@@ -151,7 +152,11 @@ export function Navbar() {
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="rounded-full">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-full"
+                    >
                       <User className="h-5 w-5" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -173,7 +178,7 @@ export function Navbar() {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={handleLogout}
                       className="cursor-pointer text-red-600 focus:text-red-600"
                     >
