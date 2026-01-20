@@ -649,6 +649,7 @@
       "skills": "Skills",
       "languages": "Languages",
       "courses": "Courses & Certifications",
+      "certifications": "Certifications",
       "projects": "Projects",
       "activities": "Activities & Volunteering",
       "contact": "Contact",
@@ -815,7 +816,10 @@
     "template": {
       "title": "Template",
       "modern": { "name": "Modern", "description": "Clean and professional" },
-      "classic": { "name": "Classic", "description": "Timeless and traditional" },
+      "classic": {
+        "name": "Classic",
+        "description": "Timeless and traditional"
+      },
       "creative": { "name": "Creative", "description": "Bold and standout" }
     },
     "colors": "Accent Color",
@@ -918,9 +922,18 @@
       "badge": "Full Arabic Support!",
       "cta": "Open Builder",
       "features": {
-        "preview": { "title": "Real-time Preview", "description": "See changes instantly as you type" },
-        "ai": { "title": "AI Enhancement", "description": "Get smart suggestions to improve your content" },
-        "multiLang": { "title": "Multi-language", "description": "Full support for English and Arabic layouts" }
+        "preview": {
+          "title": "Real-time Preview",
+          "description": "See changes instantly as you type"
+        },
+        "ai": {
+          "title": "AI Enhancement",
+          "description": "Get smart suggestions to improve your content"
+        },
+        "multiLang": {
+          "title": "Multi-language",
+          "description": "Full support for English and Arabic layouts"
+        }
       }
     },
     "pricing": {
@@ -979,12 +992,30 @@
       "title": "Seamless Integrations",
       "subtitle": "Connect with your favorite platforms and tools",
       "items": {
-        "linkedin": { "name": "LinkedIn", "description": "Import your profile data instantly" },
-        "google-docs": { "name": "Google Docs", "description": "Export and edit in Google Docs" },
-        "word": { "name": "Microsoft Word", "description": "Download in .docx format" },
-        "indeed": { "name": "Indeed", "description": "Optimize for Indeed applications" },
-        "glassdoor": { "name": "Glassdoor", "description": "Tailor for Glassdoor postings" },
-        "google-drive": { "name": "Google Drive", "description": "Save directly to Drive" }
+        "linkedin": {
+          "name": "LinkedIn",
+          "description": "Import your profile data instantly"
+        },
+        "google-docs": {
+          "name": "Google Docs",
+          "description": "Export and edit in Google Docs"
+        },
+        "word": {
+          "name": "Microsoft Word",
+          "description": "Download in .docx format"
+        },
+        "indeed": {
+          "name": "Indeed",
+          "description": "Optimize for Indeed applications"
+        },
+        "glassdoor": {
+          "name": "Glassdoor",
+          "description": "Tailor for Glassdoor postings"
+        },
+        "google-drive": {
+          "name": "Google Drive",
+          "description": "Save directly to Drive"
+        }
       }
     },
     "templates": {
@@ -996,12 +1027,36 @@
         "text": "— Optimized to pass applicant tracking systems"
       },
       "items": {
-        "ats-clean": { "name": "Clean ATS", "category": "Professional", "description": "Simple, scannable format optimized for applicant tracking systems" },
-        "professional": { "name": "Professional", "category": "Business", "description": "Elegant design perfect for corporate and traditional industries" },
-        "minimalist": { "name": "Minimalist", "category": "Modern", "description": "Ultra-clean design with sophisticated use of white space" },
-        "modern": { "name": "Modern", "category": "Creative", "description": "Contemporary design with geometric elements and bold typography" },
-        "technical": { "name": "Technical", "category": "Tech", "description": "Developer-focused with skills matrix and GitHub-style layout" },
-        "creative": { "name": "Creative", "category": "Design", "description": "Artistic layout for designers and creative professionals" }
+        "ats-clean": {
+          "name": "Clean ATS",
+          "category": "Professional",
+          "description": "Simple, scannable format optimized for applicant tracking systems"
+        },
+        "professional": {
+          "name": "Professional",
+          "category": "Business",
+          "description": "Elegant design perfect for corporate and traditional industries"
+        },
+        "minimalist": {
+          "name": "Minimalist",
+          "category": "Modern",
+          "description": "Ultra-clean design with sophisticated use of white space"
+        },
+        "modern": {
+          "name": "Modern",
+          "category": "Creative",
+          "description": "Contemporary design with geometric elements and bold typography"
+        },
+        "technical": {
+          "name": "Technical",
+          "category": "Tech",
+          "description": "Developer-focused with skills matrix and GitHub-style layout"
+        },
+        "creative": {
+          "name": "Creative",
+          "category": "Design",
+          "description": "Artistic layout for designers and creative professionals"
+        }
       }
     },
     "testimonials": {
@@ -1192,6 +1247,5 @@
         }
       }
     }
-  
   }
 }
