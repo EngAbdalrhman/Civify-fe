@@ -1,0 +1,50 @@
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  subscriptionService,
+  SubscriptionService,
+} from "@/services/subscription.service";
+import { toast } from "sonner";
+
+export const usePlans = () => {
+  return useQuery({
+    queryKey: ["plans"],
+    queryFn: () => subscriptionService.getAllPlans(),
+  });
+};
+
+export const usePlan = (id: number) => {
+  return useQuery({
+    queryKey: ["plans", id],
+    queryFn: () => subscriptionService.getPlanById(id),
+    enabled: !!id,
+  });
+};
+
+export const useMyActiveSubscription = () => {
+  return useQuery({
+    queryKey: ["subscription", "active"],
+    queryFn: () => subscriptionService.getMyActiveSubscription(),
+  });
+};
+
+export const useMySubscriptions = () => {
+  return useQuery({
+    queryKey: ["subscription", "history"],
+    queryFn: () => subscriptionService.getMySubscriptions(),
+  });
+};
+
+export const useCancelSubscription = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => subscriptionService.cancelSubscription(),
+    onSuccess: (data) => {
+      toast.success(data.message || "Subscription cancelled successfully");
+      queryClient.invalidateQueries({ queryKey: ["subscription"] });
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || "Failed to cancel subscription");
+    },
+  });
+};
