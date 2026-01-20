@@ -1,12 +1,27 @@
 "use client";
 
-import { useState } from 'react';
-import { ResumeData, ResumeSection, SectionItem } from '@/features/upload-cv/types';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useState } from "react";
+import {
+  ResumeData,
+  ResumeSection,
+  SectionItem,
+} from "@/features/upload-cv/types";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -14,30 +29,30 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { PersonalInfoForm } from './editor/PersonalInfoForm';
-import { ExperienceForm } from './editor/ExperienceForm';
-import { EducationForm } from './editor/EducationForm';
-import { SkillsForm } from './editor/SkillsForm';
-import { GenericSectionForm } from './editor/GenericSectionForm';
-import { LanguagesForm } from './editor/LanguagesForm';
-import { 
-  User, 
-  Briefcase, 
-  GraduationCap, 
-  Code, 
-  FolderGit2, 
-  Award, 
+} from "@/components/ui/dialog";
+import { PersonalInfoForm } from "./editor/PersonalInfoForm";
+import { ExperienceForm } from "./editor/ExperienceForm";
+import { EducationForm } from "./editor/EducationForm";
+import { SkillsForm } from "./editor/SkillsForm";
+import { GenericSectionForm } from "./editor/GenericSectionForm";
+import { LanguagesForm } from "./editor/LanguagesForm";
+import {
+  User,
+  Briefcase,
+  GraduationCap,
+  Code,
+  FolderGit2,
+  Award,
   Languages as LanguagesIcon,
   Heart,
   LayoutList,
   Plus,
   GripVertical,
   Pencil,
-  Trash2
-} from 'lucide-react';
-import { v4 as uuidv4 } from 'uuid';
-import { useTranslations } from 'next-intl';
+  Trash2,
+} from "lucide-react";
+import { v4 as uuidv4 } from "uuid";
+import { useTranslations } from "next-intl";
 
 import {
   DndContext,
@@ -47,15 +62,15 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface EditorPanelProps {
   data: ResumeData;
@@ -74,30 +89,30 @@ const sectionIcons: Record<string, React.ReactNode> = {
 };
 
 const SECTION_TYPES = [
-  { value: 'experience', label: 'Experience' },
-  { value: 'education', label: 'Education' },
-  { value: 'skills', label: 'Skills' },
-  { value: 'languages', label: 'Languages' },
-  { value: 'projects', label: 'Projects' },
-  { value: 'certifications', label: 'Certifications' },
-  { value: 'custom', label: 'Custom' },
+  { value: "experience", label: "Experience" },
+  { value: "education", label: "Education" },
+  { value: "skills", label: "Skills" },
+  { value: "languages", label: "Languages" },
+  { value: "projects", label: "Projects" },
+  { value: "certifications", label: "Certifications" },
+  { value: "custom", label: "Custom" },
 ];
 
 // Sortable Section Component
-function SortableSection({ 
-  section, 
-  children, 
+function SortableSection({
+  section,
+  children,
   onRename,
-  onDelete 
-}: { 
-  section: ResumeSection; 
+  onDelete,
+}: {
+  section: ResumeSection;
   children: React.ReactNode;
   onRename: (id: string, newTitle: string) => void;
   onDelete: (id: string) => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(section.title);
-  
+
   const {
     attributes,
     listeners,
@@ -133,16 +148,18 @@ function SortableSection({
             >
               <GripVertical className="h-4 w-4 text-muted-foreground" />
             </div>
-            {sectionIcons[section.type] || <LayoutList className="h-4 w-4 text-primary" />}
-            
+            {sectionIcons[section.type] || (
+              <LayoutList className="h-4 w-4 text-primary" />
+            )}
+
             {isEditing ? (
               <Input
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
                 onBlur={handleSaveTitle}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleSaveTitle();
-                  if (e.key === 'Escape') {
+                  if (e.key === "Enter") handleSaveTitle();
+                  if (e.key === "Escape") {
                     setEditTitle(section.title);
                     setIsEditing(false);
                   }
@@ -154,39 +171,49 @@ function SortableSection({
             ) : (
               <span>{section.title}</span>
             )}
-            
+
             <span className="text-xs text-muted-foreground ml-auto mr-2">
               ({section.items.length})
             </span>
-            
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6"
+
+            <div
+              role="button"
+              tabIndex={0}
+              className="h-6 w-6 inline-flex items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
                 setIsEditing(true);
               }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.stopPropagation();
+                  setIsEditing(true);
+                }
+              }}
             >
               <Pencil className="h-3 w-3" />
-            </Button>
-            
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6 text-destructive hover:text-destructive"
+            </div>
+
+            <div
+              role="button"
+              tabIndex={0}
+              className="h-6 w-6 inline-flex items-center justify-center rounded-md text-destructive hover:bg-accent cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
                 onDelete(section.id);
               }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.stopPropagation();
+                  onDelete(section.id);
+                }
+              }}
             >
               <Trash2 className="h-3 w-3" />
-            </Button>
+            </div>
           </div>
         </AccordionTrigger>
-        <AccordionContent className="px-2 pt-2">
-          {children}
-        </AccordionContent>
+        <AccordionContent className="px-2 pt-2">{children}</AccordionContent>
       </AccordionItem>
     </div>
   );
@@ -194,12 +221,12 @@ function SortableSection({
 
 export function EditorPanel({ data, onChange }: EditorPanelProps) {
   const [showAddDialog, setShowAddDialog] = useState(false);
-  const [newSectionName, setNewSectionName] = useState('');
-  const [newSectionType, setNewSectionType] = useState<string>('custom');
-  
-  const t = useTranslations('editor');
-  const tResume = useTranslations('resume.sections');
-  
+  const [newSectionName, setNewSectionName] = useState("");
+  const [newSectionType, setNewSectionType] = useState<string>("custom");
+
+  const t = useTranslations("editor");
+  const tResume = useTranslations("resume.sections");
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -208,15 +235,15 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
-  const updatePersonalInfo = (info: ResumeData['personalInfo']) => {
+  const updatePersonalInfo = (info: ResumeData["personalInfo"]) => {
     onChange({ ...data, personalInfo: info });
   };
 
   const updateSection = (sectionId: string, items: SectionItem[]) => {
-    const newSections = data.sections.map(section => {
+    const newSections = data.sections.map((section) => {
       if (section.id === sectionId) {
         return { ...section, items };
       }
@@ -226,7 +253,7 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
   };
 
   const renameSection = (sectionId: string, newTitle: string) => {
-    const newSections = data.sections.map(section => {
+    const newSections = data.sections.map((section) => {
       if (section.id === sectionId) {
         return { ...section, title: newTitle };
       }
@@ -236,109 +263,119 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
   };
 
   const deleteSection = (sectionId: string) => {
-    onChange({ 
-      ...data, 
-      sections: data.sections.filter(s => s.id !== sectionId) 
+    onChange({
+      ...data,
+      sections: data.sections.filter((s) => s.id !== sectionId),
     });
   };
 
   const addSection = () => {
     if (!newSectionName.trim()) return;
-    
+
     const newSection: ResumeSection = {
       id: uuidv4(),
       title: newSectionName.trim(),
-      type: newSectionType as ResumeSection['type'],
+      type: newSectionType as ResumeSection["type"],
       items: [],
       visible: true,
       order: data.sections.length,
     };
-    
+
     onChange({ ...data, sections: [...data.sections, newSection] });
-    setNewSectionName('');
-    setNewSectionType('custom');
+    setNewSectionName("");
+    setNewSectionType("custom");
     setShowAddDialog(false);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    
+
     if (over && active.id !== over.id) {
       const oldIndex = data.sections.findIndex((s) => s.id === active.id);
       const newIndex = data.sections.findIndex((s) => s.id === over.id);
-      
-      const newSections = arrayMove(data.sections, oldIndex, newIndex).map((section, index) => ({
-        ...section,
-        order: index,
-      }));
-      
+
+      const newSections = arrayMove(data.sections, oldIndex, newIndex).map(
+        (section, index) => ({
+          ...section,
+          order: index,
+        }),
+      );
+
       onChange({ ...data, sections: newSections });
     }
   };
 
-  const getIcon = (type: string) => sectionIcons[type] || <LayoutList className="h-4 w-4 text-primary" />;
+  const getIcon = (type: string) =>
+    sectionIcons[type] || <LayoutList className="h-4 w-4 text-primary" />;
 
   const renderSectionContent = (section: ResumeSection) => {
     switch (section.type) {
-      case 'experience':
+      case "experience":
         return (
-          <ExperienceForm 
-            items={section.items} 
-            onChange={(items) => updateSection(section.id, items)} 
+          <ExperienceForm
+            items={section.items}
+            onChange={(items) => updateSection(section.id, items)}
           />
         );
-      case 'education':
+      case "education":
         return (
-          <EducationForm 
-            items={section.items} 
-            onChange={(items) => updateSection(section.id, items)} 
+          <EducationForm
+            items={section.items}
+            onChange={(items) => updateSection(section.id, items)}
           />
         );
-      case 'skills':
+      case "skills":
         return (
-          <SkillsForm 
-            items={section.items} 
-            onChange={(items) => updateSection(section.id, items)} 
+          <SkillsForm
+            items={section.items}
+            onChange={(items) => updateSection(section.id, items)}
           />
         );
-      case 'languages':
+      case "languages":
         return (
-          <LanguagesForm 
-            items={section.items} 
-            onChange={(items) => updateSection(section.id, items)} 
+          <LanguagesForm
+            items={section.items}
+            onChange={(items) => updateSection(section.id, items)}
           />
         );
       default:
         return (
-          <GenericSectionForm 
+          <GenericSectionForm
             sectionType={section.type}
             sectionTitle={section.title}
-            items={section.items} 
-            onChange={(items) => updateSection(section.id, items)} 
+            items={section.items}
+            onChange={(items) => updateSection(section.id, items)}
           />
         );
     }
   };
 
-  // Helper to get translated label for section types
   const getSectionTypeLabel = (type: string) => {
-    if (type === 'custom') return tResume('projects'); 
+    if (type === "custom") return t("sections.custom");
     return tResume(type as any) || type;
   };
 
   return (
     <>
-      <Accordion type="single" collapsible defaultValue="personal" className="w-full">
+      <Accordion
+        type="single"
+        collapsible
+        defaultValue="personal"
+        className="w-full"
+      >
         {/* Personal Information - Always first */}
         <AccordionItem value="personal">
           <AccordionTrigger className="hover:no-underline px-2">
             <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-primary" />
-              <span>{t('sections.personal')}</span>
+              <span>{t("sections.personal")}</span>
             </div>
           </AccordionTrigger>
           <AccordionContent className="px-2 pt-2">
-            <PersonalInfoForm data={data.personalInfo} onChange={updatePersonalInfo} />
+            <PersonalInfoForm
+              data={data.personalInfo}
+              onChange={updatePersonalInfo}
+            />
           </AccordionContent>
         </AccordionItem>
 
@@ -349,12 +386,12 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={data.sections.map(s => s.id)}
+            items={data.sections.map((s) => s.id)}
             strategy={verticalListSortingStrategy}
           >
-            {data.sections.map(section => (
-              <SortableSection 
-                key={section.id} 
+            {data.sections.map((section) => (
+              <SortableSection
+                key={section.id}
                 section={section}
                 onRename={renameSection}
                 onDelete={deleteSection}
@@ -373,40 +410,40 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
         onClick={() => setShowAddDialog(true)}
       >
         <Plus className="h-4 w-4" />
-        {t('sections.add')}
+        {t("sections.add")}
       </Button>
 
       {/* Add Section Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t('dialog.title')}</DialogTitle>
-            <DialogDescription>
-              {t('dialog.description')}
-            </DialogDescription>
+            <DialogTitle>{t("dialog.title")}</DialogTitle>
+            <DialogDescription>{t("dialog.description")}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>{t('dialog.nameLabel')}</Label>
+              <Label>{t("dialog.nameLabel")}</Label>
               <Input
                 value={newSectionName}
                 onChange={(e) => setNewSectionName(e.target.value)}
-                placeholder={t('dialog.namePlaceholder')}
+                placeholder={t("dialog.namePlaceholder")}
                 autoFocus
               />
             </div>
             <div className="space-y-2">
-              <Label>{t('dialog.typeLabel')}</Label>
+              <Label>{t("dialog.typeLabel")}</Label>
               <Select value={newSectionType} onValueChange={setNewSectionType}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {SECTION_TYPES.map(type => (
+                  {SECTION_TYPES.map((type) => (
                     <SelectItem key={type.value} value={type.value}>
                       <div className="flex items-center gap-2">
                         {getIcon(type.value)}
-                        {type.value === 'custom' ? 'Custom' : tResume(type.value as any)}
+                        {type.value === "custom"
+                          ? t("sections.custom")
+                          : tResume(type.value as any)}
                       </div>
                     </SelectItem>
                   ))}
@@ -416,10 +453,10 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-              {t('dialog.cancel')}
+              {t("dialog.cancel")}
             </Button>
             <Button onClick={addSection} disabled={!newSectionName.trim()}>
-              {t('dialog.confirm')}
+              {t("dialog.confirm")}
             </Button>
           </DialogFooter>
         </DialogContent>
