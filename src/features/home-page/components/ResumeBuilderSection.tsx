@@ -107,12 +107,12 @@ export function ResumeBuilderSection() {
 
               {/* YouTube Iframe Container */}
               <div className="aspect-video w-full bg-black/5 relative group-hover:bg-black/10 transition-colors">
-               <iframe
-                    className="w-full h-full"
-                    src="https://www.youtube.com/embed/TyZcDykNqQE?autoplay=0&mute=1&controls=0&loop=1"
-                    title="Civify Resume Builder Demo"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
+                <Image 
+                  src="/civify-builder.png" 
+                  alt="Preview" 
+                  fill 
+                  className="object-cover object-left-top"
+                  sizes="(max-width: 768px) 100vw, 50vw"
                 />
                 
                 {/* Overlay gradient to blend with design */}
