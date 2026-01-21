@@ -139,7 +139,7 @@ function CheckoutContent() {
 
       // Invoice mode (renewal) - use billing service
       if (isInvoiceMode && invoice) {
-        const response = await billingService.payInvoice(invoice.uuid, gateway);
+        const response = await billingService.payInvoice(invoice.uuid, gateway, paymentMethod);
         
         if (response.paymentUrl) {
           window.location.href = response.paymentUrl;
