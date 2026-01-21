@@ -612,7 +612,6 @@
       "skills": "المهارات",
       "languages": "اللغات",
       "courses": "الدورات والشهادات",
-      "certifications": "الشهادات",
       "projects": "المشاريع",
       "activities": "الأنشطة والتطوع",
       "contact": "معلومات الاتصال",
@@ -789,18 +788,9 @@
       "badge": "دعم كامل للغة العربية",
       "cta": "افتح المنشئ",
       "features": {
-        "preview": {
-          "title": "معاينة فورية",
-          "description": "شاهد التغييرات فوراً أثناء الكتابة"
-        },
-        "ai": {
-          "title": "تحسين الذكاء الاصطناعي",
-          "description": "احصل على اقتراحات ذكية لتحسين المحتوى الخاص بك"
-        },
-        "multiLang": {
-          "title": "متعدد اللغات",
-          "description": "دعم كامل لتخطيطات الإنجليزية والعربية"
-        }
+        "preview": { "title": "معاينة فورية", "description": "شاهد التغييرات فوراً أثناء الكتابة" },
+        "ai": { "title": "تحسين الذكاء الاصطناعي", "description": "احصل على اقتراحات ذكية لتحسين المحتوى الخاص بك" },
+        "multiLang": { "title": "متعدد اللغات", "description": "دعم كامل لتخطيطات الإنجليزية والعربية" }
       }
     },
     "pricing": {
@@ -859,30 +849,12 @@
       "title": "تكامل سلس",
       "subtitle": "تواصل مع منصاتك وأدواتك المفضلة",
       "items": {
-        "linkedin": {
-          "name": "LinkedIn",
-          "description": "استورد بيانات ملفك الشخصي فوراً"
-        },
-        "google-docs": {
-          "name": "Google Docs",
-          "description": "تصدير وتعديل في Google Docs"
-        },
-        "word": {
-          "name": "Microsoft Word",
-          "description": "تحميل بصيغة .docx"
-        },
-        "indeed": {
-          "name": "Indeed",
-          "description": "تحسين لطلبات التقديم على Indeed"
-        },
-        "glassdoor": {
-          "name": "Glassdoor",
-          "description": "تخصيص لإعلانات Glassdoor"
-        },
-        "google-drive": {
-          "name": "Google Drive",
-          "description": "حفظ مباشرة إلى Drive"
-        }
+        "linkedin": { "name": "LinkedIn", "description": "استورد بيانات ملفك الشخصي فوراً" },
+        "google-docs": { "name": "Google Docs", "description": "تصدير وتعديل في Google Docs" },
+        "word": { "name": "Microsoft Word", "description": "تحميل بصيغة .docx" },
+        "indeed": { "name": "Indeed", "description": "تحسين لطلبات التقديم على Indeed" },
+        "glassdoor": { "name": "Glassdoor", "description": "تخصيص لإعلانات Glassdoor" },
+        "google-drive": { "name": "Google Drive", "description": "حفظ مباشرة إلى Drive" }
       }
     },
     "templates": {
@@ -894,36 +866,12 @@
         "text": "— محسنة لاجتياز أنظمة تتبع المتقدمين"
       },
       "items": {
-        "ats-clean": {
-          "name": "Clean ATS",
-          "category": "احترافي",
-          "description": "تنسيق بسيط وقابل للمسح محسن لأنظمة تتبع المتقدمين"
-        },
-        "professional": {
-          "name": "Professional",
-          "category": "أعمال",
-          "description": "تصميم أنيق مثالي للشركات والصناعات التقليدية"
-        },
-        "minimalist": {
-          "name": "Minimalist",
-          "category": "عصري",
-          "description": "تصميم نظيف للغاية مع استخدام متطور للمساحة البيضاء"
-        },
-        "modern": {
-          "name": "Modern",
-          "category": "إبداعي",
-          "description": "تصميم معاصر بعناصر هندسية وطباعة جريئة"
-        },
-        "technical": {
-          "name": "Technical",
-          "category": "تقني",
-          "description": "مخصص للمطورين مع مصفوفة مهارات وتخطيط بنمط GitHub"
-        },
-        "creative": {
-          "name": "Creative",
-          "category": "تصميم",
-          "description": "تخطيط فني للمصممين والمحترفين المبدعين"
-        }
+        "ats-clean": { "name": "Clean ATS", "category": "احترافي", "description": "تنسيق بسيط وقابل للمسح محسن لأنظمة تتبع المتقدمين" },
+        "professional": { "name": "Professional", "category": "أعمال", "description": "تصميم أنيق مثالي للشركات والصناعات التقليدية" },
+        "minimalist": { "name": "Minimalist", "category": "عصري", "description": "تصميم نظيف للغاية مع استخدام متطور للمساحة البيضاء" },
+        "modern": { "name": "Modern", "category": "إبداعي", "description": "تصميم معاصر بعناصر هندسية وطباعة جريئة" },
+        "technical": { "name": "Technical", "category": "تقني", "description": "مخصص للمطورين مع مصفوفة مهارات وتخطيط بنمط GitHub" },
+        "creative": { "name": "Creative", "category": "تصميم", "description": "تخطيط فني للمصممين والمحترفين المبدعين" }
       }
     },
     "testimonials": {
@@ -1114,5 +1062,6 @@
         }
       }
     }
+  
   }
 }
