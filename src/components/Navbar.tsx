@@ -196,7 +196,7 @@ export function Navbar() {
                 </Button>
                 <Button
                   asChild
-                  className="bg-black text-white hover:bg-black/90 hover:text-white dark:bg-white dark:text-black dark:hover:bg-white/90 dark:hover:text-black"
+                  className="bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
                 >
                   <Link href="/signup">Start for free</Link>
                 </Button>
@@ -278,7 +278,7 @@ export function Navbar() {
                       </Button>
                       <Button
                         asChild
-                        className="w-full bg-black text-white hover:bg-black/90 hover:text-white dark:bg-white dark:text-black dark:hover:bg-white/90 dark:hover:text-black"
+                        className="w-full bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
                       >
                         <Link href="/signup" onClick={() => setIsOpen(false)}>
                           Start for free
