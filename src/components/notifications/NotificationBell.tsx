@@ -125,9 +125,7 @@ export function NotificationBell() {
   };
 
   const formatTime = (timestamp: string) => {
-    // Backend returns UTC time without 'Z' suffix, so we append it
-    const utcTimestamp = timestamp.endsWith('Z') ? timestamp : timestamp + 'Z';
-    const date = new Date(utcTimestamp);
+    const date = new Date(timestamp);
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const minutes = Math.floor(diff / 60000);
