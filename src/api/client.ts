@@ -208,25 +208,10 @@ apiClient.interceptors.response.use(
 
       // Skip refresh for login/refresh endpoints themselves
       const url = originalRequest.url || "";
-      if (url.includes("/login")) {
-        // For login failures, just reject the error without redirecting
-        // The login page will handle displaying the error message
+      if (url.includes("/login") || url.includes("/auth/refresh")) {
         console.log(
-          "[Auth] 401 on login endpoint, letting component handle error",
+          "[Auth] 401 on login/refresh endpoint, redirecting to login",
         );
-        return Promise.reject({
-          status: error.response?.status,
-          message:
-            (error.response?.data as { message?: string })?.message ||
-            "Invalid credentials",
-          errorCode: (error.response?.data as { errorCode?: string })
-            ?.errorCode,
-          data: error.response?.data,
-        });
-      }
-
-      if (url.includes("/auth/refresh")) {
-        console.log("[Auth] 401 on refresh endpoint, redirecting to login");
         clearAuthAndRedirect();
         return Promise.reject(error);
       }
