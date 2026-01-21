@@ -6,18 +6,17 @@ import { Check, Loader2 } from "lucide-react";
 import { useRouter } from "@/i18n/routing";
 import { usePlans } from "@/features/plans/hooks/usePlans";
 import { Badge } from "@/components/ui/badge";
-import { isAuthenticated } from "@/utils/cookies";
 
 import { useState, useEffect } from "react";
 
 export default function PlansPage() {
   const t = useTranslations("plans");
   const router = useRouter();
-  const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { displayPlans, isLoading, error, isAnnual, setIsAnnual } = usePlans();
 
   useEffect(() => {
-    setIsUserAuthenticated(isAuthenticated());
+    setIsAuthenticated(!!localStorage.getItem("auth_token"));
   }, []);
 
   const handlePlanSelect = (ctaLink: string) => {
@@ -27,7 +26,7 @@ export default function PlansPage() {
       return;
     }
 
-    if (!isUserAuthenticated) {
+    if (!isAuthenticated) {
       // Redirect to signup with callback
       // Construct callback URL: /checkout?planId=X
       const callbackUrl = encodeURIComponent(ctaLink);

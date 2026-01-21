@@ -1,16 +1,15 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef, useCallback } from "react";
-import { Bell, X, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Bell, X, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import apiClient from "@/api/client";
-import { getAccessToken } from "@/utils/cookies";
+} from '@/components/ui/popover';
+import apiClient from '@/api/client';
 
 interface Notification {
   id: number;
@@ -32,59 +31,58 @@ export function NotificationBell() {
   const fetchNotifications = useCallback(async () => {
     try {
       // 1. Get unread count
-      const countRes = await apiClient.get<{ count: number }>(
-        "/v1/notifications/unread-count",
-      );
+      const countRes = await apiClient.get<{ count: number }>('/v1/notifications/unread-count');
       setUnreadCount(countRes.data.count);
 
       // 2. Get recent notifications (for the list)
-      const listRes = await apiClient.get<{ content: any[] }>(
-        "/v1/notifications?size=20",
-      );
+      const listRes = await apiClient.get<{ content: any[] }>('/v1/notifications?size=20');
       // Fix: Ensure we use the 'content' field from Page response
       if (listRes.data && Array.isArray(listRes.data.content)) {
-        const mappedNotifications = listRes.data.content.map((n: any) => ({
-          ...n,
-          timestamp: n.createdAt || n.timestamp, // Handle both API (createdAt) and SSE (timestamp) formats
-          read: n.delivered, // Map delivered to read status if needed, though logic might differ
-        }));
-        setNotifications(mappedNotifications);
+          const mappedNotifications = listRes.data.content.map((n: any) => ({
+              ...n,
+              timestamp: n.createdAt || n.timestamp, // Handle both API (createdAt) and SSE (timestamp) formats
+              read: n.delivered // Map delivered to read status if needed, though logic might differ
+          }));
+          setNotifications(mappedNotifications); 
       }
     } catch (err) {
-      console.error("Failed to fetch notifications:", err);
+      console.error('Failed to fetch notifications:', err);
     }
   }, []);
 
   // Connect to SSE stream
   useEffect(() => {
-    const token = getAccessToken();
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
     if (!token) return;
 
-    const baseUrl =
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8077/apis";
+    // Set cookie for EventSource authentication (since headers aren't supported)
+    document.cookie = `auth_token=${token}; path=/; max-age=3600; SameSite=Strict`;
 
-    // Connect to stream using cookie for auth (access token is already in cookie)
-    const eventSource = new EventSource(`${baseUrl}/v1/notifications/stream`, {
-      withCredentials: true,
-    });
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8077/apis';
+    
+    // Connect to stream using cookie for auth
+    const eventSource = new EventSource(
+      `${baseUrl}/v1/notifications/stream`,
+      { withCredentials: true }
+    );
 
     eventSource.onopen = () => {
       setIsConnected(true);
-      console.log("[SSE] Connected to notifications stream");
+      console.log('[SSE] Connected to notifications stream');
     };
 
-    eventSource.addEventListener("notification", (event) => {
+    eventSource.addEventListener('notification', (event) => {
       try {
         const notification: Notification = JSON.parse(event.data);
-        setNotifications((prev) => [notification, ...prev].slice(0, 20)); // Keep last 20
-        setUnreadCount((prev) => prev + 1);
+        setNotifications(prev => [notification, ...prev].slice(0, 20)); // Keep last 20
+        setUnreadCount(prev => prev + 1);
       } catch (err) {
-        console.error("[SSE] Failed to parse notification:", err);
+        console.error('[SSE] Failed to parse notification:', err);
       }
     });
 
     eventSource.onerror = (error) => {
-      console.error("[SSE] Connection error:", error);
+      console.error('[SSE] Connection error:', error);
       setIsConnected(false);
     };
 
@@ -100,10 +98,10 @@ export function NotificationBell() {
   }, [fetchNotifications]);
 
   const markAsRead = (id: number) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
+    setNotifications(prev =>
+      prev.map(n => n.id === id ? { ...n, read: true } : n)
     );
-    setUnreadCount((prev) => Math.max(0, prev - 1));
+    setUnreadCount(prev => Math.max(0, prev - 1));
   };
 
   const clearAll = () => {
@@ -113,22 +111,22 @@ export function NotificationBell() {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case "SUCCESS":
-        return "bg-green-500";
-      case "WARNING":
-        return "bg-yellow-500";
-      case "PROMO":
-        return "bg-purple-500";
-      case "SYSTEM":
-        return "bg-slate-500";
+      case 'SUCCESS':
+        return 'bg-green-500';
+      case 'WARNING':
+        return 'bg-yellow-500';
+      case 'PROMO':
+        return 'bg-purple-500';
+      case 'SYSTEM':
+        return 'bg-slate-500';
       default:
-        return "bg-blue-500";
+        return 'bg-blue-500';
     }
   };
 
   const formatTime = (timestamp: string) => {
     // Backend returns UTC time without 'Z' suffix, so we append it
-    const utcTimestamp = timestamp.endsWith("Z") ? timestamp : timestamp + "Z";
+    const utcTimestamp = timestamp.endsWith('Z') ? timestamp : timestamp + 'Z';
     const date = new Date(utcTimestamp);
     const now = new Date();
     const diff = now.getTime() - date.getTime();
@@ -136,7 +134,7 @@ export function NotificationBell() {
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
 
-    if (minutes < 1) return "Just now";
+    if (minutes < 1) return 'Just now';
     if (minutes < 60) return `${minutes}m ago`;
     if (hours < 24) return `${hours}h ago`;
     return `${days}d ago`;
@@ -152,7 +150,7 @@ export function NotificationBell() {
               variant="destructive"
               className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
             >
-              {unreadCount > 9 ? "9+" : unreadCount}
+              {unreadCount > 9 ? '9+' : unreadCount}
             </Badge>
           )}
           {isConnected && (
@@ -181,7 +179,7 @@ export function NotificationBell() {
               <div
                 key={notification.id}
                 className={`px-4 py-3 border-b last:border-b-0 hover:bg-muted/50 cursor-pointer ${
-                  !notification.read ? "bg-muted/20" : ""
+                  !notification.read ? 'bg-muted/20' : ''
                 }`}
                 onClick={() => markAsRead(notification.id)}
               >

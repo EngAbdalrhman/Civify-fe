@@ -3,20 +3,28 @@ import { useRouter } from "@/i18n/routing";
 import apiClient from "@/api/client";
 import { toast } from "sonner";
 import { usePermissions } from "@/contexts/PermissionContext";
-import { getAccessToken, clearAuthTokens } from "@/utils/cookies";
 
 export const useLogout = () => {
   const router = useRouter();
   const { clearPermissions } = usePermissions();
 
-  const { mutate: logout, isPending: isLoggingOut } = useMutation({
+  const {
+    mutate: logout,
+    isPending: isLoggingOut,
+  } = useMutation({
     mutationFn: async () => {
-      const accessToken = getAccessToken();
+      const accessToken = typeof window !== "undefined" 
+        ? localStorage.getItem("auth_token") 
+        : null;
+      const refreshToken = typeof window !== "undefined" 
+        ? localStorage.getItem("refresh_token") 
+        : null;
 
-      if (accessToken) {
+      if (accessToken || refreshToken) {
         try {
           await apiClient.post("/auth/logout", null, {
-            headers: { Authorization: `Bearer ${accessToken}` },
+            params: { refreshToken },
+            headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
           });
         } catch (error) {
           // Ignore logout API errors - we'll clear tokens anyway
@@ -25,7 +33,10 @@ export const useLogout = () => {
       }
 
       // Always clear tokens and permissions regardless of API result
-      clearAuthTokens();
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("auth_token");
+        localStorage.removeItem("refresh_token");
+      }
       clearPermissions();
     },
     onSuccess: () => {

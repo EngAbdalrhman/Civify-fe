@@ -15,37 +15,30 @@ import { useLogout } from "@/features/auth/hooks";
 import { ThemeToggle } from "./theme-toggle";
 import { Link } from "@/i18n/routing";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
-import { getAccessToken } from "@/utils/cookies";
 
 export function DashboardNavbar() {
   const { logout, isLoggingOut } = useLogout();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+  
   // Check authentication status on mount
   useEffect(() => {
-    const checkAuth = () => {
-      const token = getAccessToken();
-      setIsAuthenticated(!!token);
+    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+    setIsAuthenticated(!!token);
+    
+    // Re-check on storage change (in case user logs in/out in another tab)
+    const handleStorageChange = () => {
+      const currentToken = localStorage.getItem("auth_token");
+      setIsAuthenticated(!!currentToken);
     };
-
-    checkAuth();
-
-    // Re-check on window focus (in case user logs in/out in another tab)
-    window.addEventListener("focus", checkAuth);
-    // Also poll periodically to catch cookie changes
-    const interval = setInterval(checkAuth, 1000);
-
-    return () => {
-      window.removeEventListener("focus", checkAuth);
-      clearInterval(interval);
-    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  const date = new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+  const date = new Date().toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
   });
 
   return (
@@ -58,6 +51,7 @@ export function DashboardNavbar() {
       </div>
 
       <div className="flex items-center gap-2 ml-4">
+
         <LanguageSwitcher />
         <ThemeToggle />
 
@@ -68,41 +62,31 @@ export function DashboardNavbar() {
         {isAuthenticated ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-muted-foreground hover:text-foreground"
-              >
+              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
                 <User className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem asChild>
-                <Link
-                  href="/app/profile"
-                  className="w-full cursor-pointer flex items-center"
-                >
+                <Link href="/app/profile" className="w-full cursor-pointer flex items-center">
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </Link>
               </DropdownMenuItem>
-
+              
               <DropdownMenuItem asChild>
-                <Link
-                  href="/app/settings"
-                  className="w-full cursor-pointer flex items-center"
-                >
+                <Link href="/app/settings" className="w-full cursor-pointer flex items-center">
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Settings</span>
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem
+              <DropdownMenuItem 
                 className="text-red-500 cursor-pointer flex items-center"
                 onClick={logout}
                 disabled={isLoggingOut}
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>{isLoggingOut ? "Signing out..." : "Sign Out"}</span>
+                <span>{isLoggingOut ? 'Signing out...' : 'Sign Out'}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -118,3 +102,4 @@ export function DashboardNavbar() {
     </div>
   );
 }
+

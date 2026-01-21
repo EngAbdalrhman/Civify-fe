@@ -4,13 +4,9 @@ import axios, {
   type AxiosError,
 } from "axios";
 import { toast } from "sonner";
-import {
-  getAccessToken,
-  setAccessToken,
-  clearAuthTokens,
-} from "@/utils/cookies";
 
 // Constants
+const ACCESS_TOKEN_COOKIE_NAME = "accessToken";
 const MAX_REFRESH_RETRIES = 3;
 
 // Flag to prevent multiple simultaneous refresh attempts
@@ -22,6 +18,51 @@ let refreshSubscribers: {
   resolve: (token: string) => void;
   reject: (error: Error) => void;
 }[] = [];
+
+// Helper function to get a cookie by name
+const getCookie = (name: string): string | null => {
+  if (typeof document === "undefined") return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+    return parts.pop()?.split(";").shift() || null;
+  }
+  return null;
+};
+
+// Helper function to set a cookie
+const setCookie = (
+  name: string,
+  value: string,
+  options: {
+    path?: string;
+    maxAge?: number;
+    secure?: boolean;
+    sameSite?: "Strict" | "Lax" | "None";
+  } = {},
+): void => {
+  if (typeof document === "undefined") return;
+
+  const { path = "/", maxAge, secure = true, sameSite = "Lax" } = options;
+
+  let cookieString = `${name}=${value}; path=${path}; SameSite=${sameSite}`;
+
+  if (maxAge !== undefined) {
+    cookieString += `; max-age=${maxAge}`;
+  }
+
+  if (secure && window.location.protocol === "https:") {
+    cookieString += "; Secure";
+  }
+
+  document.cookie = cookieString;
+};
+
+// Helper function to delete a cookie
+const deleteCookie = (name: string): void => {
+  if (typeof document === "undefined") return;
+  document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+};
 
 // Subscribe a request to wait for token refresh
 const subscribeTokenRefresh = (
@@ -48,8 +89,12 @@ const clearAuthAndRedirect = () => {
   if (typeof window !== "undefined") {
     console.log("[Auth] Clearing tokens");
 
-    // Clear all auth tokens using centralized utility
-    clearAuthTokens();
+    // Clear access token cookie
+    deleteCookie(ACCESS_TOKEN_COOKIE_NAME);
+
+    // Clear refresh token cookie (httpOnly cookie will be cleared by the server,
+    // but we attempt to clear it here as well for any non-httpOnly fallback)
+    deleteCookie("refreshToken");
 
     // Reset refresh retry count
     refreshRetryCount = 0;
@@ -102,8 +147,14 @@ const attemptTokenRefresh = async (): Promise<string> => {
 
     console.log("[Auth] Token refresh successful");
 
-    // Set the new access token using centralized utility
-    setAccessToken(accessToken);
+    // Set the new access token as a normal cookie
+    // Setting maxAge to match typical access token lifetime (e.g., 15 minutes = 900 seconds)
+    setCookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, {
+      path: "/",
+      maxAge: 900, // 15 minutes
+      secure: true,
+      sameSite: "Lax",
+    });
 
     // Reset retry count on success
     refreshRetryCount = 0;
@@ -145,8 +196,8 @@ const apiClient: AxiosInstance = axios.create({
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     if (typeof window !== "undefined") {
-      // Get access token from cookie using centralized utility
-      const token = getAccessToken();
+      // Get access token from cookie
+      const token = getCookie(ACCESS_TOKEN_COOKIE_NAME);
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -163,10 +214,15 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => {
     // Extract access token from response body (login responses)
-    // and store it using centralized utility
+    // and store it as a normal cookie
     const data = response.data;
     if (data?.accessToken && typeof window !== "undefined") {
-      setAccessToken(data.accessToken);
+      setCookie(ACCESS_TOKEN_COOKIE_NAME, data.accessToken, {
+        path: "/",
+        maxAge: 900, // 15 minutes
+        secure: true,
+        sameSite: "Lax",
+      });
     }
 
     // Also check Authorization header (legacy support)
@@ -175,7 +231,12 @@ apiClient.interceptors.response.use(
       const token = authHeader.startsWith("Bearer ")
         ? authHeader.substring(7)
         : authHeader;
-      setAccessToken(token);
+      setCookie(ACCESS_TOKEN_COOKIE_NAME, token, {
+        path: "/",
+        maxAge: 900,
+        secure: true,
+        sameSite: "Lax",
+      });
     }
 
     return response;
@@ -211,17 +272,6 @@ apiClient.interceptors.response.use(
       if (url.includes("/login") || url.includes("/auth/refresh")) {
         console.log(
           "[Auth] 401 on login/refresh endpoint, redirecting to login",
-        );
-        clearAuthAndRedirect();
-        return Promise.reject(error);
-      }
-
-      // Check if access token exists - if not, no point in retrying refresh
-      // Just redirect to login immediately
-      const currentAccessToken = getAccessToken();
-      if (!currentAccessToken) {
-        console.log(
-          "[Auth] No access token found, skipping refresh and redirecting to login",
         );
         clearAuthAndRedirect();
         return Promise.reject(error);

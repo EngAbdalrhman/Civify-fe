@@ -1,15 +1,7 @@
 "use client";
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  useEffect,
-  ReactNode,
-} from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
 import apiClient from "@/api/client";
-import { getAccessToken } from "@/utils/cookies";
 
 interface PermissionsResponse {
   permissions: string[];
@@ -29,25 +21,21 @@ interface PermissionContextType {
   clearPermissions: () => void;
 }
 
-const PermissionContext = createContext<PermissionContextType | undefined>(
-  undefined,
-);
+const PermissionContext = createContext<PermissionContextType | undefined>(undefined);
 
 interface PermissionProviderProps {
   children: ReactNode;
 }
 
-export const PermissionProvider: React.FC<PermissionProviderProps> = ({
-  children,
-}) => {
+export const PermissionProvider: React.FC<PermissionProviderProps> = ({ children }) => {
   const [permissions, setPermissions] = useState<string[]>([]);
   const [groupName, setGroupName] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   const fetchPermissions = useCallback(async () => {
-    // Only fetch if we have an access token cookie
-    const token = getAccessToken();
+    // Only fetch if we have an auth token
+    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
     if (!token) {
       setPermissions([]);
       setGroupName(null);
@@ -58,16 +46,13 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({
     setError(null);
 
     try {
-      const response =
-        await apiClient.get<PermissionsResponse>("/auth/permissions");
+      const response = await apiClient.get<PermissionsResponse>("/auth/permissions");
       const data = response.data;
       setPermissions(data.permissions || []);
       setGroupName(data.groupName || null);
     } catch (err) {
       console.error("Failed to fetch permissions:", err);
-      setError(
-        err instanceof Error ? err : new Error("Failed to fetch permissions"),
-      );
+      setError(err instanceof Error ? err : new Error("Failed to fetch permissions"));
       setPermissions([]);
       setGroupName(null);
     } finally {
@@ -85,26 +70,26 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({
     (permission: string): boolean => {
       return permissions.includes(permission);
     },
-    [permissions],
+    [permissions]
   );
 
   const hasAnyPermission = useCallback(
     (requiredPermissions: string[]): boolean => {
       return requiredPermissions.some((p) => permissions.includes(p));
     },
-    [permissions],
+    [permissions]
   );
 
   const hasAllPermissions = useCallback(
     (requiredPermissions: string[]): boolean => {
       return requiredPermissions.every((p) => permissions.includes(p));
     },
-    [permissions],
+    [permissions]
   );
 
   // Auto-fetch permissions on mount if token exists
   useEffect(() => {
-    const token = getAccessToken();
+    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
     if (token && permissions.length === 0) {
       fetchPermissions();
     }
