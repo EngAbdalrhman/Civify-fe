@@ -63,10 +63,11 @@ class PaymentService {
   /**
    * Verify payment transaction
    */
-  async verifyPayment(transactionId: string): Promise<{ verified: boolean; message: string }> {
-    const response = await apiClient.get<{ verified: boolean; message: string }>(
-      API_ENDPOINTS.VERIFY(transactionId)
-    );
+  async verifyPayment(transactionId: string, gateway?: string): Promise<{ verified: boolean; message: string }> {
+    const url = gateway
+      ? `${API_ENDPOINTS.VERIFY(transactionId)}?gateway=${gateway}`
+      : API_ENDPOINTS.VERIFY(transactionId);
+    const response = await apiClient.get<{ verified: boolean; message: string }>(url);
     return response.data;
   }
 
@@ -75,12 +76,13 @@ class PaymentService {
    */
   async handlePaymentSuccess(
     transactionId: string,
+    gateway?: string,
     maxRetries: number = 5,
     retryDelay: number = 2000
   ): Promise<{ verified: boolean; message: string }> {
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
-        const result = await this.verifyPayment(transactionId);
+        const result = await this.verifyPayment(transactionId, gateway);
         
         if (result.verified) {
           return result;
@@ -150,7 +152,8 @@ class PaymentService {
     error?: string;
   } {
     const success = searchParams.get('success') === 'true';
-    const transactionId = searchParams.get('id') || undefined;
+    // Use 'order' as transactionId because that's what we store in Invoice.paymentTransactionId
+    const transactionId = searchParams.get('order') || undefined;
     const orderId = searchParams.get('order') || undefined;
     const amount = searchParams.get('amount_cents') || undefined;
     const currency = searchParams.get('currency') || undefined;
