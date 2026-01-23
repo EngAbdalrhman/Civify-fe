@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
 import {
   Receipt,
   CreditCard,
@@ -31,41 +30,22 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+
 import { toast } from 'sonner';
 import { billingService, Invoice } from '@/services/billing.service';
-import { paymentService } from '@/services/payment.service';
 import { PermissionGuard } from '@/components/auth/PermissionGuard';
 
+import { useRouter } from '@/i18n/routing';
+
 export default function BillingPage() {
+  const router = useRouter();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
-  const [showPayDialog, setShowPayDialog] = useState(false);
-  const [selectedGateway, setSelectedGateway] = useState<string>('paymob');
-  const [selectedMethod, setSelectedMethod] = useState<string>('CARD');
-  const [isPaying, setIsPaying] = useState(false);
-  const [enabledGateways, setEnabledGateways] = useState<string[]>([]);
 
   // Fetch invoices on mount
   useEffect(() => {
     fetchInvoices();
-    fetchGateways();
   }, []);
 
   const fetchInvoices = async () => {
@@ -80,46 +60,9 @@ export default function BillingPage() {
     }
   };
 
-  const fetchGateways = async () => {
-    try {
-      const gateways = await paymentService.getEnabledGateways();
-      setEnabledGateways(gateways);
-      if (gateways.length > 0) {
-        setSelectedGateway(gateways[0]);
-      }
-    } catch {
-      // Use default
-    }
-  };
-
   const handleRefresh = () => {
     setIsRefreshing(true);
     fetchInvoices();
-  };
-
-  const handlePayInvoice = async () => {
-    if (!selectedInvoice) return;
-    
-    setIsPaying(true);
-    try {
-      const result = await billingService.payInvoice(
-        selectedInvoice.uuid,
-        selectedGateway,
-        selectedMethod
-      );
-      
-      if (result.paymentUrl) {
-        // Redirect to payment page
-        window.location.href = result.paymentUrl;
-      } else {
-        toast.error('No payment URL received');
-      }
-    } catch (error) {
-      toast.error('Failed to initiate payment');
-    } finally {
-      setIsPaying(false);
-      setShowPayDialog(false);
-    }
   };
 
   const getStatusBadge = (status: Invoice['status']) => {
@@ -224,10 +167,7 @@ export default function BillingPage() {
                       </span>
                       <Button
                         size="sm"
-                        onClick={() => {
-                          setSelectedInvoice(invoice);
-                          setShowPayDialog(true);
-                        }}
+                        onClick={() => router.push(`/checkout?invoice=${invoice.uuid}`)}
                       >
                         <CreditCard className="w-4 h-4 mr-2" />
                         Pay Now
@@ -346,10 +286,7 @@ export default function BillingPage() {
                           {invoice.status === 'PENDING' ? (
                             <Button
                               size="sm"
-                              onClick={() => {
-                                setSelectedInvoice(invoice);
-                                setShowPayDialog(true);
-                              }}
+                              onClick={() => router.push(`/checkout?invoice=${invoice.uuid}`)}
                             >
                               <CreditCard className="w-4 h-4 mr-2" />
                               Pay
@@ -372,79 +309,6 @@ export default function BillingPage() {
             )}
           </CardContent>
         </Card>
-
-        {/* Pay Invoice Dialog */}
-        <Dialog open={showPayDialog} onOpenChange={setShowPayDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Pay Invoice</DialogTitle>
-              <DialogDescription>
-                Choose your payment method to complete the payment.
-              </DialogDescription>
-            </DialogHeader>
-            
-            {selectedInvoice && (
-              <div className="space-y-4">
-                <div className="p-4 bg-muted rounded-lg">
-                  <div className="flex justify-between mb-2">
-                    <span className="text-muted-foreground">Plan</span>
-                    <span className="font-medium">{selectedInvoice.planName}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Amount</span>
-                    <span className="font-bold text-lg">
-                      {formatAmount(selectedInvoice.finalAmount, selectedInvoice.currency)}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Payment Gateway</label>
-                    <Select value={selectedGateway} onValueChange={setSelectedGateway}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {enabledGateways.map((gw) => (
-                          <SelectItem key={gw} value={gw}>
-                            {gw.charAt(0).toUpperCase() + gw.slice(1)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Payment Method</label>
-                    <Select value={selectedMethod} onValueChange={setSelectedMethod}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="CARD">Credit/Debit Card</SelectItem>
-                        <SelectItem value="WALLET">Mobile Wallet</SelectItem>
-                        {selectedGateway === 'paymob' && (
-                          <SelectItem value="FAWRY">Fawry</SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowPayDialog(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handlePayInvoice} disabled={isPaying}>
-                {isPaying && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                Proceed to Payment
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </div>
     </PermissionGuard>
   );
