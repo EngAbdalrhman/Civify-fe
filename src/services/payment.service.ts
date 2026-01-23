@@ -120,19 +120,20 @@ class PaymentService {
     const invoiceKey = searchParams.get('invoice_key') || searchParams.get('payment_key');
 
     // If status is missing but we have IDs, this is a success callback
-    if (!status && invoiceId && invoiceKey) {
+    // Fawaterak redirects back with invoice_key on success
+    if (!status && invoiceKey) {
       status = 'paid';
     }
 
     const success = status === 'paid' || status === 'success';
-    // const orderId = searchParams.get('invoice_id') || undefined; // Already defined above
     const error = !success 
       ? (searchParams.get('error') || `Payment status: ${status || 'unknown'}`) 
       : undefined;
 
     return {
       success,
-      transactionId: invoiceKey || undefined,
+      // Use invoiceId as transactionId (backend stores this as orderId for lookup)
+      transactionId: invoiceId || undefined,
       orderId: invoiceId || undefined,
       invoiceKey: invoiceKey || undefined,
       status: status || undefined,
