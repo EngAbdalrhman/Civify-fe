@@ -44,6 +44,7 @@
     "subscriptions": "Subscriptions",
     "notifications": "Notifications",
     "auditMonitor": "Audit Monitor",
+    "scheduler": "Scheduler",
     "logout": "Logout",
     "resumeBuilder": "Resume Builder",
     "apiKeys": "API Keys",

@@ -8,6 +8,7 @@ import {
   Bell,
   TrendingUp,
   FileSearch,
+  Clock,
   LucideIcon 
 } from 'lucide-react';
 
@@ -78,6 +79,12 @@ export const ADMIN_MENU_ITEMS: AdminMenuItem[] = [
     icon: FileSearch, 
     labelKey: 'auditMonitor', 
     permission: 'SYSTEM.LOGS.VIEW' 
+  },
+  { 
+    path: '/admin/scheduler', 
+    icon: Clock, 
+    labelKey: 'scheduler', 
+    permission: 'ADMIN_STATS.VIEW' 
   },
 ];
 
