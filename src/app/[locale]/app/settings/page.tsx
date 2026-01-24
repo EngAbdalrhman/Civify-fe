@@ -377,7 +377,6 @@ export default function SettingsPage() {
                         <p className="font-medium">{user?.username}</p>
                         <p className="text-sm text-muted-foreground">{user?.email}</p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          Hover avatar to change
                         </p>
                       </div>
                     </div>
