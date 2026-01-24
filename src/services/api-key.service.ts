@@ -5,7 +5,7 @@ export interface ApiKey {
   keyHash: string;
   keyPreview: string;
   name?: string;
-  revoked: boolean;
+  isActive: boolean;
   createdAt: string;
   lastUsedAt?: string;
   user?: any;
