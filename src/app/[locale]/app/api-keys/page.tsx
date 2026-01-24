@@ -217,7 +217,7 @@ export default function ApiKeysPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{t('keyId')}</TableHead>
+
                     <TableHead>{t('maskedKey')}</TableHead>
                     <TableHead>{t('created')}</TableHead>
                     <TableHead>{t('lastUsed')}</TableHead>
@@ -228,7 +228,7 @@ export default function ApiKeysPage() {
                 <TableBody>
                   {keys.map((key) => (
                     <TableRow key={key.id}>
-                      <TableCell className="font-medium">#{key.id}</TableCell>
+
                       <TableCell className="font-mono text-xs">{key.keyPreview}</TableCell>
                       <TableCell>{new Date(key.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell>
@@ -237,12 +237,12 @@ export default function ApiKeysPage() {
                           : t('never')}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={!key.revoked ? 'default' : 'destructive'} className={!key.revoked ? 'bg-green-600 hover:bg-green-700' : ''}>
-                          {!key.revoked ? t('active') : t('revoked')}
+                        <Badge variant={key.isActive ? 'default' : 'destructive'} className={key.isActive ? 'bg-green-600 hover:bg-green-700' : ''}>
+                          {key.isActive ? t('active') : t('revoked')}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        {!key.revoked && (
+                        {key.isActive && (
                           <Button variant="ghost" size="sm" onClick={() => handleRevoke(key.id)} className="text-destructive hover:text-destructive/90 hover:bg-destructive/10">
                              {t('revoke')}
                           </Button>
