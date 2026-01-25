@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, MapPin } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function ContactPage() {
   const t = useTranslations("contact");
@@ -27,7 +28,19 @@ export default function ContactPage() {
     }
     
     setIsSubmitting(true);
-    // We allow the native form submission to proceed to the action URL
+    
+    // Since we are submitting to an iframe, we can't easily know when it's done cross-origin.
+    // We will assume success after a short delay and show the toast.
+    setTimeout(() => {
+        setIsSubmitting(false);
+        toast.success(t("form.success"));
+        setFormData({
+            "Contact Name": "",
+            "Email": "",
+            "Subject": "",
+            "Description": "",
+        });
+    }, 1000);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -74,9 +87,11 @@ export default function ContactPage() {
           {/* Contact Form */}
           <div className="md:col-span-2">
             <div className="bg-card p-6 rounded-lg shadow-sm border">
+              <iframe name="hidden_iframe" style={{ display: 'none' }} />
               <form 
                 action='https://desk.zoho.com/support/WebToCase' 
                 method='POST' 
+                target="hidden_iframe"
                 onSubmit={handleSubmit} 
                 className="space-y-6"
                 encType='multipart/form-data'
