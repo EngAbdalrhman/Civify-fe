@@ -92,6 +92,14 @@ export function Footer() {
                   {t("company.terms")}
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/policy/cancellation"
+                  className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
+                >
+                  {t("subscription.policy.nature")} & {t("subscription.policy.noRefund")}
+                </Link>
+              </li>
             </ul>
           </div>
 

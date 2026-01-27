@@ -499,6 +499,11 @@ function CheckoutContent() {
                 </div>
               </div>
 
+              {/* Consent Disclaimer */}
+              <p className="text-xs text-muted-foreground text-center px-4">
+                {t('subscription.policy.consentDisclaimer')}
+              </p>
+
               {/* Checkout Button */}
               <Button
                 onClick={handleCheckout}
@@ -518,12 +523,15 @@ function CheckoutContent() {
                 )}
               </Button>
 
-              <p className="text-xs text-center text-muted-foreground">
-                {t('termsAgreement')}{' '}
-                <a href="/terms" className="underline hover:text-foreground">{t('termsOfService')}</a>
-                {' '}{t('and')}{' '}
-                <a href="/privacy" className="underline hover:text-foreground">{t('privacyPolicy')}</a>
-              </p>
+              <div className="flex flex-wrap justify-center gap-x-1 text-xs text-muted-foreground text-center">
+                <a href="/terms" target="_blank" className="underline hover:text-foreground">{t('termsOfService')}</a>
+                <span>&bull;</span>
+                <a href="/policy" target="_blank" className="underline hover:text-foreground">{t('privacyPolicy')}</a>
+                <span>&bull;</span>
+                <a href="/policy/cancellation" target="_blank" className="underline hover:text-foreground">
+                  {t('subscription.policy.nature')} & {t('subscription.policy.noRefund')}
+                </a>
+              </div>
             </CardContent>
           </Card>
         </div>
