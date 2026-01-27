@@ -1121,5 +1121,17 @@
         }
       }
     }
+  },
+  "atsScore": {
+    "title": "نقاط ATS العامة",
+    "description": "تحليل سيرتك الذاتية وفقاً لأفضل الممارسات للتوافق مع أنظمة ATS.",
+    "analyzing": "جاري تحليل سيرتك الذاتية...",
+    "overallCompatibility": "التوافق العام مع ATS",
+    "contentQuality": "جودة المحتوى",
+    "skillsPresentation": "عرض المهارات",
+    "areasToImprove": "مجالات للتحسين",
+    "suggestions": "الاقتراحات",
+    "close": "إغلاق",
+    "noScore": "لا توجد نتيجة متاحة"
   }
 }

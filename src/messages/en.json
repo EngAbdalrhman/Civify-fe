@@ -1124,5 +1124,17 @@
         }
       }
     }
+  },
+  "atsScore": {
+    "title": "General ATS Score",
+    "description": "Analyzing your CV against industry best practices for ATS compatibility.",
+    "analyzing": "Analyzing your CV...",
+    "overallCompatibility": "Overall ATS Compatibility",
+    "contentQuality": "Content Quality",
+    "skillsPresentation": "Skills Presentation",
+    "areasToImprove": "Areas to Improve",
+    "suggestions": "Suggestions",
+    "close": "Close",
+    "noScore": "No score available"
   }
 }
