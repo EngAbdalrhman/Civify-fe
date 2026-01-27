@@ -390,6 +390,19 @@
     }
   },
   "subscription": {
+    "policy": {
+      "consentDisclaimer": "By clicking 'Pay', you agree to our Terms & Conditions and Cancellation Policy.",
+      "nature": "Subscription Nature",
+      "natureDesc": "Our services operate on a periodic subscription basis (monthly/yearly). Upon completing the payment, the subscriber immediately obtains full access to the agreed-upon digital services.",
+      "noRefund": "Non-Refund Policy",
+      "noRefundDesc": "Due to the digital nature of the service and its immediate availability for use, all payments collected for current subscription periods are non-refundable in whole or in part. The subscriber is not entitled to claim a refund after service activation, in accordance with laws governing digital goods and services.",
+      "autoRenew": "Cancellation of Auto-Renewal",
+      "autoRenewDesc": "The subscriber has the right to cancel 'Auto-Renewal' at any time through their account control panel.",
+      "cancellationEffect": "Effect of Cancellation",
+      "cancellationEffectDesc": "Upon cancellation, the service will remain active until the end of the pre-paid subscription period. No future charges will be deducted, and the subscription will terminate permanently at the end of the current period.",
+      "agreement": "Agreement",
+      "agreementDesc": "By completing the payment, the subscriber acknowledges having read and agreed to this policy and waives their right to refund the current period's value once usage begins."
+    },
     "confirm": {
       "title": "Confirm Subscription",
       "plan": "Plan",
