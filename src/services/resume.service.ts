@@ -1,11 +1,17 @@
 import apiClient from '@/api/client';
-import { ResumeData } from '@/features/upload-cv/types';
+import { ResumeData, AtsScore } from '@/features/upload-cv/types';
 
 export interface ResumeSummary {
   id: string;
   title: string;
   updatedAt: string;
   data: ResumeData;
+}
+
+interface CommonResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
 }
 
 export const ResumeService = {
@@ -31,5 +37,10 @@ export const ResumeService = {
 
   delete: async (id: string): Promise<void> => {
     await apiClient.delete(`/v1/resumes/${id}`);
+  },
+
+  calculateScore: async (resumeData: ResumeData): Promise<AtsScore> => {
+    const response = await apiClient.post<CommonResponse<AtsScore>>('/v1/cvs/score', { resumeData });
+    return response.data.data;
   }
 };

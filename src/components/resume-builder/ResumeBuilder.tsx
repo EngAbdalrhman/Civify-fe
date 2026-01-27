@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { ResumeData, emptyResumeData } from '@/features/upload-cv/types';
+import { ResumeData, emptyResumeData, AtsScore } from '@/features/upload-cv/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,7 +23,9 @@ import {
   FileText,
   Maximize2,
   Minimize2,
-  Upload
+  Upload,
+  Target,
+  Loader2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -36,6 +38,7 @@ import { ResumePreview } from './ResumePreview';
 import { EditorPanel } from './EditorPanel';
 import { DesignPanel } from './DesignPanel';
 import { ExportPanel } from './ExportPanel';
+import { AtsScoreDialog } from './AtsScoreDialog';
 
 const STORAGE_KEY = 'civify_guest_resume';
 
@@ -62,8 +65,12 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
   const originalDataRef = useRef<ResumeData>(initialData);
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  // ... inside ResumeBuilder component
   const [isUploading, setIsUploading] = useState(false);
+  
+  // ATS Score state
+  const [showScoreDialog, setShowScoreDialog] = useState(false);
+  const [atsScore, setAtsScore] = useState<AtsScore | null>(null);
+  const [isCalculatingScore, setIsCalculatingScore] = useState(false);
   
   const t = useTranslations('builder');
   const tCommon = useTranslations('common');
@@ -176,8 +183,32 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
     }
   };
 
+  const handleCalculateScore = async () => {
+    if (isGuest) {
+      toast.info('Please login to use ATS Score analysis', {
+        action: {
+          label: tCommon('login'),
+          onClick: () => router.push('/login?callbackUrl=/app/resume-builder')
+        }
+      });
+      return;
+    }
 
+    setShowScoreDialog(true);
+    setIsCalculatingScore(true);
+    setAtsScore(null);
 
+    try {
+      const score = await ResumeService.calculateScore(resumeData);
+      setAtsScore(score);
+    } catch (error) {
+      console.error('Score calculation error:', error);
+      toast.error('Failed to calculate ATS score');
+      setShowScoreDialog(false);
+    } finally {
+      setIsCalculatingScore(false);
+    }
+  };
   return (
     <>
       <div className="flex h-screen overflow-hidden bg-background">
@@ -216,12 +247,29 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
                 className="gap-2"
                 title={t('actions.upload')}
               >
-                <Upload className="h-4 w-4" />
-                {isUploading ? t('actions.parsing') : t('actions.upload')}
+                {isUploading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4" />
+                  </>
+                )}
               </Button>
               
               <Button variant="ghost" size="icon" onClick={handleReset} title={t('actions.reset')}>
                 <RotateCcw className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleCalculateScore}
+                disabled={isCalculatingScore}
+                className="gap-2"
+                title="ATS Score"
+              >
+                <Target className="h-4 w-4" />
               </Button>
               <Button 
                 variant="default" 
@@ -330,6 +378,14 @@ export function ResumeBuilder({ initialData, resumeId, isGuest }: ResumeBuilderP
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* ATS Score Dialog */}
+      <AtsScoreDialog
+        open={showScoreDialog}
+        onOpenChange={setShowScoreDialog}
+        score={atsScore}
+        isLoading={isCalculatingScore}
+      />
     </>
   );
 }
