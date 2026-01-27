@@ -4,6 +4,13 @@ import { Check, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { useRouter } from "@/i18n/routing";
 import { usePlans } from "@/features/plans/hooks/usePlans";
 import { useState, useEffect, useMemo } from "react";
@@ -25,6 +32,12 @@ export function PricingSection() {
     if (!plans || plans.length === 0) return [];
 
     return plans
+      .filter((plan) => {
+        if (isAnnual && plan.allowAnnualBilling === false) {
+          return false;
+        }
+        return true;
+      })
       .map((plan) => {
         const features: string[] = [];
         const name = plan.name.toLowerCase();
@@ -171,71 +184,168 @@ export function PricingSection() {
 
         {/* Pricing Cards */}
         {!isLoading && !error && displayPlans.length > 0 && (
-          <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-3">
-            {displayPlans.map((tier) => (
-              <Card
-                key={tier.id}
-                className={`relative flex flex-col border-2 transition-all duration-300 ${
-                  tier.highlighted
-                    ? "border-primary shadow-2xl shadow-primary/20 scale-105"
-                    : "hover:border-primary/50 hover:shadow-xl"
-                }`}
-              >
-                {tier.highlighted && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-600 to-purple-600">
-                    {t("mostPopular")}
-                  </Badge>
-                )}
+          <>
+            {displayPlans.length > 3 ? (
+              <div className="mx-auto max-w-6xl px-4">
+                <Carousel
+                  opts={{
+                    align: "start",
+                    loop: false,
+                  }}
+                  className="w-full"
+                >
+                  <CarouselContent className="-ml-4">
+                    {displayPlans.map((tier) => (
+                      <CarouselItem
+                        key={tier.id}
+                        className="pl-4 md:basis-1/2 lg:basis-1/3"
+                      >
+                        <div className="h-full p-1">
+                          <Card
+                            className={`relative flex h-full flex-col border-2 transition-all duration-300 ${
+                              tier.highlighted
+                                ? "border-primary shadow-2xl shadow-primary/20"
+                                : "hover:border-primary/50 hover:shadow-xl"
+                            }`}
+                          >
+                            {tier.highlighted && (
+                              <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-600 to-purple-600">
+                                {t("mostPopular")}
+                              </Badge>
+                            )}
 
-                <CardHeader className="pb-8 pt-8">
-                  <div className="mb-2 text-center">
-                    <h3 className="text-2xl font-bold">{tier.name}</h3>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {tier.description}
-                    </p>
-                  </div>
+                            <CardHeader className="pb-8 pt-8">
+                              <div className="mb-2 text-center">
+                                <h3 className="text-2xl font-bold">
+                                  {tier.name}
+                                </h3>
+                                <p className="mt-2 text-sm text-muted-foreground">
+                                  {tier.description}
+                                </p>
+                              </div>
 
-                  <div className="mt-4 text-center">
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-5xl font-bold">{tier.price}</span>
-                      <span className="text-xl font-bold text-muted-foreground">
-                        EGP
-                      </span>
-                      <span className="text-muted-foreground">
-                        /{tier.period}
-                      </span>
-                    </div>
-                  </div>
-                </CardHeader>
+                              <div className="mt-4 text-center">
+                                <div className="flex items-baseline justify-center gap-1">
+                                  <span className="text-5xl font-bold">
+                                    {tier.price}
+                                  </span>
+                                  <span className="text-xl font-bold text-muted-foreground">
+                                    EGP
+                                  </span>
+                                  <span className="text-muted-foreground">
+                                    /{tier.period}
+                                  </span>
+                                </div>
+                              </div>
+                            </CardHeader>
 
-                <CardContent className="flex flex-1 flex-col">
-                  {/* Features */}
-                  <ul className="mb-8 flex-1 space-y-3">
-                    {tier.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-3">
-                        <Check className="h-5 w-5 flex-shrink-0 text-green-600" />
-                        <span className="text-sm">{feature}</span>
-                      </li>
+                            <CardContent className="flex flex-1 flex-col">
+                              {/* Features */}
+                              <ul className="mb-8 flex-1 space-y-3">
+                                {tier.features.map((feature, index) => (
+                                  <li
+                                    key={index}
+                                    className="flex items-start gap-3"
+                                  >
+                                    <Check className="h-5 w-5 flex-shrink-0 text-green-600" />
+                                    <span className="text-sm">{feature}</span>
+                                  </li>
+                                ))}
+                              </ul>
+
+                              {/* CTA */}
+                              <Button
+                                size="lg"
+                                className={`w-full ${
+                                  tier.highlighted
+                                    ? "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                                    : ""
+                                }`}
+                                variant={
+                                  tier.highlighted ? "default" : "outline"
+                                }
+                                onClick={() => handlePlanSelect(tier.ctaLink)}
+                              >
+                                {tier.cta}
+                              </Button>
+                            </CardContent>
+                          </Card>
+                        </div>
+                      </CarouselItem>
                     ))}
-                  </ul>
-
-                  {/* CTA */}
-                  <Button
-                    size="lg"
-                    className={`w-full ${
+                  </CarouselContent>
+                  <CarouselPrevious className="-left-4 lg:-left-12" />
+                  <CarouselNext className="-right-4 lg:-right-12" />
+                </Carousel>
+              </div>
+            ) : (
+              <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-3">
+                {displayPlans.map((tier) => (
+                  <Card
+                    key={tier.id}
+                    className={`relative flex flex-col border-2 transition-all duration-300 ${
                       tier.highlighted
-                        ? "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                        : ""
+                        ? "border-primary shadow-2xl shadow-primary/20 scale-105"
+                        : "hover:border-primary/50 hover:shadow-xl"
                     }`}
-                    variant={tier.highlighted ? "default" : "outline"}
-                    onClick={() => handlePlanSelect(tier.ctaLink)}
                   >
-                    {tier.cta}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                    {tier.highlighted && (
+                      <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-600 to-purple-600">
+                        {t("mostPopular")}
+                      </Badge>
+                    )}
+
+                    <CardHeader className="pb-8 pt-8">
+                      <div className="mb-2 text-center">
+                        <h3 className="text-2xl font-bold">{tier.name}</h3>
+                        <p className="mt-2 text-sm text-muted-foreground">
+                          {tier.description}
+                        </p>
+                      </div>
+
+                      <div className="mt-4 text-center">
+                        <div className="flex items-baseline justify-center gap-1">
+                          <span className="text-5xl font-bold">{tier.price}</span>
+                          <span className="text-xl font-bold text-muted-foreground">
+                            EGP
+                          </span>
+                          <span className="text-muted-foreground">
+                            /{tier.period}
+                          </span>
+                        </div>
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="flex flex-1 flex-col">
+                      {/* Features */}
+                      <ul className="mb-8 flex-1 space-y-3">
+                        {tier.features.map((feature, index) => (
+                          <li key={index} className="flex items-start gap-3">
+                            <Check className="h-5 w-5 flex-shrink-0 text-green-600" />
+                            <span className="text-sm">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      {/* CTA */}
+                      <Button
+                        size="lg"
+                        className={`w-full ${
+                          tier.highlighted
+                            ? "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                            : ""
+                        }`}
+                        variant={tier.highlighted ? "default" : "outline"}
+                        onClick={() => handlePlanSelect(tier.ctaLink)}
+                      >
+                        {tier.cta}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </>
         )}
 
         {/* Note */}
