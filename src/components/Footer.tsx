@@ -12,6 +12,7 @@ import { toast } from "sonner";
 
 export function Footer() {
   const t = useTranslations("footer");
+  const tSubscription = useTranslations("subscription.policy");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -97,7 +98,7 @@ export function Footer() {
                   href="/policy/cancellation"
                   className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
                 >
-                  {t("subscription.policy.nature")} & {t("subscription.policy.noRefund")}
+                  {tSubscription("cancellationPolicy")}
                 </Link>
               </li>
             </ul>

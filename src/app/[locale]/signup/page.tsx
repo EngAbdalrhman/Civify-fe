@@ -104,15 +104,20 @@ export default function SignupPage() {
             )}
           </div>
 
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" />
-            {t("terms")}
+          <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <input type="checkbox" required className="rounded border-gray-300 text-primary focus:ring-primary" />
+            <span>
+              {t.rich('terms', {
+                terms: (chunks) => <Link href="/terms" className="underline hover:text-foreground">{chunks}</Link>,
+                privacy: (chunks) => <Link href="/policy" className="underline hover:text-foreground">{chunks}</Link>
+              })}
+            </span>
           </label>
 
           <Button className="w-full" disabled={isSignupPending}>
             {t("signup")}
           </Button>
-
+          
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />

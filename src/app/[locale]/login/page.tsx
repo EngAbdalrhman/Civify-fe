@@ -249,6 +249,13 @@ export default function LoginPage() {
             {t('signup')}
           </Link>
         </p>
+
+        <p className="text-center text-xs text-muted-foreground px-4">
+          {t.rich('agreement', {
+            terms: (chunks) => <Link href="/terms" className="underline hover:text-foreground">{chunks}</Link>,
+            privacy: (chunks) => <Link href="/policy" className="underline hover:text-foreground">{chunks}</Link>
+          })}
+        </p>
       </div>
     </div>
   );

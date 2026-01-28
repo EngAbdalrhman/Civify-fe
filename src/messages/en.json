@@ -78,7 +78,7 @@
     "confirmPasswordMin": "Confirm Password must be at least 8 characters long",
     "passwordsMatch": "Passwords do not match",
     "subtitle": "Create your account to get started",
-    "terms": "I accept the terms and conditions",
+    "terms": "I accept the <terms>Terms & Conditions</terms> and <privacy>Privacy Policy</privacy>.",
     "orContinueWith": "Or continue with",
     "emailNotVerified": "Please verify your email before logging in.",
     "verificationSentAutomatically": "Verification email sent automatically! Please check your inbox.",
@@ -86,7 +86,8 @@
     "identifierPlaceholder": "your@email.com or username",
     "identifierRequired": "Please enter your email or username",
     "passwordComplexity": "Password must contain at least 8 characters, one uppercase, one lowercase, one number, and one special character",
-    "passwordPwned": "This password has been found in a data breach. Please choose a different password"
+    "passwordPwned": "This password has been found in a data breach. Please choose a different password",
+    "agreement": "By confirming, you agree to our <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>."
   },
   "dashboard": {
     "personalPage": {
@@ -391,7 +392,8 @@
   },
   "subscription": {
     "policy": {
-      "consentDisclaimer": "By clicking 'Pay', you agree to our Terms & Conditions and Cancellation Policy.",
+      "consentDisclaimer": "By clicking 'Pay', you agree to our <terms>Terms & Conditions</terms> and <cancellation>Cancellation Policy</cancellation>.",
+      "cancellationPolicy": "Cancellation Policy",
       "nature": "Subscription Nature",
       "natureDesc": "Our services operate on a periodic subscription basis (monthly/yearly). Upon completing the payment, the subscriber immediately obtains full access to the agreed-upon digital services.",
       "noRefund": "Non-Refund Policy",
