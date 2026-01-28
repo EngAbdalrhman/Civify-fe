@@ -42,9 +42,11 @@ export function usePlans(options: UsePlansOptions = {}): UsePlansReturn {
       setPlans(fetchedPlans);
 
       // Transform and sort plans
-      const transformed = fetchedPlans.map(plan => 
-        subscriptionService.transformPlanToDisplay(plan, isAnnual)
-      );
+      const transformed = fetchedPlans
+        .filter(plan => !isAnnual || plan.allowAnnualBilling !== false)
+        .map(plan => 
+          subscriptionService.transformPlanToDisplay(plan, isAnnual)
+        );
 
       // Sort: Free -> Pro/Premium -> Enterprise -> Lifetime
       const sorted = transformed.sort((a, b) => {
@@ -66,9 +68,11 @@ export function usePlans(options: UsePlansOptions = {}): UsePlansReturn {
   // Re-transform when isAnnual changes
   useEffect(() => {
     if (plans.length > 0) {
-      const transformed = plans.map(plan => 
-        subscriptionService.transformPlanToDisplay(plan, isAnnual)
-      );
+      const transformed = plans
+        .filter(plan => !isAnnual || plan.allowAnnualBilling !== false)
+        .map(plan => 
+          subscriptionService.transformPlanToDisplay(plan, isAnnual)
+        );
 
       const sorted = transformed.sort((a, b) => {
         const order = ['free', 'pro', 'premium', 'enterprise', 'lifetime'];
