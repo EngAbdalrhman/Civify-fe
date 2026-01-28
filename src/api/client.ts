@@ -231,17 +231,10 @@ apiClient.interceptors.response.use(
         return Promise.reject(error);
       }
 
-      // Check if access token exists - if not, no point in retrying refresh
-      // Just redirect to login immediately
-      const currentAccessToken = getAccessToken();
-      if (!currentAccessToken) {
-        console.log(
-          "[Auth] No access token found, skipping refresh and redirecting to login",
-        );
-        clearAuthAndRedirect();
-        return Promise.reject(error);
-      }
-
+      // If we are here, it means we have a 401.
+      // We should attempt to refresh the token regardless of whether we have a local access token,
+      // because the HttpOnly refresh token cookie might still be valid.
+      
       // If already refreshing, queue this request
       if (isRefreshing) {
         console.log("[Auth] Refresh in progress, queuing request:", url);
