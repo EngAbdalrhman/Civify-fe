@@ -21,6 +21,7 @@ function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations('checkout');
+  const tPolicy = useTranslations('subscription.policy');
 
   const planId = searchParams.get('planId');
   const invoiceUuid = searchParams.get('invoice');
@@ -412,9 +413,16 @@ function CheckoutContent() {
                       {gateway === 'paymob' && <Check className="h-3 w-3 text-primary-foreground" />}
                     </div>
                     <div className="flex-1">
-                      <div className="font-medium">{t('paymob')}</div>
+                      <Image src="/paymob.png" alt="Paymob" width={100} height={100} />
                       <div className="text-sm text-muted-foreground">
                         {t('paymobDesc')}
+                      </div>
+                    </div>
+                      <div className="flex gap-1">
+                      <div className="w-10 h-6 bg-gradient-to-r from-blue-600 to-blue-800 rounded text-white text-xs flex items-center justify-center font-bold">VISA</div>
+                      <div className="w-10 h-6 bg-gradient-to-r from-red-500 to-yellow-500 rounded flex items-center justify-center">
+                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-yellow-500 -ml-1"></div>
                       </div>
                     </div>
                   </button>
@@ -422,71 +430,7 @@ function CheckoutContent() {
               </div>
 
              {/* Payment Method Selection */}
-              {(gateway === 'fawaterak' || gateway === 'paymob') && (
-                <div className="space-y-4">
-                  <Label className="text-sm font-medium">
-                    {t('selectPaymentMethod') || 'Select Payment Method'}
-                  </Label>
-                  
-                  {/* CHANGED: grid-cols-3 to grid-cols-2 to fit 2 items evenly */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    
-                    {/* Visa/Card Option */}
-                    <button
-                      onClick={() => setPaymentMethod('CARD')}
-                      className={`flex flex-col items-center justify-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all text-center h-full hover:bg-muted/50 ${
-                        paymentMethod === 'CARD' 
-                          ? 'border-primary bg-primary/5' 
-                          : 'border-muted'
-                      }`}
-                    >
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mb-1 transition-colors ${
-                        paymentMethod === 'CARD' 
-                          ? 'border-primary bg-primary text-primary-foreground' 
-                          : 'border-muted-foreground'
-                      }`}>
-                        {paymentMethod === 'CARD' && <Check className="h-3 w-3" />}
-                      </div>
-                      
-                      <CreditCard className={`h-8 w-8 ${paymentMethod === 'CARD' ? 'text-blue-600' : 'text-muted-foreground'}`} />
-                      
-                      <div>
-                        <div className="font-medium">{t('visa') || 'Card'}</div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {t('visaDesc') || 'Visa, Mastercard'}
-                        </div>
-                      </div>
-                    </button>
 
-                    {/* Mobile Wallet Option */}
-                    <button
-                      onClick={() => setPaymentMethod('WALLET')}
-                      className={`flex flex-col items-center justify-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all text-center h-full hover:bg-muted/50 ${
-                        paymentMethod === 'WALLET' 
-                          ? 'border-primary bg-primary/5' 
-                          : 'border-muted'
-                      }`}
-                    >
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mb-1 transition-colors ${
-                        paymentMethod === 'WALLET' 
-                          ? 'border-primary bg-primary text-primary-foreground' 
-                          : 'border-muted-foreground'
-                      }`}>
-                        {paymentMethod === 'WALLET' && <Check className="h-3 w-3" />}
-                      </div>
-                      
-                      <Smartphone className={`h-8 w-8 ${paymentMethod === 'WALLET' ? 'text-green-600' : 'text-muted-foreground'}`} />
-                      
-                      <div>
-                        <div className="font-medium">{t('mobileWallet') || 'Wallet'}</div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {t('mobileWalletDesc') || 'Vodafone, Orange...'}
-                        </div>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-              )}
 
               {/* Security Note */}
               <div className="flex items-start gap-3 p-4 rounded-lg bg-green-50 dark:bg-green-950/20 text-green-800 dark:text-green-400">
@@ -501,7 +445,10 @@ function CheckoutContent() {
 
               {/* Consent Disclaimer */}
               <p className="text-xs text-muted-foreground text-center px-4">
-                {t('subscription.policy.consentDisclaimer')}
+                {tPolicy.rich('consentDisclaimer', {
+                  terms: (chunks) => <a href="/terms" target="_blank" className="underline hover:text-foreground">{chunks}</a>,
+                  cancellation: (chunks) => <a href="/policy/cancellation" target="_blank" className="underline hover:text-foreground">{chunks}</a>
+                })}
               </p>
 
               {/* Checkout Button */}
@@ -522,16 +469,6 @@ function CheckoutContent() {
                   </>
                 )}
               </Button>
-
-              <div className="flex flex-wrap justify-center gap-x-1 text-xs text-muted-foreground text-center">
-                <a href="/terms" target="_blank" className="underline hover:text-foreground">{t('termsOfService')}</a>
-                <span>&bull;</span>
-                <a href="/policy" target="_blank" className="underline hover:text-foreground">{t('privacyPolicy')}</a>
-                <span>&bull;</span>
-                <a href="/policy/cancellation" target="_blank" className="underline hover:text-foreground">
-                  {t('subscription.policy.nature')} & {t('subscription.policy.noRefund')}
-                </a>
-              </div>
             </CardContent>
           </Card>
         </div>
