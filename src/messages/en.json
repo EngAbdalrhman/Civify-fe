@@ -511,6 +511,8 @@
         "sortOrder": "Sort Order",
         "update": "Update"
       }
+      "createPackage": "Create Package",
+      "popular": "Popular"
     },
     "plans": {
       "title": "Plan Management",

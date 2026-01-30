@@ -509,6 +509,8 @@
         "sortOrder": "ترتيب العرض",
         "update": "تحديث"
       }
+      "createPackage": "إنشاء حزمة",
+      "popular": "شائع"
     },
     "plans": {
       "title": "إدارة الخطط",

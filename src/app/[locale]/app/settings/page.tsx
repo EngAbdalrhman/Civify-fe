@@ -729,6 +729,11 @@ export default function SettingsPage() {
                       {showPasswords.new ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
+                  <Switch
+                    checked={is2FAEnabled}
+                    onCheckedChange={handleToggle2FA}
+                    disabled={isToggling2FA || !user}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Confirm New Password</Label>
