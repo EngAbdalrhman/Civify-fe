@@ -81,6 +81,7 @@ export interface AdminPlan {
   watermark: boolean;
   monthlyPrice: string;
   annualPrice: string;
+  currency: string;
   active: boolean;
   // Billing restrictions
   allowAnnualBilling: boolean;
@@ -115,6 +116,7 @@ export interface CreatePlanRequest {
   watermark?: boolean;
   monthlyPrice: number;
   annualPrice: number;
+  currency?: string;
   active?: boolean;
   // Linked group
   linkedGroupId?: number;

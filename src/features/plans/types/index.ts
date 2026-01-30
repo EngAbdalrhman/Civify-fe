@@ -15,6 +15,7 @@ export interface SubscriptionPlan {
   active: boolean;
   createdAt?: string;
   updatedAt?: string;
+  allowAnnualBilling?: boolean;
 }
 
 export interface PlanFeature {

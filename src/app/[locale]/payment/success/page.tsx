@@ -53,6 +53,7 @@ function PaymentSuccessContent() {
       // Verify payment with backend (with retry)
       const result = await paymentService.handlePaymentSuccess(
         callbackData.transactionId,
+        gateway, // Pass gateway for proper backend routing
         5, // max retries
         2000 // retry delay
       );

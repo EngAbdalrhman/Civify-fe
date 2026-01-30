@@ -4,19 +4,28 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Check, Loader2 } from "lucide-react";
 import { useRouter } from "@/i18n/routing";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { usePlans } from "@/features/plans/hooks/usePlans";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { isAuthenticated } from "@/utils/cookies";
 
 import { useState, useEffect } from "react";
 
 export default function PlansPage() {
   const t = useTranslations("plans");
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
   const { displayPlans, isLoading, error, isAnnual, setIsAnnual } = usePlans();
 
   useEffect(() => {
-    setIsAuthenticated(!!localStorage.getItem("auth_token"));
+    setIsUserAuthenticated(isAuthenticated());
   }, []);
 
   const handlePlanSelect = (ctaLink: string) => {
@@ -26,7 +35,7 @@ export default function PlansPage() {
       return;
     }
 
-    if (!isAuthenticated) {
+    if (!isUserAuthenticated) {
       // Redirect to signup with callback
       // Construct callback URL: /checkout?planId=X
       const callbackUrl = encodeURIComponent(ctaLink);
@@ -92,57 +101,130 @@ export default function PlansPage() {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-        {displayPlans.map((plan) => (
-          <div
-            key={plan.id}
-            className={`relative rounded-2xl border p-8 shadow-sm flex flex-col ${
-              plan.highlighted
-                ? "border-primary ring-1 ring-primary shadow-lg scale-105 bg-primary/5"
-                : "bg-card"
-            }`}
+      {displayPlans.length > 3 ? (
+        <div className="mx-auto max-w-7xl px-4">
+          <Carousel
+            opts={{
+              align: "start",
+              loop: false,
+            }}
+            className="w-full"
           >
-            {plan.highlighted && (
-              <Badge className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
-                Most Popular
-              </Badge>
-            )}
+            <CarouselContent className="-ml-4">
+              {displayPlans.map((plan) => (
+                <CarouselItem
+                  key={plan.id}
+                  className="pl-4 md:basis-1/2 lg:basis-1/3"
+                >
+                  <div className="h-full p-1">
+                    <div
+                      key={plan.id}
+                      className={`relative flex h-full flex-col rounded-2xl border p-8 shadow-sm ${
+                        plan.highlighted
+                          ? "scale-105 border-primary bg-primary/5 ring-1 ring-primary shadow-lg"
+                          : "bg-card"
+                      }`}
+                    >
+                      {plan.highlighted && (
+                        <Badge className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-1 text-sm font-medium text-primary-foreground">
+                          Most Popular
+                        </Badge>
+                      )}
 
-            <div className="mb-8">
-              <h3 className="text-xl font-bold">{plan.name}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {plan.description}
-              </p>
-              <div className="mt-4 flex items-baseline">
-                <span className="text-4xl font-bold tracking-tight">
-                  ${plan.price}
-                </span>
-                <span className="ml-1 text-muted-foreground">
-                  /{plan.period}
-                </span>
-              </div>
-            </div>
+                      <div className="mb-8">
+                        <h3 className="text-xl font-bold">{plan.name}</h3>
+                        <p className="mt-2 text-sm text-muted-foreground">
+                          {plan.description}
+                        </p>
+                        <div className="mt-4 flex items-baseline">
+                          <span className="text-4xl font-bold tracking-tight">
+                            ${plan.price}
+                          </span>
+                          <span className="ml-1 text-muted-foreground">
+                            /{plan.period}
+                          </span>
+                        </div>
+                      </div>
 
-            <ul className="space-y-4 mb-8 flex-1">
-              {plan.features.map((feature, i) => (
-                <li key={i} className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span className="text-sm">{feature}</span>
-                </li>
+                      <ul className="mb-8 flex-1 space-y-4">
+                        {plan.features.map((feature, i) => (
+                          <li key={i} className="flex items-center gap-3">
+                            <Check className="h-5 w-5 flex-shrink-0 text-primary" />
+                            <span className="text-sm">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      <Button
+                        className="w-full"
+                        variant={plan.highlighted ? "default" : "outline"}
+                        size="lg"
+                        onClick={() => handlePlanSelect(plan.ctaLink)}
+                      >
+                        {plan.cta}
+                      </Button>
+                    </div>
+                  </div>
+                </CarouselItem>
               ))}
-            </ul>
-
-            <Button
-              className="w-full"
-              variant={plan.highlighted ? "default" : "outline"}
-              size="lg"
-              onClick={() => handlePlanSelect(plan.ctaLink)}
+            </CarouselContent>
+            <CarouselPrevious className="-left-4 lg:-left-12" />
+            <CarouselNext className="-right-4 lg:-right-12" />
+          </Carousel>
+        </div>
+      ) : (
+        <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-3">
+          {displayPlans.map((plan) => (
+            <div
+              key={plan.id}
+              className={`relative flex flex-col rounded-2xl border p-8 shadow-sm ${
+                plan.highlighted
+                  ? "scale-105 border-primary bg-primary/5 ring-1 ring-primary shadow-lg"
+                  : "bg-card"
+              }`}
             >
-              {plan.cta}
-            </Button>
-          </div>
-        ))}
-      </div>
+              {plan.highlighted && (
+                <Badge className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-1 text-sm font-medium text-primary-foreground">
+                  Most Popular
+                </Badge>
+              )}
+
+              <div className="mb-8">
+                <h3 className="text-xl font-bold">{plan.name}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {plan.description}
+                </p>
+                <div className="mt-4 flex items-baseline">
+                  <span className="text-4xl font-bold tracking-tight">
+                    ${plan.price}
+                  </span>
+                  <span className="ml-1 text-muted-foreground">
+                    /{plan.period}
+                  </span>
+                </div>
+              </div>
+
+              <ul className="mb-8 flex-1 space-y-4">
+                {plan.features.map((feature, i) => (
+                  <li key={i} className="flex items-center gap-3">
+                    <Check className="h-5 w-5 flex-shrink-0 text-primary" />
+                    <span className="text-sm">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Button
+                className="w-full"
+                variant={plan.highlighted ? "default" : "outline"}
+                size="lg"
+                onClick={() => handlePlanSelect(plan.ctaLink)}
+              >
+                {plan.cta}
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* FAQ Section */}
       <div className="max-w-3xl mx-auto mt-24">

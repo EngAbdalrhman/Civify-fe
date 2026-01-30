@@ -75,6 +75,7 @@ export function PlansManager() {
     description: '',
     monthlyPrice: '',
     annualPrice: '',
+    currency: 'EGP',
     cvLimit: '',
     tokenLimit: '',
     watermark: true,
@@ -114,6 +115,7 @@ export function PlansManager() {
       description: '',
       monthlyPrice: '',
       annualPrice: '',
+      currency: 'EGP',
       cvLimit: '',
       tokenLimit: '',
       watermark: true,
@@ -134,6 +136,7 @@ export function PlansManager() {
       description: plan.description || '',
       monthlyPrice: plan.monthlyPrice,
       annualPrice: plan.annualPrice,
+      currency: plan.currency || 'EGP',
       cvLimit: plan.cvLimit?.toString() || '',
       tokenLimit: plan.tokenLimit?.toString() || '',
       watermark: plan.watermark ?? true,
@@ -155,6 +158,7 @@ export function PlansManager() {
         description: planFormData.description,
         monthlyPrice: parseFloat(planFormData.monthlyPrice),
         annualPrice: parseFloat(planFormData.annualPrice),
+        currency: planFormData.currency,
         cvLimit: planFormData.cvLimit ? parseInt(planFormData.cvLimit) : undefined,
         tokenLimit: planFormData.tokenLimit ? parseInt(planFormData.tokenLimit) : undefined,
         watermark: planFormData.watermark,
@@ -340,7 +344,7 @@ export function PlansManager() {
             </div>
             
             {/* Pricing */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="monthlyPrice">{t('form.monthlyPrice')} *</Label>
                 <Input
@@ -358,6 +362,25 @@ export function PlansManager() {
                   value={planFormData.annualPrice}
                   onChange={(e) => setPlanFormData({ ...planFormData, annualPrice: e.target.value })}
                 />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="currency">{t('form.currency') || 'Currency'} *</Label>
+                <Select
+                  value={planFormData.currency}
+                  onValueChange={(val) => setPlanFormData({ ...planFormData, currency: val })}
+                >
+                  <SelectTrigger id="currency">
+                    <SelectValue placeholder="Currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="EGP">EGP (Egyptian Pound)</SelectItem>
+                    <SelectItem value="USD">USD (US Dollar)</SelectItem>
+                    <SelectItem value="SAR">SAR (Saudi Riyal)</SelectItem>
+                    <SelectItem value="AED">AED (UAE Dirham)</SelectItem>
+                    <SelectItem value="EUR">EUR (Euro)</SelectItem>
+                    <SelectItem value="GBP">GBP (British Pound)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             

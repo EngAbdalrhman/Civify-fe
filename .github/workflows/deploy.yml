@@ -1,13 +1,13 @@
-name: Deploy Frontend to Dokploy
+name: Deploy Production to Dokploy
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "Production" ]
   workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}-frontend
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build-and-deploy:
@@ -46,6 +46,8 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           build-args: |
             NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
+            NEXT_PUBLIC_GA_MEASUREMENT_ID=${{ vars.NEXT_PUBLIC_GA_MEASUREMENT_ID }}
+            NEXT_PUBLIC_CLARITY_PROJECT_ID=${{ vars.NEXT_PUBLIC_CLARITY_PROJECT_ID }}
 
       # 5. Trigger Dokploy to Pull and Deploy
       - name: Trigger Dokploy Deployment

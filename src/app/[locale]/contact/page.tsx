@@ -4,30 +4,43 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Mail, MapPin } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner"; 
+import { toast } from "sonner";
 
 export default function ContactPage() {
   const t = useTranslations("contact");
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
+    "Contact Name": "",
+    "Email": "",
+    "Subject": "",
+    "Description": "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e: React.FormEvent) => {
+    // Simple validation before submission
+    if (!formData["Contact Name"] || !formData["Email"] || !formData["Subject"] || !formData["Description"]) {
+      e.preventDefault();
+      // You might want to show an error message here if needed, 
+      // but the 'required' attributes on inputs usually handle this.
+      return;
+    }
+    
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    setIsSubmitting(false);
-    toast.success(t("form.success"));
-    setFormData({ name: "", email: "", subject: "", message: "" });
+    // Since we are submitting to an iframe, we can't easily know when it's done cross-origin.
+    // We will assume success after a short delay and show the toast.
+    setTimeout(() => {
+        setIsSubmitting(false);
+        toast.success(t("form.success"));
+        setFormData({
+            "Contact Name": "",
+            "Email": "",
+            "Subject": "",
+            "Description": "",
+        });
+    }, 1000);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -74,7 +87,22 @@ export default function ContactPage() {
           {/* Contact Form */}
           <div className="md:col-span-2">
             <div className="bg-card p-6 rounded-lg shadow-sm border">
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <iframe name="hidden_iframe" style={{ display: 'none' }} />
+              <form 
+                action='https://desk.zoho.com/support/WebToCase' 
+                method='POST' 
+                target="hidden_iframe"
+                onSubmit={handleSubmit} 
+                className="space-y-6"
+                encType='multipart/form-data'
+              >
+                 <input type='hidden' name='xnQsjsdp' value='edbsn2e154c5c86be9ce8f4b23d5d0c28f6b1'/>
+                 <input type='hidden' name='xmIwtLD' value='edbsn4c64b6b33a28e1868c82c07130fb7aa37f8930026275a13a01f00b7be4dbed61'/>
+                 <input type='hidden' name='xJdfEaS' value=''/>
+                 <input type='hidden' name='actionType' value='Q2FzZXM='/>
+                 <input type="hidden" id="property(module)" value="Cases"/>
+                 <input type='hidden' name='returnURL' value='https://civify.cv'/>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label htmlFor="name" className="text-sm font-medium leading-none text-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -82,8 +110,8 @@ export default function ContactPage() {
                     </label>
                     <Input
                       id="name"
-                      name="name"
-                      value={formData.name}
+                      name="Contact Name"
+                      value={formData["Contact Name"]}
                       onChange={handleChange}
                       required
                       placeholder={t("form.name")}
@@ -95,9 +123,9 @@ export default function ContactPage() {
                     </label>
                     <Input
                       id="email"
-                      name="email"
+                      name="Email"
                       type="email"
-                      value={formData.email}
+                      value={formData["Email"]}
                       onChange={handleChange}
                       required
                       placeholder={t("form.email")}
@@ -111,8 +139,8 @@ export default function ContactPage() {
                   </label>
                   <Input
                     id="subject"
-                    name="subject"
-                    value={formData.subject}
+                    name="Subject"
+                    value={formData["Subject"]}
                     onChange={handleChange}
                     required
                     placeholder={t("form.subject")}
@@ -125,8 +153,8 @@ export default function ContactPage() {
                   </label>
                   <Textarea
                     id="message"
-                    name="message"
-                    value={formData.message}
+                    name="Description"
+                    value={formData["Description"]}
                     onChange={handleChange}
                     required
                     placeholder={t("form.message")}

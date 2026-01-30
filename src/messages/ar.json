@@ -78,15 +78,19 @@
     "confirmPasswordMin": "تأكيد كلمة المرور يجب أن يتكون من 8 أحرف على الأقل",
     "passwordsMatch": "كلمات المرور غير متطابقة",
     "subtitle": "أنشئ حسابك للبدء",
-    "terms": "أوافق على الشروط والأحكام",
+    "terms": "أوافق على <terms>الشروط والأحكام</terms> و<privacy>سياسة الخصوصية</privacy>.",
     "orContinueWith": "أو تابع بواسطة",
     "emailNotVerified": "يرجى التحقق من بريدك الإلكتروني قبل تسجيل الدخول.",
     "verificationSentAutomatically": "تم إرسال رسالة التحقق تلقائياً! يرجى التحقق من صندوق الوارد.",
+    "name": "الاسم الكامل",
+    "namePlaceholder": "محمد أحمد",
+    "nameMin": "يجب أن يتكون الاسم من حرفين على الأقل",
     "identifier": "البريد الإلكتروني أو اسم المستخدم",
     "identifierPlaceholder": "بريدك الإلكتروني أو اسم المستخدم",
     "identifierRequired": "يرجى إدخال بريدك الإلكتروني أو اسم المستخدم",
     "passwordComplexity": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل، حرف كبير، حرف صغير، رقم، ورمز خاص",
-    "passwordPwned": "تم العثور على كلمة المرور هذه في خرق بيانات. يرجى اختيار كلمة مرور مختلفة"
+    "passwordPwned": "تم العثور على كلمة المرور هذه في خرق بيانات. يرجى اختيار كلمة مرور مختلفة",
+    "agreement": "من خلال التأكيد، فإنك توافق على <terms>شروط الخدمة</terms> و <privacy>سياسة الخصوصية</privacy>."
   },
   "dashboard": {
     "personalPage": {
@@ -255,6 +259,13 @@
     "fawaterakDesc": "بطاقة ائتمان/خصم، فوري، المحافظ",
     "paymob": "باي موب",
     "paymobDesc": "بطاقة ائتمان/خصم، المحافظ الإلكترونية",
+    "selectPaymentMethod": "اختر طريقة الدفع",
+    "visa": "بطاقة ائتمان/خصم",
+    "visaDesc": "فيزا، ماستركارد، ميزة",
+    "fawryPay": "فوري",
+    "fawryPayDesc": "ادفع في أي منفذ فوري",
+    "mobileWallet": "المحفظة الإلكترونية",
+    "mobileWalletDesc": "فودافون كاش، أورانج، اتصالات، وي",
     "termsAgreement": "بالمتابعة، أنت توافق على",
     "termsOfService": "شروط الخدمة",
     "and": "و",
@@ -383,6 +394,19 @@
     }
   },
   "subscription": {
+    "policy": {
+      "consentDisclaimer": "بالنقر على \"ادفع\"، فإنك توافق على <terms>الشروط والأحكام</terms> و<cancellation>سياسة الإلغاء</cancellation>.",
+      "nature": "طبيعة الاشتراك",
+      "natureDesc": "تعمل خدماتنا بنظام الاشتراك الدوري (شهري/سنوي). عند إتمام عملية الدفع، يحصل المشترك فوراً على صلاحية الوصول الكاملة للخدمات الرقمية المتفق عليها.",
+      "noRefund": "سياسة عدم الاسترداد",
+      "noRefundDesc": "نظراً للطبيعة الرقمية للخدمة وإتاحتها للاستخدام الفوري، فإن جميع المدفوعات التي تم تحصيلها عن فترات الاشتراك الحالية غير قابلة للاسترداد كلياً أو جزئياً، ولا يحق للمشترك المطالبة باسترجاع المبلغ بعد تفعيل الخدمة، وذلك وفقاً لما تقتضيه القوانين المنظمة للسلع والخدمات الرقمية.",
+      "autoRenew": "إلغاء التجديد التلقائي",
+      "autoRenewDesc": "يحق للمشترك في أي وقت إلغاء \"التجديد التلقائي\" للاشتراك من خلال لوحة التحكم الخاصة بحسابه.",
+      "cancellationEffect": "تأثير الإلغاء",
+      "cancellationEffectDesc": "عند الإلغاء، ستستمر الخدمة فعالة حتى نهاية فترة الاشتراك المدفوعة مسبقاً. لن يتم خصم أي مبالغ جديدة مستقبلاً، وسيتوقف الاشتراك نهائياً بنهاية الفترة الحالية.",
+      "agreement": "الموافقة",
+      "agreementDesc": "بإتمام عملية الدفع، يقر المشترك بأنه قد قرأ ووافق على هذه السياسة وعلى التنازل عن حقه في استرداد قيمة الفترة الحالية بمجرد بدء الاستخدام."
+    },
     "confirm": {
       "title": "تأكيد الاشتراك",
       "plan": "الخطة",
@@ -639,6 +663,7 @@
       "skills": "المهارات",
       "languages": "اللغات",
       "courses": "الدورات والشهادات",
+      "certifications": "الشهادات",
       "projects": "المشاريع",
       "activities": "الأنشطة والتطوع",
       "contact": "معلومات الاتصال",
@@ -901,9 +926,18 @@
       "badge": "دعم كامل للغة العربية",
       "cta": "افتح المنشئ",
       "features": {
-        "preview": { "title": "معاينة فورية", "description": "شاهد التغييرات فوراً أثناء الكتابة" },
-        "ai": { "title": "تحسين الذكاء الاصطناعي", "description": "احصل على اقتراحات ذكية لتحسين المحتوى الخاص بك" },
-        "multiLang": { "title": "متعدد اللغات", "description": "دعم كامل لتخطيطات الإنجليزية والعربية" }
+        "preview": {
+          "title": "معاينة فورية",
+          "description": "شاهد التغييرات فوراً أثناء الكتابة"
+        },
+        "ai": {
+          "title": "تحسين الذكاء الاصطناعي",
+          "description": "احصل على اقتراحات ذكية لتحسين المحتوى الخاص بك"
+        },
+        "multiLang": {
+          "title": "متعدد اللغات",
+          "description": "دعم كامل لتخطيطات الإنجليزية والعربية"
+        }
       }
     },
     "pricing": {
@@ -962,12 +996,30 @@
       "title": "تكامل سلس",
       "subtitle": "تواصل مع منصاتك وأدواتك المفضلة",
       "items": {
-        "linkedin": { "name": "LinkedIn", "description": "استورد بيانات ملفك الشخصي فوراً" },
-        "google-docs": { "name": "Google Docs", "description": "تصدير وتعديل في Google Docs" },
-        "word": { "name": "Microsoft Word", "description": "تحميل بصيغة .docx" },
-        "indeed": { "name": "Indeed", "description": "تحسين لطلبات التقديم على Indeed" },
-        "glassdoor": { "name": "Glassdoor", "description": "تخصيص لإعلانات Glassdoor" },
-        "google-drive": { "name": "Google Drive", "description": "حفظ مباشرة إلى Drive" }
+        "linkedin": {
+          "name": "LinkedIn",
+          "description": "استورد بيانات ملفك الشخصي فوراً"
+        },
+        "google-docs": {
+          "name": "Google Docs",
+          "description": "تصدير وتعديل في Google Docs"
+        },
+        "word": {
+          "name": "Microsoft Word",
+          "description": "تحميل بصيغة .docx"
+        },
+        "indeed": {
+          "name": "Indeed",
+          "description": "تحسين لطلبات التقديم على Indeed"
+        },
+        "glassdoor": {
+          "name": "Glassdoor",
+          "description": "تخصيص لإعلانات Glassdoor"
+        },
+        "google-drive": {
+          "name": "Google Drive",
+          "description": "حفظ مباشرة إلى Drive"
+        }
       }
     },
     "templates": {
@@ -979,12 +1031,36 @@
         "text": "— محسنة لاجتياز أنظمة تتبع المتقدمين"
       },
       "items": {
-        "ats-clean": { "name": "Clean ATS", "category": "احترافي", "description": "تنسيق بسيط وقابل للمسح محسن لأنظمة تتبع المتقدمين" },
-        "professional": { "name": "Professional", "category": "أعمال", "description": "تصميم أنيق مثالي للشركات والصناعات التقليدية" },
-        "minimalist": { "name": "Minimalist", "category": "عصري", "description": "تصميم نظيف للغاية مع استخدام متطور للمساحة البيضاء" },
-        "modern": { "name": "Modern", "category": "إبداعي", "description": "تصميم معاصر بعناصر هندسية وطباعة جريئة" },
-        "technical": { "name": "Technical", "category": "تقني", "description": "مخصص للمطورين مع مصفوفة مهارات وتخطيط بنمط GitHub" },
-        "creative": { "name": "Creative", "category": "تصميم", "description": "تخطيط فني للمصممين والمحترفين المبدعين" }
+        "ats-clean": {
+          "name": "Clean ATS",
+          "category": "احترافي",
+          "description": "تنسيق بسيط وقابل للمسح محسن لأنظمة تتبع المتقدمين"
+        },
+        "professional": {
+          "name": "Professional",
+          "category": "أعمال",
+          "description": "تصميم أنيق مثالي للشركات والصناعات التقليدية"
+        },
+        "minimalist": {
+          "name": "Minimalist",
+          "category": "عصري",
+          "description": "تصميم نظيف للغاية مع استخدام متطور للمساحة البيضاء"
+        },
+        "modern": {
+          "name": "Modern",
+          "category": "إبداعي",
+          "description": "تصميم معاصر بعناصر هندسية وطباعة جريئة"
+        },
+        "technical": {
+          "name": "Technical",
+          "category": "تقني",
+          "description": "مخصص للمطورين مع مصفوفة مهارات وتخطيط بنمط GitHub"
+        },
+        "creative": {
+          "name": "Creative",
+          "category": "تصميم",
+          "description": "تخطيط فني للمصممين والمحترفين المبدعين"
+        }
       }
     },
     "testimonials": {
@@ -1175,6 +1251,17 @@
         }
       }
     }
-  
+  },
+  "atsScore": {
+    "title": "نقاط ATS العامة",
+    "description": "تحليل سيرتك الذاتية وفقاً لأفضل الممارسات للتوافق مع أنظمة ATS.",
+    "analyzing": "جاري تحليل سيرتك الذاتية...",
+    "overallCompatibility": "التوافق العام مع ATS",
+    "contentQuality": "جودة المحتوى",
+    "skillsPresentation": "عرض المهارات",
+    "areasToImprove": "مجالات للتحسين",
+    "suggestions": "الاقتراحات",
+    "close": "إغلاق",
+    "noScore": "لا توجد نتيجة متاحة"
   }
 }

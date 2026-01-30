@@ -55,9 +55,9 @@ class BillingService {
   /**
    * Generate payment link for an invoice
    */
-  async payInvoice(uuid: string, gateway: string): Promise<Invoice> {
+  async payInvoice(uuid: string, gateway: string, method?: string): Promise<Invoice> {
     const response = await apiClient.post<Invoice>(
-      `${API_ENDPOINTS.PAY_INVOICE(uuid)}?gateway=${gateway}`
+      `${API_ENDPOINTS.PAY_INVOICE(uuid)}?gateway=${gateway}&method=${method || 'CARD'}`
     );
     return response.data;
   }

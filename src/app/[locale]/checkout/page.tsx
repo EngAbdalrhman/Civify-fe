@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, CreditCard, ArrowLeft, Shield, Tag, Check, X, Receipt } from 'lucide-react';
+import { Loader2, CreditCard, ArrowLeft, Shield, Tag, Check, X, Receipt, Smartphone, Store } from 'lucide-react';
 import { Link } from '@/i18n/routing';
+import Image from 'next/image';
 import { subscriptionService } from '@/services/subscription.service';
 import { paymentService } from '@/services/payment.service';
 import { billingService, type Invoice } from '@/services/billing.service';
@@ -20,6 +21,7 @@ function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations('checkout');
+  const tPolicy = useTranslations('subscription.policy');
 
   const planId = searchParams.get('planId');
   const invoiceUuid = searchParams.get('invoice');
@@ -32,6 +34,7 @@ function CheckoutContent() {
   const [isAnnual, setIsAnnual] = useState(initialIsAnnual);
   const [promoCode, setPromoCode] = useState('');
   const [gateway, setGateway] = useState('fawaterak');
+  const [paymentMethod, setPaymentMethod] = useState('CARD');
   const [enabledGateways, setEnabledGateways] = useState<string[]>([]);
   
   // Promo code validation state
@@ -137,7 +140,7 @@ function CheckoutContent() {
 
       // Invoice mode (renewal) - use billing service
       if (isInvoiceMode && invoice) {
-        const response = await billingService.payInvoice(invoice.uuid, gateway);
+        const response = await billingService.payInvoice(invoice.uuid, gateway, paymentMethod);
         
         if (response.paymentUrl) {
           window.location.href = response.paymentUrl;
@@ -154,7 +157,8 @@ function CheckoutContent() {
         plan.id,
         isAnnual,
         priceCalculation ? promoCode : undefined,
-        gateway
+        gateway,
+        paymentMethod
       );
 
       if (response.paymentUrl) {
@@ -409,14 +413,24 @@ function CheckoutContent() {
                       {gateway === 'paymob' && <Check className="h-3 w-3 text-primary-foreground" />}
                     </div>
                     <div className="flex-1">
-                      <div className="font-medium">{t('paymob')}</div>
+                      <Image src="/paymob.png" alt="Paymob" width={100} height={100} />
                       <div className="text-sm text-muted-foreground">
                         {t('paymobDesc')}
+                      </div>
+                    </div>
+                      <div className="flex gap-1">
+                      <div className="w-10 h-6 bg-gradient-to-r from-blue-600 to-blue-800 rounded text-white text-xs flex items-center justify-center font-bold">VISA</div>
+                      <div className="w-10 h-6 bg-gradient-to-r from-red-500 to-yellow-500 rounded flex items-center justify-center">
+                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-yellow-500 -ml-1"></div>
                       </div>
                     </div>
                   </button>
                 )}
               </div>
+
+             {/* Payment Method Selection */}
+
 
               {/* Security Note */}
               <div className="flex items-start gap-3 p-4 rounded-lg bg-green-50 dark:bg-green-950/20 text-green-800 dark:text-green-400">
@@ -428,6 +442,14 @@ function CheckoutContent() {
                   </p>
                 </div>
               </div>
+
+              {/* Consent Disclaimer */}
+              <p className="text-xs text-muted-foreground text-center px-4">
+                {tPolicy.rich('consentDisclaimer', {
+                  terms: (chunks) => <a href="/terms" target="_blank" className="underline hover:text-foreground">{chunks}</a>,
+                  cancellation: (chunks) => <a href="/policy/cancellation" target="_blank" className="underline hover:text-foreground">{chunks}</a>
+                })}
+              </p>
 
               {/* Checkout Button */}
               <Button
@@ -447,13 +469,6 @@ function CheckoutContent() {
                   </>
                 )}
               </Button>
-
-              <p className="text-xs text-center text-muted-foreground">
-                {t('termsAgreement')}{' '}
-                <a href="/terms" className="underline hover:text-foreground">{t('termsOfService')}</a>
-                {' '}{t('and')}{' '}
-                <a href="/privacy" className="underline hover:text-foreground">{t('privacyPolicy')}</a>
-              </p>
             </CardContent>
           </Card>
         </div>

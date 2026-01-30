@@ -15,7 +15,11 @@ WORKDIR /app
 # Build arguments for Next.js public environment variables
 # These MUST be provided at build time for NEXT_PUBLIC_* vars to work
 ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_GA_MEASUREMENT_ID
+ARG NEXT_PUBLIC_CLARITY_PROJECT_ID
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_GA_MEASUREMENT_ID=$NEXT_PUBLIC_GA_MEASUREMENT_ID
+ENV NEXT_PUBLIC_CLARITY_PROJECT_ID=$NEXT_PUBLIC_CLARITY_PROJECT_ID
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules

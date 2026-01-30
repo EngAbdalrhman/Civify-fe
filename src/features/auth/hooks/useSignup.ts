@@ -14,6 +14,7 @@ export const useSignup = () => {
 
   const signupSchema = z
     .object({
+      name: z.string().min(2, t("nameMin") || "Name must be at least 2 characters"),
       username: z.string().min(3, t("usernameMin")),
       email: z.string().email(t("invalidEmail")),
       password: z.string()
@@ -61,6 +62,7 @@ export const useSignup = () => {
 };
 
 export type SignupSchemaType = {
+  name: string;
   username: string;
   email: string;
   password: string;
