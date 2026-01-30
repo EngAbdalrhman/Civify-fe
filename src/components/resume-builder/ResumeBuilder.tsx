@@ -78,25 +78,17 @@ export function ResumeBuilder({
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
-  
-  // ATS Score state
-  const [showScoreDialog, setShowScoreDialog] = useState(false);
-  const [atsScore, setAtsScore] = useState<AtsScore | null>(null);
-  const [isCalculatingScore, setIsCalculatingScore] = useState(false);
-  
-  const t = useTranslations('builder');
-  const tCommon = useTranslations('common');
 
   // ATS Score state
   const [showScoreDialog, setShowScoreDialog] = useState(false);
   const [atsScore, setAtsScore] = useState<AtsScore | null>(null);
   const [isCalculatingScore, setIsCalculatingScore] = useState(false);
-
-  // Mobile view state - 'editor' or 'preview'
-  const [mobileView, setMobileView] = useState<"editor" | "preview">("editor");
 
   const t = useTranslations("builder");
   const tCommon = useTranslations("common");
+
+  // Mobile view state - 'editor' or 'preview'
+  const [mobileView, setMobileView] = useState<"editor" | "preview">("editor");
 
   // Update ref when initialData changes (e.g., loading a different resume)
   useEffect(() => {
