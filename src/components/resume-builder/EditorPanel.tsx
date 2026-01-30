@@ -350,7 +350,6 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
     }
   };
 
-  // Helper to get translated label for section types
   const getSectionTypeLabel = (type: string) => {
     if (type === "custom") return t("sections.custom");
     return tResume(type as any) || type;

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { User, LogIn, Settings, LogOut } from "lucide-react";
+import { User, LogIn, Settings, LogOut, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import {
@@ -84,6 +84,16 @@ export function DashboardNavbar() {
                 >
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
+                </Link>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem asChild>
+                <Link
+                  href="/app/billing"
+                  className="w-full cursor-pointer flex items-center"
+                >
+                  <Receipt className="mr-2 h-4 w-4" />
+                  <span>Billing</span>
                 </Link>
               </DropdownMenuItem>
 

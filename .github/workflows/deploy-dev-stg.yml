@@ -2,7 +2,7 @@ name: Deploy Dev-Stg Frontend to Dokploy
 
 on:
   push:
-    branches: [ "dev-stg" ]
+    branches: [ "Staging" ]
   workflow_dispatch:
 
 env:

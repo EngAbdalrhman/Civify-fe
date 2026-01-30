@@ -43,6 +43,21 @@ export default function SignupPage() {
           className="rounded-lg border p-6 space-y-4"
         >
           <div className="space-y-2">
+            <label className="text-sm font-medium">{t("name") || "Name"}</label>
+            <input
+              type="text"
+              {...register("name")}
+              className="w-full rounded-md border px-3 py-2"
+              placeholder={t("namePlaceholder") || "John Doe"}
+            />
+            {errors.name && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.name.message}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
             <label className="text-sm font-medium">{t("username")}</label>
             <input
               type="text"

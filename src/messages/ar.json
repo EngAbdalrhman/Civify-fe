@@ -82,6 +82,9 @@
     "orContinueWith": "أو تابع بواسطة",
     "emailNotVerified": "يرجى التحقق من بريدك الإلكتروني قبل تسجيل الدخول.",
     "verificationSentAutomatically": "تم إرسال رسالة التحقق تلقائياً! يرجى التحقق من صندوق الوارد.",
+    "name": "الاسم الكامل",
+    "namePlaceholder": "محمد أحمد",
+    "nameMin": "يجب أن يتكون الاسم من حرفين على الأقل",
     "identifier": "البريد الإلكتروني أو اسم المستخدم",
     "identifierPlaceholder": "بريدك الإلكتروني أو اسم المستخدم",
     "identifierRequired": "يرجى إدخال بريدك الإلكتروني أو اسم المستخدم",
@@ -477,8 +480,35 @@
       "plansDesc": "تكوين خطط الاشتراك التي يمكن للمستخدمين شراؤها",
       "tokensDesc": "تكوين حزم الرموز التي يمكن للمستخدمين شراؤها للاستخدام الإضافي",
       "createPlan": "إنشاء خطة",
+      "editPlan": "تعديل الخطة",
       "createPackage": "إنشاء حزمة",
-      "popular": "شائع"
+      "popular": "شائع",
+      "form": {
+        "name": "الاسم",
+        "namePlaceholder": "مثال: الخطة الاحترافية",
+        "description": "الوصف",
+        "descriptionPlaceholder": "وصف مختصر للخطة",
+        "monthlyPrice": "السعر الشهري ($)",
+        "annualPrice": "السعر السنوي ($)",
+        "cvLimit": "حد السير الذاتية (فارغ = غير محدود)",
+        "cvLimitPlaceholder": "اتركه فارغاً للسماح بعدد غير محدود",
+        "tokenLimit": "حد الرموز (فارغ = غير محدود)",
+        "tokenLimitPlaceholder": "حصة رموز الذكاء الاصطناعي الشهرية",
+        "linkedGroup": "المجموعة المرتبطة",
+        "linkedGroupPlaceholder": "اختر مجموعة (اختياري)",
+        "linkedGroupHint": "المستخدمون المشتركون في هذه الخطة سيرثون صلاحيات المجموعة",
+        "none": "لا يوجد",
+        "billingRestrictions": "قيود الفوترة",
+        "allowAnnualBilling": "السماح بالفوترة السنوية",
+        "allowRenewal": "السماح بالتجديد",
+        "maxBillingCycles": "الحد الأقصى لدورات الفوترة (فارغ = غير محدود)",
+        "maxBillingCyclesPlaceholder": "مثال: 1 للشراء لمرة واحدة",
+        "displaySettings": "إعدادات العرض",
+        "featured": "مميز (شائع)",
+        "showWatermark": "إظهار العلامة المائية",
+        "sortOrder": "ترتيب العرض",
+        "update": "تحديث"
+      }
     },
     "plans": {
       "title": "إدارة الخطط",
@@ -684,6 +714,18 @@
         "description": "قابل للتعديل في Microsoft Word أو Google Docs."
       },
       "tip": "نصيحة: راجع سيرتك الذاتية في لوحة المعاينة قبل التحميل للتأكد من أن كل شيء يبدو مثالياً."
+    },
+    "toasts": {
+      "enterTitle": "الرجاء إدخال عنوان لسيرتك الذاتية",
+      "saveSuccess": "تم حفظ السيرة الذاتية بنجاح",
+      "saveError": "فشل حفظ السيرة الذاتية",
+      "resetInfo": "تم إعادة تعيين السيرة الذاتية إلى الحالة الأصلية",
+      "uploadError": "يرجى تحميل ملف PDF أو Word",
+      "parseSuccess": "تم تحليل السيرة الذاتية بنجاح!",
+      "parseError": "فشل تحليل السيرة الذاتية. يرجى المحاولة مرة أخرى.",
+      "fullscreenError": "ملء الشاشة غير مدعوم",
+      "guestUpload": "يرجى تسجيل الدخول لتحميل سيرة ذاتية",
+      "loginAction": "تسجيل الدخول"
     }
   },
   "editor": {
@@ -692,6 +734,80 @@
       "add": "إضافة قسم",
       "rename": "إعادة تسمية القسم",
       "custom": "مخصص"
+    },
+    "personalForm": {
+      "fullName": "الاسم الكامل",
+      "fullNamePlaceholder": "محمد أحمد",
+      "jobTitle": "المسمى الوظيفي",
+      "jobTitlePlaceholder": "مهندس برمجيات",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "email@example.com",
+      "phone": "رقم الهاتف",
+      "phonePlaceholder": "+966 50 123 4567",
+      "address": "العنوان / الموقع",
+      "addressPlaceholder": "الرياض، السعودية",
+      "summary": "الملخص",
+      "summaryPlaceholder": "ملخص مهني موجز...",
+      "linkedin": "لينكد إن",
+      "linkedinPlaceholder": "linkedin.com/in/speedy",
+      "github": "جيت هب",
+      "githubPlaceholder": "github.com/speedy",
+      "website": "الموقع الإلكتروني",
+      "websitePlaceholder": "speedy.com"
+    },
+    "experience": {
+      "add": "إضافة خبرة",
+      "company": "اسم الشركة",
+      "companyPlaceholder": "شركة المجد.",
+      "position": "المسمى الوظيفي",
+      "positionPlaceholder": "مطور أول",
+      "location": "الموقع",
+      "locationPlaceholder": "عن بعد / المدينة، البلد",
+      "description": "الوصف",
+      "descriptionPlaceholder": "• حققت نتائج...",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "present": "الحالي / حتى الآن"
+    },
+    "education": {
+      "add": "إضافة تعليم",
+      "school": "المدرسة / الجامعة",
+      "schoolPlaceholder": "جامعة هارفارد",
+      "degree": "الدرجة / التخصص",
+      "degreePlaceholder": "بكالوريوس علوم حاسب",
+      "location": "الموقع",
+      "locationPlaceholder": "الرياض، السعودية",
+      "gpa": "المعدل / ملاحظات (اختياري)",
+      "gpaPlaceholder": "معدل 3.8 / مرتبة الشرف",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "present": "الحالي / ما زلت أدرس"
+    },
+    "skills": {
+      "addPlaceholder": "اسم المهارة...",
+      "noItems": "لم تتم إضافة مهارات بعد"
+    },
+    "languages": {
+      "addPlaceholder": "اسم اللغة...",
+      "noItems": "لم تتم إضافة لغات بعد",
+      "none": "لا يوجد"
+    },
+    "generic": {
+      "item": "عنصر",
+      "title": "العنوان *",
+      "titlePlaceholder": "مثال: اسم المشروع، عنوان الدورة التدريبية...",
+      "subtitle": "العنوان الفرعي / المنظمة",
+      "subtitlePlaceholder": "مثال: الدور، المنظمة...",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "present": "الحالي",
+      "description": "الوصف",
+      "descriptionPlaceholder": "وصف موجز...",
+      "addItem": "إضافة عنصر",
+      "addSimplePlaceholder": "مثال: القراءة، الشطرنج، التصوير...",
+      "noItems": "لم تتم إضافة عناصر بعد",
+      "newItemTitle": "عنوان العنصر الجديد...",
+      "add": "إضافة"
     },
     "dialog": {
       "title": "إضافة قسم جديد",

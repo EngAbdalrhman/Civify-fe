@@ -86,6 +86,8 @@ function SortableGenericItem({
     isDragging,
   } = useSortable({ id: item.id });
 
+  const t = useTranslations('editor.generic');
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -116,7 +118,7 @@ function SortableGenericItem({
               className="flex items-center gap-2 text-sm text-muted-foreground cursor-grab active:cursor-grabbing"
             >
               <GripVertical className="h-4 w-4" />
-              <span>Item {index + 1}</span>
+              <span>{t('item')} {index + 1}</span>
             </div>
             <Button
               variant="ghost"
@@ -130,22 +132,22 @@ function SortableGenericItem({
 
           <div className="grid gap-3">
             <div>
-              <Label className="text-xs">Title *</Label>
+              <Label className="text-xs">{t('title')}</Label>
               <Input
                 value={item.title || ''}
                 onChange={(e) => updateItem(item.id, { title: e.target.value })}
-                placeholder="e.g., Project Name, Course Title..."
+                placeholder={t('titlePlaceholder')}
                 className="h-9"
               />
             </div>
 
             {showSubtitle && (
               <div>
-                <Label className="text-xs">Subtitle / Organization</Label>
+                <Label className="text-xs">{t('subtitle')}</Label>
                 <Input
                   value={item.subtitle || ''}
                   onChange={(e) => updateItem(item.id, { subtitle: e.target.value })}
-                  placeholder="e.g., Role, Organization..."
+                  placeholder={t('subtitlePlaceholder')}
                   className="h-9"
                 />
               </div>
@@ -154,7 +156,7 @@ function SortableGenericItem({
             {showDates && (
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <Label className="text-xs">Start Date</Label>
+                  <Label className="text-xs">{t('startDate')}</Label>
                   <Input
                     type="month"
                     value={displayStartDate !== 'Present' ? displayStartDate : ''}
@@ -163,7 +165,7 @@ function SortableGenericItem({
                   />
                 </div>
                 <div>
-                  <Label className="text-xs">End Date</Label>
+                  <Label className="text-xs">{t('endDate')}</Label>
                   <Input
                     type="month"
                     value={isPresent ? '' : displayEndDate}
@@ -180,7 +182,7 @@ function SortableGenericItem({
                       }}
                     />
                     <Label htmlFor={`present-${item.id}`} className="text-xs text-muted-foreground">
-                      Present / Ongoing
+                      {t('present')}
                     </Label>
                   </div>
                 </div>
@@ -189,11 +191,11 @@ function SortableGenericItem({
 
             {showDescription && (
               <div>
-                <Label className="text-xs">Description</Label>
+                <Label className="text-xs">{t('description')}</Label>
                 <Textarea
                   value={item.description || ''}
                   onChange={(e) => updateItem(item.id, { description: e.target.value })}
-                  placeholder="Brief description..."
+                  placeholder={t('descriptionPlaceholder')}
                   className="min-h-[60px] resize-none"
                 />
               </div>
@@ -205,7 +207,10 @@ function SortableGenericItem({
   );
 }
 
+import { useTranslations } from 'next-intl';
+
 export function GenericSectionForm({ sectionType, sectionTitle = '', items, onChange }: GenericSectionFormProps) {
+  const t = useTranslations('editor.generic');
   const [newItemTitle, setNewItemTitle] = useState('');
 
   const sensors = useSensors(
@@ -280,13 +285,13 @@ export function GenericSectionForm({ sectionType, sectionTitle = '', items, onCh
     return (
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label>Add Item</Label>
+          <Label>{t('addItem')}</Label>
           <div className="flex gap-2">
             <Input 
               value={newItemTitle} 
               onChange={e => setNewItemTitle(e.target.value)} 
               onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addItem())}
-              placeholder="e.g. Reading, Chess, Photography..."
+              placeholder={t('addSimplePlaceholder')}
             />
             <Button onClick={addItem} size="icon">
               <Plus className="h-4 w-4" />
@@ -305,7 +310,7 @@ export function GenericSectionForm({ sectionType, sectionTitle = '', items, onCh
           ))}
           {items.length === 0 && (
             <div className="text-muted-foreground text-sm flex items-center justify-center w-full">
-              No items added yet
+              {t('noItems')}
             </div>
           )}
         </div>
@@ -345,12 +350,12 @@ export function GenericSectionForm({ sectionType, sectionTitle = '', items, onCh
           value={newItemTitle} 
           onChange={e => setNewItemTitle(e.target.value)} 
           onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addItem())}
-          placeholder="New item title..."
+          placeholder={t('newItemTitle')}
           className="flex-1"
         />
         <Button onClick={addItem} className="gap-2">
           <Plus className="h-4 w-4" />
-          Add
+          {t('add')}
         </Button>
       </div>
     </div>

@@ -12,6 +12,8 @@ import {
   FileEdit,
   PanelLeftClose,
   PanelLeft,
+  Menu,
+  X,
 } from "lucide-react";
 import { DashboardNavbar } from "@/components/DashboardNavbar";
 import { useAuth } from "@/hooks/use-auth";
@@ -43,6 +45,7 @@ export default function UserDashboardLayout({
   const isResumeBuilderPage = pathname.includes("/resume-builder");
   const [isSidebarCollapsed, setIsSidebarCollapsed] =
     useState(isResumeBuilderPage);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   // Permission checks for menu items
   const canViewApiKeys = hasAnyPermission(["API.ACCESS", "API.KEY.CREATE"]);
@@ -105,6 +108,15 @@ export default function UserDashboardLayout({
 
   const isUploadPage = pathname.includes("/upload");
 
+  // Close mobile sidebar on route change
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [pathname]);
+
+  // On mobile, always show expanded sidebar when open
+  const isMobileExpanded = isMobileOpen;
+  const shouldShowCollapsed = isSidebarCollapsed && !isMobileExpanded;
+
   const getLinkClasses = (path: string) => {
     const active = isActive(path);
     return cn(
@@ -112,7 +124,7 @@ export default function UserDashboardLayout({
       active
         ? `bg-gray-300/30 ${mounted && resolvedTheme === "dark" ? "text-white" : "text-grey-700"} translate-x-1`
         : "text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:translate-x-1",
-      isSidebarCollapsed && "justify-center px-2",
+      shouldShowCollapsed && "justify-center px-2",
     );
   };
 
@@ -122,25 +134,36 @@ export default function UserDashboardLayout({
       ? "/civify-logo-simple-dark-2.png"
       : "/civify-logo-simple.png";
 
-  const sidebarWidth = isSidebarCollapsed ? "w-16" : "w-64";
+  const sidebarWidth = shouldShowCollapsed ? "w-16" : "w-64";
   const mainMargin = isSidebarCollapsed
-    ? "ltr:ml-16 rtl:mr-16"
-    : "ltr:ml-64 rtl:mr-64";
+    ? "md:ltr:ml-16 md:rtl:mr-16"
+    : "md:ltr:ml-64 md:rtl:mr-64";
 
   return (
     <div className="flex min-h-screen bg-background">
+      {/* Mobile Overlay Backdrop */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
+
       {/* Left Sidebar */}
       <aside
         className={cn(
           "border-r bg-background flex flex-col fixed inset-y-0 z-50 transition-all duration-300",
           sidebarWidth,
+          // Mobile: hidden by default, show when isMobileOpen is true
+          "max-md:-translate-x-full max-md:rtl:translate-x-full",
+          isMobileOpen && "max-md:translate-x-0 max-md:rtl:translate-x-0",
         )}
       >
-        <div className={cn("p-4", isSidebarCollapsed ? "px-2" : "p-6")}>
+        <div className={cn("p-4", shouldShowCollapsed ? "px-2" : "p-6")}>
           <div
             className={cn(
               "flex items-center gap-2 mb-8",
-              isSidebarCollapsed && "justify-center",
+              shouldShowCollapsed && "justify-center",
             )}
           >
             {/* Logo */}
@@ -150,14 +173,14 @@ export default function UserDashboardLayout({
                   <Image
                     src={logoSrc}
                     alt="Civify Logo"
-                    width={isSidebarCollapsed ? 32 : 75}
-                    height={isSidebarCollapsed ? 32 : 35}
+                    width={shouldShowCollapsed ? 32 : 75}
+                    height={shouldShowCollapsed ? 32 : 35}
                     className="object-contain"
                   />
                 </div>
               </Link>
             </div>
-            {!isSidebarCollapsed && (
+            {!shouldShowCollapsed && (
               <div className="grid flex-1 ltr:text-left rtl:text-right text-sm leading-tight">
                 <span className="truncate font-semibold">Civify</span>
                 <span className="truncate text-xs text-muted-foreground">
@@ -175,10 +198,10 @@ export default function UserDashboardLayout({
               <Link
                 href="/app"
                 className={getLinkClasses("/app")}
-                title={isSidebarCollapsed ? t("dashboard") : undefined}
+                title={shouldShowCollapsed ? t("dashboard") : undefined}
               >
                 <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
-                {!isSidebarCollapsed && t("dashboard")}
+                {!shouldShowCollapsed && t("dashboard")}
               </Link>
             )}
 
@@ -186,20 +209,20 @@ export default function UserDashboardLayout({
             <Link
               href="/app/resume-builder"
               className={getLinkClasses("/app/resume-builder")}
-              title={isSidebarCollapsed ? t("resumeBuilder") : undefined}
+              title={shouldShowCollapsed ? t("resumeBuilder") : undefined}
             >
               <FileEdit className="h-4 w-4 flex-shrink-0" />
-              {!isSidebarCollapsed && t("resumeBuilder")}
+              {!shouldShowCollapsed && t("resumeBuilder")}
             </Link>
 
             {/* Upload CV - visible for all (guests redirected on action) */}
             <Link
               href="/app/upload"
               className={getLinkClasses("/app/upload")}
-              title={isSidebarCollapsed ? t("upload") : undefined}
+              title={shouldShowCollapsed ? t("upload") : undefined}
             >
               <UploadCloud className="h-4 w-4 flex-shrink-0" />
-              {!isSidebarCollapsed && t("upload")}
+              {!shouldShowCollapsed && t("upload")}
             </Link>
 
             {/* Analytics - requires STATS.VIEW or API_USAGE.VIEW */}
@@ -207,10 +230,10 @@ export default function UserDashboardLayout({
               <Link
                 href="/app/analytics"
                 className={getLinkClasses("/app/analytics")}
-                title={isSidebarCollapsed ? t("analytics") : undefined}
+                title={shouldShowCollapsed ? t("analytics") : undefined}
               >
                 <BarChart2 className="h-4 w-4 flex-shrink-0" />
-                {!isSidebarCollapsed && t("analytics")}
+                {!shouldShowCollapsed && t("analytics")}
               </Link>
             )}
 
@@ -219,10 +242,10 @@ export default function UserDashboardLayout({
               <Link
                 href="/app/api-keys"
                 className={getLinkClasses("/app/api-keys")}
-                title={isSidebarCollapsed ? t("apiKeys") : undefined}
+                title={shouldShowCollapsed ? t("apiKeys") : undefined}
               >
                 <Key className="h-4 w-4 flex-shrink-0" />
-                {!isSidebarCollapsed && t("apiKeys")}
+                {!shouldShowCollapsed && t("apiKeys")}
               </Link>
             )}
 
@@ -231,10 +254,10 @@ export default function UserDashboardLayout({
               <Link
                 href="/app/tokens"
                 className={getLinkClasses("/app/tokens")}
-                title={isSidebarCollapsed ? t("buyTokens") : undefined}
+                title={shouldShowCollapsed ? t("buyTokens") : undefined}
               >
                 <Zap className="h-4 w-4 flex-shrink-0" />
-                {!isSidebarCollapsed && t("buyTokens")}
+                {!shouldShowCollapsed && t("buyTokens")}
               </Link>
             )}
 
@@ -242,10 +265,10 @@ export default function UserDashboardLayout({
             <Link
               href="/app/help"
               className={cn(getLinkClasses("/app/help"), "mt-4")}
-              title={isSidebarCollapsed ? t("helpCenter") : undefined}
+              title={shouldShowCollapsed ? t("helpCenter") : undefined}
             >
               <HelpCircle className="h-4 w-4 flex-shrink-0" />
-              {!isSidebarCollapsed && t("helpCenter")}
+              {!shouldShowCollapsed && t("helpCenter")}
             </Link>
 
             {isAdmin && (
@@ -253,12 +276,12 @@ export default function UserDashboardLayout({
                 href="/admin/users"
                 className={cn(
                   "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted/50 transition-colors text-muted-foreground hover:text-foreground mt-4 border-t pt-4",
-                  isSidebarCollapsed && "justify-center px-2",
+                  shouldShowCollapsed && "justify-center px-2",
                 )}
-                title={isSidebarCollapsed ? t("adminDashboard") : undefined}
+                title={shouldShowCollapsed ? t("adminDashboard") : undefined}
               >
                 <Shield className="h-4 w-4 flex-shrink-0" />
-                {!isSidebarCollapsed && t("adminDashboard")}
+                {!shouldShowCollapsed && t("adminDashboard")}
               </Link>
             )}
           </nav>
@@ -266,19 +289,19 @@ export default function UserDashboardLayout({
 
         {/* Sidebar Toggle Button */}
         <div
-          className={cn("mt-auto p-4 border-t", isSidebarCollapsed && "px-2")}
+          className={cn("mt-auto p-4 border-t", shouldShowCollapsed && "px-2")}
         >
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
             className={cn(
-              "w-full",
-              isSidebarCollapsed ? "justify-center px-2" : "justify-start",
+              "w-full hidden md:flex",
+              shouldShowCollapsed ? "justify-center px-2" : "justify-start",
             )}
             title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            {isSidebarCollapsed ? (
+            {shouldShowCollapsed ? (
               <PanelLeft className="h-4 w-4" />
             ) : (
               <>
@@ -298,7 +321,29 @@ export default function UserDashboardLayout({
           isResumeBuilderPage ? "h-screen overflow-hidden" : "min-h-screen",
         )}
       >
-        <DashboardNavbar />
+        {/* Mobile Header with Menu Toggle */}
+        <div className="flex items-center md:hidden border-b bg-background">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsMobileOpen(!isMobileOpen)}
+            className="m-2"
+            aria-label={isMobileOpen ? "Close menu" : "Open menu"}
+          >
+            {isMobileOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
+          </Button>
+          <div className="flex-1">
+            <DashboardNavbar />
+          </div>
+        </div>
+        {/* Desktop Navbar */}
+        <div className="hidden md:block">
+          <DashboardNavbar />
+        </div>
 
         <div
           className={cn(

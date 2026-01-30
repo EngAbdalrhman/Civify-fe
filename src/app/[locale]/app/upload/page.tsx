@@ -852,7 +852,7 @@ export default function UploadPage() {
                     onChange={(e) =>
                       updatePersonalInfo("website", e.target.value)
                     }
-                    placeholder="yourwebsite.com"
+                    placeholder="speedy.com"
                   />
                 </div>
               </div>

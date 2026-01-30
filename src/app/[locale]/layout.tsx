@@ -1,15 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-import { notFound } from 'next/navigation';
-import { routing } from '@/i18n/routing';
-import { QueryProvider } from '@/providers/query-provider';
-import { ThemeProvider } from '@/providers/theme-provider';
-import { PermissionProvider } from '@/contexts/PermissionContext';
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+import { notFound } from "next/navigation";
+import { routing } from "@/i18n/routing";
+import { QueryProvider } from "@/providers/query-provider";
+import { ThemeProvider } from "@/providers/theme-provider";
+import { PermissionProvider } from "@/contexts/PermissionContext";
 import LayoutWrapper from "@/components/LayoutWrapper";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import "../globals.css";
+import ServiceWorkerRegister from "@/components/pwa/ServiceWorkerRegister";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,7 +24,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Civify - AI CV Builder with ATS Optimization | 92% Match Rate",
-  description: "75% of CVs never get seen by humans. Civify uses AI to analyze job descriptions and tailor your CV for ATS systems. Full Arabic support. Start free, no credit card required.",
+  description:
+    "75% of CVs never get seen by humans. Civify uses AI to analyze job descriptions and tailor your CV for ATS systems. Full Arabic support. Start free, no credit card required.",
   keywords: [
     "AI CV builder",
     "ATS resume optimization",
@@ -45,7 +47,8 @@ export const metadata: Metadata = {
     url: "https://civify.cv",
     siteName: "Civify",
     title: "Civify - AI CV Builder | Make Your CV Get Seen",
-    description: "75% of CVs are rejected by ATS. Civify uses AI to tailor your CV, achieving 92% average match scores. Full Arabic support.",
+    description:
+      "75% of CVs are rejected by ATS. Civify uses AI to tailor your CV, achieving 92% average match scores. Full Arabic support.",
     images: [
       {
         url: "/og-image.png",
@@ -58,7 +61,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Civify - AI CV Builder with ATS Optimization",
-    description: "75% of CVs never get seen. Make yours the exception with AI-powered optimization. 92% match rate. Full Arabic support.",
+    description:
+      "75% of CVs never get seen. Make yours the exception with AI-powered optimization. 92% match rate. Full Arabic support.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -74,6 +78,10 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  themeColor: "#000000",
+};
+
 export default async function LocaleLayout({
   children,
   params,
@@ -82,9 +90,9 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  
+
   // Ensure that the incoming `locale` is valid
-  if (!routing.locales.includes(locale as 'en' | 'ar')) {
+  if (!routing.locales.includes(locale as "en" | "ar")) {
     notFound();
   }
 
@@ -96,32 +104,37 @@ export default async function LocaleLayout({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    "name": "Civify",
-    "applicationCategory": "BusinessApplication",
-    "operatingSystem": "Web",
-    "offers": {
+    name: "Civify",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    offers: {
       "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
+      price: "0",
+      priceCurrency: "USD",
     },
-    "description": "AI-powered CV builder with ATS optimization and full Arabic support.",
-    "aggregateRating": {
+    description:
+      "AI-powered CV builder with ATS optimization and full Arabic support.",
+    aggregateRating: {
       "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "ratingCount": "1250"
-    }
+      ratingValue: "4.8",
+      ratingCount: "1250",
+    },
   };
 
   return (
-    <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'} suppressHydrationWarning>
+    <html
+      lang={locale}
+      dir={locale === "ar" ? "rtl" : "ltr"}
+      suppressHydrationWarning
+    >
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AnalyticsProvider />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <ServiceWorkerRegister />
         <ThemeProvider>
           <QueryProvider>
             <PermissionProvider>
@@ -135,5 +148,3 @@ export default async function LocaleLayout({
     </html>
   );
 }
-
-

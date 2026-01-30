@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ResumeData } from '@/features/upload-cv/types';
+import { useTranslations } from 'next-intl';
 
 interface PersonalInfoFormProps {
   data: ResumeData['personalInfo'];
@@ -11,6 +12,8 @@ interface PersonalInfoFormProps {
 }
 
 export function PersonalInfoForm({ data, onChange }: PersonalInfoFormProps) {
+  const t = useTranslations('editor.personalForm');
+  
   const handleChange = (field: keyof ResumeData['personalInfo'], value: string) => {
     onChange({ ...data, [field]: value });
   };
@@ -19,84 +22,84 @@ export function PersonalInfoForm({ data, onChange }: PersonalInfoFormProps) {
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>Full Name</Label>
+          <Label>{t('fullName')}</Label>
           <Input 
             value={data.fullName || ''} 
             onChange={e => handleChange('fullName', e.target.value)} 
-            placeholder="John Doe"
+            placeholder={t('fullNamePlaceholder')}
           />
         </div>
         <div className="space-y-2">
-          <Label>Job Title</Label>
+          <Label>{t('jobTitle')}</Label>
           <Input 
             value={data.jobTitle || ''} 
             onChange={e => handleChange('jobTitle', e.target.value)} 
-            placeholder="Software Engineer"
+            placeholder={t('jobTitlePlaceholder')}
           />
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>Email</Label>
+          <Label>{t('email')}</Label>
           <Input 
             value={data.email || ''} 
             onChange={e => handleChange('email', e.target.value)} 
-            placeholder="john@example.com"
+            placeholder={t('emailPlaceholder')}
           />
         </div>
         <div className="space-y-2">
-          <Label>Phone</Label>
+          <Label>{t('phone')}</Label>
           <Input 
             value={data.phone || ''} 
             onChange={e => handleChange('phone', e.target.value)} 
-            placeholder="+1 234 567 890"
+            placeholder={t('phonePlaceholder')}
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label>Address / Location</Label>
+        <Label>{t('address')}</Label>
         <Input 
           value={data.address || ''} 
           onChange={e => handleChange('address', e.target.value)} 
-          placeholder="New York, NY"
+          placeholder={t('addressPlaceholder')}
         />
       </div>
 
       <div className="space-y-2">
-        <Label>Summary</Label>
+        <Label>{t('summary')}</Label>
         <Textarea 
           value={data.summary || ''} 
           onChange={e => handleChange('summary', e.target.value)} 
-          placeholder="Brief professional summary..."
+          placeholder={t('summaryPlaceholder')}
           className="min-h-[100px]"
         />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
-          <Label>LinkedIn</Label>
+          <Label>{t('linkedin')}</Label>
           <Input 
             value={data.linkedin || ''} 
             onChange={e => handleChange('linkedin', e.target.value)} 
-            placeholder="linkedin.com/in/johndoe"
+            placeholder={t('linkedinPlaceholder')}
           />
         </div>
         <div className="space-y-2">
-          <Label>GitHub</Label>
+          <Label>{t('github')}</Label>
           <Input 
             value={data.github || ''} 
             onChange={e => handleChange('github', e.target.value)} 
-            placeholder="github.com/johndoe"
+            placeholder={t('githubPlaceholder')}
           />
         </div>
         <div className="space-y-2">
-          <Label>Website</Label>
+          <Label>{t('website')}</Label>
           <Input 
             value={data.website || ''} 
             onChange={e => handleChange('website', e.target.value)} 
-            placeholder="speedy.com"
+            placeholder={t('websitePlaceholder')}
           />
         </div>
       </div>

@@ -15,16 +15,20 @@ interface LanguagesFormProps {
   onChange: (items: SectionItem[]) => void;
 }
 
+import { useTranslations } from 'next-intl';
+
 const LANGUAGE_LEVELS = [
-  { value: 'native', label: 'Native' },
-  { value: 'fluent', label: 'Fluent' },
-  { value: 'advanced', label: 'Advanced' },
-  { value: 'intermediate', label: 'Intermediate' },
-  { value: 'beginner', label: 'Beginner' },
-  { value: 'none', label: 'None' },
+  { value: 'native', labelKey: 'native' },
+  { value: 'fluent', labelKey: 'fluent' },
+  { value: 'advanced', labelKey: 'advanced' },
+  { value: 'intermediate', labelKey: 'intermediate' },
+  { value: 'beginner', labelKey: 'beginner' },
+  { value: 'none', labelKey: 'none' },
 ];
 
 export function LanguagesForm({ items = [], onChange }: LanguagesFormProps) {
+  const t = useTranslations('editor.languages');
+  const tLevels = useTranslations('resume.levels');
   const [newLanguage, setNewLanguage] = useState('');
   const [newLevel, setNewLevel] = useState('intermediate');
 
@@ -61,7 +65,7 @@ export function LanguagesForm({ items = [], onChange }: LanguagesFormProps) {
           value={newLanguage} 
           onChange={e => setNewLanguage(e.target.value)} 
           onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addLanguage())}
-          placeholder="Language name..."
+          placeholder={t('addPlaceholder')}
           className="flex-1"
         />
         <Select value={newLevel} onValueChange={setNewLevel}>
@@ -71,7 +75,7 @@ export function LanguagesForm({ items = [], onChange }: LanguagesFormProps) {
           <SelectContent>
             {LANGUAGE_LEVELS.map(level => (
               <SelectItem key={level.value} value={level.value}>
-                {level.label}
+                {level.value === 'none' ? t('none') : tLevels(level.labelKey)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -97,7 +101,7 @@ export function LanguagesForm({ items = [], onChange }: LanguagesFormProps) {
                 <SelectContent>
                   {LANGUAGE_LEVELS.map(level => (
                     <SelectItem key={level.value} value={level.value}>
-                      {level.label}
+                      {level.value === 'none' ? t('none') : tLevels(level.labelKey)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -115,7 +119,7 @@ export function LanguagesForm({ items = [], onChange }: LanguagesFormProps) {
         ))}
         {items.length === 0 && (
           <div className="text-muted-foreground text-sm text-center py-8 bg-muted/30 rounded-lg">
-            No languages added yet
+            {t('noItems')}
           </div>
         )}
       </div>

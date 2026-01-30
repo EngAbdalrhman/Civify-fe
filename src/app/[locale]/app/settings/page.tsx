@@ -13,7 +13,11 @@ import {
   Palette,
   Camera,
   Trash2,
-  AlertTriangle
+  AlertTriangle,
+  CreditCard,
+  XCircle,
+  CheckCircle,
+  Calendar
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -50,6 +54,8 @@ import { toast } from 'sonner';
 import apiClient from '@/api/client';
 import { Link, useRouter } from '@/i18n/routing';
 import { PermissionGuard } from '@/components/auth/PermissionGuard';
+import { useMyActiveSubscription, useCancelSubscription } from '@/features/plans/hooks/useSubscription';
+import { Progress } from '@/components/ui/progress';
 
 interface UserProfile {
   id: number;
@@ -110,6 +116,11 @@ export default function SettingsPage() {
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const router = useRouter();
+
+  // Subscription state
+  const { data: subscription, isLoading: isSubscriptionLoading } = useMyActiveSubscription();
+  const cancelMutation = useCancelSubscription();
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
 
   // Fetch user profile on mount
   useEffect(() => {
@@ -317,6 +328,10 @@ export default function SettingsPage() {
               <User className="h-4 w-4 hidden sm:block" />
               Profile
             </TabsTrigger>
+            <TabsTrigger value="subscription" className="gap-2">
+              <CreditCard className="h-4 w-4 hidden sm:block" />
+              Subscription
+            </TabsTrigger>
             <TabsTrigger value="preferences" className="gap-2">
               <Settings className="h-4 w-4 hidden sm:block" />
               Preferences
@@ -377,7 +392,6 @@ export default function SettingsPage() {
                         <p className="font-medium">{user?.username}</p>
                         <p className="text-sm text-muted-foreground">{user?.email}</p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          Hover avatar to change
                         </p>
                       </div>
                     </div>
@@ -420,6 +434,174 @@ export default function SettingsPage() {
                   Save Changes
                 </Button>
               </CardFooter>
+            </Card>
+          </TabsContent>
+
+          {/* Subscription Tab */}
+          <TabsContent value="subscription" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="h-5 w-5" />
+                  Current Subscription
+                </CardTitle>
+                <CardDescription>
+                  Manage your subscription and billing preferences.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {isSubscriptionLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                  </div>
+                ) : subscription ? (
+                  <>
+                    {/* Plan Info */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-4 rounded-lg border bg-muted/50">
+                        <div className="space-y-1">
+                          <p className="text-sm text-muted-foreground">Current Plan</p>
+                          <p className="text-2xl font-bold">{subscription.planName}</p>
+                        </div>
+                        <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                          subscription.status === 'ACTIVE' 
+                            ? subscription.autoRenew === false 
+                              ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+                              : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                            : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
+                        }`}>
+                          {subscription.status === 'ACTIVE' && subscription.autoRenew === false 
+                            ? 'Cancelling' 
+                            : subscription.status}
+                        </div>
+                      </div>
+
+                      {/* Billing Period */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="p-4 rounded-lg border">
+                          <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                            <Calendar className="h-4 w-4" />
+                            <span className="text-sm">Billing Period Ends</span>
+                          </div>
+                          <p className="text-lg font-semibold">
+                            {new Date(subscription.endDate).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })}
+                          </p>
+                        </div>
+                        <div className="p-4 rounded-lg border">
+                          <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                            {subscription.autoRenew !== false ? (
+                              <CheckCircle className="h-4 w-4 text-green-500" />
+                            ) : (
+                              <XCircle className="h-4 w-4 text-orange-500" />
+                            )}
+                            <span className="text-sm">Auto-Renewal</span>
+                          </div>
+                          <p className="text-lg font-semibold">
+                            {subscription.autoRenew !== false ? 'Enabled' : 'Disabled'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Usage Stats */}
+                      {subscription.cvLimit !== null && (
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">CV Generations Used</span>
+                            <span className="font-medium">
+                              {subscription.currentCvCount} / {subscription.cvLimit}
+                            </span>
+                          </div>
+                          <Progress 
+                            value={(subscription.currentCvCount / subscription.cvLimit) * 100} 
+                            className="h-2"
+                          />
+                        </div>
+                      )}
+
+                      {/* Cancellation Notice */}
+                      {subscription.autoRenew === false && (
+                        <div className="p-4 rounded-lg border border-orange-200 bg-orange-50 dark:border-orange-900 dark:bg-orange-950/50">
+                          <div className="flex items-start gap-3">
+                            <AlertTriangle className="h-5 w-5 text-orange-500 mt-0.5 flex-shrink-0" />
+                            <div>
+                              <p className="font-medium text-orange-700 dark:text-orange-400">
+                                Subscription Scheduled for Cancellation
+                              </p>
+                              <p className="text-sm text-orange-600 dark:text-orange-500 mt-1">
+                                Your subscription will remain active until {new Date(subscription.endDate).toLocaleDateString()}. 
+                                After that, you'll be automatically moved to the Free plan.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No active subscription found.
+                  </div>
+                )}
+              </CardContent>
+
+              {/* Cancel Button - Only show for paid plans with auto-renew enabled */}
+              {subscription && subscription.planName?.toLowerCase() !== 'free' && subscription.autoRenew !== false && (
+                <CardFooter className="border-t pt-6">
+                  <div className="w-full space-y-4">
+                    <Separator />
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-destructive">Cancel Subscription</p>
+                        <p className="text-sm text-muted-foreground">
+                          You'll continue to have access until the end of your billing period.
+                        </p>
+                      </div>
+                      <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" className="gap-2">
+                            <XCircle className="h-4 w-4" />
+                            Cancel Subscription
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Cancel your subscription?</AlertDialogTitle>
+                            <AlertDialogDescription className="space-y-2">
+                              <p>
+                                Are you sure you want to cancel your <strong>{subscription.planName}</strong> subscription?
+                              </p>
+                              <ul className="list-disc list-inside space-y-1 text-sm mt-2">
+                                <li>Your subscription will remain active until <strong>{new Date(subscription.endDate).toLocaleDateString()}</strong></li>
+                                <li>You won't be charged on the next billing cycle</li>
+                                <li>After expiration, you'll be moved to the Free plan</li>
+                                <li>You can re-subscribe at any time</li>
+                              </ul>
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Keep Subscription</AlertDialogCancel>
+                            <Button
+                              variant="destructive"
+                              onClick={() => {
+                                cancelMutation.mutate();
+                                setShowCancelDialog(false);
+                              }}
+                              disabled={cancelMutation.isPending}
+                            >
+                              {cancelMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                              Yes, Cancel Subscription
+                            </Button>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </div>
+                </CardFooter>
+              )}
             </Card>
           </TabsContent>
 
@@ -547,6 +729,11 @@ export default function SettingsPage() {
                       {showPasswords.new ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
+                  <Switch
+                    checked={is2FAEnabled}
+                    onCheckedChange={handleToggle2FA}
+                    disabled={isToggling2FA || !user}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Confirm New Password</Label>
