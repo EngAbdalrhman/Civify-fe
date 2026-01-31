@@ -1,12 +1,11 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { motion, useInView } from "framer-motion";
+import { useInView } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/routing";
 import {
   ArrowRight,
-  CheckCircle2,
   Sparkles,
   Wand2,
   Languages,
@@ -14,7 +13,6 @@ import {
   Play,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
 
 export function ResumeBuilderSection() {
   const t = useTranslations("landing.resumeBuilder");
