@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { QueryProvider } from "@/providers/query-provider";
@@ -23,6 +23,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://civify.cv"),
   title: "Civify - AI CV Builder with ATS Optimization | 92% Match Rate",
   description:
     "75% of CVs never get seen by humans. Civify uses AI to analyze job descriptions and tailor your CV for ATS systems. Full Arabic support. Start free, no credit card required.",
@@ -82,6 +83,10 @@ export const viewport: Viewport = {
   themeColor: "#000000",
 };
 
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
 export default async function LocaleLayout({
   children,
   params,
@@ -95,6 +100,9 @@ export default async function LocaleLayout({
   if (!routing.locales.includes(locale as "en" | "ar")) {
     notFound();
   }
+
+  // Enable static rendering
+  setRequestLocale(locale);
 
   // Providing all messages to the client
   // side is the easiest way to get started
@@ -144,6 +152,7 @@ export default async function LocaleLayout({
             </PermissionProvider>
           </QueryProvider>
         </ThemeProvider>
+        <AnalyticsProvider />
       </body>
     </html>
   );
