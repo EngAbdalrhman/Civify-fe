@@ -1,9 +1,9 @@
-import createMiddleware from 'next-intl/middleware';
-import { routing } from './i18n/routing';
+import createMiddleware from "next-intl/middleware";
+import { routing } from "./i18n/routing";
 
 export default createMiddleware(routing);
 
 export const config = {
-  // Match all paths except API routes and static files
-  matcher: ['/((?!api/|_next|_vercel|.*\\..*).*)']
+  // Match all paths except API routes, static files, sitemap, and robots
+  matcher: ["/((?!api/|_next|_vercel|robots.txt|.*\\..*).*)"],
 };
