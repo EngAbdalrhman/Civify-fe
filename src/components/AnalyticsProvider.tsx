@@ -9,15 +9,18 @@ import Script from "next/script";
 export function AnalyticsProvider() {
   const clarityId = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID;
   const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+  const isProduction = process.env.NODE_ENV === "production";
+
+  // Only load analytics in production
+  if (!isProduction) {
+    return null;
+  }
 
   return (
     <>
       {/* Microsoft Clarity */}
       {clarityId && (
-        <Script
-          id="microsoft-clarity"
-          strategy="afterInteractive"
-        >
+        <Script id="microsoft-clarity" strategy="afterInteractive">
           {`
             (function(c,l,a,r,i,t,y){
               c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -35,10 +38,7 @@ export function AnalyticsProvider() {
             src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
             strategy="afterInteractive"
           />
-          <Script
-            id="google-analytics"
-            strategy="afterInteractive"
-          >
+          <Script id="google-analytics" strategy="afterInteractive">
             {`
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}

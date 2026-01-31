@@ -28,6 +28,7 @@ function getEntry(
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  console.log(...getEntry("/", "weekly", 1));
   return [
     ...getEntry("/", "weekly", 1),
     ...getEntry("/plans", "weekly", 0.9),
