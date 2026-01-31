@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { getPathname, routing } from "@/i18n/routing";
 
 // Ensure the host doesn't have a trailing slash to prevent double slashes (e.g., //en)
-const host = (process.env.NEXT_PUBLIC_BASE_URL || "https://civify.io").replace(
+const host = (process.env.NEXT_PUBLIC_BASE_URL || "https://civify.cv").replace(
   /\/$/,
   "",
 );
