@@ -3,7 +3,8 @@
 import { useResumeData } from "../hooks/useResumeData";
 import { CachePromptDialog } from "./CachePromptDialog";
 import { LoadingSpinner } from "./LoadingSpinner";
-import { ResumeBuilderWrapper } from "./ResumeBuilderWrapper";
+import { ResumeBuilder } from "./ResumeBuilder";
+import { emptyResumeData } from "@/features/upload-cv/types";
 
 export function ResumeBuilderContent() {
   const {
@@ -34,10 +35,12 @@ export function ResumeBuilderContent() {
   }
 
   return (
-    <ResumeBuilderWrapper
-      initialData={initialData}
-      resumeId={resumeId}
-      isGuest={isGuest}
-    />
+    <div className="min-h-screen bg-background">
+      <ResumeBuilder
+        initialData={initialData || emptyResumeData}
+        resumeId={resumeId}
+        isGuest={isGuest}
+      />
+    </div>
   );
 }
