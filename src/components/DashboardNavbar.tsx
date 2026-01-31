@@ -18,6 +18,7 @@ import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { getAccessToken } from "@/utils/cookies";
 
 export function DashboardNavbar() {
+  const t = useTranslations();
   const { logout, isLoggingOut } = useLogout();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -41,12 +42,12 @@ export function DashboardNavbar() {
     };
   }, []);
 
-  const date = new Date().toLocaleDateString("en-US", {
+  const date = new Intl.DateTimeFormat(undefined, {
     weekday: "long",
     year: "numeric",
     month: "long",
     day: "numeric",
-  });
+  }).format(new Date());
 
   return (
     <div className="flex items-center justify-between p-4 border-b bg-background">
@@ -83,7 +84,7 @@ export function DashboardNavbar() {
                   className="w-full cursor-pointer flex items-center"
                 >
                   <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
+                  <span>{t("dashboard.personalPage.profile")}</span>
                 </Link>
               </DropdownMenuItem>
 
@@ -93,7 +94,7 @@ export function DashboardNavbar() {
                   className="w-full cursor-pointer flex items-center"
                 >
                   <Receipt className="mr-2 h-4 w-4" />
-                  <span>Billing</span>
+                  <span>{t("nav.billing")}</span>
                 </Link>
               </DropdownMenuItem>
 
@@ -103,7 +104,7 @@ export function DashboardNavbar() {
                   className="w-full cursor-pointer flex items-center"
                 >
                   <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
+                  <span>{t("nav.settings")}</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -112,7 +113,7 @@ export function DashboardNavbar() {
                 disabled={isLoggingOut}
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>{isLoggingOut ? "Signing out..." : "Sign Out"}</span>
+                <span>{isLoggingOut ? t("nav.logout") + "..." : t("nav.logout")}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -120,7 +121,7 @@ export function DashboardNavbar() {
           <Button variant="outline" size="sm" asChild>
             <Link href="/login">
               <LogIn className="h-4 w-4 mr-2" />
-              Sign In
+              {t("nav.signIn")}
             </Link>
           </Button>
         )}
