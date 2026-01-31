@@ -295,6 +295,22 @@ const cvLogColumns: ColumnDef<any>[] = [
     sortable: true,
   },
   {
+    key: 'requestId',
+    label: 'Request ID',
+    sortable: true,
+    filterable: true,
+    filterType: 'text',
+    render: (value) => {
+      const id = value as string;
+      if (!id) return '-';
+      return (
+        <span className="font-mono text-xs" title={id}>
+          {id.substring(0, 8)}...
+        </span>
+      );
+    },
+  },
+  {
     key: 'action',
     label: 'Action',
     sortable: true,
