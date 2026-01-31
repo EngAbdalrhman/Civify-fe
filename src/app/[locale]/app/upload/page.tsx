@@ -778,7 +778,7 @@ export default function UploadPage() {
                     onChange={(e) =>
                       updatePersonalInfo("fullName", e.target.value)
                     }
-                    placeholder="John Doe"
+                    placeholder={t("placeholders.fullName")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -789,7 +789,7 @@ export default function UploadPage() {
                     onChange={(e) =>
                       updatePersonalInfo("email", e.target.value)
                     }
-                    placeholder="john@example.com"
+                    placeholder={t("placeholders.email")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -799,7 +799,7 @@ export default function UploadPage() {
                     onChange={(e) =>
                       updatePersonalInfo("phone", e.target.value)
                     }
-                    placeholder="+1 (555) 000-0000"
+                    placeholder={t("placeholders.phone")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -809,7 +809,7 @@ export default function UploadPage() {
                     onChange={(e) =>
                       updatePersonalInfo("jobTitle", e.target.value)
                     }
-                    placeholder="Software Engineer"
+                    placeholder={t("placeholders.jobTitle")}
                   />
                 </div>
               </div>
@@ -832,7 +832,7 @@ export default function UploadPage() {
                     onChange={(e) =>
                       updatePersonalInfo("linkedin", e.target.value)
                     }
-                    placeholder="linkedin.com/in/..."
+                    placeholder={t("placeholders.linkedin")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -842,7 +842,7 @@ export default function UploadPage() {
                     onChange={(e) =>
                       updatePersonalInfo("github", e.target.value)
                     }
-                    placeholder="github.com/..."
+                    placeholder={t("placeholders.github")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -852,7 +852,7 @@ export default function UploadPage() {
                     onChange={(e) =>
                       updatePersonalInfo("website", e.target.value)
                     }
-                    placeholder="speedy.com"
+                    placeholder={t("placeholders.website")}
                   />
                 </div>
               </div>
@@ -879,7 +879,7 @@ export default function UploadPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <Label>Skills (comma-separated)</Label>
+                      <Label>{t("sections.skillsInput")}</Label>
                       <Textarea
                         value={allSkills.join(", ")}
                         onChange={(e) => {
@@ -1330,7 +1330,7 @@ export default function UploadPage() {
                 onClick={() => setCurrentStep(3)}
                 disabled={!isResumeValid()}
               >
-                Continue to Generate <ArrowRight className="ml-2 h-4 w-4" />
+                {t("upload.generateTailoredCv")} <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -1342,16 +1342,15 @@ export default function UploadPage() {
         <div className="max-w-3xl mx-auto space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Target Job Description</CardTitle>
+              <CardTitle>{t("upload.targetJobDescription")}</CardTitle>
               <CardDescription>
-                Paste the job description you're applying for. Our AI will
-                optimize your CV to match.
+                {t("upload.pasteJobDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Job Title (optional)</Label>
+                  <Label>{t("upload.jobTitleOptional")}</Label>
                   <Input
                     value={jobTitle}
                     onChange={(e) => setJobTitle(e.target.value)}
@@ -1359,7 +1358,7 @@ export default function UploadPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Company Name (optional)</Label>
+                  <Label>{t("upload.companyOptional")}</Label>
                   <Input
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
@@ -1368,21 +1367,21 @@ export default function UploadPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Job Description *</Label>
+                <Label>{t("upload.jobDescLabel")} *</Label>
                 <Textarea
                   value={jobDescription}
                   onChange={(e) => {
                     setJobDescription(e.target.value);
                     if (jobDescriptionError) setJobDescriptionError("");
                   }}
-                  placeholder="Paste the full job description here..."
+                  placeholder={t("upload.pasteJobDescPlaceholder")}
                   className={`min-h-[200px] ${jobDescriptionError ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                 />
                 {jobDescriptionError && (
                   <p className="text-sm text-red-500">{jobDescriptionError}</p>
                 )}
                 <p className="text-xs text-muted-foreground">
-                  {jobDescription.length}/50 characters minimum
+                  {jobDescription.length}/50 {t("upload.charsMin")}
                 </p>
               </div>
             </CardContent>
@@ -1390,14 +1389,14 @@ export default function UploadPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Additional Options</CardTitle>
+              <CardTitle>{t("upload.additionalOptions")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Generate Cover Letter</Label>
+                  <Label>{t("upload.generateCoverLetter")}</Label>
                   <p className="text-sm text-muted-foreground">
-                    Create a tailored cover letter
+                    {t("upload.coverLetterDesc")}
                   </p>
                 </div>
                 <Switch
@@ -1408,9 +1407,9 @@ export default function UploadPage() {
               <Separator />
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Interview Questions</Label>
+                  <Label>{t("upload.interviewQuestions")}</Label>
                   <p className="text-sm text-muted-foreground">
-                    Get potential interview questions
+                    {t("upload.interviewDesc")}
                   </p>
                 </div>
                 <Switch
@@ -1421,9 +1420,9 @@ export default function UploadPage() {
               <Separator />
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Career Roadmap</Label>
+                  <Label>{t("upload.careerRoadmap")}</Label>
                   <p className="text-sm text-muted-foreground">
-                    Skills roadmap to improve your fit
+                    {t("upload.roadmapDesc")}
                   </p>
                 </div>
                 <Switch
@@ -1436,7 +1435,7 @@ export default function UploadPage() {
 
           <div className="flex justify-between gap-3">
             <Button variant="outline" onClick={() => setCurrentStep(2)}>
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back
+              <ArrowLeft className="mr-2 h-4 w-4" /> {t("actions.back")}
             </Button>
             <Button
               onClick={handleGenerate}
@@ -1445,12 +1444,12 @@ export default function UploadPage() {
               {isTailoring ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generating...
+                  {t("upload.generating")}
                 </>
               ) : (
                 <>
                   <Sparkles className="mr-2 h-4 w-4" />
-                  Generate Tailored CV
+                  {t("upload.generateTailoredCv")}
                 </>
               )}
             </Button>
@@ -1470,11 +1469,10 @@ export default function UploadPage() {
                 <CardContent className="pt-6 space-y-4">
                   <div className="flex items-center gap-2 text-green-600">
                     <CheckCircle2 className="h-5 w-5" />
-                    <span className="font-semibold">CV Generated!</span>
+                    <span className="font-semibold">{t("upload.cvGenerated")}</span>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Your AI-optimized CV is ready. Review the result or
-                    regenerate if needed.
+                   {t("upload.cvReadyDesc")}
                   </p>
 
                   <div className="space-y-2">
@@ -1485,7 +1483,7 @@ export default function UploadPage() {
                       disabled={isExportingPdf || isExportingDocx}
                     >
                       <Download className="mr-2 h-4 w-4" />
-                      {isExportingPdf ? "Exporting PDF..." : "Download PDF"}
+                      {isExportingPdf ? t("upload.exporting") : t("upload.downloadPdf")}
                     </Button>
                     <Button
                       variant="outline"
@@ -1495,7 +1493,7 @@ export default function UploadPage() {
                       disabled={isExportingPdf || isExportingDocx}
                     >
                       <Download className="mr-2 h-4 w-4" />
-                      {isExportingDocx ? "Exporting DOCX..." : "Download DOCX"}
+                      {isExportingDocx ? t("upload.exporting") : t("upload.downloadDocx")}
                     </Button>
                   </div>
 
@@ -1511,10 +1509,10 @@ export default function UploadPage() {
                     >
                       <Save className="mr-2 h-4 w-4" />
                       {savedResumeId
-                        ? "Saved to Resumes"
+                        ? t("upload.saved")
                         : isSavingResume
-                          ? "Saving..."
-                          : "Save to My Resumes"}
+                          ? t("upload.saving")
+                          : t("upload.saveToResumes")}
                     </Button>
                     {/* <Button 
                       variant="outline" 
@@ -1533,7 +1531,7 @@ export default function UploadPage() {
               {/* Refine Options */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">Refine Result</CardTitle>
+                  <CardTitle className="text-base">{t("upload.refineResult")}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <Button
@@ -1542,7 +1540,7 @@ export default function UploadPage() {
                     size="sm"
                     onClick={() => setCurrentStep(2)}
                   >
-                    <Edit2 className="mr-2 h-4 w-4" /> Edit Sections
+                    <Edit2 className="mr-2 h-4 w-4" /> {t("upload.editSections")}
                   </Button>
                   <Button
                     variant="ghost"
@@ -1550,7 +1548,7 @@ export default function UploadPage() {
                     size="sm"
                     onClick={() => setCurrentStep(3)}
                   >
-                    <RefreshCw className="mr-2 h-4 w-4" /> Regenerate Variant
+                    <RefreshCw className="mr-2 h-4 w-4" /> {t("upload.regenerateVariant")}
                   </Button>
                 </CardContent>
               </Card>
@@ -1558,7 +1556,7 @@ export default function UploadPage() {
               {/* ATS Score */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">ATS Match Score</CardTitle>
+                  <CardTitle className="text-base">{t("upload.atsMatchScore")}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Before/After Comparison */}
@@ -1566,7 +1564,7 @@ export default function UploadPage() {
                     <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg mb-3">
                       <div className="text-center">
                         <p className="text-xs text-muted-foreground mb-1">
-                          Before
+                          {t("upload.before")}
                         </p>
                         <span
                           className={`text-xl font-bold ${getScoreColor(tailorResponse.originalAtsScore.overall)}`}
@@ -1588,7 +1586,7 @@ export default function UploadPage() {
                       </div>
                       <div className="text-center">
                         <p className="text-xs text-muted-foreground mb-1">
-                          After
+                          {t("upload.after")}
                         </p>
                         <span
                           className={`text-xl font-bold ${getScoreColor(tailorResponse.atsScore.overall)}`}
