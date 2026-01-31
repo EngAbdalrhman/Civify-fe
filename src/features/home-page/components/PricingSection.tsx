@@ -59,8 +59,9 @@ export function PricingSection() {
           features.push(t("features.noWatermark"));
         }
 
-        // API Access
-        if (plan.hasApiAccess) {
+        // API Access - check if plan has API_ACCESS feature enabled
+        const hasApiAccessFeature = plan.features?.some(f => f.code === 'API_ACCESS' && f.enabled);
+        if (hasApiAccessFeature) {
           features.push(t("features.apiAccess"));
         }
 

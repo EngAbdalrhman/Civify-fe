@@ -3,6 +3,13 @@
  * TypeScript interfaces for subscription and payment data
  */
 
+export interface SimpleFeature {
+  code: string;
+  name: string;
+  limitValue?: number | null;
+  enabled: boolean;
+}
+
 export interface SubscriptionPlan {
   id: number;
   name: string;
@@ -16,7 +23,7 @@ export interface SubscriptionPlan {
   updatedAt?: string;
   allowAnnualBilling?: boolean;
   sortOrder?: number;
-  hasApiAccess?: boolean;
+  features?: SimpleFeature[];
 }
 
 export interface PlanFeature {
