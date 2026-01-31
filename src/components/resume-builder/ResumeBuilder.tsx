@@ -183,7 +183,7 @@ export function ResumeBuilder({
 
       const response = await apiClient.post<CvParseResponse>(
         "/v1/cvs/upload",
-        formData,
+        formData as unknown as object,
         {
           headers: { "Content-Type": "multipart/form-data" },
           timeout: 120000, // 2 min timeout for file processing

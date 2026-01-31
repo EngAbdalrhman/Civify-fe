@@ -14,17 +14,27 @@ export const useVerifyOtp = () => {
     isSuccess: isVerifySuccess,
     error: verifyError,
   } = useMutation({
-    mutationFn: async ({ username, code }: { username: string; code: string }) => {
+    mutationFn: async ({
+      username,
+      code,
+    }: {
+      username: string;
+      code: string;
+    }) => {
       // Using URLSearchParams to send as form data (not visible in browser URL bar)
       const params = new URLSearchParams();
       params.append("username", username);
       params.append("code", code);
-      
-      const response = await apiClient.post("/auth/verify-otp", params, {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+
+      const response = await apiClient.post(
+        "/auth/verify-otp",
+        params as unknown as object,
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
         },
-      });
+      );
       return response.data;
     },
     onSuccess: () => {
@@ -32,7 +42,8 @@ export const useVerifyOtp = () => {
       toast.success(t("loginSuccess") || "Login successful!");
     },
     onError: (error: { message?: string }) => {
-      const errorMessage = error?.message || t("invalidOtp") || "Invalid or expired OTP";
+      const errorMessage =
+        error?.message || t("invalidOtp") || "Invalid or expired OTP";
       toast.error(errorMessage);
     },
   });

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { 
-  User, 
-  Shield, 
-  Bell, 
+import { useState, useEffect, useRef } from "react";
+import {
+  User,
+  Shield,
+  Bell,
   Eye,
   EyeOff,
   Loader2,
@@ -17,19 +17,14 @@ import {
   CreditCard,
   XCircle,
   CheckCircle,
-  Calendar
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Switch } from '@/components/ui/switch';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
+  Calendar,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
   CardContent,
@@ -37,8 +32,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,13 +44,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { toast } from 'sonner';
-import apiClient from '@/api/client';
-import { Link, useRouter } from '@/i18n/routing';
-import { PermissionGuard } from '@/components/auth/PermissionGuard';
-import { useMyActiveSubscription, useCancelSubscription } from '@/features/plans/hooks/useSubscription';
-import { Progress } from '@/components/ui/progress';
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import apiClient from "@/api/client";
+import { Link, useRouter } from "@/i18n/routing";
+import { PermissionGuard } from "@/components/auth/PermissionGuard";
+import {
+  useMyActiveSubscription,
+  useCancelSubscription,
+} from "@/features/plans/hooks/useSubscription";
+import { Progress } from "@/components/ui/progress";
 
 interface UserProfile {
   id: number;
@@ -68,33 +66,33 @@ interface UserProfile {
 }
 
 interface UserPreferences {
-  preferredLanguage: 'EN' | 'AR';
-  preferredTheme: 'LIGHT' | 'DARK';
+  preferredLanguage: "EN" | "AR";
+  preferredTheme: "LIGHT" | "DARK";
 }
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("profile");
-  
+
   // Profile state
   const [user, setUser] = useState<UserProfile | null>(null);
   const [profileForm, setProfileForm] = useState({
-    firstName: '',
-    lastName: '',
-    phoneNumber: ''
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
   });
   const [isProfileLoading, setIsProfileLoading] = useState(true);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
   // Security state
   const [passwordForm, setPasswordForm] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
   const [showPasswords, setShowPasswords] = useState({
     current: false,
     new: false,
-    confirm: false
+    confirm: false,
   });
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [is2FAEnabled, setIs2FAEnabled] = useState(false);
@@ -102,8 +100,8 @@ export default function SettingsPage() {
 
   // Preferences state
   const [preferences, setPreferences] = useState<UserPreferences>({
-    preferredLanguage: 'EN',
-    preferredTheme: 'LIGHT'
+    preferredLanguage: "EN",
+    preferredTheme: "LIGHT",
   });
   const [isPrefsLoading, setIsPrefsLoading] = useState(true);
   const [isSavingPrefs, setIsSavingPrefs] = useState(false);
@@ -112,13 +110,14 @@ export default function SettingsPage() {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   // Delete account state
-  const [deleteAccountPassword, setDeleteAccountPassword] = useState('');
+  const [deleteAccountPassword, setDeleteAccountPassword] = useState("");
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const router = useRouter();
 
   // Subscription state
-  const { data: subscription, isLoading: isSubscriptionLoading } = useMyActiveSubscription();
+  const { data: subscription, isLoading: isSubscriptionLoading } =
+    useMyActiveSubscription();
   const cancelMutation = useCancelSubscription();
   const [showCancelDialog, setShowCancelDialog] = useState(false);
 
@@ -126,15 +125,15 @@ export default function SettingsPage() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await apiClient.get<UserProfile>('/v1/users/me');
+        const response = await apiClient.get<UserProfile>("/v1/users/me");
         setUser(response.data);
         setProfileForm({
-          firstName: response.data.firstName || '',
-          lastName: response.data.lastName || '',
-          phoneNumber: response.data.phoneNumber || ''
+          firstName: response.data.firstName || "",
+          lastName: response.data.lastName || "",
+          phoneNumber: response.data.phoneNumber || "",
         });
       } catch {
-        toast.error('Failed to load profile');
+        toast.error("Failed to load profile");
       } finally {
         setIsProfileLoading(false);
       }
@@ -146,7 +145,9 @@ export default function SettingsPage() {
   useEffect(() => {
     const fetchPreferences = async () => {
       try {
-        const response = await apiClient.get<UserPreferences>('/v1/users/me/preferences');
+        const response = await apiClient.get<UserPreferences>(
+          "/v1/users/me/preferences",
+        );
         setPreferences(response.data);
       } catch {
         // Use defaults if preferences not set
@@ -161,11 +162,14 @@ export default function SettingsPage() {
   const handleSaveProfile = async () => {
     setIsSavingProfile(true);
     try {
-      const response = await apiClient.put<UserProfile>('/v1/users/me', profileForm);
+      const response = await apiClient.put<UserProfile>(
+        "/v1/users/me",
+        profileForm,
+      );
       setUser(response.data);
-      toast.success('Profile updated successfully');
+      toast.success("Profile updated successfully");
     } catch {
-      toast.error('Failed to update profile');
+      toast.error("Failed to update profile");
     } finally {
       setIsSavingProfile(false);
     }
@@ -174,25 +178,29 @@ export default function SettingsPage() {
   // Change password
   const handleChangePassword = async () => {
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      toast.error('New passwords do not match');
+      toast.error("New passwords do not match");
       return;
     }
     if (passwordForm.newPassword.length < 8) {
-      toast.error('Password must be at least 8 characters');
+      toast.error("Password must be at least 8 characters");
       return;
     }
 
     setIsChangingPassword(true);
     try {
-      await apiClient.post('/auth/change-password', {
+      await apiClient.post("/auth/change-password", {
         currentPassword: passwordForm.currentPassword,
-        newPassword: passwordForm.newPassword
+        newPassword: passwordForm.newPassword,
       });
-      toast.success('Password changed successfully');
-      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      toast.success("Password changed successfully");
+      setPasswordForm({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
     } catch (err: unknown) {
       const error = err as { message?: string };
-      toast.error(error.message || 'Failed to change password');
+      toast.error(error.message || "Failed to change password");
     } finally {
       setIsChangingPassword(false);
     }
@@ -203,12 +211,14 @@ export default function SettingsPage() {
     if (!user) return;
     setIsToggling2FA(true);
     try {
-      const endpoint = enabled ? '/auth/enable-2fa' : '/auth/disable-2fa';
+      const endpoint = enabled ? "/auth/enable-2fa" : "/auth/disable-2fa";
       await apiClient.post(`${endpoint}?username=${user.username}`);
       setIs2FAEnabled(enabled);
-      toast.success(`Two-factor authentication ${enabled ? 'enabled' : 'disabled'}`);
+      toast.success(
+        `Two-factor authentication ${enabled ? "enabled" : "disabled"}`,
+      );
     } catch {
-      toast.error('Failed to update 2FA settings');
+      toast.error("Failed to update 2FA settings");
     } finally {
       setIsToggling2FA(false);
     }
@@ -218,11 +228,14 @@ export default function SettingsPage() {
   const handleSavePreferences = async () => {
     setIsSavingPrefs(true);
     try {
-      const response = await apiClient.put<UserPreferences>('/v1/users/me/preferences', preferences);
+      const response = await apiClient.put<UserPreferences>(
+        "/v1/users/me/preferences",
+        preferences as unknown as object,
+      );
       setPreferences(response.data);
-      toast.success('Preferences saved successfully');
+      toast.success("Preferences saved successfully");
     } catch {
-      toast.error('Failed to save preferences');
+      toast.error("Failed to save preferences");
     } finally {
       setIsSavingPrefs(false);
     }
@@ -230,29 +243,31 @@ export default function SettingsPage() {
 
   // Get user initials
   const getInitials = () => {
-    if (!user) return 'U';
-    const first = user.firstName?.charAt(0) || user.username?.charAt(0) || '';
-    const last = user.lastName?.charAt(0) || '';
-    return (first + last).toUpperCase() || 'U';
+    if (!user) return "U";
+    const first = user.firstName?.charAt(0) || user.username?.charAt(0) || "";
+    const last = user.lastName?.charAt(0) || "";
+    return (first + last).toUpperCase() || "U";
   };
 
   // Avatar file input ref
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
   // Handle avatar upload
-  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
       return;
     }
 
     // Validate file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
-      toast.error('Image size must be less than 2MB');
+      toast.error("Image size must be less than 2MB");
       return;
     }
 
@@ -263,52 +278,55 @@ export default function SettingsPage() {
       reader.onloadend = async () => {
         const base64Image = reader.result as string;
         try {
-          const response = await apiClient.put<UserProfile>('/v1/users/me/profile-picture', {
-            image: base64Image
-          });
+          const response = await apiClient.put<UserProfile>(
+            "/v1/users/me/profile-picture",
+            {
+              image: base64Image,
+            },
+          );
           setUser(response.data);
-          toast.success('Profile picture updated!');
+          toast.success("Profile picture updated!");
         } catch {
-          toast.error('Failed to upload profile picture');
+          toast.error("Failed to upload profile picture");
         } finally {
           setIsUploadingAvatar(false);
         }
       };
       reader.readAsDataURL(file);
     } catch {
-      toast.error('Failed to process image');
+      toast.error("Failed to process image");
       setIsUploadingAvatar(false);
     }
     // Reset input
     if (avatarInputRef.current) {
-      avatarInputRef.current.value = '';
+      avatarInputRef.current.value = "";
     }
   };
 
   // Delete account handler
   const handleDeleteAccount = async () => {
     if (!deleteAccountPassword) {
-      toast.error('Please enter your password');
+      toast.error("Please enter your password");
       return;
     }
 
     setIsDeletingAccount(true);
     try {
-      await apiClient.delete('/v1/users/me', {
-        data: { password: deleteAccountPassword }
+      await apiClient.delete("/v1/users/me", {
+        data: { password: deleteAccountPassword },
       });
-      toast.success('Account deleted successfully');
+      toast.success("Account deleted successfully");
       setShowDeleteDialog(false);
       // Clear local storage and redirect
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      router.push('/');
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      router.push("/");
     } catch (err: unknown) {
       const error = err as { message?: string };
-      toast.error(error.message || 'Failed to delete account');
+      toast.error(error.message || "Failed to delete account");
     } finally {
       setIsDeletingAccount(false);
-      setDeleteAccountPassword('');
+      setDeleteAccountPassword("");
     }
   };
 
@@ -322,7 +340,11 @@ export default function SettingsPage() {
           </p>
         </div>
 
-        <Tabs defaultValue="profile" className="space-y-4" onValueChange={setActiveTab}>
+        <Tabs
+          defaultValue="profile"
+          className="space-y-4"
+          onValueChange={setActiveTab}
+        >
           <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-flex">
             <TabsTrigger value="profile" className="gap-2">
               <User className="h-4 w-4 hidden sm:block" />
@@ -365,8 +387,12 @@ export default function SettingsPage() {
                     <div className="flex items-center gap-4">
                       <div className="relative group">
                         <Avatar className="h-20 w-20">
-                          <AvatarImage src={user?.profilePictureUrl || undefined} />
-                          <AvatarFallback className="text-lg">{getInitials()}</AvatarFallback>
+                          <AvatarImage
+                            src={user?.profilePictureUrl || undefined}
+                          />
+                          <AvatarFallback className="text-lg">
+                            {getInitials()}
+                          </AvatarFallback>
                         </Avatar>
                         <button
                           type="button"
@@ -390,37 +416,53 @@ export default function SettingsPage() {
                       </div>
                       <div>
                         <p className="font-medium">{user?.username}</p>
-                        <p className="text-sm text-muted-foreground">{user?.email}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-sm text-muted-foreground">
+                          {user?.email}
                         </p>
+                        <p className="text-xs text-muted-foreground mt-1"></p>
                       </div>
                     </div>
                     <Separator />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="firstName">First Name</Label>
-                        <Input 
-                          id="firstName" 
-                          value={profileForm.firstName} 
-                          onChange={(e) => setProfileForm({...profileForm, firstName: e.target.value})} 
+                        <Input
+                          id="firstName"
+                          value={profileForm.firstName}
+                          onChange={(e) =>
+                            setProfileForm({
+                              ...profileForm,
+                              firstName: e.target.value,
+                            })
+                          }
                           placeholder="John"
                         />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="lastName">Last Name</Label>
-                        <Input 
-                          id="lastName" 
-                          value={profileForm.lastName} 
-                          onChange={(e) => setProfileForm({...profileForm, lastName: e.target.value})}
+                        <Input
+                          id="lastName"
+                          value={profileForm.lastName}
+                          onChange={(e) =>
+                            setProfileForm({
+                              ...profileForm,
+                              lastName: e.target.value,
+                            })
+                          }
                           placeholder="Doe"
                         />
                       </div>
                       <div className="space-y-2 md:col-span-2">
                         <Label htmlFor="phone">Phone Number</Label>
-                        <Input 
-                          id="phone" 
+                        <Input
+                          id="phone"
                           value={profileForm.phoneNumber}
-                          onChange={(e) => setProfileForm({...profileForm, phoneNumber: e.target.value})}
+                          onChange={(e) =>
+                            setProfileForm({
+                              ...profileForm,
+                              phoneNumber: e.target.value,
+                            })
+                          }
                           placeholder="+1234567890"
                         />
                       </div>
@@ -429,8 +471,13 @@ export default function SettingsPage() {
                 )}
               </CardContent>
               <CardFooter>
-                <Button onClick={handleSaveProfile} disabled={isSavingProfile || isProfileLoading}>
-                  {isSavingProfile && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <Button
+                  onClick={handleSaveProfile}
+                  disabled={isSavingProfile || isProfileLoading}
+                >
+                  {isSavingProfile && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   Save Changes
                 </Button>
               </CardFooter>
@@ -460,18 +507,25 @@ export default function SettingsPage() {
                     <div className="space-y-4">
                       <div className="flex items-center justify-between p-4 rounded-lg border bg-muted/50">
                         <div className="space-y-1">
-                          <p className="text-sm text-muted-foreground">Current Plan</p>
-                          <p className="text-2xl font-bold">{subscription.planName}</p>
+                          <p className="text-sm text-muted-foreground">
+                            Current Plan
+                          </p>
+                          <p className="text-2xl font-bold">
+                            {subscription.planName}
+                          </p>
                         </div>
-                        <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          subscription.status === 'ACTIVE' 
-                            ? subscription.autoRenew === false 
-                              ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
-                              : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                            : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
-                        }`}>
-                          {subscription.status === 'ACTIVE' && subscription.autoRenew === false 
-                            ? 'Cancelling' 
+                        <div
+                          className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            subscription.status === "ACTIVE"
+                              ? subscription.autoRenew === false
+                                ? "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"
+                                : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                              : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400"
+                          }`}
+                        >
+                          {subscription.status === "ACTIVE" &&
+                          subscription.autoRenew === false
+                            ? "Cancelling"
                             : subscription.status}
                         </div>
                       </div>
@@ -484,11 +538,14 @@ export default function SettingsPage() {
                             <span className="text-sm">Billing Period Ends</span>
                           </div>
                           <p className="text-lg font-semibold">
-                            {new Date(subscription.endDate).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })}
+                            {new Date(subscription.endDate).toLocaleDateString(
+                              "en-US",
+                              {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              },
+                            )}
                           </p>
                         </div>
                         <div className="p-4 rounded-lg border">
@@ -501,7 +558,9 @@ export default function SettingsPage() {
                             <span className="text-sm">Auto-Renewal</span>
                           </div>
                           <p className="text-lg font-semibold">
-                            {subscription.autoRenew !== false ? 'Enabled' : 'Disabled'}
+                            {subscription.autoRenew !== false
+                              ? "Enabled"
+                              : "Disabled"}
                           </p>
                         </div>
                       </div>
@@ -510,13 +569,20 @@ export default function SettingsPage() {
                       {subscription.cvLimit !== null && (
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">CV Generations Used</span>
+                            <span className="text-muted-foreground">
+                              CV Generations Used
+                            </span>
                             <span className="font-medium">
-                              {subscription.currentCvCount} / {subscription.cvLimit}
+                              {subscription.currentCvCount} /{" "}
+                              {subscription.cvLimit}
                             </span>
                           </div>
-                          <Progress 
-                            value={(subscription.currentCvCount / subscription.cvLimit) * 100} 
+                          <Progress
+                            value={
+                              (subscription.currentCvCount /
+                                subscription.cvLimit) *
+                              100
+                            }
                             className="h-2"
                           />
                         </div>
@@ -532,8 +598,12 @@ export default function SettingsPage() {
                                 Subscription Scheduled for Cancellation
                               </p>
                               <p className="text-sm text-orange-600 dark:text-orange-500 mt-1">
-                                Your subscription will remain active until {new Date(subscription.endDate).toLocaleDateString()}. 
-                                After that, you'll be automatically moved to the Free plan.
+                                Your subscription will remain active until{" "}
+                                {new Date(
+                                  subscription.endDate,
+                                ).toLocaleDateString()}
+                                . After that, you'll be automatically moved to
+                                the Free plan.
                               </p>
                             </div>
                           </div>
@@ -549,59 +619,88 @@ export default function SettingsPage() {
               </CardContent>
 
               {/* Cancel Button - Only show for paid plans with auto-renew enabled */}
-              {subscription && subscription.planName?.toLowerCase() !== 'free' && subscription.autoRenew !== false && (
-                <CardFooter className="border-t pt-6">
-                  <div className="w-full space-y-4">
-                    <Separator />
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium text-destructive">Cancel Subscription</p>
-                        <p className="text-sm text-muted-foreground">
-                          You'll continue to have access until the end of your billing period.
-                        </p>
-                      </div>
-                      <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="destructive" className="gap-2">
-                            <XCircle className="h-4 w-4" />
+              {subscription &&
+                subscription.planName?.toLowerCase() !== "free" &&
+                subscription.autoRenew !== false && (
+                  <CardFooter className="border-t pt-6">
+                    <div className="w-full space-y-4">
+                      <Separator />
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-destructive">
                             Cancel Subscription
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Cancel your subscription?</AlertDialogTitle>
-                            <AlertDialogDescription className="space-y-2">
-                              <p>
-                                Are you sure you want to cancel your <strong>{subscription.planName}</strong> subscription?
-                              </p>
-                              <ul className="list-disc list-inside space-y-1 text-sm mt-2">
-                                <li>Your subscription will remain active until <strong>{new Date(subscription.endDate).toLocaleDateString()}</strong></li>
-                                <li>You won't be charged on the next billing cycle</li>
-                                <li>After expiration, you'll be moved to the Free plan</li>
-                                <li>You can re-subscribe at any time</li>
-                              </ul>
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Keep Subscription</AlertDialogCancel>
-                            <Button
-                              variant="destructive"
-                              onClick={() => {
-                                cancelMutation.mutate();
-                                setShowCancelDialog(false);
-                              }}
-                              disabled={cancelMutation.isPending}
-                            >
-                              {cancelMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                              Yes, Cancel Subscription
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            You'll continue to have access until the end of your
+                            billing period.
+                          </p>
+                        </div>
+                        <AlertDialog
+                          open={showCancelDialog}
+                          onOpenChange={setShowCancelDialog}
+                        >
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive" className="gap-2">
+                              <XCircle className="h-4 w-4" />
+                              Cancel Subscription
                             </Button>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Cancel your subscription?
+                              </AlertDialogTitle>
+                              <AlertDialogDescription className="space-y-2">
+                                <p>
+                                  Are you sure you want to cancel your{" "}
+                                  <strong>{subscription.planName}</strong>{" "}
+                                  subscription?
+                                </p>
+                                <ul className="list-disc list-inside space-y-1 text-sm mt-2">
+                                  <li>
+                                    Your subscription will remain active until{" "}
+                                    <strong>
+                                      {new Date(
+                                        subscription.endDate,
+                                      ).toLocaleDateString()}
+                                    </strong>
+                                  </li>
+                                  <li>
+                                    You won't be charged on the next billing
+                                    cycle
+                                  </li>
+                                  <li>
+                                    After expiration, you'll be moved to the
+                                    Free plan
+                                  </li>
+                                  <li>You can re-subscribe at any time</li>
+                                </ul>
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>
+                                Keep Subscription
+                              </AlertDialogCancel>
+                              <Button
+                                variant="destructive"
+                                onClick={() => {
+                                  cancelMutation.mutate();
+                                  setShowCancelDialog(false);
+                                }}
+                                disabled={cancelMutation.isPending}
+                              >
+                                {cancelMutation.isPending && (
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                )}
+                                Yes, Cancel Subscription
+                              </Button>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     </div>
-                  </div>
-                </CardFooter>
-              )}
+                  </CardFooter>
+                )}
             </Card>
           </TabsContent>
 
@@ -611,7 +710,8 @@ export default function SettingsPage() {
               <CardHeader>
                 <CardTitle>Language & Theme Preferences</CardTitle>
                 <CardDescription>
-                  Customize your experience with language and email theme settings.
+                  Customize your experience with language and email theme
+                  settings.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -625,23 +725,44 @@ export default function SettingsPage() {
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
                         <Globe className="h-5 w-5 text-muted-foreground" />
-                        <Label className="text-base font-medium">Preferred Language</Label>
+                        <Label className="text-base font-medium">
+                          Preferred Language
+                        </Label>
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        Choose your preferred language for the application and emails.
+                        Choose your preferred language for the application and
+                        emails.
                       </p>
                       <div className="flex gap-3">
                         <Button
-                          variant={preferences.preferredLanguage === 'EN' ? 'default' : 'outline'}
+                          variant={
+                            preferences.preferredLanguage === "EN"
+                              ? "default"
+                              : "outline"
+                          }
                           className="flex-1"
-                          onClick={() => setPreferences({...preferences, preferredLanguage: 'EN'})}
+                          onClick={() =>
+                            setPreferences({
+                              ...preferences,
+                              preferredLanguage: "EN",
+                            })
+                          }
                         >
                           English
                         </Button>
                         <Button
-                          variant={preferences.preferredLanguage === 'AR' ? 'default' : 'outline'}
+                          variant={
+                            preferences.preferredLanguage === "AR"
+                              ? "default"
+                              : "outline"
+                          }
                           className="flex-1"
-                          onClick={() => setPreferences({...preferences, preferredLanguage: 'AR'})}
+                          onClick={() =>
+                            setPreferences({
+                              ...preferences,
+                              preferredLanguage: "AR",
+                            })
+                          }
                         >
                           العربية
                         </Button>
@@ -654,23 +775,43 @@ export default function SettingsPage() {
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
                         <Palette className="h-5 w-5 text-muted-foreground" />
-                        <Label className="text-base font-medium">Email Theme</Label>
+                        <Label className="text-base font-medium">
+                          Email Theme
+                        </Label>
                       </div>
                       <p className="text-sm text-muted-foreground">
                         Choose the theme for emails you receive from Civify.
                       </p>
                       <div className="flex gap-3">
                         <Button
-                          variant={preferences.preferredTheme === 'LIGHT' ? 'default' : 'outline'}
+                          variant={
+                            preferences.preferredTheme === "LIGHT"
+                              ? "default"
+                              : "outline"
+                          }
                           className="flex-1"
-                          onClick={() => setPreferences({...preferences, preferredTheme: 'LIGHT'})}
+                          onClick={() =>
+                            setPreferences({
+                              ...preferences,
+                              preferredTheme: "LIGHT",
+                            })
+                          }
                         >
                           ☀️ Light
                         </Button>
                         <Button
-                          variant={preferences.preferredTheme === 'DARK' ? 'default' : 'outline'}
+                          variant={
+                            preferences.preferredTheme === "DARK"
+                              ? "default"
+                              : "outline"
+                          }
                           className="flex-1"
-                          onClick={() => setPreferences({...preferences, preferredTheme: 'DARK'})}
+                          onClick={() =>
+                            setPreferences({
+                              ...preferences,
+                              preferredTheme: "DARK",
+                            })
+                          }
                         >
                           🌙 Dark
                         </Button>
@@ -680,8 +821,13 @@ export default function SettingsPage() {
                 )}
               </CardContent>
               <CardFooter>
-                <Button onClick={handleSavePreferences} disabled={isSavingPrefs || isPrefsLoading}>
-                  {isSavingPrefs && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <Button
+                  onClick={handleSavePreferences}
+                  disabled={isSavingPrefs || isPrefsLoading}
+                >
+                  {isSavingPrefs && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   Save Preferences
                 </Button>
               </CardFooter>
@@ -693,40 +839,70 @@ export default function SettingsPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Change Password</CardTitle>
-                <CardDescription>Update your password to keep your account secure.</CardDescription>
+                <CardDescription>
+                  Update your password to keep your account secure.
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label>Current Password</Label>
                   <div className="relative">
-                    <Input 
+                    <Input
                       type={showPasswords.current ? "text" : "password"}
                       value={passwordForm.currentPassword}
-                      onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})}
+                      onChange={(e) =>
+                        setPasswordForm({
+                          ...passwordForm,
+                          currentPassword: e.target.value,
+                        })
+                      }
                     />
                     <button
                       type="button"
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                      onClick={() => setShowPasswords({...showPasswords, current: !showPasswords.current})}
+                      onClick={() =>
+                        setShowPasswords({
+                          ...showPasswords,
+                          current: !showPasswords.current,
+                        })
+                      }
                     >
-                      {showPasswords.current ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showPasswords.current ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
                     </button>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label>New Password</Label>
                   <div className="relative">
-                    <Input 
+                    <Input
                       type={showPasswords.new ? "text" : "password"}
                       value={passwordForm.newPassword}
-                      onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
+                      onChange={(e) =>
+                        setPasswordForm({
+                          ...passwordForm,
+                          newPassword: e.target.value,
+                        })
+                      }
                     />
                     <button
                       type="button"
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                      onClick={() => setShowPasswords({...showPasswords, new: !showPasswords.new})}
+                      onClick={() =>
+                        setShowPasswords({
+                          ...showPasswords,
+                          new: !showPasswords.new,
+                        })
+                      }
                     >
-                      {showPasswords.new ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showPasswords.new ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
                     </button>
                   </div>
                   <Switch
@@ -738,24 +914,43 @@ export default function SettingsPage() {
                 <div className="space-y-2">
                   <Label>Confirm New Password</Label>
                   <div className="relative">
-                    <Input 
+                    <Input
                       type={showPasswords.confirm ? "text" : "password"}
                       value={passwordForm.confirmPassword}
-                      onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
+                      onChange={(e) =>
+                        setPasswordForm({
+                          ...passwordForm,
+                          confirmPassword: e.target.value,
+                        })
+                      }
                     />
                     <button
                       type="button"
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                      onClick={() => setShowPasswords({...showPasswords, confirm: !showPasswords.confirm})}
+                      onClick={() =>
+                        setShowPasswords({
+                          ...showPasswords,
+                          confirm: !showPasswords.confirm,
+                        })
+                      }
                     >
-                      {showPasswords.confirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showPasswords.confirm ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
                     </button>
                   </div>
                 </div>
               </CardContent>
               <CardFooter>
-                <Button onClick={handleChangePassword} disabled={isChangingPassword}>
-                  {isChangingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <Button
+                  onClick={handleChangePassword}
+                  disabled={isChangingPassword}
+                >
+                  {isChangingPassword && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   Update Password
                 </Button>
               </CardFooter>
@@ -764,7 +959,9 @@ export default function SettingsPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Two-Factor Authentication</CardTitle>
-                <CardDescription>Add an extra layer of security to your account.</CardDescription>
+                <CardDescription>
+                  Add an extra layer of security to your account.
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between">
@@ -799,10 +996,14 @@ export default function SettingsPage() {
                   <div className="space-y-0.5">
                     <div className="font-medium">Delete Account</div>
                     <div className="text-sm text-muted-foreground">
-                      Once deleted, your account cannot be recovered. You can create a new account with the same email later.
+                      Once deleted, your account cannot be recovered. You can
+                      create a new account with the same email later.
                     </div>
                   </div>
-                  <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                  <AlertDialog
+                    open={showDeleteDialog}
+                    onOpenChange={setShowDeleteDialog}
+                  >
                     <AlertDialogTrigger asChild>
                       <Button variant="destructive" className="gap-2">
                         <Trash2 className="h-4 w-4" />
@@ -811,26 +1012,35 @@ export default function SettingsPage() {
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogTitle>
+                          Are you absolutely sure?
+                        </AlertDialogTitle>
                         <AlertDialogDescription>
-                          This action cannot be undone. This will permanently delete your account.
-                          Your data will remain in our system but will no longer be accessible.
+                          This action cannot be undone. This will permanently
+                          delete your account. Your data will remain in our
+                          system but will no longer be accessible.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <div className="py-4">
-                        <Label htmlFor="delete-password">Enter your password to confirm</Label>
+                        <Label htmlFor="delete-password">
+                          Enter your password to confirm
+                        </Label>
                         <div className="relative mt-2">
                           <Input
                             id="delete-password"
                             type="password"
                             value={deleteAccountPassword}
-                            onChange={(e) => setDeleteAccountPassword(e.target.value)}
+                            onChange={(e) =>
+                              setDeleteAccountPassword(e.target.value)
+                            }
                             placeholder="Your password"
                           />
                         </div>
                       </div>
                       <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setDeleteAccountPassword('')}>
+                        <AlertDialogCancel
+                          onClick={() => setDeleteAccountPassword("")}
+                        >
                           Cancel
                         </AlertDialogCancel>
                         <Button
@@ -838,7 +1048,9 @@ export default function SettingsPage() {
                           onClick={handleDeleteAccount}
                           disabled={isDeletingAccount || !deleteAccountPassword}
                         >
-                          {isDeletingAccount && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                          {isDeletingAccount && (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          )}
                           Delete Account
                         </Button>
                       </AlertDialogFooter>

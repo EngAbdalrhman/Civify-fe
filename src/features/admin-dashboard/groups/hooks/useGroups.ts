@@ -11,7 +11,9 @@ export const useGroups = (options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: [GROUPS_QUERY_KEY],
     queryFn: async (): Promise<Group[]> => {
-      const response = await apiClient.get("/v1/admin/groups");
+      const response = await apiClient.get<{ data?: Group[] }>(
+        "/v1/admin/groups",
+      );
       return response.data.data || [];
     },
     enabled: options?.enabled !== false, // Default to true if not specified
@@ -23,7 +25,9 @@ export const usePermissions = () => {
   return useQuery({
     queryKey: [PERMISSIONS_QUERY_KEY],
     queryFn: async (): Promise<Permission[]> => {
-      const response = await apiClient.get("/v1/admin/groups/permissions");
+      const response = await apiClient.get<{ data?: Permission[] }>(
+        "/v1/admin/groups/permissions",
+      );
       return response.data.data || [];
     },
   });
@@ -34,7 +38,9 @@ export const useGroup = (groupId: number | null) => {
   return useQuery({
     queryKey: [GROUPS_QUERY_KEY, groupId],
     queryFn: async (): Promise<Group> => {
-      const response = await apiClient.get(`/v1/admin/groups/${groupId}`);
+      const response = await apiClient.get<{ data: Group }>(
+        `/v1/admin/groups/${groupId}`,
+      );
       return response.data.data;
     },
     enabled: !!groupId,
@@ -44,10 +50,13 @@ export const useGroup = (groupId: number | null) => {
 // Create group
 export const useCreateGroup = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (data: GroupCreateRequest): Promise<Group> => {
-      const response = await apiClient.post("/v1/admin/groups", data);
+      const response = await apiClient.post<{ data: Group }>(
+        "/v1/admin/groups",
+        data as unknown as object,
+      );
       return response.data.data;
     },
     onSuccess: () => {
@@ -63,10 +72,19 @@ export const useCreateGroup = () => {
 // Update group
 export const useUpdateGroup = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: GroupCreateRequest }): Promise<Group> => {
-      const response = await apiClient.put(`/v1/admin/groups/${id}`, data);
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: number;
+      data: GroupCreateRequest;
+    }): Promise<Group> => {
+      const response = await apiClient.put<{ data: Group }>(
+        `/v1/admin/groups/${id}`,
+        data as unknown as object,
+      );
       return response.data.data;
     },
     onSuccess: () => {
@@ -82,7 +100,7 @@ export const useUpdateGroup = () => {
 // Delete group
 export const useDeleteGroup = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (id: number): Promise<void> => {
       await apiClient.delete(`/v1/admin/groups/${id}`);
@@ -100,10 +118,12 @@ export const useDeleteGroup = () => {
 // Toggle group active status
 export const useToggleGroupActive = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (id: number): Promise<Group> => {
-      const response = await apiClient.patch(`/v1/admin/groups/${id}/toggle-active`);
+      const response = await apiClient.patch<{ data: Group }>(
+        `/v1/admin/groups/${id}/toggle-active`,
+      );
       return response.data.data;
     },
     onSuccess: (data) => {
