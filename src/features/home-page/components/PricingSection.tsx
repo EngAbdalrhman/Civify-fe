@@ -59,14 +59,8 @@ export function PricingSection() {
           features.push(t("features.noWatermark"));
         }
 
-        // Dashboard access
-        if (plan.dashboard) {
-          features.push(t("features.dashboardAccess"));
-          features.push(t("features.prioritySupport"));
-          features.push(t("features.advancedAi"));
-        } else {
-          features.push(t("features.basicSupport"));
-        }
+        // All plans get basic support
+        features.push(t("features.basicSupport"));
 
         const price = isAnnual
           ? parseFloat(plan.annualPrice)

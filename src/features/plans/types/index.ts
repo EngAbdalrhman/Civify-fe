@@ -11,7 +11,6 @@ export interface SubscriptionPlan {
   annualPrice: string;
   cvLimit: number | null;
   watermark: boolean;
-  dashboard: boolean;
   active: boolean;
   createdAt?: string;
   updatedAt?: string;
