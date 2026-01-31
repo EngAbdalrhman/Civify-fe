@@ -526,6 +526,7 @@
         "featured": "مميز (شائع)",
         "showWatermark": "إظهار العلامة المائية",
         "sortOrder": "ترتيب العرض",
+        "apiAccess": "الوصول للـ API",
         "update": "تحديث"
       }
     },

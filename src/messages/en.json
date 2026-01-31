@@ -527,6 +527,7 @@
         "featured": "Featured (Popular)",
         "showWatermark": "Show Watermark",
         "sortOrder": "Sort Order",
+        "apiAccess": "API Access",
         "update": "Update"
       }
     },

@@ -57,9 +57,8 @@ export function usePlans(options: UsePlansOptions = {}): UsePlansReturn {
       features.push(t('features.noWatermark'));
     }
 
-    // API Access - check if plan has API_ACCESS feature enabled
-    const hasApiAccessFeature = plan.features?.some(f => f.code === 'API_ACCESS' && f.enabled);
-    if (hasApiAccessFeature) {
+    // API Access
+    if (plan.hasApiAccess) {
       features.push(t('features.apiAccess'));
     }
 
