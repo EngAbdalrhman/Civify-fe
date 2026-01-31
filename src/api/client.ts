@@ -102,17 +102,29 @@ const attemptTokenRefresh = async (): Promise<string> => {
 
   try {
     // Call refresh endpoint - the httpOnly refresh token cookie will be sent automatically
-    // because we have credentials: 'include'
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
-      {
-        method: "POST",
-        credentials: "include", // This sends the httpOnly refresh token cookie
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
+    // In development, use the proxy to solve cross-origin cookie issues
+    const baseUrl =
+      typeof window !== "undefined" && process.env.NODE_ENV === "development"
+        ? "/api"
+        : process.env.NEXT_PUBLIC_API_URL;
+    const refreshUrl = `${baseUrl}/auth/refresh`;
+    console.log("[Auth] DEBUG: Refresh URL:", refreshUrl);
+    console.log(
+      "[Auth] DEBUG: Current origin:",
+      typeof window !== "undefined" ? window.location.origin : "SSR",
     );
+    console.log(
+      "[Auth] DEBUG: Document cookies (non-httpOnly):",
+      typeof document !== "undefined" ? document.cookie : "SSR",
+    );
+
+    const response = await fetch(refreshUrl, {
+      method: "POST",
+      credentials: "include", // This sends the httpOnly refresh token cookie
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     if (!response.ok) {
       throw new Error(`Refresh failed with status ${response.status}`);
@@ -177,16 +189,35 @@ const fetchWithTimeout = async (
   }
 };
 
+// Check if we should use the local proxy (development mode)
+const shouldUseProxy = (): boolean => {
+  if (typeof window === "undefined") return false; // SSR should call backend directly
+  // Use proxy in development to solve cross-origin cookie issues
+  return process.env.NODE_ENV === "development";
+};
+
+// Get the API base URL - uses proxy in development
+const getApiBaseUrl = (): string => {
+  if (shouldUseProxy()) {
+    // In development, route through Next.js API proxy
+    return "/api";
+  }
+  return process.env.NEXT_PUBLIC_API_URL || "";
+};
+
 // Build full URL from path with query params
 const buildUrl = (
   path: string,
   params?: Record<string, string | number | boolean | undefined>,
 ): string => {
-  const baseURL = process.env.NEXT_PUBLIC_API_URL || "";
+  const baseURL = getApiBaseUrl();
   let fullUrl: string;
 
-  // If path is already a full URL, use as is
-  if (path.startsWith("http://") || path.startsWith("https://")) {
+  // If path is already a full URL, use as is (but not in development with proxy)
+  if (
+    !shouldUseProxy() &&
+    (path.startsWith("http://") || path.startsWith("https://"))
+  ) {
     fullUrl = path;
   } else {
     // Ensure proper path joining
@@ -197,7 +228,7 @@ const buildUrl = (
 
   // Add query params if present
   if (params && Object.keys(params).length > 0) {
-    const url = new URL(fullUrl);
+    const url = new URL(fullUrl, window?.location?.origin);
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined) {
         url.searchParams.append(key, String(value));
@@ -299,8 +330,9 @@ const handle401Error = async <T>(
   }
 
   if (url.includes("/auth/refresh")) {
-    console.log("[Auth] 401 on refresh endpoint, redirecting to login");
-    clearAuthAndRedirect();
+    console.log("[Auth] 401 on refresh endpoint - DEBUG: Skipping redirect");
+    // TODO: Re-enable after debugging
+    // clearAuthAndRedirect();
     throw new Error("Refresh token expired");
   }
 
@@ -342,14 +374,17 @@ const handle401Error = async <T>(
     headers.set("Authorization", `Bearer ${accessToken}`);
     return await apiClient<T>(url, { ...options, headers, _retry: true });
   } catch (refreshError) {
-    console.log("[Auth] Token refresh failed after all retries");
+    console.log(
+      "[Auth] Token refresh failed after all retries - DEBUG: Skipping redirect",
+    );
     isRefreshing = false;
     onTokenRefreshFailed(
       refreshError instanceof Error
         ? refreshError
         : new Error("Refresh failed"),
     );
-    clearAuthAndRedirect();
+    // TODO: Re-enable after debugging
+    // clearAuthAndRedirect();
     throw refreshError;
   }
 };
