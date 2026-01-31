@@ -1,18 +1,35 @@
 import { MetadataRoute } from "next";
+import { routing } from "@/i18n/routing";
 
 export default function robots(): MetadataRoute.Robots {
   const host = (
     process.env.NEXT_PUBLIC_BASE_URL || "https://civify.io"
   ).replace(/\/$/, "");
 
+  // The paths you requested to block
+  const protectedPaths = [
+    "/admin/",
+    "/payment/",
+    "/app/",
+    "/checkout/",
+    "/subscription/",
+    "/api", // Blocks /api, /api/auth, etc.
+  ];
+
+  // Generate the full list including all locale prefixes
+  const disallowList = protectedPaths.flatMap((route) => {
+    return [
+      route, // Block non-localized (e.g. /api)
+      ...routing.locales.map((locale) => `/${locale}${route}`), // Block localized (e.g. /en/api)
+    ];
+  });
+
   return {
     rules: {
       userAgent: "*",
       allow: "/",
-      // Disallow private routes if you have them, e.g., /account, /admin
-      disallow: ["/private/", "/admin/", "/payment/", "/payment/*", "/api"],
+      disallow: disallowList,
     },
-    // Crucial: Point Google to your dynamic sitemap
     sitemap: `${host}/sitemap.xml`,
   };
 }
