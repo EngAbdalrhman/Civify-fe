@@ -192,9 +192,12 @@ export function ResumeBuilder({
 
       const data = response.data;
 
-      if (data?.resumeData) {
-        setResumeData(data.resumeData);
-        originalDataRef.current = data.resumeData;
+      // Access nested data from CommonResponse wrapper
+      const responseData = (data as any).data || data;
+
+      if (responseData?.resumeData) {
+        setResumeData(responseData.resumeData);
+        originalDataRef.current = responseData.resumeData;
         toast.success(t("toasts.parseSuccess"));
       }
     } catch (error) {
