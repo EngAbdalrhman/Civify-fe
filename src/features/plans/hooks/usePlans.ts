@@ -48,12 +48,11 @@ export function usePlans(options: UsePlansOptions = {}): UsePlansReturn {
           subscriptionService.transformPlanToDisplay(plan, isAnnual)
         );
 
-      // Sort: Free -> Pro/Premium -> Enterprise -> Lifetime
+      // Sort by backend sortOrder field
       const sorted = transformed.sort((a, b) => {
-        const order = ['free', 'pro', 'premium', 'enterprise', 'lifetime'];
-        const aIndex = order.findIndex(o => a.name.toLowerCase().includes(o));
-        const bIndex = order.findIndex(o => b.name.toLowerCase().includes(o));
-        return (aIndex === -1 ? 99 : aIndex) - (bIndex === -1 ? 99 : bIndex);
+        const aPlan = fetchedPlans.find(p => p.id === a.planId);
+        const bPlan = fetchedPlans.find(p => p.id === b.planId);
+        return (aPlan?.sortOrder ?? 999) - (bPlan?.sortOrder ?? 999);
       });
 
       setDisplayPlans(sorted);
@@ -74,11 +73,11 @@ export function usePlans(options: UsePlansOptions = {}): UsePlansReturn {
           subscriptionService.transformPlanToDisplay(plan, isAnnual)
         );
 
+      // Sort by backend sortOrder field
       const sorted = transformed.sort((a, b) => {
-        const order = ['free', 'pro', 'premium', 'enterprise', 'lifetime'];
-        const aIndex = order.findIndex(o => a.name.toLowerCase().includes(o));
-        const bIndex = order.findIndex(o => b.name.toLowerCase().includes(o));
-        return (aIndex === -1 ? 99 : aIndex) - (bIndex === -1 ? 99 : bIndex);
+        const aPlan = plans.find(p => p.id === a.planId);
+        const bPlan = plans.find(p => p.id === b.planId);
+        return (aPlan?.sortOrder ?? 999) - (bPlan?.sortOrder ?? 999);
       });
 
       setDisplayPlans(sorted);

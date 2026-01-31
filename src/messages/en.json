@@ -57,7 +57,9 @@
     "apiDocSubtitle": "Complete guide to integrating Civify CV API into your applications",
     "language": {
       "switch": "Switch Language"
-    }
+    },
+    "signIn": "Sign in",
+    "startForFree": "Sign up"
   },
   "auth": {
     "login": "Login",
@@ -223,17 +225,33 @@
   },
   "plans": {
     "title": "Choose Your Plan",
+    "subtitle": "Choose the perfect plan for your career journey",
     "free": "Free",
     "pro": "Pro",
     "enterprise": "Enterprise",
     "monthly": "Monthly",
     "yearly": "Yearly",
+    "save20": "Save 20%",
+    "mostPopular": "Most Popular",
     "selectPlan": "Select Plan",
     "currentPlan": "Current Plan",
     "upgrade": "Upgrade",
     "features": "Features",
     "errorLoading": "Failed to load plans. Please try again.",
-    "retry": "Retry"
+    "retry": "Retry",
+    "faqTitle": "Frequently Asked Questions",
+    "faq": {
+      "q1": "What payment methods do you accept?",
+      "a1": "We accept all major credit cards (Visa, Mastercard) through Fawaterak for local payments.",
+      "q2": "Can I cancel my subscription at any time?",
+      "a2": "Yes, you can cancel your subscription at any time. Your access will continue until the end of your current billing period.",
+      "q3": "What is the difference between CV generations and parsing?",
+      "a3": "CV generation creates a new CV from scratch or template. Parsing extracts data from an existing CV to populate your profile."
+    },
+    "pricesNote": "Prices are in EGP. Local taxes may apply.",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "contactSupport": "Contact Support"
   },
   "checkout": {
     "orderSummary": "Order Summary",

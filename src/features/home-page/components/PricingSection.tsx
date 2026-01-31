@@ -101,11 +101,11 @@ export function PricingSection() {
           ctaLink: isFreePlan ? "/signup" : `/checkout?planId=${plan.id}`,
         };
       })
+      // Sort by backend sortOrder field
       .sort((a, b) => {
-        const order = ["free", "pro", "premium", "enterprise", "lifetime"];
-        const aIndex = order.findIndex((o) => a.name.toLowerCase().includes(o));
-        const bIndex = order.findIndex((o) => b.name.toLowerCase().includes(o));
-        return (aIndex === -1 ? 99 : aIndex) - (bIndex === -1 ? 99 : bIndex);
+        const aPlan = plans.find(p => p.id === a.planId);
+        const bPlan = plans.find(p => p.id === b.planId);
+        return (aPlan?.sortOrder ?? 999) - (bPlan?.sortOrder ?? 999);
       });
   }, [plans, isAnnual, t]);
 
