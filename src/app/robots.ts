@@ -3,7 +3,7 @@ import { routing } from "@/i18n/routing";
 
 export default function robots(): MetadataRoute.Robots {
   const host = (
-    process.env.NEXT_PUBLIC_BASE_URL || "https://civify.io"
+    process.env.NEXT_PUBLIC_BASE_URL || "https://civify.cv"
   ).replace(/\/$/, "");
 
   // The paths you requested to block

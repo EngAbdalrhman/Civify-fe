@@ -136,6 +136,9 @@ export const ADMIN_ACTION_PERMISSIONS = {
 
   // Scheduler
   SCHEDULER_TRIGGER: 'SCHEDULER_TRIGGER',
+
+  // Logs
+  LOGS_CV: 'LOGS.CV',
 } as const;
 
 export type AdminActionPermission = typeof ADMIN_ACTION_PERMISSIONS[keyof typeof ADMIN_ACTION_PERMISSIONS];
