@@ -990,6 +990,7 @@
         "masking": "Personal information masking",
         "pdfExport": "PDF export",
         "noWatermark": "No watermark",
+        "apiAccess": "API access for integrations",
         "dashboardAccess": "Dashboard access",
         "prioritySupport": "Priority support",
         "advancedAi": "Advanced AI features",

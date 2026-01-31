@@ -16,6 +16,7 @@ export interface SubscriptionPlan {
   updatedAt?: string;
   allowAnnualBilling?: boolean;
   sortOrder?: number;
+  hasApiAccess?: boolean;
 }
 
 export interface PlanFeature {

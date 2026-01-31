@@ -979,6 +979,7 @@
         "masking": "إخفاء المعلومات الشخصية",
         "pdfExport": "تصدير PDF",
         "noWatermark": "بدون علامة مائية",
+        "apiAccess": "الوصول للـ API للتكاملات",
         "dashboardAccess": "الوصول إلى لوحة التحكم",
         "prioritySupport": "دعم ذو أولوية",
         "advancedAi": "ميزات الذكاء الاصطناعي المتقدمة",

@@ -59,6 +59,11 @@ export function PricingSection() {
           features.push(t("features.noWatermark"));
         }
 
+        // API Access
+        if (plan.hasApiAccess) {
+          features.push(t("features.apiAccess"));
+        }
+
         // All plans get basic support
         features.push(t("features.basicSupport"));
 
