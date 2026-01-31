@@ -167,7 +167,19 @@
       "skills": "المهارات",
       "skillsPlaceholder": "Java, Spring Boot, Angular, TypeScript, React...",
       "noItems": "لا توجد عناصر بعد. انقر \"إضافة\" لإضافة",
-      "add": "إضافة"
+      "add": "إضافة",
+      "experience": "الخبرة",
+      "education": "التعليم",
+      "projects": "المشاريع",
+      "languages": "اللغات",
+      "certifications": "الدورات",
+      "interests": "الاهتمامات",
+      "activities": "الأنشطة والتطوع",
+      "placeholders": {
+        "date": "2020 - الحاضر",
+        "location": "المدينة، الدولة",
+        "description": "صف مسؤولياتك وإنجازاتك..."
+      }
     },
     "jobDetails": {
       "title": "تفاصيل الوظيفة",
@@ -197,6 +209,7 @@
       "generating": "جاري الإنشاء...",
       "downloadPdf": "تحميل PDF",
       "downloadDocx": "تحميل DOCX",
+      "addSection": "إضافة قسم",
       "saveToResumes": "حفظ في سيري الذاتية",
       "trackApplication": "تتبع الطلب",
       "startOver": "ابدأ من جديد"
@@ -220,6 +233,23 @@
       "loading": "جارٍ تحميل السير الذاتية...",
       "loadError": "فشل تحميل السير الذاتية",
       "selected": "تم اختيار السيرة الذاتية!"
+    },
+    "errors": {
+      "invalidFileType": "يرجى تحميل ملف PDF أو DOCX",
+      "parseFailed": "فشل تحليل بيانات السيرة الذاتية",
+      "exportPdfFailed": "فشل تحميل PDF. يرجى المحاولة مرة أخرى.",
+      "exportDocxFailed": "فشل تحميل DOCX. يرجى المحاولة مرة أخرى.",
+      "saveFailed": "فشل حفظ السيرة الذاتية. يرجى المحاولة مرة أخرى.",
+      "trackFailed": "فشل تتبع الطلب. يرجى المحاولة مرة أخرى.",
+      "jobDescRequired": "وصف الوظيفة مطلوب",
+      "jobDescMinLength": "يجب أن يكون وصف الوظيفة 50 حرفاً على الأقل للتخصيص الدقيق"
+    },
+    "tokenLimit": {
+      "title": "تم الوصول إلى حد الرموز",
+      "description": "لقد استهلكت جميع رموزك الشهرية. قم بترقية خطتك للحصول على المزيد أو شراء رموز إضافية للمتابعة.",
+      "upgrade": "ترقية الخطة",
+      "buyTokens": "شراء حزمة رموز",
+      "cancel": "ربما لاحقاً"
     }
   },
   "plans": {

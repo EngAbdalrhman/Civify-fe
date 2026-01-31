@@ -145,7 +145,7 @@ export default function UploadPage() {
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       ];
       if (!validTypes.includes(file.type)) {
-        toast.error("Please upload a PDF or DOCX file");
+        toast.error(t("errors.invalidFileType"));
         return;
       }
 
@@ -155,7 +155,7 @@ export default function UploadPage() {
             setResumeData(data.resumeData);
             setCurrentStep(2);
           } else {
-            toast.error("Failed to parse CV data");
+            toast.error(t("errors.parseFailed"));
           }
         },
         onError: (error: any) => {
@@ -213,7 +213,7 @@ export default function UploadPage() {
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       ];
       if (!validTypes.includes(file.type)) {
-        toast.error("Please upload a PDF or DOCX file");
+        toast.error(t("errors.invalidFileType"));
         return;
       }
 
@@ -223,7 +223,7 @@ export default function UploadPage() {
             setResumeData(data.resumeData);
             setCurrentStep(2);
           } else {
-            toast.error("Failed to parse CV data");
+            toast.error(t("errors.parseFailed"));
           }
         },
         onError: (error: any) => {
@@ -293,7 +293,7 @@ export default function UploadPage() {
       // toast.success('PDF downloaded successfully!');
     } catch (error) {
       console.error("PDF export failed:", error);
-      toast.error("Failed to download PDF. Please try again.");
+      toast.error(t("errors.exportPdfFailed"));
     } finally {
       setIsExportingPdf(false);
     }
@@ -309,7 +309,7 @@ export default function UploadPage() {
       // toast.success('DOCX downloaded successfully!');
     } catch (error) {
       console.error("DOCX export failed:", error);
-      toast.error("Failed to download DOCX. Please try again.");
+      toast.error(t("errors.exportDocxFailed"));
     } finally {
       setIsExportingDocx(false);
     }
@@ -330,7 +330,7 @@ export default function UploadPage() {
       // toast.success('CV saved to My Resumes!');
     } catch (error) {
       console.error("Save to resumes failed:", error);
-      toast.error("Failed to save CV. Please try again.");
+      toast.error(t("errors.saveFailed"));
     } finally {
       setIsSavingResume(false);
     }
@@ -354,7 +354,7 @@ export default function UploadPage() {
       // toast.success('Added to Job Tracker!');
     } catch (error) {
       console.error("Track application failed:", error);
-      toast.error("Failed to track application. Please try again.");
+      toast.error(t("errors.trackFailed"));
     } finally {
       setIsTrackingApplication(false);
     }
@@ -366,12 +366,12 @@ export default function UploadPage() {
     // Validate job description
     const trimmedDesc = jobDescription.trim();
     if (!trimmedDesc) {
-      setJobDescriptionError("Job description is required");
+      setJobDescriptionError(t("errors.jobDescRequired"));
       return;
     }
     if (trimmedDesc.length < 50) {
       setJobDescriptionError(
-        "Job description must be at least 50 characters for accurate tailoring",
+        t("errors.jobDescMinLength"),
       );
       return;
     }
@@ -1210,7 +1210,7 @@ export default function UploadPage() {
                                   e.target.value,
                                 )
                               }
-                              placeholder="2020 - Present"
+                              placeholder={t("sections.placeholders.date")}
                             />
                             <Input
                               value={item.location || ""}
@@ -1222,7 +1222,7 @@ export default function UploadPage() {
                                   e.target.value,
                                 )
                               }
-                              placeholder="City, Country"
+                              placeholder={t("sections.placeholders.location")}
                             />
                           </div>
                           <Textarea
@@ -1235,7 +1235,7 @@ export default function UploadPage() {
                                 e.target.value,
                               )
                             }
-                            placeholder="Describe your responsibilities and achievements..."
+                            placeholder={t("sections.placeholders.description")}
                             rows={2}
                           />
                         </>
@@ -1250,7 +1250,7 @@ export default function UploadPage() {
           {/* Add New Section Dropdown + Navigation */}
           <div className="flex justify-between items-center gap-3">
             <Button variant="outline" onClick={() => setCurrentStep(1)}>
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back
+              <ArrowLeft className="mr-2 h-4 w-4" /> {t("actions.back")}
             </Button>
 
             <div className="flex gap-2">
@@ -1258,45 +1258,45 @@ export default function UploadPage() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm">
                     <Plus className="h-4 w-4 mr-1" />
-                    Add Section
+                    {t("actions.addSection")}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   {[
                     {
                       type: "experience",
-                      title: "Experience",
+                      title: t("sections.experience"),
                       match: ["experience", "professional experience"],
                     },
                     {
                       type: "education",
-                      title: "Education",
+                      title: t("sections.education"),
                       match: ["education"],
                     },
-                    { type: "projects", title: "Projects", match: ["project"] },
+                    { type: "projects", title: t("sections.projects"), match: ["project"] },
                     {
                       type: "skills",
-                      title: "Skills",
+                      title: t("sections.skills"),
                       match: ["skill", "competenc"],
                     },
                     {
                       type: "languages",
-                      title: "Languages",
+                      title: t("sections.languages"),
                       match: ["language"],
                     },
                     {
                       type: "certifications",
-                      title: "Courses",
+                      title: t("sections.certifications"),
                       match: ["course", "certif"],
                     },
                     {
                       type: "custom",
-                      title: "Interests",
+                      title: t("sections.interests"),
                       match: ["interest", "hobby"],
                     },
                     {
                       type: "custom",
-                      title: "Activities & Volunteering",
+                      title: t("sections.activities"),
                       match: ["activit", "volunteer"],
                     },
                   ]
@@ -2183,30 +2183,29 @@ export default function UploadPage() {
               <Zap className="h-6 w-6 text-amber-600" />
             </div>
             <AlertDialogTitle className="text-center">
-              Token Limit Reached
+              {t("tokenLimit.title")}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-center">
-              You've used all your monthly tokens. Upgrade your plan for more
-              usage or purchase additional tokens to continue.
+              {t("tokenLimit.description")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="grid gap-3 py-4">
             <Link href="/plans" className="w-full">
               <Button className="w-full" size="lg">
                 <Sparkles className="mr-2 h-4 w-4" />
-                Upgrade Plan
+                {t("tokenLimit.upgrade")}
               </Button>
             </Link>
             <Link href="/app/tokens" className="w-full">
               <Button variant="outline" className="w-full" size="lg">
                 <CreditCard className="mr-2 h-4 w-4" />
-                Buy Token Package
+                {t("tokenLimit.buyTokens")}
               </Button>
             </Link>
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel className="w-full">
-              Maybe Later
+              {t("tokenLimit.cancel")}
             </AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
