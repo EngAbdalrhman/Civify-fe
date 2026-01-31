@@ -78,7 +78,11 @@ import {
   emptyResumeData,
   PII_FIELDS,
 } from "@/features/upload-cv/types";
-import { exportToPdf, exportToDocx } from "@/features/upload-cv/utils/exportCv";
+import {
+  exportToPdfPuppeteer,
+  exportToDocx,
+  type TemplateType,
+} from "@/features/upload-cv/utils/exportCv";
 import { useRouter } from "next/navigation";
 import { ResumeService, ResumeSummary } from "@/services/resume.service";
 import { JobApplicationService } from "@/services/job-application.service";
@@ -280,16 +284,22 @@ export default function UploadPage() {
 
   // Download handlers
   const handleDownloadPdf = useCallback(async () => {
-    if (!cvPreviewRef.current || !tailorResponse) return;
+    if (!tailorResponse) return;
 
     setIsExportingPdf(true);
     try {
       const filename = `${tailorResponse.tailoredCv.personalInfo.fullName || "cv"}_tailored`;
-      await exportToPdf(
-        cvPreviewRef.current,
+
+      const template = (tailorResponse.tailoredCv.metadata?.templateId ||
+        "modern") as TemplateType;
+      const color =
+        tailorResponse.tailoredCv.metadata?.primaryColor || "#000000";
+
+      await exportToPdfPuppeteer(tailorResponse.tailoredCv, {
         filename,
-        tailorResponse.tailoredCv,
-      );
+        template,
+        color,
+      });
       // toast.success('PDF downloaded successfully!');
     } catch (error) {
       console.error("PDF export failed:", error);
@@ -370,9 +380,7 @@ export default function UploadPage() {
       return;
     }
     if (trimmedDesc.length < 50) {
-      setJobDescriptionError(
-        t("errors.jobDescMinLength"),
-      );
+      setJobDescriptionError(t("errors.jobDescMinLength"));
       return;
     }
     setJobDescriptionError("");
@@ -1273,7 +1281,11 @@ export default function UploadPage() {
                       title: t("sections.education"),
                       match: ["education"],
                     },
-                    { type: "projects", title: t("sections.projects"), match: ["project"] },
+                    {
+                      type: "projects",
+                      title: t("sections.projects"),
+                      match: ["project"],
+                    },
                     {
                       type: "skills",
                       title: t("sections.skills"),
@@ -1330,7 +1342,8 @@ export default function UploadPage() {
                 onClick={() => setCurrentStep(3)}
                 disabled={!isResumeValid()}
               >
-                {t("upload.generateTailoredCv")} <ArrowRight className="ml-2 h-4 w-4" />
+                {t("upload.generateTailoredCv")}{" "}
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -1343,9 +1356,7 @@ export default function UploadPage() {
           <Card>
             <CardHeader>
               <CardTitle>{t("upload.targetJobDescription")}</CardTitle>
-              <CardDescription>
-                {t("upload.pasteJobDesc")}
-              </CardDescription>
+              <CardDescription>{t("upload.pasteJobDesc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1469,10 +1480,12 @@ export default function UploadPage() {
                 <CardContent className="pt-6 space-y-4">
                   <div className="flex items-center gap-2 text-green-600">
                     <CheckCircle2 className="h-5 w-5" />
-                    <span className="font-semibold">{t("upload.cvGenerated")}</span>
+                    <span className="font-semibold">
+                      {t("upload.cvGenerated")}
+                    </span>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                   {t("upload.cvReadyDesc")}
+                    {t("upload.cvReadyDesc")}
                   </p>
 
                   <div className="space-y-2">
@@ -1483,7 +1496,9 @@ export default function UploadPage() {
                       disabled={isExportingPdf || isExportingDocx}
                     >
                       <Download className="mr-2 h-4 w-4" />
-                      {isExportingPdf ? t("upload.exporting") : t("upload.downloadPdf")}
+                      {isExportingPdf
+                        ? t("upload.exporting")
+                        : t("upload.downloadPdf")}
                     </Button>
                     <Button
                       variant="outline"
@@ -1493,7 +1508,9 @@ export default function UploadPage() {
                       disabled={isExportingPdf || isExportingDocx}
                     >
                       <Download className="mr-2 h-4 w-4" />
-                      {isExportingDocx ? t("upload.exporting") : t("upload.downloadDocx")}
+                      {isExportingDocx
+                        ? t("upload.exporting")
+                        : t("upload.downloadDocx")}
                     </Button>
                   </div>
 
@@ -1531,7 +1548,9 @@ export default function UploadPage() {
               {/* Refine Options */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{t("upload.refineResult")}</CardTitle>
+                  <CardTitle className="text-base">
+                    {t("upload.refineResult")}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <Button
@@ -1540,7 +1559,8 @@ export default function UploadPage() {
                     size="sm"
                     onClick={() => setCurrentStep(2)}
                   >
-                    <Edit2 className="mr-2 h-4 w-4" /> {t("upload.editSections")}
+                    <Edit2 className="mr-2 h-4 w-4" />{" "}
+                    {t("upload.editSections")}
                   </Button>
                   <Button
                     variant="ghost"
@@ -1548,7 +1568,8 @@ export default function UploadPage() {
                     size="sm"
                     onClick={() => setCurrentStep(3)}
                   >
-                    <RefreshCw className="mr-2 h-4 w-4" /> {t("upload.regenerateVariant")}
+                    <RefreshCw className="mr-2 h-4 w-4" />{" "}
+                    {t("upload.regenerateVariant")}
                   </Button>
                 </CardContent>
               </Card>
@@ -1556,7 +1577,9 @@ export default function UploadPage() {
               {/* ATS Score */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{t("upload.atsMatchScore")}</CardTitle>
+                  <CardTitle className="text-base">
+                    {t("upload.atsMatchScore")}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Before/After Comparison */}
