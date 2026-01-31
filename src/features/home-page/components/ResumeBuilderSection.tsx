@@ -1,33 +1,49 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/routing";
-import { ArrowRight, CheckCircle2, Sparkles, Wand2, Languages, Layout } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Sparkles,
+  Wand2,
+  Languages,
+  Layout,
+  Play,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 export function ResumeBuilderSection() {
-  const t = useTranslations('landing.resumeBuilder');
+  const t = useTranslations("landing.resumeBuilder");
   const ref = useRef(null);
+  const videoRef = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const isVideoInView = useInView(videoRef, { once: true, margin: "100px" });
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+
+  // Load video when it comes into view
+  if (isVideoInView && !shouldLoadVideo) {
+    setShouldLoadVideo(true);
+  }
 
   const features = [
     {
       icon: Layout,
-      title: t('features.preview.title'),
-      description: t('features.preview.description'),
+      title: t("features.preview.title"),
+      description: t("features.preview.description"),
     },
     {
       icon: Wand2,
-      title: t('features.ai.title'),
-      description: t('features.ai.description'),
+      title: t("features.ai.title"),
+      description: t("features.ai.description"),
     },
     {
       icon: Languages,
-      title: t('features.multiLang.title'),
-      description: t('features.multiLang.description'),
+      title: t("features.multiLang.title"),
+      description: t("features.multiLang.description"),
     },
   ];
 
@@ -36,27 +52,27 @@ export function ResumeBuilderSection() {
       <div className="container px-4 mx-auto">
         <div className="flex flex-col lg:flex-row gap-16 items-center">
           {/* Left Content */}
-          <div 
+          <div
             ref={ref}
             className="w-full lg:w-1/2 space-y-8"
             style={{
               opacity: isInView ? 1 : 0,
               transform: isInView ? "none" : "translateX(-50px)",
-              transition: "all 0.8s cubic-bezier(0.17, 0.55, 0.55, 1) 0.1s"
+              transition: "all 0.8s cubic-bezier(0.17, 0.55, 0.55, 1) 0.1s",
             }}
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 text-sm font-medium">
               <Sparkles className="w-4 h-4" />
-              <span>{t('badge')}</span>
+              <span>{t("badge")}</span>
             </div>
-            
+
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
-              {t('title')} <br />
-              <span className="text-primary">{t('titleAccent')}</span>
+              {t("title")} <br />
+              <span className="text-primary">{t("titleAccent")}</span>
             </h2>
-            
+
             <p className="text-lg text-muted-foreground leading-relaxed">
-              {t('description')}
+              {t("description")}
             </p>
 
             <div className="grid sm:grid-cols-2 gap-6">
@@ -67,16 +83,22 @@ export function ResumeBuilderSection() {
                   </div>
                   <div>
                     <h3 className="font-semibold mb-1">{feature.title}</h3>
-                    <p className="text-sm text-muted-foreground">{feature.description}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {feature.description}
+                    </p>
                   </div>
                 </div>
               ))}
             </div>
 
             <div className="pt-4">
-              <Button asChild size="lg" className="h-12 px-8 text-base shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all">
+              <Button
+                asChild
+                size="lg"
+                className="h-12 px-8 text-base shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
+              >
                 <Link href="/app/resume-builder">
-                  {t('cta')}
+                  {t("cta")}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -84,12 +106,12 @@ export function ResumeBuilderSection() {
           </div>
 
           {/* Right Content - Video Placeholder */}
-          <div 
+          <div
             className="w-full lg:w-1/2"
             style={{
               opacity: isInView ? 1 : 0,
               transform: isInView ? "none" : "translateX(50px)",
-              transition: "all 0.8s cubic-bezier(0.17, 0.55, 0.55, 1) 0.3s"
+              transition: "all 0.8s cubic-bezier(0.17, 0.55, 0.55, 1) 0.3s",
             }}
           >
             <div className="relative rounded-2xl overflow-hidden shadow-2xl border bg-background/50 backdrop-blur-sm group">
@@ -106,15 +128,33 @@ export function ResumeBuilderSection() {
               </div>
 
               {/* YouTube Iframe Container */}
-              <div className="aspect-video w-full bg-black/5 relative group-hover:bg-black/10 transition-colors">
-               <iframe
+              <div
+                ref={videoRef}
+                className="aspect-video w-full bg-black/5 relative group-hover:bg-black/10 transition-colors"
+              >
+                {shouldLoadVideo ? (
+                  <iframe
                     className="w-full h-full"
                     src="https://www.youtube.com/embed/TyZcDykNqQE?autoplay=0&mute=1&controls=0&loop=1"
                     title="Civify Resume Builder Demo"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
-                />
-                
+                    loading="lazy"
+                  />
+                ) : (
+                  /* Thumbnail placeholder with loading spinner */
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
+                        <Play className="w-8 h-8 text-primary ml-1" />
+                      </div>
+                      <span className="text-sm text-muted-foreground">
+                        {t("loadingVideo") || "Loading video..."}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
                 {/* Overlay gradient to blend with design */}
                 <div className="absolute inset-0 ring-1 ring-inset ring-black/10 rounded-b-2xl pointer-events-none" />
               </div>
