@@ -11,11 +11,12 @@ export interface SubscriptionPlan {
   annualPrice: string;
   cvLimit: number | null;
   watermark: boolean;
-  dashboard: boolean;
   active: boolean;
   createdAt?: string;
   updatedAt?: string;
   allowAnnualBilling?: boolean;
+  sortOrder?: number;
+  hasApiAccess?: boolean;
 }
 
 export interface PlanFeature {

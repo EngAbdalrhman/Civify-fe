@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Menu, ChevronDown, User, LogOut, LayoutDashboard } from "lucide-react";
 import { Link } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import {
@@ -44,6 +45,7 @@ export function Navbar() {
   const [mounted, setMounted] = useState(false);
   const { groupName, clearPermissions } = usePermissions();
   const { resolvedTheme } = useTheme();
+  const t = useTranslations("nav");
 
   // Avoid hydration mismatch
   useEffect(() => {
@@ -147,7 +149,7 @@ export function Navbar() {
                 <Button variant="outline" asChild>
                   <Link href="/app">
                     <LayoutDashboard className="h-4 w-4 mr-2" />
-                    Dashboard
+                    {t("dashboard")}
                   </Link>
                 </Button>
                 <DropdownMenu>
@@ -168,13 +170,13 @@ export function Navbar() {
                     <DropdownMenuItem asChild>
                       <Link href="/app" className="cursor-pointer">
                         <LayoutDashboard className="h-4 w-4 mr-2" />
-                        Dashboard
+                        {t("dashboard")}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/app/settings" className="cursor-pointer">
                         <User className="h-4 w-4 mr-2" />
-                        Settings
+                        {t("settings")}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -183,7 +185,7 @@ export function Navbar() {
                       className="cursor-pointer text-red-600 focus:text-red-600"
                     >
                       <LogOut className="h-4 w-4 mr-2" />
-                      Logout
+                      {t("logout")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -192,13 +194,13 @@ export function Navbar() {
               /* User is not logged in - show sign in / sign up */
               <>
                 <Button variant="ghost" asChild>
-                  <Link href="/login">Sign in</Link>
+                  <Link href="/login">{t("signIn")}</Link>
                 </Button>
                 <Button
                   asChild
                   className="bg-black text-white hover:bg-black/90 hover:text-white dark:bg-white dark:text-black dark:hover:bg-white/90 dark:hover:text-black"
                 >
-                  <Link href="/signup">Start for free</Link>
+                  <Link href="/signup">{t("startForFree")}</Link>
                 </Button>
               </>
             )}
@@ -254,7 +256,7 @@ export function Navbar() {
                       <Button variant="outline" asChild className="w-full">
                         <Link href="/app" onClick={() => setIsOpen(false)}>
                           <LayoutDashboard className="h-4 w-4 mr-2" />
-                          Dashboard
+                          {t("dashboard")}
                         </Link>
                       </Button>
                       <Button
@@ -266,14 +268,14 @@ export function Navbar() {
                         }}
                       >
                         <LogOut className="h-4 w-4 mr-2" />
-                        Logout
+                        {t("logout")}
                       </Button>
                     </>
                   ) : (
                     <>
                       <Button variant="outline" asChild className="w-full">
                         <Link href="/login" onClick={() => setIsOpen(false)}>
-                          Sign in
+                          {t("signIn")}
                         </Link>
                       </Button>
                       <Button
@@ -281,7 +283,7 @@ export function Navbar() {
                         className="w-full bg-black text-white hover:bg-black/90 hover:text-white dark:bg-white dark:text-black dark:hover:bg-white/90 dark:hover:text-black"
                       >
                         <Link href="/signup" onClick={() => setIsOpen(false)}>
-                          Start for free
+                          {t("startForFree")}
                         </Link>
                       </Button>
                     </>

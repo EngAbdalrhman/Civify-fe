@@ -99,14 +99,8 @@ class SubscriptionService {
       features.push('No watermark');
     }
 
-    // Dashboard access
-    if (plan.dashboard) {
-      features.push('Dashboard access');
-      features.push('Priority support');
-      features.push('Advanced AI features');
-    } else {
-      features.push('Basic support');
-    }
+    // All plans get basic support
+    features.push('Basic support');
 
     const price = isAnnual ? parseFloat(plan.annualPrice) : parseFloat(plan.monthlyPrice);
     const isPopular = name.includes('premium') || name.includes('pro') || name.includes('beta');

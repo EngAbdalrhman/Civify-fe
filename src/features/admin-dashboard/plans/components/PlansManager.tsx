@@ -85,6 +85,7 @@ export function PlansManager() {
     maxBillingCycles: '',
     isFeatured: false,
     sortOrder: '0',
+    hasApiAccess: false,
   });
 
   // Fetch plans
@@ -125,6 +126,7 @@ export function PlansManager() {
       maxBillingCycles: '',
       isFeatured: false,
       sortOrder: '0',
+      hasApiAccess: false,
     });
     setIsPlanDialogOpen(true);
   };
@@ -146,6 +148,7 @@ export function PlansManager() {
       maxBillingCycles: plan.maxBillingCycles?.toString() || '',
       isFeatured: plan.isFeatured ?? false,
       sortOrder: plan.sortOrder?.toString() || '0',
+      hasApiAccess: plan.hasApiAccess ?? false,
     });
     setIsPlanDialogOpen(true);
   };
@@ -168,6 +171,7 @@ export function PlansManager() {
         maxBillingCycles: planFormData.maxBillingCycles ? parseInt(planFormData.maxBillingCycles) : undefined,
         isFeatured: planFormData.isFeatured,
         sortOrder: parseInt(planFormData.sortOrder) || 0,
+        hasApiAccess: planFormData.hasApiAccess,
       };
       
       if (editingPlan) {
@@ -485,6 +489,14 @@ export function PlansManager() {
                     onCheckedChange={(checked) => setPlanFormData({ ...planFormData, watermark: checked })}
                   />
                   <Label htmlFor="watermark" className="text-sm">{t('form.showWatermark')}</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="hasApiAccess"
+                    checked={planFormData.hasApiAccess}
+                    onCheckedChange={(checked) => setPlanFormData({ ...planFormData, hasApiAccess: checked })}
+                  />
+                  <Label htmlFor="hasApiAccess" className="text-sm">{t('form.apiAccess')}</Label>
                 </div>
               </div>
               <div className="space-y-2">

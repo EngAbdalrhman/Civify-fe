@@ -295,6 +295,22 @@ const cvLogColumns: ColumnDef<any>[] = [
     sortable: true,
   },
   {
+    key: 'requestId',
+    label: 'Request ID',
+    sortable: true,
+    filterable: true,
+    filterType: 'text',
+    render: (value) => {
+      const id = value as string;
+      if (!id) return '-';
+      return (
+        <span className="font-mono text-xs" title={id}>
+          {id.substring(0, 8)}...
+        </span>
+      );
+    },
+  },
+  {
     key: 'action',
     label: 'Action',
     sortable: true,
@@ -386,6 +402,9 @@ function CvLogTabContent() {
   const [currentSort, setCurrentSort] = useState<SortState>({ field: 'createdAt', direction: 'DESC' });
   const [currentPage, setCurrentPage] = useState(0);
   const [currentFilters, setCurrentFilters] = useState<FilterState>({});
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [viewerTitle, setViewerTitle] = useState('');
+  const [viewerValue, setViewerValue] = useState<Record<string, unknown> | null>(null);
   const pageSize = 10;
 
   const fetchData = useCallback(async (
@@ -430,23 +449,57 @@ function CvLogTabContent() {
     fetchData(currentFilters, currentSort, page);
   }, [fetchData, currentSort, currentFilters]);
 
+  const viewDetails = (log: any) => {
+    setViewerTitle(`Details - ${log.action} #${log.id}`);
+    
+    // Combine metadata for display
+    const details = {
+      ...(log.requestMetadata || {}),
+      ...(log.extractedPii ? { extractedPii: log.extractedPii } : {})
+    };
+    
+    setViewerValue(Object.keys(details).length > 0 ? details : null);
+    setViewerOpen(true);
+  };
+
+  const columnsWithActions: ColumnDef<any>[] = [
+    ...cvLogColumns,
+    {
+      key: 'details',
+      label: 'Details',
+      render: (_, item) => (
+        <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => viewDetails(item)}>
+          View
+        </Button>
+      ),
+    },
+  ];
+
   return (
-    <GenericList
-      data={data as any}
-      columns={cvLogColumns}
-      isLoading={isLoading}
-      meta={{
-        page: currentPage,
-        size: pageSize,
-        totalElements,
-        totalPages: Math.ceil(totalElements / pageSize),
-      }}
-      onFilterChange={handleFilterChange}
-      onSortChange={handleSortChange}
-      onPageChange={handlePageChange}
-      defaultSort={currentSort}
-      emptyMessage="No CV logs found"
-    />
+    <>
+      <GenericList
+        data={data as any}
+        columns={columnsWithActions}
+        isLoading={isLoading}
+        meta={{
+          page: currentPage,
+          size: pageSize,
+          totalElements,
+          totalPages: Math.ceil(totalElements / pageSize),
+        }}
+        onFilterChange={handleFilterChange}
+        onSortChange={handleSortChange}
+        onPageChange={handlePageChange}
+        defaultSort={currentSort}
+        emptyMessage="No CV logs found"
+      />
+      <ValueViewer
+        title={viewerTitle}
+        value={viewerValue}
+        open={viewerOpen}
+        onClose={() => setViewerOpen(false)}
+      />
+    </>
   );
 }
 
