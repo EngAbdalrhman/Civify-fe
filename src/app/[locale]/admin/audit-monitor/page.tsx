@@ -17,6 +17,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/use-auth';
+import { ADMIN_ACTION_PERMISSIONS } from '@/config/adminMenuConfig';
 
 // Define columns for audit logs
 const auditColumns: ColumnDef<AuditLog>[] = [
@@ -295,6 +297,22 @@ const cvLogColumns: ColumnDef<any>[] = [
     sortable: true,
   },
   {
+    key: 'requestId',
+    label: 'Request ID',
+    sortable: true,
+    filterable: true,
+    filterType: 'text',
+    render: (value) => {
+      const id = value as string;
+      if (!id) return '-';
+      return (
+        <span className="font-mono text-xs" title={id}>
+          {id.substring(0, 8)}...
+        </span>
+      );
+    },
+  },
+  {
     key: 'action',
     label: 'Action',
     sortable: true,
@@ -386,6 +404,9 @@ function CvLogTabContent() {
   const [currentSort, setCurrentSort] = useState<SortState>({ field: 'createdAt', direction: 'DESC' });
   const [currentPage, setCurrentPage] = useState(0);
   const [currentFilters, setCurrentFilters] = useState<FilterState>({});
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [viewerTitle, setViewerTitle] = useState('');
+  const [viewerValue, setViewerValue] = useState<Record<string, unknown> | null>(null);
   const pageSize = 10;
 
   const fetchData = useCallback(async (
@@ -430,23 +451,57 @@ function CvLogTabContent() {
     fetchData(currentFilters, currentSort, page);
   }, [fetchData, currentSort, currentFilters]);
 
+  const viewDetails = (log: any) => {
+    setViewerTitle(`Details - ${log.action} #${log.id}`);
+    
+    // Combine metadata for display
+    const details = {
+      ...(log.requestMetadata || {}),
+      ...(log.extractedPii ? { extractedPii: log.extractedPii } : {})
+    };
+    
+    setViewerValue(Object.keys(details).length > 0 ? details : null);
+    setViewerOpen(true);
+  };
+
+  const columnsWithActions: ColumnDef<any>[] = [
+    ...cvLogColumns,
+    {
+      key: 'details',
+      label: 'Details',
+      render: (_, item) => (
+        <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => viewDetails(item)}>
+          View
+        </Button>
+      ),
+    },
+  ];
+
   return (
-    <GenericList
-      data={data as any}
-      columns={cvLogColumns}
-      isLoading={isLoading}
-      meta={{
-        page: currentPage,
-        size: pageSize,
-        totalElements,
-        totalPages: Math.ceil(totalElements / pageSize),
-      }}
-      onFilterChange={handleFilterChange}
-      onSortChange={handleSortChange}
-      onPageChange={handlePageChange}
-      defaultSort={currentSort}
-      emptyMessage="No CV logs found"
-    />
+    <>
+      <GenericList
+        data={data as any}
+        columns={columnsWithActions}
+        isLoading={isLoading}
+        meta={{
+          page: currentPage,
+          size: pageSize,
+          totalElements,
+          totalPages: Math.ceil(totalElements / pageSize),
+        }}
+        onFilterChange={handleFilterChange}
+        onSortChange={handleSortChange}
+        onPageChange={handlePageChange}
+        defaultSort={currentSort}
+        emptyMessage="No CV logs found"
+      />
+      <ValueViewer
+        title={viewerTitle}
+        value={viewerValue}
+        open={viewerOpen}
+        onClose={() => setViewerOpen(false)}
+      />
+    </>
   );
 }
 
@@ -827,6 +882,9 @@ function TokenUsageTabContent() {
 
 export default function AuditMonitorPage() {
   const t = useTranslations('admin.auditMonitor');
+  const { hasPermission } = useAuth();
+
+  const showCvLogs = hasPermission(ADMIN_ACTION_PERMISSIONS.LOGS_CV);
   
   return (
     <div className="space-y-6">
@@ -854,10 +912,14 @@ export default function AuditMonitorPage() {
             <Settings className="h-4 w-4" />
             {t('tabs.promos')}
           </TabsTrigger>
-          <TabsTrigger value="cv-logs" className="gap-2">
-            <FileSearch className="h-4 w-4" />
-            {t('tabs.cvLogs')}
-          </TabsTrigger>
+          
+          {showCvLogs && (
+            <TabsTrigger value="cv-logs" className="gap-2">
+              <FileSearch className="h-4 w-4" />
+              {t('tabs.cvLogs')}
+            </TabsTrigger>
+          )}
+
           <TabsTrigger value="subscription-audit" className="gap-2">
             <RefreshCcw className="h-4 w-4" />
             Subscriptions
@@ -900,13 +962,15 @@ export default function AuditMonitorPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="cv-logs" className="mt-6">
-          <div className="rounded-lg border bg-card p-6">
-            <h3 className="text-lg font-semibold mb-4">CV Operation Logs</h3>
-            <p className="text-sm text-muted-foreground mb-4">Logs for CV parsing, tailoring, and masking</p>
-            <CvLogTabContent />
-          </div>
-        </TabsContent>
+        {showCvLogs && (
+          <TabsContent value="cv-logs" className="mt-6">
+            <div className="rounded-lg border bg-card p-6">
+              <h3 className="text-lg font-semibold mb-4">CV Operation Logs</h3>
+              <p className="text-sm text-muted-foreground mb-4">Logs for CV parsing, tailoring, and masking</p>
+              <CvLogTabContent />
+            </div>
+          </TabsContent>
+        )}
 
         <TabsContent value="subscription-audit" className="mt-6">
           <div className="rounded-lg border bg-card p-6">

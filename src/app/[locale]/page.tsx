@@ -3,18 +3,31 @@ import {
   HowItWorksSection,
   FeaturesSection,
   BeforeAfterSection,
-  TemplatesSection,
+  // TemplatesSection,
   RolePersonalizationSection,
-  TestimonialsSection,
+  // TestimonialsSection,
   PricingSection,
   FAQSection,
-  IntegrationsSection,
-  BlogPreviewSection,
+  // IntegrationsSection,
+  // BlogPreviewSection,
   CTASection,
   ResumeBuilderSection,
 } from "@/features/home-page/components";
+import { setRequestLocale } from "next-intl/server";
+import { routing } from "@/i18n/routing";
 
-const Homepage = () => {
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+const Homepage = async ({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) => {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   return (
     <>
       <HeroSection />
@@ -35,4 +48,3 @@ const Homepage = () => {
 };
 
 export default Homepage;
-

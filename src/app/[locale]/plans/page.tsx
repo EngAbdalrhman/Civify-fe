@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Check, Loader2 } from "lucide-react";
-import { useRouter } from "@/i18n/routing";
+import { useRouter, Link } from "@/i18n/routing";
 import {
   Carousel,
   CarouselContent,
@@ -72,7 +72,7 @@ export default function PlansPage() {
           {t("title")}
         </h1>
         <p className="text-xl text-muted-foreground">
-          Choose the perfect plan for your career journey
+          {t("subtitle")}
         </p>
 
         {/* Billing Toggle */}
@@ -85,7 +85,7 @@ export default function PlansPage() {
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            Monthly
+            {t("monthly")}
           </button>
           <button
             onClick={() => setIsAnnual(true)}
@@ -95,8 +95,8 @@ export default function PlansPage() {
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            Yearly{" "}
-            <span className="text-xs text-green-600 font-bold">(Save 20%)</span>
+            {t("yearly")}{" "}
+            <span className="text-xs text-green-600 font-bold">({t("save20")})</span>
           </button>
         </div>
       </div>
@@ -127,7 +127,7 @@ export default function PlansPage() {
                     >
                       {plan.highlighted && (
                         <Badge className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-1 text-sm font-medium text-primary-foreground">
-                          Most Popular
+                          {t("mostPopular")}
                         </Badge>
                       )}
 
@@ -138,10 +138,10 @@ export default function PlansPage() {
                         </p>
                         <div className="mt-4 flex items-baseline">
                           <span className="text-4xl font-bold tracking-tight">
-                            ${plan.price}
+                            {plan.price}
                           </span>
                           <span className="ml-1 text-muted-foreground">
-                            /{plan.period}
+                            EGP/{plan.period}
                           </span>
                         </div>
                       </div>
@@ -185,7 +185,7 @@ export default function PlansPage() {
             >
               {plan.highlighted && (
                 <Badge className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-1 text-sm font-medium text-primary-foreground">
-                  Most Popular
+                  {t("mostPopular")}
                 </Badge>
               )}
 
@@ -196,10 +196,10 @@ export default function PlansPage() {
                 </p>
                 <div className="mt-4 flex items-baseline">
                   <span className="text-4xl font-bold tracking-tight">
-                    ${plan.price}
+                    {plan.price}
                   </span>
                   <span className="ml-1 text-muted-foreground">
-                    /{plan.period}
+                    EGP/{plan.period}
                   </span>
                 </div>
               </div>
@@ -229,26 +229,22 @@ export default function PlansPage() {
       {/* FAQ Section */}
       <div className="max-w-3xl mx-auto mt-24">
         <h2 className="text-3xl font-bold text-center mb-12">
-          Frequently Asked Questions
+          {t("faqTitle")}
         </h2>
         <div className="space-y-4">
           {[
             {
-              q: "What payment methods do you accept?",
-              a: "We accept all major credit cards (Visa, Mastercard) through Fawaterak for local payments.",
+              q: t("faq.q1"),
+              a: t("faq.a1"),
             },
             {
-              q: "Can I cancel my subscription at any time?",
-              a: "Yes, you can cancel your subscription at any time. Your access will continue until the end of your current billing period.",
+              q: t("faq.q2"),
+              a: t("faq.a2"),
             },
             {
-              q: "What is the difference between CV generations and parsing?",
-              a: "CV generation creates a new CV from scratch or template. Parsing extracts data from an existing CV to populate your profile.",
+              q: t("faq.q3"),
+              a: t("faq.a3"),
             },
-            // {
-            //   q: "Do you offer refunds?",
-            //   a: "We offer a 14-day money-back guarantee if you are not satisfied with our service.",
-            // },
           ].map((faq, i) => (
             <div
               key={i}
@@ -263,19 +259,19 @@ export default function PlansPage() {
 
       {/* Footer Info */}
       <div className="text-center mt-16 text-muted-foreground text-sm">
-        <p>Prices are in USD. Local taxes may apply.</p>
+        <p>{t("pricesNote")}</p>
         <div className="mt-4 flex justify-center gap-4">
-          <a href="#" className="hover:text-foreground">
-            Terms of Service
-          </a>
+          <Link href="/terms" className="hover:text-foreground">
+            {t("termsOfService")}
+          </Link>
           <span>•</span>
-          <a href="#" className="hover:text-foreground">
-            Privacy Policy
-          </a>
+          <Link href="/policy" className="hover:text-foreground">
+            {t("privacyPolicy")}
+          </Link>
           <span>•</span>
-          <a href="#" className="hover:text-foreground">
-            Contact Support
-          </a>
+          <Link href="/contact" className="hover:text-foreground">
+            {t("contactSupport")}
+          </Link>
         </div>
       </div>
     </div>

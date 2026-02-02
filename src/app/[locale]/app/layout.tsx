@@ -82,7 +82,7 @@ export default function UserDashboardLayout({
       if (!token) return;
 
       try {
-        const response = await apiClient.get(
+        const response = await apiClient.get<{ planName?: string }>(
           "/v1/subscriptions/my-subscription",
         );
         setPlanName(response.data?.planName || null);

@@ -6,6 +6,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { subscriptionService } from '@/services/subscription.service';
 import type { SubscriptionPlan, PricingTierDisplay } from '../types';
 
@@ -26,12 +27,67 @@ interface UsePlansReturn {
 
 export function usePlans(options: UsePlansOptions = {}): UsePlansReturn {
   const { isAnnual: initialIsAnnual = false, autoFetch = true } = options;
+  const t = useTranslations('landing.pricing');
 
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [displayPlans, setDisplayPlans] = useState<PricingTierDisplay[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAnnual, setIsAnnual] = useState(initialIsAnnual);
+
+  // Transform plan to display format with translations
+  const transformPlanToDisplay = useCallback((plan: SubscriptionPlan, annual: boolean): PricingTierDisplay => {
+    const features: string[] = [];
+    const name = plan.name.toLowerCase();
+
+    // CV Limit
+    if (plan.cvLimit === null) {
+      features.push(t('features.cvStorageUnlimited'));
+    } else {
+      features.push(t('features.cvStorage', { count: plan.cvLimit }));
+    }
+
+    // Standard features
+    features.push(t('features.aiTailoring'));
+    features.push(t('features.masking'));
+    features.push(t('features.pdfExport'));
+
+    // Watermark
+    if (!plan.watermark) {
+      features.push(t('features.noWatermark'));
+    }
+
+    // API Access
+    if (plan.hasApiAccess) {
+      features.push(t('features.apiAccess'));
+    }
+
+    // All plans get basic support
+    features.push(t('features.basicSupport'));
+
+    const price = annual ? parseFloat(plan.annualPrice) : parseFloat(plan.monthlyPrice);
+    const isPopular = name.includes('premium') || name.includes('pro') || name.includes('beta');
+    const isFreePlan = name === 'free';
+
+    // Capitalize first letter of each word for display
+    const displayName = plan.name
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+
+    return {
+      id: name.replace(/\s+/g, '-').toLowerCase(),
+      planId: plan.id,
+      name: displayName,
+      price,
+      period: annual ? t('yearly').toLowerCase() : t('monthly').toLowerCase(),
+      description: plan.description,
+      features,
+      highlighted: isPopular,
+      cta: isFreePlan ? t('getStarted') : t('selectPlan'),
+      ctaLink: isFreePlan ? '/signup' : `/checkout?planId=${plan.id}`,
+    };
+  }, [t]);
 
   const fetchPlans = useCallback(async () => {
     try {
@@ -44,16 +100,13 @@ export function usePlans(options: UsePlansOptions = {}): UsePlansReturn {
       // Transform and sort plans
       const transformed = fetchedPlans
         .filter(plan => !isAnnual || plan.allowAnnualBilling !== false)
-        .map(plan => 
-          subscriptionService.transformPlanToDisplay(plan, isAnnual)
-        );
+        .map(plan => transformPlanToDisplay(plan, isAnnual));
 
-      // Sort: Free -> Pro/Premium -> Enterprise -> Lifetime
+      // Sort by backend sortOrder field
       const sorted = transformed.sort((a, b) => {
-        const order = ['free', 'pro', 'premium', 'enterprise', 'lifetime'];
-        const aIndex = order.findIndex(o => a.name.toLowerCase().includes(o));
-        const bIndex = order.findIndex(o => b.name.toLowerCase().includes(o));
-        return (aIndex === -1 ? 99 : aIndex) - (bIndex === -1 ? 99 : bIndex);
+        const aPlan = fetchedPlans.find(p => p.id === a.planId);
+        const bPlan = fetchedPlans.find(p => p.id === b.planId);
+        return (aPlan?.sortOrder ?? 999) - (bPlan?.sortOrder ?? 999);
       });
 
       setDisplayPlans(sorted);
@@ -63,27 +116,25 @@ export function usePlans(options: UsePlansOptions = {}): UsePlansReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [isAnnual]);
+  }, [isAnnual, transformPlanToDisplay]);
 
   // Re-transform when isAnnual changes
   useEffect(() => {
     if (plans.length > 0) {
       const transformed = plans
         .filter(plan => !isAnnual || plan.allowAnnualBilling !== false)
-        .map(plan => 
-          subscriptionService.transformPlanToDisplay(plan, isAnnual)
-        );
+        .map(plan => transformPlanToDisplay(plan, isAnnual));
 
+      // Sort by backend sortOrder field
       const sorted = transformed.sort((a, b) => {
-        const order = ['free', 'pro', 'premium', 'enterprise', 'lifetime'];
-        const aIndex = order.findIndex(o => a.name.toLowerCase().includes(o));
-        const bIndex = order.findIndex(o => b.name.toLowerCase().includes(o));
-        return (aIndex === -1 ? 99 : aIndex) - (bIndex === -1 ? 99 : bIndex);
+        const aPlan = plans.find(p => p.id === a.planId);
+        const bPlan = plans.find(p => p.id === b.planId);
+        return (aPlan?.sortOrder ?? 999) - (bPlan?.sortOrder ?? 999);
       });
 
       setDisplayPlans(sorted);
     }
-  }, [isAnnual, plans]);
+  }, [isAnnual, plans, transformPlanToDisplay]);
 
   // Auto-fetch on mount
   useEffect(() => {
@@ -104,3 +155,4 @@ export function usePlans(options: UsePlansOptions = {}): UsePlansReturn {
 }
 
 export default usePlans;
+

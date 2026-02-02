@@ -16,7 +16,9 @@ export const useLogin = () => {
   const [loginUsername, setLoginUsername] = useState<string | null>(null);
 
   const loginSchema = z.object({
-    identifier: z.string().min(1, t("identifierRequired") || "Please enter your email or username"),
+    identifier: z
+      .string()
+      .min(1, t("identifierRequired") || "Please enter your email or username"),
     password: z.string().min(1, t("passwordRequired")),
   });
 
@@ -39,7 +41,10 @@ export const useLogin = () => {
         ? { email: data.identifier, password: data.password }
         : { username: data.identifier, password: data.password };
 
-      const response = await apiClient.post("/login", payload);
+      const response = await apiClient.post<{
+        requires2FA?: boolean;
+        message?: string;
+      }>("/login", payload);
       return response.data;
     },
     onSuccess: (data) => {
@@ -55,7 +60,7 @@ export const useLogin = () => {
     onError: (error: { errorCode?: string; message?: string }) => {
       const errorCode = error?.errorCode;
       const errorMessage = error?.message || "Login failed";
-      
+
       // Check if error is about email verification
       if (errorCode === "AUTH_001") {
         const identifier = form.getValues("identifier");
@@ -65,7 +70,10 @@ export const useLogin = () => {
           setShowResendVerification(true);
           resendVerification(identifier);
           toast.error(t("emailNotVerified") || errorMessage);
-          toast.info(t("verificationSentAutomatically") || "Verification email sent automatically!");
+          toast.info(
+            t("verificationSentAutomatically") ||
+              "Verification email sent automatically!",
+          );
         } else {
           toast.error(t("emailNotVerified") || errorMessage);
         }
@@ -76,23 +84,28 @@ export const useLogin = () => {
   });
 
   // Resend verification email mutation
-  const { mutate: resendVerification, isPending: isResendPending } = useMutation({
-    mutationFn: async (email: string) => {
-      const response = await apiClient.post("/auth/resend-verification", null, {
-        params: { email },
-        timeout: 60000,
-      });
-      return response.data;
-    },
-    onSuccess: () => {
-      toast.success("Verification email sent! Please check your inbox.");
-      setShowResendVerification(false);
-    },
-    onError: (error: { message?: string }) => {
-      const errorMessage = error?.message || "Failed to resend email";
-      toast.error(errorMessage);
-    },
-  });
+  const { mutate: resendVerification, isPending: isResendPending } =
+    useMutation({
+      mutationFn: async (email: string) => {
+        const response = await apiClient.post(
+          "/auth/resend-verification",
+          null,
+          {
+            params: { email },
+            timeout: 60000,
+          },
+        );
+        return response.data;
+      },
+      onSuccess: () => {
+        toast.success("Verification email sent! Please check your inbox.");
+        setShowResendVerification(false);
+      },
+      onError: (error: { message?: string }) => {
+        const errorMessage = error?.message || "Failed to resend email";
+        toast.error(errorMessage);
+      },
+    });
 
   const handleResendVerification = () => {
     if (unverifiedEmail) {
@@ -126,4 +139,3 @@ export type LoginSchemaType = {
   identifier: string;
   password: string;
 };
-

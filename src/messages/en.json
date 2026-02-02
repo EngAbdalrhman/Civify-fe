@@ -24,8 +24,14 @@
     "close": "Close",
     "confirm": "Confirm",
     "yes": "Yes",
-    "no": "No",
-    "view": "View"
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "toggleTheme": "Toggle theme",
+    "theme": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
   },
   "nav": {
     "home": "Home",
@@ -57,7 +63,9 @@
     "apiDocSubtitle": "Complete guide to integrating Civify CV API into your applications",
     "language": {
       "switch": "Switch Language"
-    }
+    },
+    "signIn": "Sign in",
+    "startForFree": "Sign up"
   },
   "auth": {
     "login": "Login",
@@ -128,6 +136,51 @@
   },
   "upload": {
     "title": "Tailor CV",
+    "upload": {
+      "title": "Tailor your CV",
+      "subtitle": "Upload your existing CV, review the extracted data, and let our AI tailor it for your dream job.",
+      "dragDrop": "Drag & drop your resume here",
+      "or": "or",
+      "browseFiles": "browse files",
+      "supportMsg": "Supports PDF and DOCX files up to 5MB",
+      "analyzing": "Analyzing your resume...",
+      "selectFromResumes": "Select from My Resumes",
+      "manualEntry": "Enter Data Manually",
+      "step1": "Upload Resume",
+      "step2": "Review Data",
+      "step3": "Tailor CV",
+      "step4": "Result",
+      "targetJobDescription": "Target Job Description",
+      "pasteJobDesc": "Paste the job description you're applying for. Our AI will optimize your CV to match.",
+      "jobTitleOptional": "Job Title (optional)",
+      "companyOptional": "Company Name (optional)",
+      "jobDescLabel": "Job Description",
+      "pasteJobDescPlaceholder": "Paste the full job description here...",
+      "charsMin": "characters minimum",
+      "additionalOptions": "Additional Options",
+      "generateCoverLetter": "Generate Cover Letter",
+      "coverLetterDesc": "Create a tailored cover letter",
+      "interviewQuestions": "Interview Questions",
+      "interviewDesc": "Get potential interview questions",
+      "careerRoadmap": "Career Roadmap",
+      "roadmapDesc": "Skills roadmap to improve your fit",
+      "generateTailoredCv": "Generate Tailored CV",
+      "generating": "Generating...",
+      "cvGenerated": "CV Generated!",
+      "cvReadyDesc": "Your AI-optimized CV is ready. Review the result or regenerate if needed.",
+      "refineResult": "Refine Result",
+      "editSections": "Edit Sections",
+      "regenerateVariant": "Regenerate Variant",
+      "atsMatchScore": "ATS Match Score",
+      "before": "Before",
+      "after": "After",
+      "saving": "Saving...",
+      "saved": "Saved to Resumes",
+      "saveToResumes": "Save to My Resumes",
+      "exporting": "Exporting...",
+      "downloadPdf": "Download PDF",
+      "downloadDocx": "Download DOCX"
+    },
     "pageTitle": "Build Your ATS-Friendly CV",
     "pageSubtitle": "Upload your current CV, review the extracted data, and let AI tailor it to your dream job.",
     "dragDrop": "Drag and drop your CV here",
@@ -160,13 +213,37 @@
       "summaryPlaceholder": "Brief overview of your experience and skills...",
       "linkedin": "LinkedIn",
       "github": "GitHub",
-      "website": "Website"
+      "website": "Website",
+      "placeholders": {
+        "fullName": "John Doe",
+        "email": "john@example.com",
+        "phone": "+1 234 567 890",
+        "jobTitle": "Software Engineer",
+        "address": "New York, NY",
+        "website": "https://johndoe.com",
+        "linkedin": "https://linkedin.com/in/johndoe",
+        "github": "https://github.com/johndoe",
+        "summary": "Experienced software engineer..."
+      }
     },
     "sections": {
       "skills": "Skills",
+      "skillsInput": "Skills (comma-separated)",
       "skillsPlaceholder": "Java, Spring Boot, Angular, TypeScript, React...",
       "noItems": "No items yet. Click \"Add\" to add your",
-      "add": "Add"
+      "add": "Add",
+      "experience": "Experience",
+      "education": "Education",
+      "projects": "Projects",
+      "languages": "Languages",
+      "certifications": "Courses",
+      "interests": "Interests",
+      "activities": "Activities & Volunteering",
+      "placeholders": {
+        "date": "2020 - Present",
+        "location": "City, Country",
+        "description": "Describe your responsibilities and achievements..."
+      }
     },
     "jobDetails": {
       "title": "Job Details",
@@ -196,6 +273,7 @@
       "generating": "Generating...",
       "downloadPdf": "Download PDF",
       "downloadDocx": "Download DOCX",
+      "addSection": "Add Section",
       "saveToResumes": "Save to My Resumes",
       "trackApplication": "Track Application",
       "startOver": "Start Over"
@@ -219,21 +297,54 @@
       "loading": "Loading your resumes...",
       "loadError": "Failed to load resumes",
       "selected": "Resume selected!"
+    },
+    "errors": {
+      "invalidFileType": "Please upload a PDF or DOCX file",
+      "parseFailed": "Failed to parse CV data",
+      "exportPdfFailed": "Failed to download PDF. Please try again.",
+      "exportDocxFailed": "Failed to download DOCX. Please try again.",
+      "saveFailed": "Failed to save CV. Please try again.",
+      "trackFailed": "Failed to track application. Please try again.",
+      "jobDescRequired": "Job description is required",
+      "jobDescMinLength": "Job description must be at least 50 characters for accurate tailoring"
+    },
+    "tokenLimit": {
+      "title": "Token Limit Reached",
+      "description": "You've used all your monthly tokens. Upgrade your plan for more usage or purchase additional tokens to continue.",
+      "upgrade": "Upgrade Plan",
+      "buyTokens": "Buy Token Package",
+      "cancel": "Maybe Later"
     }
   },
   "plans": {
     "title": "Choose Your Plan",
+    "subtitle": "Choose the perfect plan for your career journey",
     "free": "Free",
     "pro": "Pro",
     "enterprise": "Enterprise",
     "monthly": "Monthly",
     "yearly": "Yearly",
+    "save20": "Save 20%",
+    "mostPopular": "Most Popular",
     "selectPlan": "Select Plan",
     "currentPlan": "Current Plan",
     "upgrade": "Upgrade",
     "features": "Features",
     "errorLoading": "Failed to load plans. Please try again.",
-    "retry": "Retry"
+    "retry": "Retry",
+    "faqTitle": "Frequently Asked Questions",
+    "faq": {
+      "q1": "What payment methods do you accept?",
+      "a1": "We accept all major credit cards (Visa, Mastercard) through Fawaterak for local payments.",
+      "q2": "Can I cancel my subscription at any time?",
+      "a2": "Yes, you can cancel your subscription at any time. Your access will continue until the end of your current billing period.",
+      "q3": "What is the difference between CV generations and parsing?",
+      "a3": "CV generation creates a new CV from scratch or template. Parsing extracts data from an existing CV to populate your profile."
+    },
+    "pricesNote": "Prices are in EGP. Local taxes may apply.",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "contactSupport": "Contact Support"
   },
   "checkout": {
     "orderSummary": "Order Summary",
@@ -509,6 +620,7 @@
         "featured": "Featured (Popular)",
         "showWatermark": "Show Watermark",
         "sortOrder": "Sort Order",
+        "apiAccess": "API Access",
         "update": "Update"
       }
     },
@@ -972,6 +1084,7 @@
         "masking": "Personal information masking",
         "pdfExport": "PDF export",
         "noWatermark": "No watermark",
+        "apiAccess": "API access for integrations",
         "dashboardAccess": "Dashboard access",
         "prioritySupport": "Priority support",
         "advancedAi": "Advanced AI features",

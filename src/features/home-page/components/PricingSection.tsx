@@ -59,14 +59,13 @@ export function PricingSection() {
           features.push(t("features.noWatermark"));
         }
 
-        // Dashboard access
-        if (plan.dashboard) {
-          features.push(t("features.dashboardAccess"));
-          features.push(t("features.prioritySupport"));
-          features.push(t("features.advancedAi"));
-        } else {
-          features.push(t("features.basicSupport"));
+        // API Access
+        if (plan.hasApiAccess) {
+          features.push(t("features.apiAccess"));
         }
+
+        // All plans get basic support
+        features.push(t("features.basicSupport"));
 
         const price = isAnnual
           ? parseFloat(plan.annualPrice)
@@ -101,11 +100,11 @@ export function PricingSection() {
           ctaLink: isFreePlan ? "/signup" : `/checkout?planId=${plan.id}`,
         };
       })
+      // Sort by backend sortOrder field
       .sort((a, b) => {
-        const order = ["free", "pro", "premium", "enterprise", "lifetime"];
-        const aIndex = order.findIndex((o) => a.name.toLowerCase().includes(o));
-        const bIndex = order.findIndex((o) => b.name.toLowerCase().includes(o));
-        return (aIndex === -1 ? 99 : aIndex) - (bIndex === -1 ? 99 : bIndex);
+        const aPlan = plans.find(p => p.id === a.planId);
+        const bPlan = plans.find(p => p.id === b.planId);
+        return (aPlan?.sortOrder ?? 999) - (bPlan?.sortOrder ?? 999);
       });
   }, [plans, isAnnual, t]);
 

@@ -2,11 +2,14 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
 
+# Enable pnpm via corepack
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 # Copy package files
 COPY package.json package-lock.json ./
 
-# Install all dependencies (needed for build)
-RUN npm ci
+# Import npm lockfile and install dependencies
+RUN pnpm import && pnpm install --frozen-lockfile
 
 # Stage 2: Build the application
 FROM node:20-alpine AS builder
@@ -15,11 +18,15 @@ WORKDIR /app
 # Build arguments for Next.js public environment variables
 # These MUST be provided at build time for NEXT_PUBLIC_* vars to work
 ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_BASE_URL
 ARG NEXT_PUBLIC_GA_MEASUREMENT_ID
 ARG NEXT_PUBLIC_CLARITY_PROJECT_ID
+ARG NEXT_TELEMETRY_DISABLED
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
 ENV NEXT_PUBLIC_GA_MEASUREMENT_ID=$NEXT_PUBLIC_GA_MEASUREMENT_ID
 ENV NEXT_PUBLIC_CLARITY_PROJECT_ID=$NEXT_PUBLIC_CLARITY_PROJECT_ID
+ENV NEXT_TELEMETRY_DISABLED=$NEXT_TELEMETRY_DISABLED
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
