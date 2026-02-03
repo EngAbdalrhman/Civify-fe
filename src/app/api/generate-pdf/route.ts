@@ -3,15 +3,62 @@
  *
  * This route renders resume HTML using headless Chrome and returns a high-quality PDF
  * with selectable text (ATS friendly) and identical rendering to browser preview.
+ *
+ * In development (Windows/Mac), uses the system-installed Chrome.
+ * In production (Linux containers), uses @sparticuz/chromium.
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import puppeteer from "puppeteer";
+import puppeteerCore from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 import {
   renderResumeHtml,
   type TemplateType,
 } from "@/features/resume-builder/utils/renderResumeHtml";
 import type { ResumeData } from "@/features/upload-cv/types";
+
+const isDev = process.env.NODE_ENV === "development";
+
+/**
+ * Get Chrome executable path based on environment
+ * - Development: Use locally installed Chrome
+ * - Production: Use @sparticuz/chromium bundled binary
+ */
+async function getChromePath(): Promise<string> {
+  if (isDev) {
+    // Common Chrome paths for different OS
+    const possiblePaths = [
+      // Windows
+      "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      process.env.LOCALAPPDATA + "\\Google\\Chrome\\Application\\chrome.exe",
+      // Mac
+      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      // Linux
+      "/usr/bin/google-chrome",
+      "/usr/bin/chromium-browser",
+    ];
+
+    // Try to find Chrome
+    for (const chromePath of possiblePaths) {
+      try {
+        const fs = await import("fs");
+        if (fs.existsSync(chromePath)) {
+          return chromePath;
+        }
+      } catch {
+        continue;
+      }
+    }
+
+    throw new Error(
+      "Chrome not found. Please install Google Chrome for local development.",
+    );
+  }
+
+  // Production: use @sparticuz/chromium
+  return await chromium.executablePath();
+}
 
 interface GeneratePdfRequest {
   resumeData: ResumeData;
@@ -41,16 +88,18 @@ export async function POST(request: NextRequest) {
     // Generate HTML from resume data
     const html = renderResumeHtml(resumeData, template, color);
 
-    // Launch Puppeteer
-    const browser = await puppeteer.launch({
+    // Launch Puppeteer with environment-appropriate Chrome
+    const executablePath = await getChromePath();
+    const browser = await puppeteerCore.launch({
+      args: isDev
+        ? ["--no-sandbox", "--disable-setuid-sandbox"]
+        : chromium.args,
+      executablePath,
       headless: true,
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
-        "--disable-gpu",
-        "--font-render-hinting=none",
-      ],
+      defaultViewport: {
+        width: 794, // A4 width in pixels at 96 DPI
+        height: 1123, // A4 height in pixels at 96 DPI
+      },
     });
 
     try {

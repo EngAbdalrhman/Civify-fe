@@ -36,7 +36,10 @@ export async function exportToPdfPuppeteer(
       }),
     });
 
-    if (!response.ok) {
+    // Check if response is JSON (error) instead of PDF
+    const contentType = response.headers.get("content-type") || "";
+
+    if (!response.ok || contentType.includes("application/json")) {
       const errorData = await response
         .json()
         .catch(() => ({ error: "Unknown error" }));
@@ -45,7 +48,20 @@ export async function exportToPdfPuppeteer(
       );
     }
 
+    // Verify we got a PDF (log warning instead of throwing)
+    if (
+      !contentType.includes("application/pdf") &&
+      !contentType.includes("octet-stream")
+    ) {
+      console.warn(`Unexpected content type: ${contentType}`);
+    }
+
     const blob = await response.blob();
+
+    // Verify blob is not empty
+    if (blob.size === 0) {
+      throw new Error("Received empty PDF file");
+    }
 
     // Use native download approach
     const url = URL.createObjectURL(blob);
