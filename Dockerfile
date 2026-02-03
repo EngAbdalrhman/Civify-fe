@@ -5,11 +5,11 @@ WORKDIR /app
 # Enable pnpm via corepack
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Copy package files
-COPY package.json package-lock.json ./
+# Copy package files and pnpm lockfile
+COPY package.json pnpm-lock.yaml ./
 
-# Import npm lockfile and install dependencies
-RUN pnpm import && pnpm install --frozen-lockfile
+# Install dependencies using pnpm lockfile
+RUN pnpm install --frozen-lockfile
 
 # Stage 2: Build the application
 FROM node:20-alpine AS builder
