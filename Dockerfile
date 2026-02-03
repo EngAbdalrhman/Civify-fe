@@ -2,14 +2,20 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
 
-# Enable pnpm via corepack
+# Install libc6-compat for Alpine compatibility
+RUN apk add --no-cache libc6-compat
+
+# Enable pnpm via corepack and set up environment
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Copy package files
-COPY package.json package-lock.json ./
+# Copy package files and pnpm lockfile
+COPY package.json pnpm-lock.yaml ./
 
-# Import npm lockfile and install dependencies
-RUN pnpm import && pnpm install --frozen-lockfile
+# Fetch dependencies first (better caching), then install
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm fetch --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --offline
 
 # Stage 2: Build the application
 FROM node:20-alpine AS builder
