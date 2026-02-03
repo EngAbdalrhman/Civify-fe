@@ -51,6 +51,17 @@ WORKDIR /app
 # Set NODE_ENV to production
 ENV NODE_ENV=production
 
+# Install Chromium dependencies required by @sparticuz/chromium
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    font-noto \
+    font-noto-arabic
+
 # Create a non-root user for security
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -59,6 +70,9 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Copy @sparticuz/chromium binary files (required for PDF generation)
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@sparticuz/chromium ./node_modules/@sparticuz/chromium
 
 # Switch to non-root user
 USER nextjs
