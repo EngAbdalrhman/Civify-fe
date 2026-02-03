@@ -13,7 +13,7 @@ export function MobileViewToggle({
   onToggle,
 }: MobileViewToggleProps) {
   return (
-    <div className="fixed bottom-6 right-6 z-50 md:hidden">
+    <div className="fixed bottom-6 right-6 z-50 lg:hidden">
       <Button
         onClick={onToggle}
         size="lg"
