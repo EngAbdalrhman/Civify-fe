@@ -43,7 +43,9 @@ export function AnalyticsProvider() {
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', '${gaId}');
+              gtag('config', '${gaId}', {
+                'referral_exclusion_domains': ['accounts.google.com']
+              });
             `}
           </Script>
         </>

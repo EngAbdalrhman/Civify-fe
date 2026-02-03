@@ -339,7 +339,9 @@
       "q2": "Can I cancel my subscription at any time?",
       "a2": "Yes, you can cancel your subscription at any time. Your access will continue until the end of your current billing period.",
       "q3": "What is the difference between CV generations and parsing?",
-      "a3": "CV generation creates a new CV from scratch or template. Parsing extracts data from an existing CV to populate your profile."
+      "a3": "CV generation creates a new CV from scratch or template. Parsing extracts data from an existing CV to populate your profile.",
+      "stillQuestions": "Still have questions?",
+      "contactSupportTeam": "Contact our support team"
     },
     "pricesNote": "Prices are in EGP. Local taxes may apply.",
     "termsOfService": "Terms of Service",

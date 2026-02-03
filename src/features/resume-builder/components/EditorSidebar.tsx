@@ -68,7 +68,7 @@ export function EditorSidebar({
 
   return (
     <div
-      className={`w-full md:w-[450px] shrink-0 border-r bg-card flex flex-col h-full z-10 shadow-xl ${mobileView === "editor" ? "flex" : "hidden"} md:flex`}
+      className={`w-full lg:w-[450px] shrink-0 border-r bg-card flex flex-col h-full z-10 shadow-xl ${mobileView === "editor" ? "flex" : "hidden"} lg:flex`}
     >
       {/* Header */}
       <div className="p-4 border-b flex items-center justify-between bg-card">

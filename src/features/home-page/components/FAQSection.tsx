@@ -45,9 +45,9 @@ export function FAQSection() {
         {/* Contact CTA */}
         <div className="mt-12 text-center">
           <p className="text-muted-foreground">
-            Still have questions?{" "}
+            {t('stillQuestions')}{" "}
             <a href="/contact" className="font-semibold text-primary hover:underline">
-              Contact our support team
+              {t('contactSupportTeam')}
             </a>
           </p>
         </div>
