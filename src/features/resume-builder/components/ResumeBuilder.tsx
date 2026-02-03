@@ -47,7 +47,7 @@ export function ResumeBuilder({
 
   return (
     <>
-      <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-background relative">
+      <div className="flex flex-col lg:flex-row h-screen overflow-hidden bg-background relative">
         {/* Mobile View Toggle */}
         <MobileViewToggle
           mobileView={builder.mobileView}
