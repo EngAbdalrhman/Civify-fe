@@ -13,6 +13,9 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 # Copy package files and pnpm lockfile
 COPY package.json pnpm-lock.yaml ./
 
+# Copy scripts folder needed for postinstall
+COPY scripts ./scripts
+
 # Fetch dependencies first (better caching), then install
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm fetch --frozen-lockfile
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --offline
