@@ -4,64 +4,55 @@
  * This route renders resume HTML using headless Chrome and returns a high-quality PDF
  * with selectable text (ATS friendly) and identical rendering to browser preview.
  *
- * In development (Windows/Mac), uses the system-installed Chrome.
- * In production (Linux containers), uses @sparticuz/chromium.
+ * In development: Uses regular puppeteer with bundled Chromium
+ * In production: Uses @sparticuz/chromium-min with hosted Chromium binary
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import puppeteerCore from "puppeteer-core";
-import chromium from "@sparticuz/chromium";
 import {
   renderResumeHtml,
   type TemplateType,
 } from "@/features/resume-builder/utils/renderResumeHtml";
 import type { ResumeData } from "@/features/upload-cv/types";
 
-const isDev = process.env.NODE_ENV === "development";
+// URL to the Chromium binary package hosted in /public
+// Falls back to an example URL if VERCEL_PROJECT_PRODUCTION_URL is not set
+const CHROMIUM_PACK_URL = process.env.NEXT_PUBLIC_BASE_URL
+  ? `${process.env.NEXT_PUBLIC_BASE_URL}/chromium-pack.tar`
+  : process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}/chromium-pack.tar`
+    : "https://github.com/gabenunez/puppeteer-on-vercel/raw/refs/heads/main/example/chromium-dont-use-in-prod.tar";
+
+// Cache the Chromium executable path to avoid re-downloading on subsequent requests
+let cachedExecutablePath: string | null = null;
+let downloadPromise: Promise<string> | null = null;
 
 /**
- * Get Chrome executable path based on environment
- * - Development: Use locally installed Chrome
- * - Production: Use @sparticuz/chromium bundled binary
+ * Downloads and caches the Chromium executable path for production.
+ * Uses a download promise to prevent concurrent downloads.
  */
-async function getChromePath(): Promise<string> {
-  if (isDev) {
-    // Common Chrome paths for different OS
-    const possiblePaths = [
-      // Windows
-      "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-      "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
-      process.env.LOCALAPPDATA + "\\Google\\Chrome\\Application\\chrome.exe",
-      // Mac
-      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-      // Linux
-      "/usr/bin/google-chrome",
-      "/usr/bin/chromium-browser",
-    ];
+async function getChromiumPath(): Promise<string> {
+  // Return cached path if available
+  if (cachedExecutablePath) return cachedExecutablePath;
 
-    // Try to find Chrome
-    for (const chromePath of possiblePaths) {
-      try {
-        const fs = await import("fs");
-        if (fs.existsSync(chromePath)) {
-          return chromePath;
-        }
-      } catch {
-        continue;
-      }
-    }
-
-    throw new Error(
-      "Chrome not found. Please install Google Chrome for local development.",
-    );
+  // Prevent concurrent downloads by reusing the same promise
+  if (!downloadPromise) {
+    const chromium = (await import("@sparticuz/chromium-min")).default;
+    downloadPromise = chromium
+      .executablePath(CHROMIUM_PACK_URL)
+      .then((path: string) => {
+        cachedExecutablePath = path;
+        console.log("Chromium path resolved:", path);
+        return path;
+      })
+      .catch((error: Error) => {
+        console.error("Failed to get Chromium path:", error);
+        downloadPromise = null; // Reset on error to allow retry
+        throw error;
+      });
   }
 
-  // Production: use system chromium if PUPPETEER_EXECUTABLE_PATH is set (Docker),
-  // otherwise fall back to @sparticuz/chromium
-  if (process.env.PUPPETEER_EXECUTABLE_PATH) {
-    return process.env.PUPPETEER_EXECUTABLE_PATH;
-  }
-  return await chromium.executablePath();
+  return downloadPromise;
 }
 
 interface GeneratePdfRequest {
@@ -72,6 +63,7 @@ interface GeneratePdfRequest {
 }
 
 export async function POST(request: NextRequest) {
+  let browser;
   try {
     const body: GeneratePdfRequest = await request.json();
 
@@ -92,71 +84,78 @@ export async function POST(request: NextRequest) {
     // Generate HTML from resume data
     const html = renderResumeHtml(resumeData, template, color);
 
-    // Launch Puppeteer with environment-appropriate Chrome
-    const executablePath = await getChromePath();
-
-    // Use consistent args for all environments (system chromium or @sparticuz/chromium)
-    const chromiumArgs = [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
-      "--single-process",
-      "--no-zygote",
-    ];
-
-    const browser = await puppeteerCore.launch({
-      args: chromiumArgs,
-      executablePath,
+    // Configure browser based on environment
+    const isProduction = process.env.NODE_ENV === "production";
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let puppeteer: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let launchOptions: any = {
       headless: true,
       defaultViewport: {
         width: 794, // A4 width in pixels at 96 DPI
         height: 1123, // A4 height in pixels at 96 DPI
       },
+    };
+
+    if (isProduction) {
+      // Production: Use puppeteer-core with downloaded Chromium binary
+      const chromium = (await import("@sparticuz/chromium-min")).default;
+      puppeteer = await import("puppeteer-core");
+      const executablePath = await getChromiumPath();
+      launchOptions = {
+        ...launchOptions,
+        args: chromium.args,
+        executablePath,
+      };
+      console.log("Launching browser with executable path:", executablePath);
+    } else {
+      // Local: Use regular puppeteer with bundled Chromium
+      puppeteer = await import("puppeteer");
+    }
+
+    // Launch browser and generate PDF
+    browser = await puppeteer.launch(launchOptions);
+    const page = await browser.newPage();
+
+    // Set content with wait for fonts
+    await page.setContent(html, {
+      waitUntil: ["networkidle0", "domcontentloaded"],
     });
 
-    try {
-      const page = await browser.newPage();
+    // Wait for fonts to fully load
+    await page.evaluateHandle("document.fonts.ready");
 
-      // Set content with wait for fonts
-      await page.setContent(html, {
-        waitUntil: ["networkidle0", "domcontentloaded"],
-      });
+    // Generate PDF
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      printBackground: true,
+      margin: {
+        top: "0",
+        right: "0",
+        bottom: "0",
+        left: "0",
+      },
+      preferCSSPageSize: true,
+    });
 
-      // Wait a bit for fonts to fully load
-      await page.evaluateHandle("document.fonts.ready");
+    // Close browser
+    await browser.close();
 
-      // Generate PDF
-      const pdfBuffer = await page.pdf({
-        format: "A4",
-        printBackground: true,
-        margin: {
-          top: "0",
-          right: "0",
-          bottom: "0",
-          left: "0",
-        },
-        preferCSSPageSize: true,
-      });
-
-      // Close browser
-      await browser.close();
-
-      // Return PDF as response - convert Uint8Array to Buffer for NextResponse
-      return new NextResponse(Buffer.from(pdfBuffer), {
-        status: 200,
-        headers: {
-          "Content-Type": "application/pdf",
-          "Content-Disposition": `attachment; filename="${filename}.pdf"`,
-          "Content-Length": pdfBuffer.length.toString(),
-        },
-      });
-    } catch (error) {
-      await browser.close();
-      throw error;
-    }
+    // Return PDF as response
+    return new NextResponse(Buffer.from(pdfBuffer), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="${filename}.pdf"`,
+        "Content-Length": pdfBuffer.length.toString(),
+      },
+    });
   } catch (error) {
     console.error("PDF generation error:", error);
+    // Always clean up browser resources
+    if (browser) {
+      await browser.close();
+    }
     return NextResponse.json(
       {
         error: "Failed to generate PDF",
