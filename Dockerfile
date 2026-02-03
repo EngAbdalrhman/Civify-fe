@@ -2,14 +2,11 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
 
-# Enable pnpm via corepack
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Copy package files and yarn lockfile
+COPY package.json yarn.lock ./
 
-# Copy package files and pnpm lockfile
-COPY package.json pnpm-lock.yaml ./
-
-# Install dependencies using pnpm lockfile
-RUN pnpm install --frozen-lockfile
+# Install dependencies using yarn
+RUN yarn install --frozen-lockfile
 
 # Stage 2: Build the application
 FROM node:20-alpine AS builder
