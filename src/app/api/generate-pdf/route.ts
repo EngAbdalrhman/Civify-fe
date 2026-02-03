@@ -56,7 +56,11 @@ async function getChromePath(): Promise<string> {
     );
   }
 
-  // Production: use @sparticuz/chromium
+  // Production: use system chromium if PUPPETEER_EXECUTABLE_PATH is set (Docker),
+  // otherwise fall back to @sparticuz/chromium
+  if (process.env.PUPPETEER_EXECUTABLE_PATH) {
+    return process.env.PUPPETEER_EXECUTABLE_PATH;
+  }
   return await chromium.executablePath();
 }
 
@@ -90,10 +94,19 @@ export async function POST(request: NextRequest) {
 
     // Launch Puppeteer with environment-appropriate Chrome
     const executablePath = await getChromePath();
+
+    // Use consistent args for all environments (system chromium or @sparticuz/chromium)
+    const chromiumArgs = [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-gpu",
+      "--single-process",
+      "--no-zygote",
+    ];
+
     const browser = await puppeteerCore.launch({
-      args: isDev
-        ? ["--no-sandbox", "--disable-setuid-sandbox"]
-        : chromium.args,
+      args: chromiumArgs,
       executablePath,
       headless: true,
       defaultViewport: {

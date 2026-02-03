@@ -71,8 +71,9 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy @sparticuz/chromium binary files (required for PDF generation)
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@sparticuz/chromium ./node_modules/@sparticuz/chromium
+# Set Puppeteer to use system chromium instead of bundled one
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 # Switch to non-root user
 USER nextjs
