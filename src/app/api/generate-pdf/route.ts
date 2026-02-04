@@ -15,27 +15,20 @@ import {
 } from "@/features/resume-builder/utils/renderResumeHtml";
 import type { ResumeData } from "@/features/upload-cv/types";
 
-// URL to the Chromium binary package hosted in /public
-// Requires NEXT_PUBLIC_BASE_URL to be set
-const getChromiumPackUrl = (): string => {
-  if (process.env.NEXT_PUBLIC_BASE_URL) {
-    return `https://${process.env.NEXT_PUBLIC_BASE_URL}/chromium-pack.tar`;
-  }
-  throw new Error(
-    "PDF generation requires NEXT_PUBLIC_BASE_URL environment variable to be set, " +
-      "and chromium-pack.tar to be present in the public folder.",
-  );
-};
-
-const CHROMIUM_PACK_URL =
-  process.env.NODE_ENV === "production" ? getChromiumPackUrl() : "";
+// Path to the Chromium binary package
+// In production (Docker): Use local file path since Next.js standalone doesn't serve large files well
+// In development: Use fallback GitHub URL or regular puppeteer
+const CHROMIUM_PACK_PATH =
+  process.env.NODE_ENV === "production"
+    ? "/app/public/chromium-pack.tar" // Local file path in Docker container
+    : "https://github.com/nicholasgriffintn/puppeteer-on-vercel/raw/refs/heads/main/example/chromium-dont-use-in-prod.tar";
 
 // Cache the Chromium executable path to avoid re-downloading on subsequent requests
 let cachedExecutablePath: string | null = null;
 let downloadPromise: Promise<string> | null = null;
 
 /**
- * Downloads and caches the Chromium executable path for production.
+ * Downloads and caches the Chromium executable path.
  * Uses a download promise to prevent concurrent downloads.
  */
 async function getChromiumPath(): Promise<string> {
@@ -46,13 +39,13 @@ async function getChromiumPath(): Promise<string> {
   if (!downloadPromise) {
     const chromium = (await import("@sparticuz/chromium-min")).default;
     downloadPromise = chromium
-      .executablePath(CHROMIUM_PACK_URL)
-      .then((path: string) => {
+      .executablePath(CHROMIUM_PACK_PATH)
+      .then((path) => {
         cachedExecutablePath = path;
         console.log("Chromium path resolved:", path);
         return path;
       })
-      .catch((error: Error) => {
+      .catch((error) => {
         console.error("Failed to get Chromium path:", error);
         downloadPromise = null; // Reset on error to allow retry
         throw error;
