@@ -5,7 +5,7 @@
  * with selectable text (ATS friendly) and identical rendering to browser preview.
  *
  * In development: Uses regular puppeteer with bundled Chromium
- * In production: Uses @sparticuz/chromium-min with hosted Chromium binary
+ * In production: Uses @sparticuz/chromium-min with local Chromium binary
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -16,14 +16,19 @@ import {
 import type { ResumeData } from "@/features/upload-cv/types";
 
 // Path to the Chromium binary package
-// In production (Docker): Use local file path since Next.js standalone doesn't serve large files well
+// In production (Docker): Use file:// URL to local tar file
 // In development: Use fallback GitHub URL or regular puppeteer
-const CHROMIUM_PACK_PATH =
-  process.env.NODE_ENV === "production"
-    ? "/app/public/chromium-pack.tar" // Absolute path: WORKDIR is /app, so public is at /app/public
-    : "https://github.com/nicholasgriffintn/puppeteer-on-vercel/raw/refs/heads/main/example/chromium-dont-use-in-prod.tar";
+const getChromiumPackPath = (): string => {
+  if (process.env.NODE_ENV === "production") {
+    // Use file:// protocol for local file access in Docker
+    // The file is at /app/public/chromium-pack.tar in the container
+    return "file:///app/public/chromium-pack.tar";
+  }
+  // Fallback for non-production environments
+  return "https://github.com/nicholasgriffintn/puppeteer-on-vercel/raw/refs/heads/main/example/chromium-dont-use-in-prod.tar";
+};
 
-// Cache the Chromium executable path to avoid re-downloading on subsequent requests
+const CHROMIUM_PACK_PATH = getChromiumPackPath();
 let cachedExecutablePath: string | null = null;
 let downloadPromise: Promise<string> | null = null;
 
