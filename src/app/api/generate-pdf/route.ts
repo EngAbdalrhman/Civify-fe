@@ -5,7 +5,7 @@
  * with selectable text (ATS friendly) and identical rendering to browser preview.
  *
  * In development: Uses regular puppeteer with bundled Chromium
- * In production: Uses @sparticuz/chromium-min with local Chromium binary
+ * In production: Uses pre-extracted Chromium binary from Docker build
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -14,54 +14,6 @@ import {
   type TemplateType,
 } from "@/features/resume-builder/utils/renderResumeHtml";
 import type { ResumeData } from "@/features/upload-cv/types";
-
-// Path to the Chromium binary package
-// In production (Docker): Use file:// URL to local tar file
-// In development: Use fallback GitHub URL or regular puppeteer
-const getChromiumPackPath = (): string => {
-  if (process.env.NODE_ENV === "production") {
-    // Use file:// protocol for local file access in Docker
-    // The file is at /app/public/chromium-pack.tar in the container
-    return "file:///app/public/chromium-pack.tar";
-  }
-  // Fallback for non-production environments
-  return "https://github.com/nicholasgriffintn/puppeteer-on-vercel/raw/refs/heads/main/example/chromium-dont-use-in-prod.tar";
-};
-
-const CHROMIUM_PACK_PATH = getChromiumPackPath();
-let cachedExecutablePath: string | null = null;
-let downloadPromise: Promise<string> | null = null;
-
-/**
- * Downloads and caches the Chromium executable path.
- * Uses a download promise to prevent concurrent downloads.
- */
-async function getChromiumPath(): Promise<string> {
-  // Return cached path if available
-  if (cachedExecutablePath) return cachedExecutablePath;
-
-  console.log("Getting Chromium path from:", CHROMIUM_PACK_PATH);
-  console.log("NODE_ENV:", process.env.NODE_ENV);
-
-  // Prevent concurrent downloads by reusing the same promise
-  if (!downloadPromise) {
-    const chromium = (await import("@sparticuz/chromium-min")).default;
-    downloadPromise = chromium
-      .executablePath(CHROMIUM_PACK_PATH)
-      .then((path) => {
-        cachedExecutablePath = path;
-        console.log("Chromium path resolved:", path);
-        return path;
-      })
-      .catch((error) => {
-        console.error("Failed to get Chromium path:", error);
-        downloadPromise = null; // Reset on error to allow retry
-        throw error;
-      });
-  }
-
-  return downloadPromise;
-}
 
 interface GeneratePdfRequest {
   resumeData: ResumeData;
@@ -106,10 +58,16 @@ export async function POST(request: NextRequest) {
     };
 
     if (isProduction) {
-      // Production: Use puppeteer-core with downloaded Chromium binary
+      // Production: Use puppeteer-core with pre-extracted Chromium binary
+      // The binary is extracted during Docker build and path is set via CHROMIUM_EXECUTABLE_PATH
       const chromium = (await import("@sparticuz/chromium-min")).default;
       puppeteer = await import("puppeteer-core");
-      const executablePath = await getChromiumPath();
+
+      // Use pre-extracted chromium path from Docker build
+      const executablePath =
+        process.env.CHROMIUM_EXECUTABLE_PATH || "/app/chromium/chromium";
+      console.log("Using pre-extracted Chromium at:", executablePath);
+
       launchOptions = {
         ...launchOptions,
         args: chromium.args,
