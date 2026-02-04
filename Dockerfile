@@ -13,9 +13,13 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 # Copy package files and pnpm lockfile
 COPY package.json pnpm-lock.yaml ./
 
+# Copy scripts folder needed for postinstall
+COPY scripts ./scripts
+
 # Fetch dependencies first (better caching), then install
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm fetch --frozen-lockfile
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --offline
+# Use --ignore-scripts to skip postinstall here; we run it in builder stage
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --offline --ignore-scripts
 
 # Stage 2: Build the application
 FROM node:20-alpine AS builder
@@ -40,6 +44,10 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copy all source files
 COPY . .
 
+# Run postinstall to create chromium-pack.tar in public folder
+# This must run AFTER source files are copied so the public/ folder exists
+RUN node scripts/postinstall.mjs
+
 # Build the Next.js application
 # This creates a standalone output for minimal runtime
 RUN npm run build
@@ -51,14 +59,29 @@ WORKDIR /app
 # Set NODE_ENV to production
 ENV NODE_ENV=production
 
+# Install minimal dependencies needed for chromium-min at runtime
+RUN apk add --no-cache \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    font-noto \
+    font-noto-arabic
+
 # Create a non-root user for security
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 # Copy necessary files from builder
-COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Verify chromium-pack.tar exists (will show in build logs)
+RUN ls -la ./public/chromium-pack.tar || echo "WARNING: chromium-pack.tar not found!"
+
+RUN ls -la ./ || echo "WARNING: chromium-pack.tar not found!"
 
 # Switch to non-root user
 USER nextjs
