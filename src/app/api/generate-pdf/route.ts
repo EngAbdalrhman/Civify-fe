@@ -20,7 +20,7 @@ import type { ResumeData } from "@/features/upload-cv/types";
 // In development: Use fallback GitHub URL or regular puppeteer
 const CHROMIUM_PACK_PATH =
   process.env.NODE_ENV === "production"
-    ? "/app/public/chromium-pack.tar" // Local file path in Docker container
+    ? "/public/chromium-pack.tar" // Local file path in Docker container
     : "https://github.com/nicholasgriffintn/puppeteer-on-vercel/raw/refs/heads/main/example/chromium-dont-use-in-prod.tar";
 
 // Cache the Chromium executable path to avoid re-downloading on subsequent requests
