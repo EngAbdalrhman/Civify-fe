@@ -19,7 +19,7 @@ import type { ResumeData } from "@/features/upload-cv/types";
 // Requires NEXT_PUBLIC_BASE_URL to be set
 const getChromiumPackUrl = (): string => {
   if (process.env.NEXT_PUBLIC_BASE_URL) {
-    return `${process.env.NEXT_PUBLIC_BASE_URL}/chromium-pack.tar`;
+    return `https://${process.env.NEXT_PUBLIC_BASE_URL}/chromium-pack.tar`;
   }
   throw new Error(
     "PDF generation requires NEXT_PUBLIC_BASE_URL environment variable to be set, " +
