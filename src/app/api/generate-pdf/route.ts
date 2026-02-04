@@ -16,12 +16,19 @@ import {
 import type { ResumeData } from "@/features/upload-cv/types";
 
 // URL to the Chromium binary package hosted in /public
-// Falls back to an example URL if VERCEL_PROJECT_PRODUCTION_URL is not set
-const CHROMIUM_PACK_URL = process.env.NEXT_PUBLIC_BASE_URL
-  ? `${process.env.NEXT_PUBLIC_BASE_URL}/chromium-pack.tar`
-  : process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}/chromium-pack.tar`
-    : "https://github.com/gabenunez/puppeteer-on-vercel/raw/refs/heads/main/example/chromium-dont-use-in-prod.tar";
+// Requires NEXT_PUBLIC_BASE_URL to be set
+const getChromiumPackUrl = (): string => {
+  if (process.env.NEXT_PUBLIC_BASE_URL) {
+    return `${process.env.NEXT_PUBLIC_BASE_URL}/chromium-pack.tar`;
+  }
+  throw new Error(
+    "PDF generation requires NEXT_PUBLIC_BASE_URL environment variable to be set, " +
+      "and chromium-pack.tar to be present in the public folder.",
+  );
+};
+
+const CHROMIUM_PACK_URL =
+  process.env.NODE_ENV === "production" ? getChromiumPackUrl() : "";
 
 // Cache the Chromium executable path to avoid re-downloading on subsequent requests
 let cachedExecutablePath: string | null = null;
