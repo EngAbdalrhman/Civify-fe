@@ -20,7 +20,7 @@ import type { ResumeData } from "@/features/upload-cv/types";
 // In development: Use fallback GitHub URL or regular puppeteer
 const CHROMIUM_PACK_PATH =
   process.env.NODE_ENV === "production"
-    ? "/public/chromium-pack.tar" // Local file path in Docker container
+    ? "/app/public/chromium-pack.tar" // Absolute path: WORKDIR is /app, so public is at /app/public
     : "https://github.com/nicholasgriffintn/puppeteer-on-vercel/raw/refs/heads/main/example/chromium-dont-use-in-prod.tar";
 
 // Cache the Chromium executable path to avoid re-downloading on subsequent requests
@@ -34,6 +34,9 @@ let downloadPromise: Promise<string> | null = null;
 async function getChromiumPath(): Promise<string> {
   // Return cached path if available
   if (cachedExecutablePath) return cachedExecutablePath;
+
+  console.log("Getting Chromium path from:", CHROMIUM_PACK_PATH);
+  console.log("NODE_ENV:", process.env.NODE_ENV);
 
   // Prevent concurrent downloads by reusing the same promise
   if (!downloadPromise) {
