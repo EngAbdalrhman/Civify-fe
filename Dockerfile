@@ -78,13 +78,15 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Extract chromium binary from tar and set executable path
-# This avoids the need to download at runtime
-RUN mkdir -p /app/chromium && \
+# Extract and decompress chromium binary from tar
+# The tar contains Brotli-compressed files (.br), we need to decompress them
+RUN apk add --no-cache brotli && \
+    mkdir -p /app/chromium && \
     tar -xf ./public/chromium-pack.tar -C /app/chromium && \
-    echo "=== Extracted contents ===" && \
-    ls -la /app/chromium/ && \
-    find /app/chromium -type f -name "*chromium*" -o -name "*chrome*" | head -10
+    brotli -d /app/chromium/chromium.br -o /app/chromium/chromium && \
+    chmod +x /app/chromium/chromium && \
+    rm /app/chromium/chromium.br && \
+    ls -la /app/chromium/
 
 # Set environment variable for the chromium executable path
 ENV CHROMIUM_EXECUTABLE_PATH=/app/chromium/chromium
