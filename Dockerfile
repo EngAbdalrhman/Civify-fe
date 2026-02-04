@@ -81,6 +81,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Verify chromium-pack.tar exists (will show in build logs)
 RUN ls -la ./public/chromium-pack.tar || echo "WARNING: chromium-pack.tar not found!"
 
+RUN ls -la ./ || echo "WARNING: chromium-pack.tar not found!"
+
 # Switch to non-root user
 USER nextjs
 
