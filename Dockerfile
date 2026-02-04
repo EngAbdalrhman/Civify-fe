@@ -82,8 +82,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # This avoids the need to download at runtime
 RUN mkdir -p /app/chromium && \
     tar -xf ./public/chromium-pack.tar -C /app/chromium && \
-    chmod +x /app/chromium/chromium && \
-    ls -la /app/chromium/
+    echo "=== Extracted contents ===" && \
+    ls -la /app/chromium/ && \
+    find /app/chromium -type f -name "*chromium*" -o -name "*chrome*" | head -10
 
 # Set environment variable for the chromium executable path
 ENV CHROMIUM_EXECUTABLE_PATH=/app/chromium/chromium
