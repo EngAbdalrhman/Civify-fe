@@ -18,7 +18,8 @@ COPY scripts ./scripts
 
 # Fetch dependencies first (better caching), then install
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm fetch --frozen-lockfile
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --offline
+# Use --ignore-scripts to skip postinstall here; we run it in builder stage
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --offline --ignore-scripts
 
 # Stage 2: Build the application
 FROM node:20-alpine AS builder
@@ -42,6 +43,10 @@ COPY --from=deps /app/node_modules ./node_modules
 
 # Copy all source files
 COPY . .
+
+# Run postinstall to create chromium-pack.tar in public folder
+# This must run AFTER source files are copied so the public/ folder exists
+RUN node scripts/postinstall.mjs
 
 # Build the Next.js application
 # This creates a standalone output for minimal runtime
