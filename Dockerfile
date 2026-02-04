@@ -86,7 +86,10 @@ RUN apk add --no-cache brotli && \
     brotli -d /app/chromium/chromium.br -o /app/chromium/chromium && \
     chmod +x /app/chromium/chromium && \
     rm /app/chromium/chromium.br && \
-    ls -la /app/chromium/
+    chown -R nextjs:nodejs /app/chromium && \
+    ls -la /app/chromium/ && \
+    echo "Chromium binary size:" && \
+    du -h /app/chromium/chromium
 
 # Set environment variable for the chromium executable path
 ENV CHROMIUM_EXECUTABLE_PATH=/app/chromium/chromium
