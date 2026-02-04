@@ -78,10 +78,15 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Verify chromium-pack.tar exists (will show in build logs)
-RUN ls -la ./public/chromium-pack.tar || echo "WARNING: chromium-pack.tar not found!"
+# Extract chromium binary from tar and set executable path
+# This avoids the need to download at runtime
+RUN mkdir -p /app/chromium && \
+    tar -xf ./public/chromium-pack.tar -C /app/chromium && \
+    chmod +x /app/chromium/chromium && \
+    ls -la /app/chromium/
 
-RUN ls -la ./ || echo "WARNING: chromium-pack.tar not found!"
+# Set environment variable for the chromium executable path
+ENV CHROMIUM_EXECUTABLE_PATH=/app/chromium/chromium
 
 # Switch to non-root user
 USER nextjs
