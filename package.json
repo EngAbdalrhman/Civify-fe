@@ -9,8 +9,7 @@
     "copy:standalone": "xcopy /E /I /Y .next\\static .next\\standalone\\.next\\static && xcopy /E /I /Y public .next\\standalone\\public",
     "start:standalone": "npm run copy:standalone && node .next/standalone/server.js",
     "lint": "biome check",
-    "format": "biome format --write",
-    "postinstall": "node scripts/postinstall.mjs"
+    "format": "biome format --write"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
