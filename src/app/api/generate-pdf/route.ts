@@ -55,7 +55,12 @@ export async function POST(request: NextRequest) {
       args: [
         "--no-sandbox",
         "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage", // Fixes crashes in low-memory Docker containers
+        "--disable-dev-shm-usage", // Handles memory issues
+        "--disable-gpu", // Crucial for headless mode
+        "--no-first-run",
+        "--no-zygote",
+        "--single-process", // Helps avoiding zombie processes
+        "--disable-extensions",
       ],
       headless: true,
       defaultViewport: {
