@@ -4,11 +4,11 @@
  * This route renders resume HTML using headless Chrome and returns a high-quality PDF
  * with selectable text (ATS friendly) and identical rendering to browser preview.
  *
- * In development: Uses regular puppeteer with bundled Chromium
- * In production: Uses pre-extracted Chromium binary from Docker build
+ * Uses installed browser in Docker container with required args for Docker environment.
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import puppeteer from "puppeteer-core";
 import {
   renderResumeHtml,
   type TemplateType,
@@ -24,6 +24,7 @@ interface GeneratePdfRequest {
 
 export async function POST(request: NextRequest) {
   let browser;
+
   try {
     const body: GeneratePdfRequest = await request.json();
 
@@ -44,65 +45,25 @@ export async function POST(request: NextRequest) {
     // Generate HTML from resume data
     const html = renderResumeHtml(resumeData, template, color);
 
-    // Configure browser based on environment
-    const isProduction = process.env.NODE_ENV === "production";
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let puppeteer: any;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let launchOptions: any = {
+    // Launch browser with Docker-compatible configuration
+    browser = await puppeteer.launch({
+      // Use installed browser in Docker (set via PUPPETEER_EXECUTABLE_PATH env var)
+      executablePath:
+        process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
+
+      // Required args for Docker
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage", // Fixes crashes in low-memory Docker containers
+      ],
       headless: true,
       defaultViewport: {
         width: 794, // A4 width in pixels at 96 DPI
         height: 1123, // A4 height in pixels at 96 DPI
       },
-    };
+    });
 
-    if (isProduction) {
-      // Production: Use puppeteer-core with pre-extracted Chromium binary
-      // The binary is extracted during Docker build and path is set via CHROMIUM_EXECUTABLE_PATH
-      const chromium = (await import("@sparticuz/chromium-min")).default;
-      const fs = await import("fs");
-      puppeteer = await import("puppeteer-core");
-
-      // Use pre-extracted chromium path from Docker build
-      const executablePath =
-        process.env.CHROMIUM_EXECUTABLE_PATH || "/app/chromium/chromium";
-      console.log("Using pre-extracted Chromium at:", executablePath);
-
-      // Verify file exists
-      if (fs.existsSync(executablePath)) {
-        console.log("✓ Chromium binary exists at:", executablePath);
-        const stats = fs.statSync(executablePath);
-        console.log("  File size:", stats.size, "bytes");
-        console.log("  File mode:", stats.mode.toString(8));
-      } else {
-        console.error("✗ Chromium binary NOT FOUND at:", executablePath);
-        // List directory contents for debugging
-        try {
-          const dir = "/app/chromium";
-          if (fs.existsSync(dir)) {
-            console.log("Contents of", dir + ":", fs.readdirSync(dir));
-          } else {
-            console.log("Directory", dir, "does not exist");
-          }
-        } catch (e) {
-          console.error("Error listing directory:", e);
-        }
-      }
-
-      launchOptions = {
-        ...launchOptions,
-        args: chromium.args,
-        executablePath,
-      };
-      console.log("Launching browser with executable path:", executablePath);
-    } else {
-      // Local: Use regular puppeteer with bundled Chromium
-      puppeteer = await import("puppeteer");
-    }
-
-    // Launch browser and generate PDF
-    browser = await puppeteer.launch(launchOptions);
     const page = await browser.newPage();
 
     // Set content with wait for fonts
@@ -126,9 +87,6 @@ export async function POST(request: NextRequest) {
       preferCSSPageSize: true,
     });
 
-    // Close browser
-    await browser.close();
-
     // Return PDF as response
     return new NextResponse(Buffer.from(pdfBuffer), {
       status: 200,
@@ -140,10 +98,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("PDF generation error:", error);
-    // Always clean up browser resources
-    if (browser) {
-      await browser.close();
-    }
     return NextResponse.json(
       {
         error: "Failed to generate PDF",
@@ -151,5 +105,7 @@ export async function POST(request: NextRequest) {
       },
       { status: 500 },
     );
+  } finally {
+    if (browser) await browser.close();
   }
 }
