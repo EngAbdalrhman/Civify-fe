@@ -47,11 +47,9 @@ export async function POST(request: NextRequest) {
 
     // Launch browser with Docker-compatible configuration
     browser = await puppeteer.launch({
-      // Use installed browser in Docker
+      // Use installed browser in Docker (set via PUPPETEER_EXECUTABLE_PATH env var)
       executablePath:
-        process.env.PUPPETEER_EXECUTABLE_PATH ||
-        "/usr/bin/google-chrome" ||
-        "/usr/bin/chromium",
+        process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
 
       // Required args for Docker
       args: [
@@ -66,52 +64,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    if (isProduction) {
-      // Production: Use puppeteer-core with pre-extracted Chromium binary
-      // The binary is extracted during Docker build and path is set via CHROMIUM_EXECUTABLE_PATH
-      const chromium = (await import("@sparticuz/chromium-min")).default;
-      const fs = await import("fs");
-      puppeteer = await import("puppeteer-core");
-
-      // Use pre-extracted chromium path from Docker build
-      const executablePath =
-        process.env.CHROMIUM_EXECUTABLE_PATH || "/app/chromium/chromium";
-      console.log("Using pre-extracted Chromium at:", executablePath);
-
-      // Verify file exists
-      if (fs.existsSync(executablePath)) {
-        console.log("✓ Chromium binary exists at:", executablePath);
-        const stats = fs.statSync(executablePath);
-        console.log("  File size:", stats.size, "bytes");
-        console.log("  File mode:", stats.mode.toString(8));
-      } else {
-        console.error("✗ Chromium binary NOT FOUND at:", executablePath);
-        // List directory contents for debugging
-        try {
-          const dir = "/app/chromium";
-          if (fs.existsSync(dir)) {
-            console.log("Contents of", dir + ":", fs.readdirSync(dir));
-          } else {
-            console.log("Directory", dir, "does not exist");
-          }
-        } catch (e) {
-          console.error("Error listing directory:", e);
-        }
-      }
-
-      launchOptions = {
-        ...launchOptions,
-        args: chromium.args,
-        executablePath,
-      };
-      console.log("Launching browser with executable path:", executablePath);
-    } else {
-      // Local: Use regular puppeteer with bundled Chromium
-      puppeteer = await import("puppeteer");
-    }
-
-    // Launch browser and generate PDF
-    browser = await puppeteer.launch(launchOptions);
     const page = await browser.newPage();
 
     // Set content with wait for fonts
