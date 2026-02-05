@@ -1,108 +1,75 @@
-# Stage 1: Install dependencies
-FROM node:20-alpine AS deps
-WORKDIR /app
-
-# Install libc6-compat for Alpine compatibility
-RUN apk add --no-cache libc6-compat
-
-# Enable pnpm via corepack and set up environment
+# -----------------------------------------------------------------------------
+# 1. Base Stage
+# -----------------------------------------------------------------------------
+FROM node:20-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable
 
-# Copy package files and pnpm lockfile
-COPY package.json pnpm-lock.yaml ./
-
-# Copy scripts folder needed for postinstall
-COPY scripts ./scripts
-
-# Fetch dependencies first (better caching), then install
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm fetch --frozen-lockfile
-# Use --ignore-scripts to skip postinstall here; we run it in builder stage
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --offline --ignore-scripts
-
-# Stage 2: Build the application
-FROM node:20-alpine AS builder
+# -----------------------------------------------------------------------------
+# 2. Deps Stage
+# -----------------------------------------------------------------------------
+FROM base AS deps
 WORKDIR /app
+COPY package.json pnpm-lock.yaml* ./
+RUN pnpm install --frozen-lockfile
 
-# Build arguments for Next.js public environment variables
-# These MUST be provided at build time for NEXT_PUBLIC_* vars to work
+# -----------------------------------------------------------------------------
+# 3. Builder Stage (ARGS ADDED HERE)
+# -----------------------------------------------------------------------------
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# --- NEW: Build Args & Envs ---
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_BASE_URL
 ARG NEXT_PUBLIC_GA_MEASUREMENT_ID
 ARG NEXT_PUBLIC_CLARITY_PROJECT_ID
 ARG NEXT_TELEMETRY_DISABLED
+
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
 ENV NEXT_PUBLIC_GA_MEASUREMENT_ID=$NEXT_PUBLIC_GA_MEASUREMENT_ID
 ENV NEXT_PUBLIC_CLARITY_PROJECT_ID=$NEXT_PUBLIC_CLARITY_PROJECT_ID
 ENV NEXT_TELEMETRY_DISABLED=$NEXT_TELEMETRY_DISABLED
+# ------------------------------
 
-# Copy dependencies from deps stage
-COPY --from=deps /app/node_modules ./node_modules
+RUN pnpm run build
 
-# Copy all source files
-COPY . .
-
-# Run postinstall to create chromium-pack.tar in public folder
-# This must run AFTER source files are copied so the public/ folder exists
-RUN node scripts/postinstall.mjs
-
-# Build the Next.js application
-# This creates a standalone output for minimal runtime
-RUN npm run build
-
-# Stage 3: Production runtime
-FROM node:20-alpine AS runner
+# -----------------------------------------------------------------------------
+# 4. Runner Stage
+# -----------------------------------------------------------------------------
+FROM node:20-slim AS runner
 WORKDIR /app
 
-# Set NODE_ENV to production
 ENV NODE_ENV=production
+# Re-declare Telemetry disabled for runtime efficiency
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Install minimal dependencies needed for chromium-min at runtime
-RUN apk add --no-cache \
-    nss \
-    freetype \
-    harfbuzz \
-    ca-certificates \
-    ttf-freefont \
-    font-noto \
-    font-noto-arabic
+# Install Puppeteer/Chromium dependencies
+RUN apt-get update \
+    && apt-get install -y wget gnupg \
+    && apt-get install -y chromium \
+    && apt-get install -y fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
+    && rm -rf /var/lib/apt/lists/*
 
-# Create a non-root user for security
+ENV PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium"
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy necessary files from builder
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Extract and decompress chromium binary from tar
-# The tar contains Brotli-compressed files (.br), we need to decompress them
-RUN apk add --no-cache brotli && \
-    mkdir -p /app/chromium && \
-    tar -xf ./public/chromium-pack.tar -C /app/chromium && \
-    brotli -d /app/chromium/chromium.br -o /app/chromium/chromium && \
-    chmod +x /app/chromium/chromium && \
-    rm /app/chromium/chromium.br && \
-    chown -R nextjs:nodejs /app/chromium && \
-    ls -la /app/chromium/ && \
-    echo "Chromium binary size:" && \
-    du -h /app/chromium/chromium
-
-# Set environment variable for the chromium executable path
-ENV CHROMIUM_EXECUTABLE_PATH=/app/chromium/chromium
-
-# Switch to non-root user
 USER nextjs
 
-# Expose the port Next.js runs on
 EXPOSE 3000
 
-# Set the port environment variable
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Start the Next.js application
 CMD ["node", "server.js"]
