@@ -85,16 +85,19 @@ interface GeneratePdfRequest {
 export async function POST(request: NextRequest) {
   let page: Awaited<ReturnType<Browser["newPage"]>> | null = null;
 
-export async function POST(req: NextRequest) {
   try {
-    // Parse the request body
-    const body = await req.json();
-    const { html } = body;
+    const body: GeneratePdfRequest = await request.json();
 
-    // 1. Input Validation
-    if (!html || typeof html !== "string") {
+    const {
+      resumeData,
+      template = "modern",
+      color = "#000000",
+      filename = "resume",
+    } = body;
+
+    if (!resumeData) {
       return NextResponse.json(
-        { error: 'Invalid input: "html" string is required.' },
+        { error: "Resume data is required" },
         { status: 400 },
       );
     }
@@ -132,11 +135,8 @@ export async function POST(req: NextRequest) {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": 'attachment; filename="cv.pdf"',
+        "Content-Disposition": `attachment; filename="${filename}.pdf"`,
         "Content-Length": pdfBuffer.length.toString(),
-        // Cache-Control: Prevent caching of dynamic user data
-        "Cache-Control":
-          "no-store, no-cache, must-revalidate, proxy-revalidate",
       },
     });
   } catch (error) {
