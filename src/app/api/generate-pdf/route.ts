@@ -1,20 +1,80 @@
 /**
  * PDF Generation API Route using Puppeteer
  *
- * This route renders resume HTML using headless Chrome and returns a high-quality PDF
- * with selectable text (ATS friendly) and identical rendering to browser preview.
+ * Uses a shared singleton Chromium instance — each request opens a new page (tab),
+ * not a new browser process. The browser auto-recovers if it crashes or disconnects.
  *
  * Uses installed browser in Docker container with required args for Docker environment.
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import puppeteer from "puppeteer-core";
+import puppeteer, { type Browser } from "puppeteer-core";
 import {
   renderResumeHtml,
   type TemplateType,
 } from "@/features/resume-builder/utils/renderResumeHtml";
 import type { ResumeData } from "@/features/upload-cv/types";
 
+// ---------------------------------------------------------------------------
+// Shared singleton browser instance
+// ---------------------------------------------------------------------------
+let browserInstance: Browser | null = null;
+let browserLaunchPromise: Promise<Browser> | null = null;
+
+async function getBrowser(): Promise<Browser> {
+  // If we already have a connected browser, reuse it
+  if (browserInstance && browserInstance.connected) {
+    return browserInstance;
+  }
+
+  // If a launch is already in progress, wait for it (prevents parallel launches)
+  if (browserLaunchPromise) {
+    return browserLaunchPromise;
+  }
+
+  browserLaunchPromise = (async () => {
+    const executablePath =
+      process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium";
+
+    const browser = await puppeteer.launch({
+      executablePath,
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+        "--disable-software-rasterizer",
+        "--font-render-hinting=none",
+        "--crash-dumps-dir=/tmp/chromium-crashes",
+        "--user-data-dir=/tmp/chromium-data",
+        "--disable-crash-reporter",
+        "--disable-breakpad",
+      ],
+      headless: true,
+      timeout: 30000,
+      defaultViewport: {
+        width: 794,
+        height: 1123,
+      },
+    });
+
+    // Auto-clear reference when the browser disconnects / crashes
+    browser.on("disconnected", () => {
+      browserInstance = null;
+      browserLaunchPromise = null;
+    });
+
+    browserInstance = browser;
+    browserLaunchPromise = null;
+    return browser;
+  })();
+
+  return browserLaunchPromise;
+}
+
+// ---------------------------------------------------------------------------
+// Route handler
+// ---------------------------------------------------------------------------
 interface GeneratePdfRequest {
   resumeData: ResumeData;
   template?: TemplateType;
@@ -23,7 +83,7 @@ interface GeneratePdfRequest {
 }
 
 export async function POST(request: NextRequest) {
-  let browser;
+  let page: Awaited<ReturnType<Browser["newPage"]>> | null = null;
 
   try {
     const body: GeneratePdfRequest = await request.json();
@@ -45,26 +105,9 @@ export async function POST(request: NextRequest) {
     // Generate HTML from resume data
     const html = renderResumeHtml(resumeData, template, color);
 
-    // Launch browser with Docker-compatible configuration
-    browser = await puppeteer.launch({
-      // Use installed browser in Docker (set via PUPPETEER_EXECUTABLE_PATH env var)
-      executablePath:
-        process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
-
-      // Required args for Docker
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage", // Fixes crashes in low-memory Docker containers
-      ],
-      headless: true,
-      defaultViewport: {
-        width: 794, // A4 width in pixels at 96 DPI
-        height: 1123, // A4 height in pixels at 96 DPI
-      },
-    });
-
-    const page = await browser.newPage();
+    // Get the shared browser and open a new page (tab) — NOT a new process
+    const browser = await getBrowser();
+    page = await browser.newPage();
 
     // Set content with wait for fonts
     await page.setContent(html, {
@@ -97,15 +140,25 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("PDF generation error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    console.error("PDF generation error:", errorMessage);
+    console.error("Full error:", error);
     return NextResponse.json(
       {
         error: "Failed to generate PDF",
-        details: error instanceof Error ? error.message : "Unknown error",
+        details: errorMessage,
       },
       { status: 500 },
     );
   } finally {
-    if (browser) await browser.close();
+    // Close only the page (tab), not the browser
+    if (page) {
+      try {
+        await page.close();
+      } catch {
+        // Page may already be closed if browser crashed — ignore
+      }
+    }
   }
 }

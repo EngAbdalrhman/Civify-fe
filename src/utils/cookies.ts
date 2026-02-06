@@ -69,16 +69,34 @@ export const getAccessToken = (): string | null => {
 };
 
 /**
+ * Detect if the API is on a different origin (cross-origin setup)
+ * When cross-origin, cookies need SameSite=None + Secure to be sent
+ */
+const isCrossOrigin = (): boolean => {
+  if (typeof window === "undefined") return false;
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
+  if (!apiUrl) return false;
+  try {
+    const apiOrigin = new URL(apiUrl).origin;
+    return apiOrigin !== window.location.origin;
+  } catch {
+    return false;
+  }
+};
+
+/**
  * Set the access token cookie
  * @param token - The access token value
  * @param maxAge - Token lifetime in seconds (default: 900 = 15 minutes)
  */
 export const setAccessToken = (token: string, maxAge: number = 900): void => {
+  // Match backend cookie settings: use SameSite=None for cross-origin, Lax for same-origin
+  const crossOrigin = isCrossOrigin();
   setCookie(ACCESS_TOKEN_COOKIE_NAME, token, {
     path: "/",
     maxAge,
     secure: true,
-    sameSite: "Lax",
+    sameSite: crossOrigin ? "None" : "Lax",
   });
 };
 

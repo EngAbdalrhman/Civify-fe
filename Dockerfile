@@ -56,7 +56,14 @@ RUN apt-get update \
        fonts-thai-tlwg \
        fonts-kacst \
        fonts-freefont-ttf \
+       fonts-liberation \
+       fonts-noto-color-emoji \
        libxss1 \
+       libgbm1 \
+       libnss3 \
+       libatk-bridge2.0-0 \
+       libgtk-3-0 \
+       libasound2 \
     && rm -rf /var/lib/apt/lists/*
 
 # Set Puppeteer environment variables
@@ -66,6 +73,14 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
+
+# Create writable directories for Chromium crash handler, user data, and XDG dirs
+RUN mkdir -p /tmp/chromium-crashes /tmp/chromium-data /tmp/.chromium \
+    && chown -R nextjs:nodejs /tmp/chromium-crashes /tmp/chromium-data /tmp/.chromium
+
+# Set XDG directories so chrome_crashpad_handler can find a writable database path
+ENV XDG_CONFIG_HOME=/tmp/.chromium
+ENV XDG_CACHE_HOME=/tmp/.chromium
 
 # Copy built application
 COPY --from=builder /app/public ./public

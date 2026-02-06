@@ -8,9 +8,11 @@ import {
 // Constants
 const MAX_REFRESH_RETRIES = 3;
 const DEFAULT_TIMEOUT = 30000;
+const REFRESH_TIMEOUT_MS = 30000; // Safety timeout to reset isRefreshing if stuck
 
 // Flag to prevent multiple simultaneous refresh attempts
 let isRefreshing = false;
+let refreshTimeoutId: ReturnType<typeof setTimeout> | null = null;
 // Counter for refresh retry attempts
 let refreshRetryCount = 0;
 // Queue of requests waiting for token refresh
@@ -330,9 +332,10 @@ const handle401Error = async <T>(
   }
 
   if (url.includes("/auth/refresh")) {
-    console.log("[Auth] 401 on refresh endpoint - DEBUG: Skipping redirect");
-    // TODO: Re-enable after debugging
-    // clearAuthAndRedirect();
+    console.log(
+      "[Auth] 401 on refresh endpoint - refresh token is invalid/expired",
+    );
+    clearAuthAndRedirect();
     throw new Error("Refresh token expired");
   }
 
@@ -360,6 +363,19 @@ const handle401Error = async <T>(
 
   isRefreshing = true;
 
+  // Safety timeout: reset isRefreshing flag if refresh hangs
+  if (refreshTimeoutId) clearTimeout(refreshTimeoutId);
+  refreshTimeoutId = setTimeout(() => {
+    if (isRefreshing) {
+      console.log(
+        "[Auth] Refresh safety timeout reached, resetting isRefreshing flag",
+      );
+      isRefreshing = false;
+      refreshRetryCount = 0;
+      onTokenRefreshFailed(new Error("Refresh timeout"));
+    }
+  }, REFRESH_TIMEOUT_MS);
+
   try {
     // Reset retry count before starting refresh attempts
     refreshRetryCount = 0;
@@ -367,6 +383,10 @@ const handle401Error = async <T>(
     const accessToken = await attemptTokenRefresh();
 
     isRefreshing = false;
+    if (refreshTimeoutId) {
+      clearTimeout(refreshTimeoutId);
+      refreshTimeoutId = null;
+    }
     onTokenRefreshed(accessToken);
 
     // Retry original request with new token
@@ -374,17 +394,18 @@ const handle401Error = async <T>(
     headers.set("Authorization", `Bearer ${accessToken}`);
     return await apiClient<T>(url, { ...options, headers, _retry: true });
   } catch (refreshError) {
-    console.log(
-      "[Auth] Token refresh failed after all retries - DEBUG: Skipping redirect",
-    );
+    console.log("[Auth] Token refresh failed after all retries");
     isRefreshing = false;
+    if (refreshTimeoutId) {
+      clearTimeout(refreshTimeoutId);
+      refreshTimeoutId = null;
+    }
     onTokenRefreshFailed(
       refreshError instanceof Error
         ? refreshError
         : new Error("Refresh failed"),
     );
-    // TODO: Re-enable after debugging
-    // clearAuthAndRedirect();
+    clearAuthAndRedirect();
     throw refreshError;
   }
 };

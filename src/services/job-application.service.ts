@@ -47,5 +47,10 @@ export const JobApplicationService = {
 
   delete: async (id: number): Promise<void> => {
     await apiClient.delete(`/v1/job-applications/${id}`);
+  },
+
+  scrapeJd: async (url: string): Promise<string> => {
+    const response = await apiClient.post<{ content: string }>('/v1/job-applications/scrape-jd', { url });
+    return response.data.content;
   }
 };
