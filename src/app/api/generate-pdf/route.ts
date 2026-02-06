@@ -48,6 +48,7 @@ async function getBrowser(): Promise<Browser> {
         "--crash-dumps-dir=/tmp/chromium-crashes",
         "--user-data-dir=/tmp/chromium-data",
         "--disable-crash-reporter",
+        "--disable-breakpad",
       ],
       headless: true,
       timeout: 30000,
