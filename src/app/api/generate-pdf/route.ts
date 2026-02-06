@@ -59,8 +59,10 @@ export async function POST(request: NextRequest) {
         "--disable-dev-shm-usage", // Use /tmp instead of /dev/shm (limited in Docker)
         "--disable-gpu", // No GPU available in Docker containers
         "--disable-software-rasterizer",
-        "--single-process", // Reduces memory footprint in containers
         "--font-render-hinting=none", // Consistent font rendering
+        "--crash-dumps-dir=/tmp/chromium-crashes", // Writable dir for crash handler
+        "--user-data-dir=/tmp/chromium-data", // Writable user data dir for non-root user
+        "--disable-crash-reporter", // Disable crash reporter entirely in production
       ],
       headless: true,
       timeout: 30000, // 30s launch timeout

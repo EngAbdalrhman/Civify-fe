@@ -74,6 +74,10 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+# Create writable directories for Chromium crash handler and user data
+RUN mkdir -p /tmp/chromium-crashes /tmp/chromium-data \
+    && chown -R nextjs:nodejs /tmp/chromium-crashes /tmp/chromium-data
+
 # Copy built application
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
