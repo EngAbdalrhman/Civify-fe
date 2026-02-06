@@ -120,6 +120,8 @@ export default function UploadPage() {
     number | null
   >(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [jdUrl, setJdUrl] = useState("");
+  const [isScraping, setIsScraping] = useState(false);
 
   // Resume selector state
   const [showResumeSelector, setShowResumeSelector] = useState(false);
@@ -413,6 +415,34 @@ export default function UploadPage() {
     includeRoadmap,
     tailorCv,
   ]);
+
+  const handleScrapeJd = useCallback(async () => {
+    if (!jdUrl) return;
+
+    // Basic URL validation
+    try {
+      new URL(jdUrl);
+    } catch (_) {
+      toast.error(t("errors.invalidUrl") || "Invalid URL");
+      return;
+    }
+
+    setIsScraping(true);
+    try {
+      const content = await JobApplicationService.scrapeJd(jdUrl);
+      if (content) {
+        setJobDescription(content);
+        toast.success(t("scrapeSuccess") || "Job description imported!");
+      } else {
+        toast.error(t("errors.scrapeEmpty") || "No content found");
+      }
+    } catch (error) {
+      console.error("Scrape failed:", error);
+      toast.error(t("errors.scrapeFailed") || "Failed to import job description");
+    } finally {
+      setIsScraping(false);
+    }
+  }, [jdUrl, t]);
 
   // Update personal info
   const updatePersonalInfo = useCallback((field: string, value: string) => {
@@ -1377,6 +1407,34 @@ export default function UploadPage() {
                   />
                 </div>
               </div>
+              
+               <div className="space-y-2">
+                <Label>{t("upload.importUrl") || "Import from URL"}</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={jdUrl}
+                    onChange={(e) => setJdUrl(e.target.value)}
+                    placeholder="https://linkedin.com/jobs/..."
+                    disabled={isScraping}
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={handleScrapeJd}
+                    disabled={!jdUrl || isScraping}
+                  >
+                    {isScraping ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Download className="h-4 w-4 mr-2" />
+                    )}
+                    {t("actions.import") || "Import"}
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {t("upload.importUrlDesc") || "Paste a LinkedIn or Indeed job URL to automatically extract the description."}
+                </p>
+              </div>
+
               <div className="space-y-2">
                 <Label>{t("upload.jobDescLabel")} *</Label>
                 <Textarea

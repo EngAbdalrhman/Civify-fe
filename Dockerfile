@@ -75,28 +75,23 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# ------------------------------------------------------------------------------
-# 4.1 Install Google Chrome Stable and System Dependencies
-# ------------------------------------------------------------------------------
-# We install:
-# 1. curl/gnupg: To fetch the Google signing key.
-# 2. google-chrome-stable: The browser itself. This automatically pulls in 
-#    critical libs like libnss3, libatk, libX11, etc.
-# 3. fonts-liberation: Metric-compatible fonts for Arial/Times.
-# 4. dumb-init: A lightweight init system to prevent zombie processes.
-# ------------------------------------------------------------------------------
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    gnupg \
-    ca-certificates \
-    dumb-init \
-    fonts-liberation \
-    libu2f-udev \
-    libvulkan1 \
-    && curl -fSsL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor | tee /usr/share/keyrings/google-chrome.gpg >> /dev/null \
-    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends google-chrome-stable \
+# Install Chromium and required dependencies for Puppeteer
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       chromium \
+       fonts-ipafont-gothic \
+       fonts-wqy-zenhei \
+       fonts-thai-tlwg \
+       fonts-kacst \
+       fonts-freefont-ttf \
+       fonts-liberation \
+       fonts-noto-color-emoji \
+       libxss1 \
+       libgbm1 \
+       libnss3 \
+       libatk-bridge2.0-0 \
+       libgtk-3-0 \
+       libasound2 \
     && rm -rf /var/lib/apt/lists/*
 
 # ------------------------------------------------------------------------------
@@ -115,10 +110,15 @@ RUN groupadd --system --gid 1001 nodejs && \
     mkdir -p /app/.next/cache && \
     chown -R nextjs:nodejs /app
 
-# ------------------------------------------------------------------------------
-# 4.4 Copy Artifacts from Builder
-# ------------------------------------------------------------------------------
-# Copy public assets (images, fonts)
+# Create writable directories for Chromium crash handler, user data, and XDG dirs
+RUN mkdir -p /tmp/chromium-crashes /tmp/chromium-data /tmp/.chromium \
+    && chown -R nextjs:nodejs /tmp/chromium-crashes /tmp/chromium-data /tmp/.chromium
+
+# Set XDG directories so chrome_crashpad_handler can find a writable database path
+ENV XDG_CONFIG_HOME=/tmp/.chromium
+ENV XDG_CACHE_HOME=/tmp/.chromium
+
+# Copy built application
 COPY --from=builder /app/public ./public
 # Copy the standalone server and static files
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./

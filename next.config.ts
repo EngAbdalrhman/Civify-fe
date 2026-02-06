@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
   output: "standalone", // Required for Docker deployment
-  // Required: Prevents Next.js from bundling the puppeteer library
+  // Prevents Next.js from bundling puppeteer-core (moved from experimental in Next.js 15+)
   serverExternalPackages: ["puppeteer-core"],
 };
 

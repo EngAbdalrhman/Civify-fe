@@ -196,6 +196,8 @@
     "authRequired": "Please sign in to upload and tailor your CV",
     "uploadCv": "Upload your CV",
     "uploadCvDesc": "Drag and drop a PDF or DOCX file (max 5MB), or click to browse. We'll extract your details automatically.",
+    "importUrl": "Import from URL",
+    "importUrlDesc": "Paste a job post URL (LinkedIn, Indeed, etc.) or just plain text.",
     "steps": {
       "uploadCv": "Upload CV",
       "reviewData": "Review Data",
@@ -273,9 +275,9 @@
       "generating": "Generating...",
       "downloadPdf": "Download PDF",
       "downloadDocx": "Download DOCX",
-      "addSection": "Add Section",
       "saveToResumes": "Save to My Resumes",
       "trackApplication": "Track Application",
+      "import": "Import",
       "startOver": "Start Over"
     },
     "result": {
@@ -301,6 +303,10 @@
     "errors": {
       "invalidFileType": "Please upload a PDF or DOCX file",
       "parseFailed": "Failed to parse CV data",
+      "tailorFailed": "Failed to tailor CV",
+      "INTERNAL_SERVER_ERROR": "Something went wrong. Please try again later.",
+      "FILE_TOO_LARGE": "File is too large. Maximum size is 5MB.",
+      "DEFAULT": "An unexpected error occurred.",
       "exportPdfFailed": "Failed to download PDF. Please try again.",
       "exportDocxFailed": "Failed to download DOCX. Please try again.",
       "saveFailed": "Failed to save CV. Please try again.",
