@@ -46,18 +46,24 @@ export async function POST(request: NextRequest) {
     const html = renderResumeHtml(resumeData, template, color);
 
     // Launch browser with Docker-compatible configuration
-    browser = await puppeteer.launch({
-      // Use installed browser in Docker (set via PUPPETEER_EXECUTABLE_PATH env var)
-      executablePath:
-        process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
+    const executablePath =
+      process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium";
 
-      // Required args for Docker
+    browser = await puppeteer.launch({
+      executablePath,
+
+      // Required args for headless Chromium in Docker
       args: [
         "--no-sandbox",
         "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage", // Fixes crashes in low-memory Docker containers
+        "--disable-dev-shm-usage", // Use /tmp instead of /dev/shm (limited in Docker)
+        "--disable-gpu", // No GPU available in Docker containers
+        "--disable-software-rasterizer",
+        "--single-process", // Reduces memory footprint in containers
+        "--font-render-hinting=none", // Consistent font rendering
       ],
       headless: true,
+      timeout: 30000, // 30s launch timeout
       defaultViewport: {
         width: 794, // A4 width in pixels at 96 DPI
         height: 1123, // A4 height in pixels at 96 DPI
@@ -97,11 +103,17 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("PDF generation error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    const execPath =
+      process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium";
+    console.error("PDF generation error:", errorMessage);
+    console.error("Chromium path:", execPath);
+    console.error("Full error:", error);
     return NextResponse.json(
       {
         error: "Failed to generate PDF",
-        details: error instanceof Error ? error.message : "Unknown error",
+        details: errorMessage,
       },
       { status: 500 },
     );

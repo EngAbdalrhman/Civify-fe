@@ -56,7 +56,14 @@ RUN apt-get update \
        fonts-thai-tlwg \
        fonts-kacst \
        fonts-freefont-ttf \
+       fonts-liberation \
+       fonts-noto-color-emoji \
        libxss1 \
+       libgbm1 \
+       libnss3 \
+       libatk-bridge2.0-0 \
+       libgtk-3-0 \
+       libasound2 \
     && rm -rf /var/lib/apt/lists/*
 
 # Set Puppeteer environment variables
