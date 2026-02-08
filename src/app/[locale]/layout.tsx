@@ -7,6 +7,7 @@ import { routing } from "@/i18n/routing";
 import { QueryProvider } from "@/providers/query-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { PermissionProvider } from "@/contexts/PermissionContext";
+
 import LayoutWrapper from "@/components/LayoutWrapper";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import "../globals.css";
