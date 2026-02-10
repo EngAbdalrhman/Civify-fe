@@ -26,11 +26,7 @@ import apiClient from "@/api/client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getAccessToken } from "@/utils/cookies";
-import {
-  WelcomeModal,
-  OnboardingWizard,
-  OnboardingProvider,
-} from "@/features/onboarding";
+import { OnboardingProvider } from "@/features/onboarding";
 
 export default function UserDashboardLayout({
   children,
@@ -375,10 +371,6 @@ export default function UserDashboardLayout({
             </main>
           </div>
         </div>
-
-        {/* Onboarding Components */}
-        {isAuthenticated && <WelcomeModal />}
-        <OnboardingWizard />
       </div>
     </OnboardingProvider>
   );

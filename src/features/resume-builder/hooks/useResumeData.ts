@@ -5,7 +5,6 @@ import { ResumeData, emptyResumeData } from "@/features/upload-cv/types";
 import { ResumeService } from "@/services/resume.service";
 import { toast } from "sonner";
 import { STORAGE_KEY } from "../utils/constants";
-import { ONBOARDING_RESUME_DATA_KEY } from "@/features/onboarding/types";
 
 interface UseResumeDataReturn {
   initialData: ResumeData | null;
@@ -67,36 +66,7 @@ export function useResumeData(): UseResumeDataReturn {
           }
         }
 
-        // Priority 3: Check for onboarding data and apply to fresh resume
-        const onboardingDataStr = localStorage.getItem(
-          ONBOARDING_RESUME_DATA_KEY,
-        );
-        if (onboardingDataStr) {
-          try {
-            const onboardingData = JSON.parse(onboardingDataStr);
-            // Create initial data with onboarding selections applied
-            const initialWithOnboarding: ResumeData = {
-              ...emptyResumeData,
-              personalInfo: {
-                ...emptyResumeData.personalInfo,
-                jobTitle: onboardingData.targetJobTitle || "",
-              },
-              metadata: {
-                ...emptyResumeData.metadata,
-                templateId: onboardingData.selectedTemplate || "modern",
-              },
-            };
-            // Clear the onboarding data after consuming it
-            setInitialData(initialWithOnboarding);
-            setIsLoading(false);
-            return;
-          } catch (e) {
-            console.error("Failed to parse onboarding resume data", e);
-            localStorage.removeItem(ONBOARDING_RESUME_DATA_KEY);
-          }
-        }
-
-        // Priority 4: Start fresh
+        // Priority 3: Start fresh
         setInitialData(emptyResumeData);
       } finally {
         setIsLoading(false);

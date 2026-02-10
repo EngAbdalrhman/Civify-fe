@@ -194,6 +194,11 @@ const fetchWithTimeout = async (
 // Check if we should use the local proxy (development mode)
 const shouldUseProxy = (): boolean => {
   if (typeof window === "undefined") return false; // SSR should call backend directly
+
+  // Allow explicit override via env var
+  if (process.env.NEXT_PUBLIC_USE_PROXY === "true") return true;
+  if (process.env.NEXT_PUBLIC_USE_PROXY === "false") return false;
+
   // Use proxy in development to solve cross-origin cookie issues
   return process.env.NODE_ENV === "development";
 };

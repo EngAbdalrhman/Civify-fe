@@ -10,28 +10,18 @@ import {
 } from "react";
 import {
   OnboardingState,
-  OnboardingGoal,
+  PrimaryIntent,
+  UserOnboardingProfile,
   ONBOARDING_STORAGE_KEY,
   ONBOARDING_COMPLETED_KEY,
-  ONBOARDING_RESUME_DATA_KEY,
-  ONBOARDING_STEPS,
+  ONBOARDING_PROFILE_KEY,
 } from "../types";
+import { trackOnboardingEvent } from "../utils/trackOnboardingEvent";
 
 interface OnboardingContextValue extends OnboardingState {
-  startOnboarding: () => void;
-  setGoal: (goal: OnboardingGoal) => void;
-  setTargetJob: (title: string, company?: string, description?: string) => void;
-  setTemplate: (templateId: string) => void;
-  setHasExistingCv: (value: boolean) => void;
-  nextStep: () => void;
-  prevStep: () => void;
-  goToStep: (step: number) => void;
-  completeOnboarding: (data?: {
-    targetJobTitle?: string;
-    targetCompany?: string;
-    jobDescription?: string;
-    selectedTemplate?: string;
-  }) => void;
+  setPrimaryIntent: (intent: PrimaryIntent) => void;
+  setProfile: (updates: Partial<UserOnboardingProfile>) => void;
+  completeOnboarding: () => void;
   skipOnboarding: () => void;
   resetOnboarding: () => void;
   hasCompletedOnboarding: boolean;
@@ -39,10 +29,9 @@ interface OnboardingContextValue extends OnboardingState {
 
 const initialState: OnboardingState = {
   isActive: false,
-  goal: null,
-  currentStep: 0,
-  totalSteps: ONBOARDING_STEPS.length,
-  hasExistingCv: false,
+  onboardingCompleted: false,
+  primaryIntent: null,
+  profile: {},
 };
 
 const OnboardingContext = createContext<OnboardingContextValue | null>(null);
@@ -57,6 +46,21 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
 
     const completed = localStorage.getItem(ONBOARDING_COMPLETED_KEY);
     if (completed === "true") {
+      const profileData = localStorage.getItem(ONBOARDING_PROFILE_KEY);
+      let profile: UserOnboardingProfile = {};
+      if (profileData) {
+        try {
+          profile = JSON.parse(profileData);
+        } catch {
+          // ignore
+        }
+      }
+      setState((prev) => ({
+        ...prev,
+        onboardingCompleted: true,
+        primaryIntent: profile.primaryIntent || null,
+        profile,
+      }));
       setHasCompletedOnboarding(true);
       return;
     }
@@ -80,96 +84,64 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     }
   }, [state]);
 
-  const startOnboarding = useCallback(() => {
-    setState({ ...initialState, isActive: true });
-  }, []);
-
-  const setGoal = useCallback((goal: OnboardingGoal) => {
-    setState((prev) => ({ ...prev, goal }));
-  }, []);
-
-  const setTargetJob = useCallback(
-    (title: string, company?: string, description?: string) => {
-      setState((prev) => ({
-        ...prev,
-        targetJobTitle: title,
-        targetCompany: company,
-        jobDescription: description,
-      }));
-    },
-    [],
-  );
-
-  const setTemplate = useCallback((templateId: string) => {
-    setState((prev) => ({ ...prev, selectedTemplate: templateId }));
-  }, []);
-
-  const setHasExistingCv = useCallback((value: boolean) => {
-    setState((prev) => ({ ...prev, hasExistingCv: value }));
-  }, []);
-
-  const nextStep = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      currentStep: Math.min(prev.currentStep + 1, prev.totalSteps - 1),
-    }));
-  }, []);
-
-  const prevStep = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      currentStep: Math.max(prev.currentStep - 1, 0),
-    }));
-  }, []);
-
-  const goToStep = useCallback((step: number) => {
-    setState((prev) => ({
-      ...prev,
-      currentStep: Math.max(0, Math.min(step, prev.totalSteps - 1)),
-    }));
-  }, []);
-
-  const completeOnboarding = useCallback(
-    (data?: {
-      targetJobTitle?: string;
-      targetCompany?: string;
-      jobDescription?: string;
-      selectedTemplate?: string;
-    }) => {
+  const setPrimaryIntent = useCallback((intent: PrimaryIntent) => {
+    setState((prev) => {
+      const newProfile = { ...prev.profile, primaryIntent: intent };
       if (typeof window !== "undefined") {
-        // Save onboarding data for resume builder to consume
-        // Use passed data if available (to avoid stale closure), otherwise fallback to state
-        const resumeData = {
-          targetJobTitle: data?.targetJobTitle ?? state.targetJobTitle,
-          targetCompany: data?.targetCompany ?? state.targetCompany,
-          jobDescription: data?.jobDescription ?? state.jobDescription,
-          selectedTemplate: data?.selectedTemplate ?? state.selectedTemplate,
-        };
         localStorage.setItem(
-          ONBOARDING_RESUME_DATA_KEY,
-          JSON.stringify(resumeData),
+          ONBOARDING_PROFILE_KEY,
+          JSON.stringify(newProfile),
         );
-
-        localStorage.setItem(ONBOARDING_COMPLETED_KEY, "true");
-        localStorage.removeItem(ONBOARDING_STORAGE_KEY);
       }
-      setState(initialState);
-      setHasCompletedOnboarding(true);
-    },
-    [
-      state.targetJobTitle,
-      state.targetCompany,
-      state.jobDescription,
-      state.selectedTemplate,
-    ],
-  );
+      return { ...prev, primaryIntent: intent, profile: newProfile };
+    });
+    trackOnboardingEvent("primary_intent_selected", { primaryIntent: intent });
+  }, []);
+
+  const setProfile = useCallback((updates: Partial<UserOnboardingProfile>) => {
+    setState((prev) => {
+      const newProfile = { ...prev.profile, ...updates };
+      if (typeof window !== "undefined") {
+        localStorage.setItem(
+          ONBOARDING_PROFILE_KEY,
+          JSON.stringify(newProfile),
+        );
+      }
+      return { ...prev, profile: newProfile };
+    });
+  }, []);
+
+  const completeOnboarding = useCallback(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(ONBOARDING_COMPLETED_KEY, "true");
+      localStorage.removeItem(ONBOARDING_STORAGE_KEY);
+    }
+
+    trackOnboardingEvent("onboarding_completed", {
+      primaryIntent: state.primaryIntent || undefined,
+      industry: state.profile.industry,
+    });
+
+    setState((prev) => ({
+      ...initialState,
+      onboardingCompleted: true,
+      primaryIntent: prev.primaryIntent,
+      profile: prev.profile,
+    }));
+    setHasCompletedOnboarding(true);
+  }, [state.primaryIntent, state.profile]);
 
   const skipOnboarding = useCallback(() => {
     if (typeof window !== "undefined") {
       localStorage.setItem(ONBOARDING_COMPLETED_KEY, "true");
       localStorage.removeItem(ONBOARDING_STORAGE_KEY);
     }
-    setState(initialState);
+    setState((prev) => ({
+      ...initialState,
+      onboardingCompleted: true,
+      primaryIntent: prev.primaryIntent,
+      profile: prev.profile,
+    }));
     setHasCompletedOnboarding(true);
   }, []);
 
@@ -177,6 +149,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     if (typeof window !== "undefined") {
       localStorage.removeItem(ONBOARDING_COMPLETED_KEY);
       localStorage.removeItem(ONBOARDING_STORAGE_KEY);
+      localStorage.removeItem(ONBOARDING_PROFILE_KEY);
     }
     setState(initialState);
     setHasCompletedOnboarding(false);
@@ -186,14 +159,8 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     <OnboardingContext.Provider
       value={{
         ...state,
-        startOnboarding,
-        setGoal,
-        setTargetJob,
-        setTemplate,
-        setHasExistingCv,
-        nextStep,
-        prevStep,
-        goToStep,
+        setPrimaryIntent,
+        setProfile,
         completeOnboarding,
         skipOnboarding,
         resetOnboarding,

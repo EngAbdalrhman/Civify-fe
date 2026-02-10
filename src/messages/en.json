@@ -1524,6 +1524,52 @@
           "professional": "Professional"
         }
       }
+    },
+    "hub": {
+      "title": "Welcome to Civify!",
+      "subtitle": "What would you like to do today?",
+      "build": {
+        "title": "Build CV from Scratch",
+        "description": "Create a professional, ATS-friendly resume with AI assistance"
+      },
+      "tailor": {
+        "title": "Tailor CV for a Job",
+        "description": "Upload your CV and optimize it for a specific job posting"
+      },
+      "api": {
+        "title": "Use the API",
+        "description": "Integrate Civify's CV engine into your own application"
+      },
+      "getStarted": "Get Started",
+      "explore": "Just exploring — skip to dashboard"
+    },
+    "dashboard": {
+      "builder": {
+        "title": "Resume Builder",
+        "subtitle": "Build and manage your professional resumes",
+        "continueCta": "Continue Building",
+        "continueDesc": "Pick up where you left off",
+        "createNew": "Create New Resume",
+        "createNewDesc": "Start a fresh resume from scratch"
+      },
+      "tailor": {
+        "title": "Tailor Your CV",
+        "subtitle": "Optimize your resume for specific job postings",
+        "tailorCta": "Tailor for a Job",
+        "tailorCtaDesc": "Upload a CV and job description to optimize",
+        "buildFirst": "Build a Resume First",
+        "buildFirstDesc": "Create a CV to tailor for job applications"
+      },
+      "api": {
+        "title": "API Dashboard",
+        "subtitle": "Manage your API keys and integration",
+        "manageKeys": "Manage API Keys",
+        "manageKeysDesc": "Generate and manage your keys",
+        "viewDocs": "Documentation",
+        "viewDocsDesc": "Complete API reference guide",
+        "usageStats": "Usage Stats",
+        "usageStatsDesc": "Monitor your API usage"
+      }
     }
   },
   "tooltips": {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ResumeData, AtsScore } from "@/features/upload-cv/types";
 import { ResumeService } from "@/services/resume.service";
@@ -52,7 +52,9 @@ export function useResumeBuilder({
   isGuest,
 }: UseResumeBuilderParams): UseResumeBuilderReturn {
   const [resumeData, setResumeData] = useState<ResumeData>(initialData);
-  const [activeTab, setActiveTab] = useState("content");
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get("tab") || "content";
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [isSaving, setIsSaving] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [resumeTitle, setResumeTitle] = useState(
