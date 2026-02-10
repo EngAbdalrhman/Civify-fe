@@ -829,11 +829,13 @@
       "subtitle": "Select a format to export your resume.",
       "pdf": {
         "title": "PDF Document",
-        "description": "Best for sharing and printing. Preserves layout."
+        "description": "Best for sharing and printing. Preserves layout.",
+        "exporting": "Generating PDF..."
       },
       "docx": {
         "title": "Word Document",
-        "description": "Editable in Microsoft Word or Google Docs."
+        "description": "Editable in Microsoft Word or Google Docs.",
+        "exporting": "Generating DOCX..."
       },
       "tip": "Tip: Review your resume in the preview panel before downloading to ensure everything looks perfect."
     },
@@ -983,9 +985,12 @@
     "hero": {
       "titlePart1": "75% of CVs",
       "titlePart2": "Never Get Seen.",
-      "titlePart3": "Make Yours the Exception.",
-      "subtitle": "Stand out from the crowd with our AI-powered resume builder. ATS-friendly templates, expert tips, and instant formatting.",
+      "titlePart3": "Make Your Resume the Exception.",
+      "subtitle": "Stand out with our free resume builder. Use our CV AI and ATS resume checker to generate a resume with AI that gets you hired.",
       "cta": "Start Free — No Credit Card",
+      "ctaPrimary": "Build Your First CV",
+      "ctaSecondary": "Try a Sample CV",
+      "ctaSubtext": "See results before signing up — no account required for preview.",
       "ctaFree": "Try for Free",
       "badge": "Full Arabic Support!",
       "matchScore": "92%",
@@ -1396,5 +1401,218 @@
     "suggestions": "Suggestions",
     "close": "Close",
     "noScore": "No score available"
+  },
+  "guestPreview": {
+    "input": {
+      "badge": "Try Before Signing Up",
+      "title": "See How We Match Your CV to Jobs",
+      "subtitle": "Paste a job description below and see instant skill analysis — no account required.",
+      "placeholder": "Paste a job description here...\n\nExample:\nSenior Software Engineer\nWe're looking for an experienced developer with expertise in React, Node.js...",
+      "minChars": "min characters",
+      "useSample": "Use sample job description",
+      "analyzing": "Analyzing...",
+      "analyze": "Analyze Job Match"
+    },
+    "preview": {
+      "back": "Back",
+      "matchScore": "Match Score",
+      "skillsTitle": "Skills Analysis",
+      "skillsSubtitle": "How your skills match this job",
+      "cvTitle": "Sample CV Preview",
+      "cvSubtitle": "See how a tailored CV would look",
+      "ctaTitle": "Ready to Build Your Own?",
+      "ctaSubtitle": "Sign up to create a personalized CV tailored to your target jobs.",
+      "ctaButton": "Get Started Free"
+    },
+    "signup": {
+      "matchScore": "Match Score",
+      "title": "Unlock Your Full Potential",
+      "subtitle": "Create your account to generate a complete, personalized CV.",
+      "benefits": {
+        "title": "What you'll get:",
+        "fullCv": "Full AI-tailored CV generation",
+        "download": "Download as PDF or DOCX",
+        "multipleVersions": "Create unlimited CV versions",
+        "atsScore": "Real-time ATS score tracking"
+      },
+      "signupCta": "Create Free Account",
+      "loginCta": "Already have an account? Log in",
+      "securityNote": "Your data is encrypted and never shared",
+      "back": "← Go back to preview"
+    }
+  },
+  "onboarding": {
+    "welcome": {
+      "title": "Welcome to Civify!",
+      "subtitle": "Let's set you up for success in just a few steps.",
+      "benefit1": "Create ATS-optimized CVs that get noticed",
+      "benefit2": "Tailor your resume for any job in seconds",
+      "benefit3": "Track your applications in one place",
+      "startButton": "Get Started",
+      "skipButton": "Skip for now"
+    },
+    "wizard": {
+      "title": "Create Your CV",
+      "back": "Back",
+      "next": "Continue",
+      "skip": "Skip",
+      "finish": "Start Building"
+    },
+    "goals": {
+      "create_new": {
+        "title": "Create New CV",
+        "description": "Start fresh with a professional template"
+      },
+      "improve_existing": {
+        "title": "Improve My CV",
+        "description": "Upload and enhance your existing resume"
+      }
+    },
+    "steps": {
+      "jobTarget": {
+        "title": "What's your target job?",
+        "subtitle": "Help us tailor your CV for the right opportunities",
+        "jobTitle": "Job Title",
+        "jobTitlePlaceholder": "e.g., Software Engineer",
+        "company": "Company",
+        "companyPlaceholder": "e.g., Google",
+        "jobDescription": "Job Description",
+        "jobDescriptionPlaceholder": "Paste the job description here...",
+        "jobDescriptionHint": "Adding a job description helps us optimize your CV",
+        "optional": "optional"
+      },
+      "template": {
+        "title": "Choose a template",
+        "subtitle": "Select a style that fits your profession",
+        "hint": "You can change templates anytime",
+        "templates": {
+          "modern": "Modern",
+          "classic": "Classic",
+          "minimal": "Minimal",
+          "professional": "Professional"
+        }
+      },
+      "import": {
+        "title": "Import your CV",
+        "subtitle": "Upload an existing CV or start from scratch",
+        "upload": {
+          "title": "Upload Existing CV",
+          "description": "PDF or DOCX format"
+        },
+        "scratch": {
+          "title": "Start Fresh",
+          "description": "Build your CV step by step"
+        },
+        "hint": "Your data is never shared with third parties"
+      },
+      "finish": {
+        "title": "You're all set!",
+        "subtitle": "Review your choices and start building",
+        "summary": "Summary",
+        "targetJob": "Target Job",
+        "template": "Template",
+        "cvSource": "CV Source",
+        "notSpecified": "Not specified",
+        "notSelected": "Not selected",
+        "uploadedCv": "Uploaded CV",
+        "startFresh": "Starting fresh",
+        "readyMessage": "Click 'Start Building' to create your CV",
+        "templates": {
+          "modern": "Modern",
+          "classic": "Classic",
+          "minimal": "Minimal",
+          "professional": "Professional"
+        }
+      }
+    },
+    "hub": {
+      "title": "Welcome to Civify!",
+      "subtitle": "What would you like to do today?",
+      "build": {
+        "title": "Build CV from Scratch",
+        "description": "Create a professional, ATS-friendly resume with AI assistance"
+      },
+      "tailor": {
+        "title": "Tailor CV for a Job",
+        "description": "Upload your CV and optimize it for a specific job posting"
+      },
+      "api": {
+        "title": "Use the API",
+        "description": "Integrate Civify's CV engine into your own application"
+      },
+      "getStarted": "Get Started",
+      "explore": "Just exploring — skip to dashboard"
+    },
+    "dashboard": {
+      "builder": {
+        "title": "Resume Builder",
+        "subtitle": "Build and manage your professional resumes",
+        "continueCta": "Continue Building",
+        "continueDesc": "Pick up where you left off",
+        "createNew": "Create New Resume",
+        "createNewDesc": "Start a fresh resume from scratch"
+      },
+      "tailor": {
+        "title": "Tailor Your CV",
+        "subtitle": "Optimize your resume for specific job postings",
+        "tailorCta": "Tailor for a Job",
+        "tailorCtaDesc": "Upload a CV and job description to optimize",
+        "buildFirst": "Build a Resume First",
+        "buildFirstDesc": "Create a CV to tailor for job applications"
+      },
+      "api": {
+        "title": "API Dashboard",
+        "subtitle": "Manage your API keys and integration",
+        "manageKeys": "Manage API Keys",
+        "manageKeysDesc": "Generate and manage your keys",
+        "viewDocs": "Documentation",
+        "viewDocsDesc": "Complete API reference guide",
+        "usageStats": "Usage Stats",
+        "usageStatsDesc": "Monitor your API usage"
+      }
+    }
+  },
+  "tooltips": {
+    "settings": {
+      "title": "Tooltip Settings",
+      "subtitle": "Manage in-app guidance",
+      "showTooltips": "Show helpful tips",
+      "showGuides": "Show empty state guides",
+      "reset": "Reset dismissed tips"
+    },
+    "sections": {
+      "summary": {
+        "title": "Write a Great Summary",
+        "content": "Keep it 2-3 sentences. Focus on your key value proposition and target role."
+      },
+      "skills": {
+        "title": "Match Job Requirements",
+        "content": "Add skills from the job description. Matched skills help you rank higher in ATS."
+      },
+      "experience": {
+        "title": "Use Action Words",
+        "content": "Start bullets with verbs like 'Led', 'Built', 'Increased'. Quantify results when possible."
+      },
+      "skillsMatch": {
+        "title": "Skills Matched!",
+        "content": "These skills match the job requirements. Great job!"
+      },
+      "jobDesc": {
+        "title": "Pro Tip",
+        "content": "Paste the full job description for best results. We'll extract key skills and requirements."
+      }
+    },
+    "emptyStates": {
+      "summary": {
+        "title": "Add a Professional Summary",
+        "description": "A strong summary helps recruiters quickly understand your value. Keep it brief and impactful.",
+        "action": "Add summary"
+      },
+      "skills": {
+        "title": "Add Your Skills",
+        "description": "List your technical and soft skills. Match them to the job description for higher ATS scores.",
+        "action": "Add skills"
+      }
+    }
   }
 }

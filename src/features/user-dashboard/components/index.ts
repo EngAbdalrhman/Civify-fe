@@ -1,2 +1,2 @@
 // User Dashboard feature exports
-export {};
+export { PersonalizedDashboard } from "./PersonalizedDashboard";
