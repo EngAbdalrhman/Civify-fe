@@ -1,21 +1,20 @@
 "use client";
 
 import { ResumeData } from "@/features/upload-cv/types";
-import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { FileText, FileType } from "lucide-react";
+import { FileText, FileType, Loader2 } from "lucide-react";
 import {
   exportToPdfPuppeteer,
   exportToDocx,
   type TemplateType,
 } from "@/features/upload-cv/utils/exportCv";
 import { toast } from "sonner";
+import { useState } from "react"; // Added useState import
 
 import enTranslations from "@/messages/en.json";
 import arTranslations from "@/messages/ar.json";
@@ -26,16 +25,19 @@ interface ExportPanelProps {
 
 import { useTranslations } from "next-intl";
 
-// ... (imports)
-
 export function ExportPanel({ data }: ExportPanelProps) {
   const t = useTranslations("builder.exportPanel");
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+  const [isExportingDocx, setIsExportingDocx] = useState(false);
 
   const getTranslations = () => {
     return data.metadata?.language === "ar" ? arTranslations : enTranslations;
   };
 
   const handlePdfExport = async () => {
+    if (isExportingPdf || isExportingDocx) return;
+
+    setIsExportingPdf(true);
     try {
       const template = (data.metadata?.templateId || "modern") as TemplateType;
       const color = data.metadata?.primaryColor || "#000000";
@@ -50,10 +52,15 @@ export function ExportPanel({ data }: ExportPanelProps) {
     } catch (e) {
       console.error(e);
       toast.error("Failed to export PDF");
+    } finally {
+      setIsExportingPdf(false);
     }
   };
 
   const handleDocxExport = async () => {
+    if (isExportingPdf || isExportingDocx) return;
+
+    setIsExportingDocx(true);
     try {
       const translations = getTranslations();
       await exportToDocx(
@@ -65,8 +72,12 @@ export function ExportPanel({ data }: ExportPanelProps) {
     } catch (e) {
       console.error(e);
       toast.error("Failed to export DOCX");
+    } finally {
+      setIsExportingDocx(false);
     }
   };
+
+  const isExporting = isExportingPdf || isExportingDocx;
 
   return (
     <div className="space-y-6">
@@ -77,30 +88,50 @@ export function ExportPanel({ data }: ExportPanelProps) {
 
       <div className="grid gap-4">
         <Card
-          className="cursor-pointer hover:border-primary transition-colors"
+          className={`cursor-pointer transition-colors ${
+            isExporting
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:border-primary"
+          }`}
           onClick={handlePdfExport}
         >
           <CardHeader className="flex flex-row items-center gap-4 pb-2">
             <div className="p-2 bg-red-100 dark:bg-red-900/20 rounded-lg">
-              <FileType className="h-6 w-6 text-red-600 dark:text-red-400" />
+              {isExportingPdf ? (
+                <Loader2 className="h-6 w-6 text-red-600 dark:text-red-400 animate-spin" />
+              ) : (
+                <FileType className="h-6 w-6 text-red-600 dark:text-red-400" />
+              )}
             </div>
             <div className="space-y-1">
-              <CardTitle className="text-base">{t("pdf.title")}</CardTitle>
+              <CardTitle className="text-base">
+                {isExportingPdf ? t("pdf.exporting") : t("pdf.title")}
+              </CardTitle>
               <CardDescription>{t("pdf.description")}</CardDescription>
             </div>
           </CardHeader>
         </Card>
 
         <Card
-          className="cursor-pointer hover:border-primary transition-colors"
+          className={`cursor-pointer transition-colors ${
+            isExporting
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:border-primary"
+          }`}
           onClick={handleDocxExport}
         >
           <CardHeader className="flex flex-row items-center gap-4 pb-2">
             <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-              <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              {isExportingDocx ? (
+                <Loader2 className="h-6 w-6 text-blue-600 dark:text-blue-400 animate-spin" />
+              ) : (
+                <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              )}
             </div>
             <div className="space-y-1">
-              <CardTitle className="text-base">{t("docx.title")}</CardTitle>
+              <CardTitle className="text-base">
+                {isExportingDocx ? t("docx.exporting") : t("docx.title")}
+              </CardTitle>
               <CardDescription>{t("docx.description")}</CardDescription>
             </div>
           </CardHeader>

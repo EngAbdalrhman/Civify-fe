@@ -9,13 +9,13 @@ import { BetaBadge } from "@/components/BetaBadge";
 import { useTranslations } from "next-intl";
 
 export function HeroSection() {
-  const t = useTranslations('landing.hero');
+  const t = useTranslations("landing.hero");
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900">
       {/* Background decoration */}
       <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] dark:bg-grid-slate-700/25" />
-      
+
       {/* Floating elements */}
       <div className="absolute top-20 left-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob" />
       <div className="absolute top-40 right-10 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000" />
@@ -30,49 +30,68 @@ export function HeroSection() {
 
           {/* Language Support Badges */}
           <div className="flex items-center justify-center gap-3 mb-6">
-            <Badge variant="secondary" className="px-3 py-1.5 text-sm font-medium">
+            <Badge
+              variant="secondary"
+              className="px-3 py-1.5 text-sm font-medium"
+            >
               <Globe className="w-3.5 h-3.5 mr-1.5" />
               English
             </Badge>
-            <Badge variant="secondary" className="px-3 py-1.5 text-sm font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
-              🇪🇬 العربية - {t('badge')}
+            <Badge
+              variant="secondary"
+              className="px-3 py-1.5 text-sm font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+            >
+              🇪🇬 العربية - {t("badge")}
             </Badge>
           </div>
 
           {/* Problem-Focused Headline */}
           <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-            <span className="text-red-500 dark:text-red-400">{t('titlePart1')}</span>
-            {" "}{t('titlePart2')}{" "}
-            <br className="hidden sm:block" />
+            <span className="text-red-500 dark:text-red-400">
+              {t("titlePart1")}
+            </span>{" "}
+            {t("titlePart2")} <br className="hidden sm:block" />
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              {t('titlePart3')}
+              {t("titlePart3")}
             </span>
           </h1>
 
           {/* Solution Subtext */}
           <p className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground md:text-xl">
-            {t('subtitle')}
+            {t("subtitle")}
             <br />
             <span className="font-semibold text-foreground">
-              {t('matchScore')} {t('interviews')}
+              {t("matchScore")} {t("interviews")}
             </span>
           </p>
 
           {/* CTAs */}
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Button asChild size="lg" className="group h-12 px-8 text-base font-semibold">
+            <Button
+              asChild
+              size="lg"
+              className="group h-12 px-8 text-base font-semibold"
+            >
               <Link href="/app/upload">
-                {t('cta')}
+                {t("ctaPrimary")}
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
             </Button>
-            {/* <Button asChild variant="outline" size="lg" className="h-12 px-8 text-base font-semibold">
-              <Link href="#demo">
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="h-12 px-8 text-base font-semibold"
+            >
+              <Link href="/guest/preview">
                 <Play className="mr-2 h-5 w-5" />
-                See Demo
+                {t("ctaSecondary")}
               </Link>
-            </Button> */}
+            </Button>
           </div>
+          <p className="mt-4 text-sm text-muted-foreground">
+            {t("ctaSubtext")}
+          </p>
 
           {/* Trust indicators */}
           <div className="mt-12 flex flex-col items-center justify-center gap-6 sm:flex-row sm:gap-8">
@@ -107,7 +126,9 @@ export function HeroSection() {
 
             <div className="text-center sm:text-left">
               <p className="text-2xl font-bold text-foreground">92%</p>
-              <p className="text-sm text-muted-foreground">Average match score</p>
+              <p className="text-sm text-muted-foreground">
+                Average match score
+              </p>
             </div>
 
             <div className="h-8 w-px bg-border hidden sm:block" />
@@ -120,7 +141,9 @@ export function HeroSection() {
             <div className="h-8 w-px bg-border hidden sm:block" />
 
             <div className="text-center sm:text-left">
-              <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">🇪🇬</p>
+              <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                🇪🇬
+              </p>
               <p className="text-sm text-muted-foreground">Arabic OCR</p>
             </div>
           </div>
@@ -144,4 +167,3 @@ export function HeroSection() {
     </section>
   );
 }
-
