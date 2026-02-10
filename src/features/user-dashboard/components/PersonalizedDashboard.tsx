@@ -14,6 +14,7 @@ import {
 import { Link } from "@/i18n/routing";
 import { ResumeCarousel } from "@/components/dashboard/ResumeCarousel";
 import { useOnboarding } from "@/features/onboarding";
+import { DashboardPricingPromotion } from "@/components/dashboard/DashboardPricingPromotion";
 
 export function PersonalizedDashboard() {
   const { primaryIntent } = useOnboarding();
@@ -57,6 +58,7 @@ function BuilderDashboard() {
 
   return (
     <div className="space-y-6">
+      <DashboardPricingPromotion />
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-semibold">{t("title")}</h1>
@@ -68,7 +70,7 @@ function BuilderDashboard() {
       <div className="grid gap-3 md:grid-cols-2">
         <Link
           href="/app/resume-builder"
-          className="group flex items-center gap-4 rounded-lg border p-5 transition-colors hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-sm"
+          className="group flex items-center gap-4 rounded-lg border p-5 transition-colors hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-sm bg-card"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950/40">
             <FileEdit className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -82,7 +84,7 @@ function BuilderDashboard() {
 
         <Link
           href="/app/resume-builder"
-          className="group flex items-center gap-4 rounded-lg border border-dashed p-5 transition-colors hover:border-primary/40 hover:shadow-sm"
+          className="group flex items-center gap-4 rounded-lg border border-dashed p-5 transition-colors hover:border-primary/40 hover:shadow-sm bg-card"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
             <Plus className="h-5 w-5 text-muted-foreground" />
@@ -120,7 +122,7 @@ function TailorDashboard() {
       <div className="grid gap-3 md:grid-cols-2">
         <Link
           href="/app/upload"
-          className="group flex items-center gap-4 rounded-lg border p-5 transition-colors hover:border-violet-200 dark:hover:border-violet-800 hover:shadow-sm"
+          className="group flex items-center gap-4 rounded-lg border p-5 transition-colors hover:border-violet-200 dark:hover:border-violet-800 hover:shadow-sm bg-card"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-50 dark:bg-violet-950/40">
             <Sparkles className="h-5 w-5 text-violet-600 dark:text-violet-400" />
@@ -136,7 +138,7 @@ function TailorDashboard() {
 
         <Link
           href="/app/resume-builder"
-          className="group flex items-center gap-4 rounded-lg border border-dashed p-5 transition-colors hover:border-primary/40 hover:shadow-sm"
+          className="group flex items-center gap-4 rounded-lg border border-dashed p-5 transition-colors hover:border-primary/40 hover:shadow-sm bg-card"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
             <FileEdit className="h-5 w-5 text-muted-foreground" />
@@ -173,8 +175,8 @@ function ApiDashboard() {
 
       <div className="grid gap-3 md:grid-cols-3">
         <Link
-          href="/app/api-keys"
-          className="group flex flex-col items-start gap-3 rounded-lg border p-5 transition-colors hover:border-emerald-200 dark:hover:border-emerald-800 hover:shadow-sm"
+          href="/app/usage-limits"
+          className="group flex flex-col items-start gap-3 rounded-lg border p-5 transition-colors hover:border-emerald-200 dark:hover:border-emerald-800 hover:shadow-sm bg-card"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/40">
             <Key className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
@@ -189,7 +191,7 @@ function ApiDashboard() {
 
         <Link
           href="/app/api-documentation"
-          className="group flex flex-col items-start gap-3 rounded-lg border p-5 transition-colors hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-sm"
+          className="group flex flex-col items-start gap-3 rounded-lg border p-5 transition-colors hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-sm bg-card"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950/40">
             <BookOpen className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -202,7 +204,7 @@ function ApiDashboard() {
 
         <Link
           href="/app/analytics"
-          className="group flex flex-col items-start gap-3 rounded-lg border p-5 transition-colors hover:border-orange-200 dark:hover:border-orange-800 hover:shadow-sm"
+          className="group flex flex-col items-start gap-3 rounded-lg border p-5 transition-colors hover:border-orange-200 dark:hover:border-orange-800 hover:shadow-sm bg-card"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50 dark:bg-orange-950/40">
             <BarChart2 className="h-5 w-5 text-orange-600 dark:text-orange-400" />
@@ -224,6 +226,7 @@ function ApiDashboard() {
 function DefaultDashboard() {
   return (
     <div className="space-y-6">
+      <DashboardPricingPromotion />
       <div>
         <h1 className="text-2xl font-semibold">Dashboard</h1>
         <p className="text-sm text-muted-foreground">
@@ -236,7 +239,7 @@ function DefaultDashboard() {
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
         <Link
           href="/app/resume-builder"
-          className="group flex items-center gap-3 rounded-lg border p-4 transition-colors hover:shadow-sm"
+          className="group flex items-center gap-3 rounded-lg border p-4 transition-colors hover:shadow-sm bg-card"
         >
           <FileEdit className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           <div>
@@ -249,7 +252,7 @@ function DefaultDashboard() {
 
         <Link
           href="/app/upload"
-          className="group flex items-center gap-3 rounded-lg border p-4 transition-colors hover:shadow-sm"
+          className="group flex items-center gap-3 rounded-lg border p-4 transition-colors hover:shadow-sm bg-card"
         >
           <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400" />
           <div>

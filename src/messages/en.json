@@ -132,6 +132,20 @@
       "loadError": "Failed to load your resumes",
       "deleted": "Resume deleted",
       "deleteError": "Failed to delete resume"
+    },
+    "promotion": {
+      "title": "Unlock Your Full Potential",
+      "subtitle": "Get unlimited access to all features with our Pro plan",
+      "upgradeToPro": "Upgrade to Pro",
+      "features": {
+        "unlimitedCvs": "Unlimited CVs",
+        "aiTailoring": "AI Tailoring",
+        "pdfExports": "PDF Exports",
+        "noWatermark": "No Watermark"
+      },
+      "startFrom": "Start from",
+      "upgradeNow": "Try Now",
+      "learnMore": "Learn More"
     }
   },
   "upload": {
