@@ -829,11 +829,13 @@
       "subtitle": "Select a format to export your resume.",
       "pdf": {
         "title": "PDF Document",
-        "description": "Best for sharing and printing. Preserves layout."
+        "description": "Best for sharing and printing. Preserves layout.",
+        "exporting": "Generating PDF..."
       },
       "docx": {
         "title": "Word Document",
-        "description": "Editable in Microsoft Word or Google Docs."
+        "description": "Editable in Microsoft Word or Google Docs.",
+        "exporting": "Generating DOCX..."
       },
       "tip": "Tip: Review your resume in the preview panel before downloading to ensure everything looks perfect."
     },

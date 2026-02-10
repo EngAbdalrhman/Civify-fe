@@ -832,11 +832,13 @@
       "subtitle": "اختر صيغة لتصدير سيرتك الذاتية.",
       "pdf": {
         "title": "ملف PDF",
-        "description": "الأفضل للمشاركة والطباعة. يحافظ على التنسيق."
+        "description": "الأفضل للمشاركة والطباعة. يحافظ على التنسيق.",
+        "exporting": "جاري إنشاء PDF..."
       },
       "docx": {
         "title": "ملف Word",
-        "description": "قابل للتعديل في Microsoft Word أو Google Docs."
+        "description": "قابل للتعديل في Microsoft Word أو Google Docs.",
+        "exporting": "جاري إنشاء DOCX..."
       },
       "tip": "نصيحة: راجع سيرتك الذاتية في لوحة المعاينة قبل التحميل للتأكد من أن كل شيء يبدو مثالياً."
     },
