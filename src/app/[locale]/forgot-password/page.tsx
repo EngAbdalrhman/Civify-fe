@@ -11,7 +11,7 @@ type Step = "email" | "otp" | "newPassword";
 export default function ForgotPasswordPage() {
   const t = useTranslations("auth");
   const router = useRouter();
-  
+
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -29,9 +29,11 @@ export default function ForgotPasswordPage() {
 
     try {
       await apiClient.post("/auth/forgot-password", null, {
-        params: { email }
+        params: { email },
       });
-      toast.success("If an account exists, a reset code has been sent to your email");
+      toast.success(
+        "If an account exists, a reset code has been sent to your email",
+      );
       setStep("otp");
     } catch (err) {
       setError("Failed to send reset code. Please try again.");
@@ -47,9 +49,13 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      const response = await apiClient.post("/auth/verify-reset-otp", null, {
-        params: { email, otp }
-      });
+      const response = await apiClient.post<{ data?: { resetToken?: string } }>(
+        "/auth/verify-reset-otp",
+        null,
+        {
+          params: { email, otp },
+        },
+      );
       const token = response.data?.data?.resetToken;
       if (token) {
         setResetToken(token);
@@ -84,9 +90,11 @@ export default function ForgotPasswordPage() {
 
     try {
       await apiClient.post("/auth/reset-password", null, {
-        params: { resetToken, newPassword }
+        params: { resetToken, newPassword },
       });
-      toast.success("Password reset successful! Please login with your new password");
+      toast.success(
+        "Password reset successful! Please login with your new password",
+      );
       router.push("/login");
     } catch (err) {
       setError("Failed to reset password. Please try again.");
@@ -99,9 +107,12 @@ export default function ForgotPasswordPage() {
     <div className="flex min-h-screen items-center justify-center p-8">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
-          <h1 className="text-3xl font-bold">{t("forgotPassword") || "Forgot Password"}</h1>
+          <h1 className="text-3xl font-bold">
+            {t("forgotPassword") || "Forgot Password"}
+          </h1>
           <p className="text-muted-foreground mt-2">
-            {step === "email" && "Enter your email to receive a verification code"}
+            {step === "email" &&
+              "Enter your email to receive a verification code"}
             {step === "otp" && "Enter the 6-digit code sent to your email"}
             {step === "newPassword" && "Create a new password for your account"}
           </p>
@@ -113,8 +124,11 @@ export default function ForgotPasswordPage() {
             <div
               key={s}
               className={`h-2 w-12 rounded-full transition-colors ${
-                step === s ? "bg-primary" : 
-                ["email", "otp", "newPassword"].indexOf(step) > i ? "bg-primary/50" : "bg-muted"
+                step === s
+                  ? "bg-primary"
+                  : ["email", "otp", "newPassword"].indexOf(step) > i
+                    ? "bg-primary/50"
+                    : "bg-muted"
               }`}
             />
           ))}
@@ -128,9 +142,14 @@ export default function ForgotPasswordPage() {
 
         {/* Step 1: Email Input */}
         {step === "email" && (
-          <form onSubmit={handleRequestOtp} className="rounded-lg border p-6 space-y-4">
+          <form
+            onSubmit={handleRequestOtp}
+            className="rounded-lg border p-6 space-y-4"
+          >
             <div className="space-y-2">
-              <label className="text-sm font-medium">{t("email") || "Email"}</label>
+              <label className="text-sm font-medium">
+                {t("email") || "Email"}
+              </label>
               <input
                 type="email"
                 value={email}
@@ -150,13 +169,18 @@ export default function ForgotPasswordPage() {
 
         {/* Step 2: OTP Verification */}
         {step === "otp" && (
-          <form onSubmit={handleVerifyOtp} className="rounded-lg border p-6 space-y-4">
+          <form
+            onSubmit={handleVerifyOtp}
+            className="rounded-lg border p-6 space-y-4"
+          >
             <div className="space-y-2">
               <label className="text-sm font-medium">Verification Code</label>
               <input
                 type="text"
                 value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                onChange={(e) =>
+                  setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+                }
                 className="w-full rounded-md border px-3 py-2 text-center text-2xl tracking-widest font-mono bg-background"
                 placeholder="000000"
                 maxLength={6}
@@ -185,7 +209,10 @@ export default function ForgotPasswordPage() {
 
         {/* Step 3: New Password */}
         {step === "newPassword" && (
-          <form onSubmit={handleResetPassword} className="rounded-lg border p-6 space-y-4">
+          <form
+            onSubmit={handleResetPassword}
+            className="rounded-lg border p-6 space-y-4"
+          >
             <div className="space-y-2">
               <label className="text-sm font-medium">New Password</label>
               <input

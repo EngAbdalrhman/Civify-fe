@@ -1,45 +1,58 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Plus, 
-  Loader2, 
-  Edit2, 
-  Trash2, 
-  AlertCircle,
-  Coins
-} from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { toast } from 'sonner';
+import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Loader2, Edit2, Trash2, AlertCircle, Coins } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { usePermissions } from '@/contexts/PermissionContext';
-import { ADMIN_ACTION_PERMISSIONS } from '@/config/adminMenuConfig';
-import { tokenPackageService, type TokenPackage } from '@/services/token-package.service';
-import apiClient from '@/api/client';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { usePermissions } from "@/contexts/PermissionContext";
+import { ADMIN_ACTION_PERMISSIONS } from "@/config/adminMenuConfig";
+import {
+  tokenPackageService,
+  type TokenPackage,
+} from "@/services/token-package.service";
+import apiClient from "@/api/client";
 
 // Token Package Admin API
 const tokenPackageAdminApi = {
   getAll: async (): Promise<TokenPackage[]> => {
-    const response = await apiClient.get('/v1/tokens/packages/all');
+    const response = await apiClient.get<TokenPackage[]>(
+      "/v1/tokens/packages/all",
+    );
     return response.data;
   },
   create: async (data: Partial<TokenPackage>): Promise<TokenPackage> => {
-    const response = await apiClient.post('/v1/tokens/packages', data);
+    const response = await apiClient.post<TokenPackage>(
+      "/v1/tokens/packages",
+      data as unknown as object,
+    );
     return response.data;
   },
-  update: async (id: number, data: Partial<TokenPackage>): Promise<TokenPackage> => {
-    const response = await apiClient.put(`/v1/tokens/packages/${id}`, data);
+  update: async (
+    id: number,
+    data: Partial<TokenPackage>,
+  ): Promise<TokenPackage> => {
+    const response = await apiClient.put<TokenPackage>(
+      `/v1/tokens/packages/${id}`,
+      data as unknown as object,
+    );
     return response.data;
   },
   deactivate: async (id: number): Promise<void> => {
@@ -48,26 +61,29 @@ const tokenPackageAdminApi = {
 };
 
 export function TokenPackagesManager() {
-  const t = useTranslations('admin.billing');
-  const tc = useTranslations('admin.common');
+  const t = useTranslations("admin.billing");
+  const tc = useTranslations("admin.common");
   const { hasPermission } = usePermissions();
-  const canModifyTokens = hasPermission(ADMIN_ACTION_PERMISSIONS.TOKEN_PACKAGE_EDIT);
+  const canModifyTokens = hasPermission(
+    ADMIN_ACTION_PERMISSIONS.TOKEN_PACKAGE_EDIT,
+  );
 
   // Token packages state
   const [tokenPackages, setTokenPackages] = useState<TokenPackage[]>([]);
   const [isLoadingTokens, setIsLoadingTokens] = useState(false);
   const [tokensError, setTokensError] = useState<string | null>(null);
-  const [editingTokenPackage, setEditingTokenPackage] = useState<TokenPackage | null>(null);
+  const [editingTokenPackage, setEditingTokenPackage] =
+    useState<TokenPackage | null>(null);
   const [isTokenDialogOpen, setIsTokenDialogOpen] = useState(false);
   const [isSavingToken, setIsSavingToken] = useState(false);
 
   // Token package form state
   const [tokenFormData, setTokenFormData] = useState({
-    name: '',
-    description: '',
-    tokens: '',
-    price: '',
-    currency: 'EGP',
+    name: "",
+    description: "",
+    tokens: "",
+    price: "",
+    currency: "EGP",
   });
 
   // Fetch token packages
@@ -78,7 +94,8 @@ export function TokenPackagesManager() {
       const data = await tokenPackageAdminApi.getAll();
       setTokenPackages(data);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to fetch token packages';
+      const message =
+        err instanceof Error ? err.message : "Failed to fetch token packages";
       setTokensError(message);
     } finally {
       setIsLoadingTokens(false);
@@ -94,11 +111,11 @@ export function TokenPackagesManager() {
   const handleCreateTokenPackage = () => {
     setEditingTokenPackage(null);
     setTokenFormData({
-      name: '',
-      description: '',
-      tokens: '',
-      price: '',
-      currency: 'EGP',
+      name: "",
+      description: "",
+      tokens: "",
+      price: "",
+      currency: "EGP",
     });
     setIsTokenDialogOpen(true);
   };
@@ -107,7 +124,7 @@ export function TokenPackagesManager() {
     setEditingTokenPackage(pkg);
     setTokenFormData({
       name: pkg.name,
-      description: pkg.description || '',
+      description: pkg.description || "",
       tokens: pkg.tokens.toString(),
       price: pkg.price.toString(),
       currency: pkg.currency,
@@ -125,18 +142,19 @@ export function TokenPackagesManager() {
         price: parseFloat(tokenFormData.price),
         currency: tokenFormData.currency,
       };
-      
+
       if (editingTokenPackage) {
         await tokenPackageAdminApi.update(editingTokenPackage.id, data);
-        toast.success('Token package updated');
+        toast.success("Token package updated");
       } else {
         await tokenPackageAdminApi.create(data);
-        toast.success('Token package created');
+        toast.success("Token package created");
       }
       setIsTokenDialogOpen(false);
       fetchTokenPackages();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to save token package';
+      const message =
+        err instanceof Error ? err.message : "Failed to save token package";
       toast.error(message);
     } finally {
       setIsSavingToken(false);
@@ -145,13 +163,16 @@ export function TokenPackagesManager() {
 
   const handleDeactivateTokenPackage = async (pkg: TokenPackage) => {
     if (!confirm(`Are you sure you want to deactivate "${pkg.name}"?`)) return;
-    
+
     try {
       await tokenPackageAdminApi.deactivate(pkg.id);
-      toast.success('Token package deactivated');
+      toast.success("Token package deactivated");
       fetchTokenPackages();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to deactivate token package';
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Failed to deactivate token package";
       toast.error(message);
     }
   };
@@ -159,13 +180,11 @@ export function TokenPackagesManager() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <p className="text-sm text-muted-foreground">
-          {t('tokensDesc')}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("tokensDesc")}</p>
         {canModifyTokens && (
           <Button onClick={handleCreateTokenPackage}>
             <Plus className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
-            {t('createPackage')}
+            {t("createPackage")}
           </Button>
         )}
       </div>
@@ -186,7 +205,8 @@ export function TokenPackagesManager() {
             <Coins className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
             <h2 className="text-lg font-semibold mb-2">No Token Packages</h2>
             <p className="text-muted-foreground mb-4">
-              Create your first token package to allow users to purchase extra tokens.
+              Create your first token package to allow users to purchase extra
+              tokens.
             </p>
             {canModifyTokens && (
               <Button onClick={handleCreateTokenPackage}>
@@ -199,15 +219,18 @@ export function TokenPackagesManager() {
       ) : (
         <div className="grid gap-6 md:grid-cols-3">
           {tokenPackages.map((pkg) => (
-            <Card key={pkg.id} className={!pkg.active ? 'opacity-60' : ''}>
+            <Card key={pkg.id} className={!pkg.active ? "opacity-60" : ""}>
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-2">
                     <Coins className="h-5 w-5 text-amber-500" />
                     <CardTitle className="text-lg">{pkg.name}</CardTitle>
                   </div>
-                  <Badge variant={pkg.active ? 'secondary' : 'destructive'} className="text-xs">
-                    {pkg.active ? tc('active') : tc('inactive')}
+                  <Badge
+                    variant={pkg.active ? "secondary" : "destructive"}
+                    className="text-xs"
+                  >
+                    {pkg.active ? tc("active") : tc("inactive")}
                   </Badge>
                 </div>
                 {pkg.description && (
@@ -226,18 +249,18 @@ export function TokenPackagesManager() {
                   </div>
                   {canModifyTokens && (
                     <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
+                      <Button
+                        variant="outline"
+                        size="sm"
                         className="flex-1"
                         onClick={() => handleEditTokenPackage(pkg)}
                       >
                         <Edit2 className="h-3 w-3 ltr:mr-1 rtl:ml-1" />
-                        {tc('edit')}
+                        {tc("edit")}
                       </Button>
                       {pkg.active && (
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
                           size="sm"
                           className="text-destructive hover:text-destructive"
                           onClick={() => handleDeactivateTokenPackage(pkg)}
@@ -259,17 +282,21 @@ export function TokenPackagesManager() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingTokenPackage ? 'Edit Token Package' : 'Create Token Package'}
+              {editingTokenPackage
+                ? "Edit Token Package"
+                : "Create Token Package"}
             </DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="tokenName">Package Name</Label>
               <Input
                 id="tokenName"
                 value={tokenFormData.name}
-                onChange={(e) => setTokenFormData({ ...tokenFormData, name: e.target.value })}
+                onChange={(e) =>
+                  setTokenFormData({ ...tokenFormData, name: e.target.value })
+                }
                 placeholder="e.g., Starter Pack"
               />
             </div>
@@ -278,7 +305,12 @@ export function TokenPackagesManager() {
               <Input
                 id="tokenDescription"
                 value={tokenFormData.description}
-                onChange={(e) => setTokenFormData({ ...tokenFormData, description: e.target.value })}
+                onChange={(e) =>
+                  setTokenFormData({
+                    ...tokenFormData,
+                    description: e.target.value,
+                  })
+                }
                 placeholder="e.g., Perfect for occasional users"
               />
             </div>
@@ -289,7 +321,12 @@ export function TokenPackagesManager() {
                   id="tokenAmount"
                   type="number"
                   value={tokenFormData.tokens}
-                  onChange={(e) => setTokenFormData({ ...tokenFormData, tokens: e.target.value })}
+                  onChange={(e) =>
+                    setTokenFormData({
+                      ...tokenFormData,
+                      tokens: e.target.value,
+                    })
+                  }
                   placeholder="e.g., 10000"
                 />
               </div>
@@ -300,7 +337,12 @@ export function TokenPackagesManager() {
                   type="number"
                   step="0.01"
                   value={tokenFormData.price}
-                  onChange={(e) => setTokenFormData({ ...tokenFormData, price: e.target.value })}
+                  onChange={(e) =>
+                    setTokenFormData({
+                      ...tokenFormData,
+                      price: e.target.value,
+                    })
+                  }
                   placeholder="e.g., 49.99"
                 />
               </div>
@@ -308,12 +350,17 @@ export function TokenPackagesManager() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsTokenDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsTokenDialogOpen(false)}
+            >
               Cancel
             </Button>
             <Button onClick={handleSaveTokenPackage} disabled={isSavingToken}>
-              {isSavingToken && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {editingTokenPackage ? 'Update' : 'Create'}
+              {isSavingToken && (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              )}
+              {editingTokenPackage ? "Update" : "Create"}
             </Button>
           </DialogFooter>
         </DialogContent>

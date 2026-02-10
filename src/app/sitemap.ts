@@ -1,41 +1,48 @@
 import { MetadataRoute } from "next";
-import { getPathname } from "@/i18n/routing";
-import { routing } from "@/i18n/routing";
+import { getPathname, routing } from "@/i18n/routing";
 
-const host = process.env.NEXT_PUBLIC_BASE_URL || "https://civify.io";
-
-// Helper function to generate entries with all locale alternates
-function getEntry(
-  href: string,
-  changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"],
-  priority: number,
-): MetadataRoute.Sitemap {
-  // Generate one entry per locale
-  return routing.locales.map((locale) => ({
-    url: host + getPathname({ locale, href }),
-    lastModified: new Date(),
-    changeFrequency,
-    priority,
-    alternates: {
-      languages: Object.fromEntries(
-        routing.locales.map((l) => [
-          l,
-          host + getPathname({ locale: l, href }),
-        ]),
-      ),
-    },
-  }));
-}
+// Ensure the host doesn't have a trailing slash to prevent double slashes (e.g., //en)
+const host = (process.env.NEXT_PUBLIC_BASE_URL || "https://civify.cv").replace(
+  /\/$/,
+  "",
+);
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  console.log(...getEntry("/", "weekly", 1));
-  return [
-    ...getEntry("/", "weekly", 1),
-    ...getEntry("/plans", "weekly", 0.9),
-    ...getEntry("/api-docs", "weekly", 0.8),
-    ...getEntry("/contact", "monthly", 0.7),
-    ...getEntry("/terms", "yearly", 0.3),
-    ...getEntry("/policy", "yearly", 0.3),
-    ...getEntry("/policy/cancellation", "yearly", 0.3),
-  ];
+  // 1. Define your routes in a single array to avoid repetition
+  const routes = [
+    { href: "/", changeFrequency: "weekly", priority: 1 },
+    { href: "/plans", changeFrequency: "weekly", priority: 0.9 },
+    { href: "/api-docs", changeFrequency: "weekly", priority: 0.8 },
+    { href: "/contact", changeFrequency: "monthly", priority: 0.7 },
+    { href: "/terms", changeFrequency: "yearly", priority: 0.3 },
+    { href: "/policy", changeFrequency: "yearly", priority: 0.3 },
+    { href: "/policy/cancellation", changeFrequency: "yearly", priority: 0.3 },
+  ] as const;
+
+  // 2. Use flatMap to generate entries for every locale for every route
+  return routes.flatMap((route) => {
+    return routing.locales.map((locale) => {
+      // Resolve the URL for the current locale
+      // Cast href to 'any' to avoid TS errors if your routing config is strictly typed
+      const href = route.href as any;
+
+      return {
+        url: `${host}${getPathname({ locale, href })}`,
+        lastModified: new Date(),
+        changeFrequency: route.changeFrequency as
+          | "weekly"
+          | "monthly"
+          | "yearly",
+        priority: route.priority,
+        alternates: {
+          languages: Object.fromEntries(
+            routing.locales.map((l) => [
+              l,
+              `${host}${getPathname({ locale: l, href })}`,
+            ]),
+          ),
+        },
+      };
+    });
+  });
 }

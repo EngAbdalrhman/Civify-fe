@@ -7,17 +7,21 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 // Password complexity regex: 8+ chars, uppercase, lowercase, number, special char
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&^#()\-_=+\[\]{}|;:',.<>/~`])[A-Za-z\d@$!%*?&^#()\-_=+\[\]{}|;:',.<>/~`]{8,}$/;
+const PASSWORD_REGEX =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&^#()\-_=+\[\]{}|;:',.<>/~`])[A-Za-z\d@$!%*?&^#()\-_=+\[\]{}|;:',.<>/~`]{8,}$/;
 
 export const useSignup = () => {
   const t = useTranslations("auth");
 
   const signupSchema = z
     .object({
-      name: z.string().min(2, t("nameMin") || "Name must be at least 2 characters"),
+      name: z
+        .string()
+        .min(2, t("nameMin") || "Name must be at least 2 characters"),
       username: z.string().min(3, t("usernameMin")),
       email: z.string().email(t("invalidEmail")),
-      password: z.string()
+      password: z
+        .string()
         .min(8, t("passwordMin"))
         .regex(PASSWORD_REGEX, t("passwordComplexity")),
       confirmPassword: z.string().min(8, t("confirmPasswordMin")),
@@ -39,12 +43,15 @@ export const useSignup = () => {
     isSuccess: isSignupSuccess,
   } = useMutation({
     mutationFn: async (data: SignupSchemaType) => {
-      const response = await apiClient.post("/auth/register", data);
+      const response = await apiClient.post<{ message?: string }>(
+        "/auth/register",
+        data as unknown as object,
+      );
       return response.data;
     },
     onSuccess: (data) => {
       if (data.message) {
-//         toast.success(data.message);
+        //         toast.success(data.message);
       }
     },
     onError: (error: { message?: string }) => {
@@ -68,4 +75,3 @@ export type SignupSchemaType = {
   password: string;
   confirmPassword: string;
 };
-

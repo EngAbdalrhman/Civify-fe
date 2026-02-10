@@ -17,6 +17,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/use-auth';
+import { ADMIN_ACTION_PERMISSIONS } from '@/config/adminMenuConfig';
 
 // Define columns for audit logs
 const auditColumns: ColumnDef<AuditLog>[] = [
@@ -880,6 +882,9 @@ function TokenUsageTabContent() {
 
 export default function AuditMonitorPage() {
   const t = useTranslations('admin.auditMonitor');
+  const { hasPermission } = useAuth();
+
+  const showCvLogs = hasPermission(ADMIN_ACTION_PERMISSIONS.LOGS_CV);
   
   return (
     <div className="space-y-6">
@@ -907,10 +912,14 @@ export default function AuditMonitorPage() {
             <Settings className="h-4 w-4" />
             {t('tabs.promos')}
           </TabsTrigger>
-          <TabsTrigger value="cv-logs" className="gap-2">
-            <FileSearch className="h-4 w-4" />
-            {t('tabs.cvLogs')}
-          </TabsTrigger>
+          
+          {showCvLogs && (
+            <TabsTrigger value="cv-logs" className="gap-2">
+              <FileSearch className="h-4 w-4" />
+              {t('tabs.cvLogs')}
+            </TabsTrigger>
+          )}
+
           <TabsTrigger value="subscription-audit" className="gap-2">
             <RefreshCcw className="h-4 w-4" />
             Subscriptions
@@ -953,13 +962,15 @@ export default function AuditMonitorPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="cv-logs" className="mt-6">
-          <div className="rounded-lg border bg-card p-6">
-            <h3 className="text-lg font-semibold mb-4">CV Operation Logs</h3>
-            <p className="text-sm text-muted-foreground mb-4">Logs for CV parsing, tailoring, and masking</p>
-            <CvLogTabContent />
-          </div>
-        </TabsContent>
+        {showCvLogs && (
+          <TabsContent value="cv-logs" className="mt-6">
+            <div className="rounded-lg border bg-card p-6">
+              <h3 className="text-lg font-semibold mb-4">CV Operation Logs</h3>
+              <p className="text-sm text-muted-foreground mb-4">Logs for CV parsing, tailoring, and masking</p>
+              <CvLogTabContent />
+            </div>
+          </TabsContent>
+        )}
 
         <TabsContent value="subscription-audit" className="mt-6">
           <div className="rounded-lg border bg-card p-6">

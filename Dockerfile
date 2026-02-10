@@ -1,53 +1,88 @@
-# Stage 1: Install dependencies
-FROM node:20-alpine AS deps
+# -----------------------------------------------------------------------------
+# 1. Base Stage
+# -----------------------------------------------------------------------------
+FROM node:20-slim AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+# -----------------------------------------------------------------------------
+# 2. Deps Stage
+# -----------------------------------------------------------------------------
+FROM base AS deps
 WORKDIR /app
+COPY package.json pnpm-lock.yaml* ./
+RUN pnpm install --frozen-lockfile
 
-# Enable pnpm via corepack
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
-# Copy package files
-COPY package.json package-lock.json ./
-
-# Import npm lockfile and install dependencies
-RUN pnpm import && pnpm install --frozen-lockfile
-
-# Stage 2: Build the application
-FROM node:20-alpine AS builder
+# -----------------------------------------------------------------------------
+# 3. Builder Stage (ARGS ADDED HERE)
+# -----------------------------------------------------------------------------
+FROM base AS builder
 WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
 
-# Build arguments for Next.js public environment variables
-# These MUST be provided at build time for NEXT_PUBLIC_* vars to work
+# --- Build Args & Envs ---
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_BASE_URL
 ARG NEXT_PUBLIC_GA_MEASUREMENT_ID
 ARG NEXT_PUBLIC_CLARITY_PROJECT_ID
+ARG NEXT_TELEMETRY_DISABLED
+
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
 ENV NEXT_PUBLIC_GA_MEASUREMENT_ID=$NEXT_PUBLIC_GA_MEASUREMENT_ID
 ENV NEXT_PUBLIC_CLARITY_PROJECT_ID=$NEXT_PUBLIC_CLARITY_PROJECT_ID
+ENV NEXT_TELEMETRY_DISABLED=$NEXT_TELEMETRY_DISABLED
+# ------------------------------
 
-# Copy dependencies from deps stage
-COPY --from=deps /app/node_modules ./node_modules
+RUN pnpm run build
 
-# Copy all source files
-COPY . .
-
-# Build the Next.js application
-# This creates a standalone output for minimal runtime
-RUN npm run build
-
-# Stage 3: Production runtime
-FROM node:20-alpine AS runner
+# -----------------------------------------------------------------------------
+# 4. Runner Stage
+# -----------------------------------------------------------------------------
+FROM node:20-slim AS runner
 WORKDIR /app
 
-# Set NODE_ENV to production
 ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Create a non-root user for security
+# Install Chromium and required dependencies for Puppeteer
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       chromium \
+       fonts-ipafont-gothic \
+       fonts-wqy-zenhei \
+       fonts-thai-tlwg \
+       fonts-kacst \
+       fonts-freefont-ttf \
+       fonts-liberation \
+       fonts-noto-color-emoji \
+       libxss1 \
+       libgbm1 \
+       libnss3 \
+       libatk-bridge2.0-0 \
+       libgtk-3-0 \
+       libasound2 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set Puppeteer environment variables
+ENV PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium"
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
+# Create non-root user
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy necessary files from builder
+# Create writable directories for Chromium crash handler, user data, and XDG dirs
+RUN mkdir -p /tmp/chromium-crashes /tmp/chromium-data /tmp/.chromium \
+    && chown -R nextjs:nodejs /tmp/chromium-crashes /tmp/chromium-data /tmp/.chromium
+
+# Set XDG directories so chrome_crashpad_handler can find a writable database path
+ENV XDG_CONFIG_HOME=/tmp/.chromium
+ENV XDG_CACHE_HOME=/tmp/.chromium
+
+# Copy built application
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
@@ -55,12 +90,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Switch to non-root user
 USER nextjs
 
-# Expose the port Next.js runs on
 EXPOSE 3000
 
-# Set the port environment variable
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Start the Next.js application
 CMD ["node", "server.js"]

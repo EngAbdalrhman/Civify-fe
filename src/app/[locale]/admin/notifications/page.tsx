@@ -14,7 +14,7 @@ import {
   Check
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { adminService, type AdminUser, FilterOperation } from '@/services/admin.service';
+import { adminService, type AdminUser, FilterOperation, type NotificationChannel } from '@/services/admin.service';
 import { newsletterService } from '@/services/newsletter.service';
 import { usePermissions } from '@/contexts/PermissionContext';
 import { Button } from '@/components/ui/button';
@@ -40,6 +40,8 @@ export default function NotificationsPage() {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [type, setType] = useState<'INFO' | 'WARNING' | 'PROMO' | 'SUCCESS'>('INFO');
+
+  const [channel, setChannel] = useState<NotificationChannel>('PUSH');
   const [isSending, setIsSending] = useState(false);
   const { hasPermission } = usePermissions();
 
@@ -91,8 +93,9 @@ export default function NotificationsPage() {
     }
 
     setIsSending(true);
+
     try {
-      await adminService.sendBroadcast({ title, message, type });
+      await adminService.sendBroadcast({ title, message, type, channel });
       toast.success('Broadcast notification sent to all users!');
       setTitle('');
       setMessage('');
@@ -120,6 +123,7 @@ export default function NotificationsPage() {
         title,
         message,
         type,
+        channel,
         userIds: selectedUsers.map(u => u.id),
       });
       toast.success(`Notification sent to ${selectedUsers.length} user(s)!`);
