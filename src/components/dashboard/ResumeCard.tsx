@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText, Pencil, Trash2, ArrowDownToLine } from "lucide-react";
+import { FileText, Pencil, Trash2, ArrowDownToLine, Clock } from "lucide-react";
 import Link from "next/link";
 import { ResumeSummary } from "@/services/resume.service";
 import { useRouter } from "next/navigation";
@@ -14,10 +14,27 @@ interface ResumeCardProps {
 export function ResumeCard({ resume, onDelete, onDownload }: ResumeCardProps) {
   const router = useRouter();
 
-  const formattedDate = new Date(resume.updatedAt).toLocaleDateString(
-    undefined,
-    { month: "short", day: "numeric" },
-  );
+  const getRelativeTime = (dateStr: string) => {
+    const now = new Date();
+    const date = new Date(dateStr);
+    const diffMs = now.getTime() - date.getTime();
+    const diffSecs = Math.floor(diffMs / 1000);
+    const diffMins = Math.floor(diffSecs / 60);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffSecs < 60) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  const relativeDate = getRelativeTime(resume.updatedAt);
 
   return (
     <div className="flex flex-col rounded-lg border bg-card overflow-hidden transition-all duration-200 hover:shadow-md hover:border-foreground/15">
@@ -30,13 +47,22 @@ export function ResumeCard({ resume, onDelete, onDownload }: ResumeCardProps) {
           <FileText className="h-12 w-12 text-muted-foreground/15" />
         </div>
 
-        {/* Title & date */}
+        {/* Title, job title & date */}
         <div className="px-4 py-2.5">
           <h3 className="text-sm font-medium truncate" title={resume.title}>
             {resume.title}
           </h3>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {formattedDate}
+          {resume.data?.personalInfo?.jobTitle && (
+            <p
+              className="text-xs text-muted-foreground/70 truncate mt-0.5"
+              title={resume.data.personalInfo.jobTitle}
+            >
+              {resume.data.personalInfo.jobTitle}
+            </p>
+          )}
+          <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+            <Clock className="h-3 w-3" />
+            {relativeDate}
           </p>
         </div>
       </Link>

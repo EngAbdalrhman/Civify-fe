@@ -9,6 +9,7 @@ import {
   BarChart2,
   BookOpen,
   Key,
+  RotateCcw,
 } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { ResumeCarousel } from "@/components/dashboard/ResumeCarousel";
@@ -32,6 +33,23 @@ export function PersonalizedDashboard() {
   return <DefaultDashboard />;
 }
 
+// ─── Change Preference Button ───────────────────────────────────────────────
+
+function ChangePreferenceButton() {
+  const t = useTranslations("onboarding.dashboard");
+  const { resetOnboarding } = useOnboarding();
+
+  return (
+    <button
+      onClick={resetOnboarding}
+      className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+    >
+      <RotateCcw className="h-3 w-3" />
+      {t("changePreference")}
+    </button>
+  );
+}
+
 // ─── Builder Dashboard ──────────────────────────────────────────────────────
 
 function BuilderDashboard() {
@@ -39,9 +57,12 @@ function BuilderDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+        </div>
+        <ChangePreferenceButton />
       </div>
 
       <div className="grid gap-3 md:grid-cols-2">
@@ -88,9 +109,12 @@ function TailorDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+        </div>
+        <ChangePreferenceButton />
       </div>
 
       <div className="grid gap-3 md:grid-cols-2">
@@ -139,9 +163,12 @@ function ApiDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+        </div>
+        <ChangePreferenceButton />
       </div>
 
       <div className="grid gap-3 md:grid-cols-3">
