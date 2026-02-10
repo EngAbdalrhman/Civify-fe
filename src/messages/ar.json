@@ -1568,7 +1568,8 @@
         "viewDocsDesc": "دليل مرجع API الكامل",
         "usageStats": "إحصائيات الاستخدام",
         "usageStatsDesc": "راقب استخدام API الخاص بك"
-      }
+      },
+      "changePreference": "تغيير تفضيلاتي"
     }
   },
   "tooltips": {
