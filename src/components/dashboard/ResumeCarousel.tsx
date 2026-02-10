@@ -57,10 +57,10 @@ export function ResumeCarousel() {
         <h2 className="text-xl font-bold tracking-tight">{t("myResumes")}</h2>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {/* Create New Card */}
         <Link href="/app/resume-builder" className="group">
-          <Card className="h-[200px] flex flex-col items-center justify-center border-dashed border-2 hover:border-primary hover:bg-muted/50 transition-all cursor-pointer">
+          <Card className="h-full flex flex-col items-center justify-center border-dashed border-2 hover:border-primary hover:bg-muted/50 transition-all cursor-pointer">
             <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
               <Plus className="h-6 w-6 text-primary" />
             </div>

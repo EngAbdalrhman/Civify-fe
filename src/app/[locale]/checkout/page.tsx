@@ -35,6 +35,7 @@ function CheckoutContent() {
   const [promoCode, setPromoCode] = useState('');
   const [gateway, setGateway] = useState('fawaterak');
   const [paymentMethod, setPaymentMethod] = useState('CARD');
+  const [walletPhone, setWalletPhone] = useState('');
   const [enabledGateways, setEnabledGateways] = useState<string[]>([]);
   
   // Promo code validation state
@@ -153,12 +154,12 @@ function CheckoutContent() {
       // Plan mode (initial) - use payment service
       if (!plan) return;
 
-      const response = await paymentService.initiatePayment(
         plan.id,
         isAnnual,
         priceCalculation ? promoCode : undefined,
         gateway,
-        paymentMethod
+        paymentMethod,
+        paymentMethod === 'WALLET' ? walletPhone : undefined
       );
 
       if (response.paymentUrl) {
@@ -429,7 +430,54 @@ function CheckoutContent() {
                 )}
               </div>
 
-             {/* Payment Method Selection */}
+              {/* Payment Method Selection for Paymob */}
+              {gateway === 'paymob' && (
+                <div className="space-y-4 pt-4 border-t">
+                  <Label className="text-base font-medium">{t('selectPaymentMethod')}</Label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <button
+                      onClick={() => setPaymentMethod('CARD')}
+                      className={`p-4 rounded-lg border-2 flex flex-col items-center justify-center gap-2 transition-all ${
+                        paymentMethod === 'CARD' 
+                          ? 'border-primary bg-primary/5' 
+                          : 'border-muted hover:border-primary/50'
+                      }`}
+                    >
+                      <CreditCard className={`h-6 w-6 ${paymentMethod === 'CARD' ? 'text-primary' : 'text-muted-foreground'}`} />
+                      <span className="font-medium">{t('creditCard')}</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => setPaymentMethod('WALLET')}
+                      className={`p-4 rounded-lg border-2 flex flex-col items-center justify-center gap-2 transition-all ${
+                        paymentMethod === 'WALLET' 
+                          ? 'border-primary bg-primary/5' 
+                          : 'border-muted hover:border-primary/50'
+                      }`}
+                    >
+                      <Smartphone className={`h-6 w-6 ${paymentMethod === 'WALLET' ? 'text-primary' : 'text-muted-foreground'}`} />
+                      <span className="font-medium">{t('mobileWallet')}</span>
+                    </button>
+                  </div>
+
+                  {/* Wallet Phone Input */}
+                  {paymentMethod === 'WALLET' && (
+                    <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                       <Label htmlFor="walletPhone">{t('walletPhoneNumber')}</Label>
+                       <Input
+                         id="walletPhone"
+                         placeholder="01xxxxxxxxx"
+                         value={walletPhone}
+                         onChange={(e) => setWalletPhone(e.target.value)}
+                         className={!walletPhone.match(/^01[0125][0-9]{8}$/) && walletPhone ? "border-red-500" : ""}
+                       />
+                       <p className="text-xs text-muted-foreground">
+                         {t('walletPhoneHint')}
+                       </p>
+                    </div>
+                  )}
+                </div>
+              )}
 
 
               {/* Security Note */}

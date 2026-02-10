@@ -132,6 +132,20 @@
       "loadError": "Failed to load your resumes",
       "deleted": "Resume deleted",
       "deleteError": "Failed to delete resume"
+    },
+    "promotion": {
+      "title": "Unlock Your Full Potential",
+      "subtitle": "Get unlimited access to all features with our Pro plan",
+      "upgradeToPro": "Upgrade to Pro",
+      "features": {
+        "unlimitedCvs": "Unlimited CVs",
+        "aiTailoring": "AI Tailoring",
+        "pdfExports": "PDF Exports",
+        "noWatermark": "No Watermark"
+      },
+      "startFrom": "Start from",
+      "upgradeNow": "Try Now",
+      "learnMore": "Learn More"
     }
   },
   "upload": {
@@ -376,15 +390,18 @@
     "securePayment": "Secure Payment",
     "securePaymentDesc": "Your payment information is encrypted and secure. We never store your card details.",
     "fawaterak": "Fawaterak",
-    "fawaterakDesc": "Credit/Debit Card, Fawry, Wallets",
+    "fawaterakDesc": "Pay with Visa/Mastercard",
     "paymob": "Paymob",
-    "paymobDesc": "Credit/Debit Card, Mobile Wallets",
+    "paymobDesc": "Pay with Credit Card or Mobile Wallet",
     "selectPaymentMethod": "Select Payment Method",
+    "creditCard": "Credit Card",
+    "mobileWallet": "Mobile Wallet",
+    "walletPhoneNumber": "Wallet Phone Number",
+    "walletPhoneHint": "Enter the mobile number registered with your wallet (Vodafone Cash, Etisalat Cash, etc.)",
     "visa": "Credit/Debit Card",
     "visaDesc": "Visa, Mastercard, Meeza",
     "fawryPay": "Fawry",
     "fawryPayDesc": "Pay at any Fawry outlet",
-    "mobileWallet": "Mobile Wallet",
     "mobileWalletDesc": "Vodafone Cash, Orange, Etisalat, WE",
     "termsAgreement": "By confirming, you agree to our",
     "termsOfService": "Terms of Service",
@@ -502,12 +519,18 @@
       "verifying": "Verifying Payment...",
       "verifyingMessage": "Please wait while we confirm your payment.",
       "verificationPending": "Verification Pending",
-      "verificationPendingMessage": "We're still processing your payment."
+      "verificationPendingMessage": "We're still processing your payment.",
+      "processingNote": "Your payment may still be processing. Please check your email for confirmation or contact support.",
+      "retryVerification": "Try Again"
     },
     "failure": {
       "title": "Payment Failed",
       "subtitle": "We couldn't process your payment",
       "whatYouCanDo": "What you can do:",
+      "tip1": "Check your payment details and try again",
+      "tip2": "Try a different payment method",
+      "tip3": "Contact your bank if the issue persists",
+      "tip4": "Reach out to our support team for assistance",
       "tryAgain": "Try Again",
       "backToDashboard": "Back to Dashboard",
       "contactSupport": "Contact Support"
@@ -1569,7 +1592,8 @@
         "viewDocsDesc": "Complete API reference guide",
         "usageStats": "Usage Stats",
         "usageStatsDesc": "Monitor your API usage"
-      }
+      },
+      "changePreference": "Change my preference"
     }
   },
   "tooltips": {

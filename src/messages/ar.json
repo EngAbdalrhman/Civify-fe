@@ -134,6 +134,20 @@
       "loadError": "فشل تحميل سيرك الذاتية",
       "deleted": "تم حذف السيرة الذاتية",
       "deleteError": "فشل حذف السيرة الذاتية"
+    },
+    "promotion": {
+      "title": "أطلق العنان لإمكاناتك الكاملة",
+      "subtitle": "احصل على وصول غير محدود لجميع الميزات مع الخطط المدفوعة",
+      "upgradeToPro": "ترقية إلى الاحترافية",
+      "features": {
+        "unlimitedCvs": "سير ذاتية غير محدودة",
+        "aiTailoring": "تخصيص بالذكاء الاصطناعي",
+        "pdfExports": "تصدير PDF",
+        "noWatermark": "بدون علامة مائية"
+      },
+      "startFrom": "يبدأ من",
+      "upgradeNow": "جرب الآن",
+      "learnMore": "اعرف المزيد"
     }
   },
   "upload": {
@@ -379,15 +393,18 @@
     "securePayment": "دفع آمن",
     "securePaymentDesc": "معلومات الدفع الخاصة بك مشفرة وآمنة. نحن لا نخزن بيانات بطاقتك أبداً.",
     "fawaterak": "فواتيرك",
-    "fawaterakDesc": "بطاقة ائتمان/خصم، فوري، المحافظ",
+    "fawaterakDesc": "الدفع عبر فيزا / ماستركارد",
     "paymob": "باي موب",
-    "paymobDesc": "بطاقة ائتمان/خصم، المحافظ الإلكترونية",
+    "paymobDesc": "الدفع عبر البطاقة الائتمانية أو المحفظة الإلكترونية",
     "selectPaymentMethod": "اختر طريقة الدفع",
+    "creditCard": "بطاقة ائتمان",
+    "mobileWallet": "محفظة إلكترونية",
+    "walletPhoneNumber": "رقم المحفظة",
+    "walletPhoneHint": "أدخل رقم الموبايل المسجل عليه المحفظة (فودافون كاش، اتصالات كاش، إلخ)",
     "visa": "بطاقة ائتمان/خصم",
     "visaDesc": "فيزا، ماستركارد، ميزة",
     "fawryPay": "فوري",
     "fawryPayDesc": "ادفع في أي منفذ فوري",
-    "mobileWallet": "المحفظة الإلكترونية",
     "mobileWalletDesc": "فودافون كاش، أورانج، اتصالات، وي",
     "termsAgreement": "بالمتابعة، أنت توافق على",
     "termsOfService": "شروط الخدمة",
@@ -505,12 +522,18 @@
       "verifying": "جاري التحقق من الدفع...",
       "verifyingMessage": "يرجى الانتظار بينما نؤكد دفعك.",
       "verificationPending": "التحقق معلق",
-      "verificationPendingMessage": "لا نزال نعالج دفعك."
+      "verificationPendingMessage": "لا نزال نعالج دفعك.",
+      "processingNote": "قد لا يزال يتم معالجة دفعك. يرجى التحقق من بريدك الإلكتروني للتأكيد أو التواصل مع الدعم.",
+      "retryVerification": "حاول مرة أخرى"
     },
     "failure": {
       "title": "فشل الدفع",
       "subtitle": "لم نتمكن من معالجة دفعك",
       "whatYouCanDo": "ما يمكنك فعله:",
+      "tip1": "تحقق من تفاصيل الدفع وحاول مرة أخرى",
+      "tip2": "جرب طريقة دفع مختلفة",
+      "tip3": "تواصل مع البنك إذا استمرت المشكلة",
+      "tip4": "تواصل مع فريق الدعم للمساعدة",
       "tryAgain": "حاول مرة أخرى",
       "backToDashboard": "العودة إلى لوحة التحكم",
       "contactSupport": "تواصل مع الدعم"
@@ -1562,7 +1585,8 @@
         "viewDocsDesc": "دليل مرجع API الكامل",
         "usageStats": "إحصائيات الاستخدام",
         "usageStatsDesc": "راقب استخدام API الخاص بك"
-      }
+      },
+      "changePreference": "تغيير تفضيلاتي"
     }
   },
   "tooltips": {

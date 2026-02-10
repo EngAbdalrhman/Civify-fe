@@ -48,8 +48,10 @@ export function OnboardingHub() {
 
   const handleIntentSelect = (intent: (typeof intents)[number]) => {
     setPrimaryIntent(intent.id);
-    completeOnboarding();
+    // Navigate first, then mark onboarding complete after a tick
+    // to prevent the PersonalizedDashboard from briefly flashing
     router.push(intent.route);
+    setTimeout(() => completeOnboarding(), 0);
   };
 
   const handleExplore = () => {
