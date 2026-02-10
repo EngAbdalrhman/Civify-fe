@@ -502,12 +502,18 @@
       "verifying": "Verifying Payment...",
       "verifyingMessage": "Please wait while we confirm your payment.",
       "verificationPending": "Verification Pending",
-      "verificationPendingMessage": "We're still processing your payment."
+      "verificationPendingMessage": "We're still processing your payment.",
+      "processingNote": "Your payment may still be processing. Please check your email for confirmation or contact support.",
+      "retryVerification": "Try Again"
     },
     "failure": {
       "title": "Payment Failed",
       "subtitle": "We couldn't process your payment",
       "whatYouCanDo": "What you can do:",
+      "tip1": "Check your payment details and try again",
+      "tip2": "Try a different payment method",
+      "tip3": "Contact your bank if the issue persists",
+      "tip4": "Reach out to our support team for assistance",
       "tryAgain": "Try Again",
       "backToDashboard": "Back to Dashboard",
       "contactSupport": "Contact Support"
