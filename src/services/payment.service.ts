@@ -22,6 +22,7 @@ class PaymentService {
     promoCode?: string,
     gateway?: string,
     paymentMethod?: string,
+    phoneNumber?: string,
     currency?: string
   ): Promise<PaymentInitiationResponse> {
     const params = new URLSearchParams({
@@ -38,7 +39,12 @@ class PaymentService {
     }
 
     if (paymentMethod) {
-      params.append('paymentMethod', paymentMethod);
+      // Backend expects 'method', we use 'paymentMethod' in frontend
+      params.append('method', paymentMethod);
+    }
+
+    if (phoneNumber) {
+      params.append('phoneNumber', phoneNumber);
     }
 
     if (currency) {
