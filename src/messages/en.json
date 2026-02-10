@@ -1569,7 +1569,8 @@
         "viewDocsDesc": "Complete API reference guide",
         "usageStats": "Usage Stats",
         "usageStatsDesc": "Monitor your API usage"
-      }
+      },
+      "changePreference": "Change my preference"
     }
   },
   "tooltips": {
