@@ -118,16 +118,16 @@ function PaymentSuccessContent() {
               </p>
             </div>
             <p className="text-sm text-muted-foreground text-center">
-              Your payment may still be processing. Please check your email for confirmation or contact support.
+              {t('processingNote')}
             </p>
             <div className="space-y-2">
               <Button onClick={verifyPayment} className="w-full" size="lg">
-                Try Again
+                {t('retryVerification')}
               </Button>
               <Button variant="outline" asChild className="w-full" size="lg">
                 <Link href="/app">
                   <Home className="mr-2 h-4 w-4" />
-                  Go to Dashboard
+                  {t('goToDashboard')}
                 </Link>
               </Button>
             </div>
