@@ -189,6 +189,24 @@ export default function UsersPage() {
       filterOperation: FilterOperation.MATCH
     },
     {
+      key: 'oauthProvider',
+      label: 'Source',
+      render: (_: unknown, item: AdminUser) => (
+        <Badge variant="outline" className={!item.oauthProvider || item.oauthProvider === 'EMAIL' ? 'border-zinc-500' : 'border-blue-500 text-blue-500'}>
+          {item.oauthProvider || 'EMAIL'}
+        </Badge>
+      ),
+      sortable: true,
+      filterable: true,
+      filterType: 'select',
+      filterOperation: FilterOperation.EQUAL,
+      filterOptions: [
+        { label: 'Email', value: 'EMAIL' },
+        { label: 'Google', value: 'GOOGLE' },
+        { label: 'LinkedIn', value: 'LINKEDIN' }
+      ]
+    },
+    {
       key: 'name',
       label: t('columns.name'),
       render: (_: unknown, item: AdminUser) => (

@@ -65,6 +65,8 @@ export interface AdminUser {
   // Subscription (display only)
   currentPlan?: string;
   subscriptionStatus?: string;
+  oauthProvider?: string;
+  oauthSubject?: string;
 }
 
 // ============================================

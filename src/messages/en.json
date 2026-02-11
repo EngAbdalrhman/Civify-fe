@@ -80,6 +80,8 @@
     "hasAccount": "Already have an account?",
     "loginWithGoogle": "Login with Google",
     "signupWithGoogle": "Sign up with Google",
+    "loginWithLinkedIn": "Login with LinkedIn",
+    "signupWithLinkedIn": "Sign up with LinkedIn",
     "invalidEmail": "Please enter a valid email address",
     "passwordRequired": "Password is required",
     "usernameMin": "Username must be at least 3 characters long",
