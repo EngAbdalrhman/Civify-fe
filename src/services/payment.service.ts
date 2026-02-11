@@ -69,11 +69,11 @@ class PaymentService {
   /**
    * Verify payment transaction
    */
-  async verifyPayment(transactionId: string, gateway?: string): Promise<{ verified: boolean; message: string }> {
+  async verifyPayment(transactionId: string, gateway?: string): Promise<{ verified: boolean; message: string; retryable?: boolean }> {
     const url = gateway
       ? `${API_ENDPOINTS.VERIFY(transactionId)}?gateway=${gateway}`
       : API_ENDPOINTS.VERIFY(transactionId);
-    const response = await apiClient.get<{ verified: boolean; message: string }>(url);
+    const response = await apiClient.get<{ verified: boolean; message: string; retryable?: boolean }>(url);
     return response.data;
   }
 
@@ -85,7 +85,7 @@ class PaymentService {
     gateway?: string,
     maxRetries: number = 5,
     retryDelay: number = 2000
-  ): Promise<{ verified: boolean; message: string }> {
+  ): Promise<{ verified: boolean; message: string; retryable?: boolean }> {
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
         const result = await this.verifyPayment(transactionId, gateway);
@@ -94,11 +94,23 @@ class PaymentService {
           return result;
         }
 
+        // If explicitly not retryable (payment genuinely failed), stop retrying
+        if (result.retryable === false) {
+          return result;
+        }
+
         // If not verified yet, wait and retry
         if (attempt < maxRetries - 1) {
           await new Promise(resolve => setTimeout(resolve, retryDelay));
         }
-      } catch (error) {
+      } catch (error: any) {
+        // 503 errors contain retryable body — extract and retry
+        const responseData = error?.response?.data;
+        if (responseData?.retryable && attempt < maxRetries - 1) {
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          continue;
+        }
+
         if (attempt < maxRetries - 1) {
           await new Promise(resolve => setTimeout(resolve, retryDelay));
           continue;
@@ -107,7 +119,7 @@ class PaymentService {
       }
     }
 
-    return { verified: false, message: 'Payment verification timed out' };
+    return { verified: false, message: 'Payment verification timed out', retryable: true };
   }
 
   /**

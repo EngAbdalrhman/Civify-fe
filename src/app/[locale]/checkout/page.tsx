@@ -154,6 +154,7 @@ function CheckoutContent() {
       // Plan mode (initial) - use payment service
       if (!plan) return;
 
+      const response = await paymentService.initiatePayment(
         plan.id,
         isAnnual,
         priceCalculation ? promoCode : undefined,

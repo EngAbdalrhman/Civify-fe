@@ -549,6 +549,8 @@
       "confirmPayment": "تأكيد الدفع"
     },
     "success": {
+      "verifiedToast": "تم التحقق من الدفع بنجاح!",
+      "verificationFailedToast": "فشل التحقق من الدفع. يرجى التواصل مع الدعم.",
       "title": "تم الدفع بنجاح!",
       "message": "تم تفعيل اشتراكك",
       "goToDashboard": "الذهاب إلى لوحة التحكم",

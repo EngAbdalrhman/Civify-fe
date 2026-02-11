@@ -60,7 +60,7 @@ function PaymentSuccessContent() {
 
       if (result.verified) {
         setVerified(true);
-        toast.success('Payment verified successfully!');
+        toast.success(t('verifiedToast'));
         // Refresh permissions/group to update UI (e.g. remove "Free Plan" badge)
         await fetchPermissions();
       } else {
@@ -69,7 +69,7 @@ function PaymentSuccessContent() {
     } catch (err) {
       console.error('Payment verification error:', err);
       setError(err instanceof Error ? err.message : 'Failed to verify payment');
-      toast.error('Payment verification failed. Please contact support.');
+      toast.error(t('verificationFailedToast'));
     } finally {
       setVerifying(false);
     }

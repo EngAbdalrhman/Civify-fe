@@ -497,6 +497,8 @@
   },
   "payment": {
     "success": {
+      "verifiedToast": "Payment verified successfully!",
+      "verificationFailedToast": "Payment verification failed. Please contact support.",
       "title": "Payment Successful!",
       "subtitle": "Your subscription has been activated",
       "message": "Thank you for your purchase! Your account has been upgraded and you now have access to all premium features.",
