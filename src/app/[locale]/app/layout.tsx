@@ -321,7 +321,7 @@ export default function UserDashboardLayout({
         {/* Main Content Wrapper */}
         <div
           className={cn(
-            "flex-1 flex flex-col transition-all duration-300",
+            "flex-1 flex flex-col transition-all duration-300 bg-zinc-200/10",
             mainMargin,
             isResumeBuilderPage ? "h-screen overflow-hidden" : "min-h-screen",
           )}
