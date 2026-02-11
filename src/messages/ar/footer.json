@@ -1,0 +1,44 @@
+{
+  "product": {
+    "title": "المنتج",
+    "overview": "نظرة عامة",
+    "pricing": "الأسعار",
+    "apiDocs": "وثائق API"
+  },
+  "company": {
+    "title": "الشركة",
+    "about": "عن الشركة",
+    "team": "الفريق",
+    "blog": "المدونة",
+    "careers": "الوظائف",
+    "contact": "اتصل بنا",
+    "privacy": "الخصوصية",
+    "terms": "الشروط والأحكام"
+  },
+  "resources": {
+    "title": "الموارد",
+    "help": "المساعدة",
+    "sales": "المبيعات",
+    "advertise": "الإعلان"
+  },
+  "social": {
+    "title": "التواصل الاجتماعي",
+    "twitter": "تويتر",
+    "instagram": "إنستغرام",
+    "linkedin": "لينكد إن"
+  },
+  "newsletter": {
+    "title": "اشترك في نشرتنا الإخبارية",
+    "description": "احصل على آخر التحديثات والأخبار في بريدك الإلكتروني",
+    "placeholder": "أدخل بريدك الإلكتروني",
+    "subscribe": "اشترك",
+    "success": "تم الاشتراك بنجاح!",
+    "error": "فشل الاشتراك. حاول مرة أخرى."
+  },
+  "followUs": "تابعنا",
+  "mobileApp": "تطبيق الجوال",
+  "downloadOn": "حمّل من",
+  "getItOn": "احصل عليه من",
+  "copyright": "© {year} Civify.cv. جميع الحقوق محفوظة.",
+  "poweredBy": "مدعوم بواسطة Technolabs"
+}

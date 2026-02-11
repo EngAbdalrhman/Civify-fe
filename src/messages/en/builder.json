@@ -1,0 +1,52 @@
+{
+  "title": "Resume Builder",
+  "tabs": {
+    "content": "Content",
+    "design": "Design",
+    "export": "Export"
+  },
+  "actions": {
+    "upload": "Upload Resume",
+    "parsing": "Parsing...",
+    "save": "Save",
+    "saving": "Saving...",
+    "reset": "Reset to Original",
+    "fullscreen": "Fullscreen",
+    "exitFullscreen": "Exit Fullscreen"
+  },
+  "saveDialog": {
+    "title": "Save Resume",
+    "description": "Enter a title for your resume. This will help you identify it later.",
+    "label": "Resume Title",
+    "placeholder": "e.g. Software Engineer CV",
+    "cancel": "Cancel",
+    "confirm": "Save"
+  },
+  "exportPanel": {
+    "title": "Ready to download?",
+    "subtitle": "Choose a format to export your resume.",
+    "pdf": {
+      "title": "PDF File",
+      "description": "Best for sharing and printing. Preserves formatting.",
+      "exporting": "Generating PDF..."
+    },
+    "docx": {
+      "title": "Word Document",
+      "description": "Editable in Microsoft Word or Google Docs.",
+      "exporting": "Generating DOCX..."
+    },
+    "tip": "Tip: Review your resume in the preview panel before downloading to ensure everything looks perfect."
+  },
+  "toasts": {
+    "enterTitle": "Please enter a title for your resume",
+    "saveSuccess": "Resume saved successfully",
+    "saveError": "Failed to save resume",
+    "resetInfo": "Resume reset to original state",
+    "uploadError": "Please upload a PDF or Word file",
+    "parseSuccess": "Resume parsed successfully!",
+    "parseError": "Failed to parse resume. Please try again.",
+    "fullscreenError": "Fullscreen not supported",
+    "guestUpload": "Please login to upload a resume",
+    "loginAction": "Login"
+  }
+}

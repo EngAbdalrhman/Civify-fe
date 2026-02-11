@@ -16,8 +16,8 @@ import {
 import { toast } from "sonner";
 import { useState } from "react"; // Added useState import
 
-import enTranslations from "@/messages/en.json";
-import arTranslations from "@/messages/ar.json";
+import enTranslations from "@/messages/en";
+import arTranslations from "@/messages/ar";
 
 interface ExportPanelProps {
   data: ResumeData;

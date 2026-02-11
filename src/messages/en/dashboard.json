@@ -1,0 +1,47 @@
+{
+  "personalPage": {
+    "title": "Personal Page",
+    "subtitle": "Manage your profile and view your resumes",
+    "profile": "Profile",
+    "profileDesc": "Update your personal information",
+    "cvs": "My Resumes",
+    "recent": "Recent Activity",
+    "recentDesc": "Your recent activity"
+  },
+  "analytics": {
+    "title": "Analytics",
+    "overview": "Overview",
+    "cvViews": "CV Views",
+    "downloads": "Downloads",
+    "performance": "Performance"
+  },
+  "settings": {
+    "title": "Settings",
+    "account": "Account Settings",
+    "preferences": "Preferences",
+    "notifications": "Notifications",
+    "security": "Security"
+  },
+  "resumes": {
+    "myResumes": "My Resumes",
+    "viewAll": "View All",
+    "createNew": "Create New Resume",
+    "loadError": "Failed to load resumes",
+    "deleted": "Resume deleted",
+    "deleteError": "Failed to delete resume"
+  },
+  "promotion": {
+    "title": "Unlock Your Full Potential",
+    "subtitle": "Get unlimited access to all features with our premium plans",
+    "upgradeToPro": "Upgrade to Pro",
+    "features": {
+      "unlimitedCvs": "Unlimited Resumes",
+      "aiTailoring": "AI Tailoring",
+      "pdfExports": "PDF Exports",
+      "noWatermark": "No Watermark"
+    },
+    "startFrom": "Starting from",
+    "upgradeNow": "Try Now",
+    "learnMore": "Learn More"
+  }
+}

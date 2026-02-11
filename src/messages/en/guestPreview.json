@@ -1,0 +1,39 @@
+{
+  "input": {
+    "badge": "Try Before You Sign Up",
+    "title": "See How We Match Your Resume to Jobs",
+    "subtitle": "Paste a job description below and watch the skills analysis happen instantly — no account needed.",
+    "placeholder": "Paste job description here...\n\nExample:\nSenior Software Engineer\nLooking for a developer with React, Node.js experience...",
+    "minChars": "min chars",
+    "useSample": "Use sample job description",
+    "analyzing": "Analyzing...",
+    "analyze": "Analyze Job Match"
+  },
+  "preview": {
+    "back": "Back",
+    "matchScore": "Match Score",
+    "skillsTitle": "Skills Analysis",
+    "skillsSubtitle": "How your skills match against this job",
+    "cvTitle": "Resume Preview",
+    "cvSubtitle": "See what the tailored CV would look like",
+    "ctaTitle": "Ready to build your resume?",
+    "ctaSubtitle": "Sign up to create a personalized resume tailored to your target jobs.",
+    "ctaButton": "Start for Free"
+  },
+  "signup": {
+    "matchScore": "Match Score",
+    "title": "Unlock Your Full Potential",
+    "subtitle": "Create an account to generate your complete, tailored resume.",
+    "benefits": {
+      "title": "What you'll get:",
+      "fullCv": "Full AI Resume Generation",
+      "download": "Download as PDF or DOCX",
+      "multipleVersions": "Create unlimited versions",
+      "atsScore": "Track Real-time ATS Score"
+    },
+    "signupCta": "Create Free Account",
+    "loginCta": "Have an account? Login",
+    "securityNote": "Your data is encrypted & never shared",
+    "back": "← Back to Preview"
+  }
+}

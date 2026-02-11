@@ -1,0 +1,55 @@
+import admin from "./admin.json";
+import apiKeys from "./apiKeys.json";
+import atsScore from "./atsScore.json";
+import auth from "./auth.json";
+import builder from "./builder.json";
+import checkout from "./checkout.json";
+import common from "./common.json";
+import contact from "./contact.json";
+import dashboard from "./dashboard.json";
+import design from "./design.json";
+import editor from "./editor.json";
+import footer from "./footer.json";
+import guestPreview from "./guestPreview.json";
+import help from "./help.json";
+import landing from "./landing.json";
+import nav from "./nav.json";
+import onboarding from "./onboarding.json";
+import payment from "./payment.json";
+import plans from "./plans.json";
+import policy from "./policy.json";
+import resume from "./resume.json";
+import subscription from "./subscription.json";
+import terms from "./terms.json";
+import tokens from "./tokens.json";
+import tooltips from "./tooltips.json";
+import upload from "./upload.json";
+
+export default {
+  admin,
+  apiKeys,
+  atsScore,
+  auth,
+  builder,
+  checkout,
+  common,
+  contact,
+  dashboard,
+  design,
+  editor,
+  footer,
+  guestPreview,
+  help,
+  landing,
+  nav,
+  onboarding,
+  payment,
+  plans,
+  policy,
+  resume,
+  subscription,
+  terms,
+  tokens,
+  tooltips,
+  upload,
+};

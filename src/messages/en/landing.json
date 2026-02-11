@@ -1,0 +1,412 @@
+{
+  "hero": {
+    "titlePart1": "75% of CVs",
+    "titlePart2": "Never Get Seen",
+    "titlePart3": "Make Yours Count.",
+    "subtitle": "Stand out with our AI-powered resume builder. ATS-friendly templates, expert tips, and instant formatting.",
+    "cta": "Build My Resume Now",
+    "ctaPrimary": "Build Your First Resume",
+    "ctaSecondary": "Try a Resume Sample",
+    "ctaSubtext": "See results before signing up — no account needed to preview.",
+    "ctaFree": "Try for Free",
+    "badge": "Full Arabic Support!",
+    "matchScore": "92%",
+    "interviews": "More Interviews"
+  },
+  "howItWorks": {
+    "title": "How Civify Works",
+    "subtitle": "From upload to download in 4 simple steps",
+    "steps": {
+      "step1": {
+        "title": "Upload Your Resume",
+        "description": "Start from scratch or upload your existing CV in any format"
+      },
+      "step2": {
+        "title": "Paste Job Description",
+        "description": "Copy and paste the job description or select a job category"
+      },
+      "step3": {
+        "title": "AI Analysis",
+        "description": "Civify analyzes ATS keywords and role requirements instantly"
+      },
+      "step4": {
+        "title": "Download Optimized CV",
+        "description": "Get your polished, tailored resume with optimization score"
+      }
+    }
+  },
+  "features": {
+    "title": "Powerful Features",
+    "subtitle": "Everything you need to land your dream job",
+    "items": {
+      "parser": {
+        "title": "AI Job Description Parser",
+        "description": "Extracts required skills and keywords to match job listings better"
+      },
+      "ats": {
+        "title": "ATS Optimization Engine",
+        "description": "Ensures formatting and keyword density meet ATS standards for maximum visibility"
+      },
+      "templates": {
+        "title": "Role-Based Resume Templates",
+        "description": "Developer, Designer, Data Analyst, HR, Marketing, Sales, and other niche templates"
+      },
+      "aiRewrite": {
+        "title": "AI Achievement Rewrite",
+        "description": "Transforms simple tasks into measurable impact statements that wow recruiters"
+      },
+      "skills": {
+        "title": "Skill Gap Suggestions",
+        "description": "Surfaces missing skills and recommends additions based on job requirements"
+      },
+      "arabic": {
+        "title": "Full Arabic Support 🇸🇦",
+        "description": "Native RTL support, Arabic OCR for scanned docs, and dual-language resume generation"
+      },
+      "score": {
+        "title": "Real-Time Score Indicator",
+        "description": "Shows your resume match score before download so you know exactly where you stand"
+      },
+      "privacy": {
+        "title": "Resume Masking & Privacy",
+        "description": "Protect personal info when sharing resumes - mask emails, phones, and addresses"
+      }
+    }
+  },
+  "resumeBuilder": {
+    "title": "Advanced Resume Builder",
+    "titleAccent": "AI Enhanced",
+    "description": "Build, edit, and perfect your resume with our state-of-the-art tools. Instant changes, real-time previews, and smart suggestions.",
+    "badge": "Full Arabic Support",
+    "cta": "Open Builder",
+    "features": {
+      "preview": {
+        "title": "Instant Preview",
+        "description": "See changes immediately as you type"
+      },
+      "ai": {
+        "title": "AI Optimization",
+        "description": "Get smart suggestions to improve your content"
+      },
+      "multiLang": {
+        "title": "Multi-language",
+        "description": "Full support for English and Arabic layouts"
+      }
+    },
+    "loadingVideo": "Loading video..."
+  },
+  "pricing": {
+    "title": "Simple, Transparent Pricing",
+    "subtitle": "Choose the plan that fits your job search needs",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "save": "Save 20%",
+    "mostPopular": "Most Popular",
+    "selectPlan": "Select Plan",
+    "getStarted": "Get Started",
+    "noCreditCard": "No credit card needed for free plan",
+    "cancelAnytime": "Cancel anytime",
+    "errorLoading": "Failed to load pricing plans",
+    "errorContact": "Please try again later or contact support",
+    "features": {
+      "cvStorageUnlimited": "Unlimited CV Storage",
+      "cvStorage": "Store {count} CVs",
+      "aiTailoring": "AI Resume Tailoring",
+      "masking": "Personal Info Masking",
+      "pdfExport": "PDF Export",
+      "noWatermark": "No Watermark",
+      "apiAccess": "API Access for Integrations",
+      "dashboardAccess": "Dashboard Access",
+      "prioritySupport": "Priority Support",
+      "advancedAi": "Advanced AI Features",
+      "basicSupport": "Basic Support"
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know about Civify",
+    "items": {
+      "q1": {
+        "question": "Is my data private?",
+        "answer": "Absolutely. We use enterprise-grade encryption and never share your personal information with third parties. Your resume data is stored securely and you can delete it at any time."
+      },
+      "q2": {
+        "question": "What makes a resume ATS-friendly?",
+        "answer": "Applicant Tracking Systems (ATS) scan resumes for specific keywords, proper formatting, and standard section headers. Our templates are designed to pass ATS screenings while remaining professional for human recruiters."
+      },
+      "q3": {
+        "question": "Can I customize the resume manually?",
+        "answer": "Yes! After AI optimization, you have full control to edit any section, adjust formatting, and personalize content to match your personal style."
+      },
+      "q4": {
+        "question": "Do you save my documents?",
+        "answer": "Your resumes are saved securely to your account so you can access and edit them anytime. You can also download them locally and delete from our servers whenever you wish."
+      },
+      "q5": {
+        "question": "How accurate is the match score?",
+        "answer": "Our match score is based on industry-standard ATS algorithms and keyword analysis. While no score is 100% predictive, our users report significantly higher interview rates with scores above 80%."
+      }
+    },
+    "stillQuestions": "Still have questions?",
+    "contactSupportTeam": "Contact Support Team"
+  },
+  "integrations": {
+    "title": "Seamless Integration",
+    "subtitle": "Connects with your favorite platforms and tools",
+    "items": {
+      "linkedin": {
+        "name": "LinkedIn",
+        "description": "Import profile data instantly"
+      },
+      "google-docs": {
+        "name": "Google Docs",
+        "description": "Export and edit in Google Docs"
+      },
+      "word": {
+        "name": "Microsoft Word",
+        "description": "Download as .docx format"
+      },
+      "indeed": {
+        "name": "Indeed",
+        "description": "Optimize for Indeed applications"
+      },
+      "glassdoor": {
+        "name": "Glassdoor",
+        "description": "Tailor for Glassdoor listings"
+      },
+      "google-drive": {
+        "name": "Google Drive",
+        "description": "Save directly to Drive"
+      }
+    }
+  },
+  "templates": {
+    "title": "Professional Resume Templates",
+    "subtitle": "Choose from our collection of ATS-optimized templates designed for every industry",
+    "badge": "ATS-Friendly",
+    "note": {
+      "bold": "All templates are 100% ATS-compliant",
+      "text": "— optimized to pass Applicant Tracking Systems"
+    },
+    "items": {
+      "ats-clean": {
+        "name": "Clean ATS",
+        "category": "Professional",
+        "description": "Simple, scannable format optimized for Applicant Tracking Systems"
+      },
+      "professional": {
+        "name": "Professional",
+        "category": "Business",
+        "description": "Elegant design perfect for corporate and traditional industries"
+      },
+      "minimalist": {
+        "name": "Minimalist",
+        "category": "Modern",
+        "description": "Ultra-clean design with sophisticated use of whitespace"
+      },
+      "modern": {
+        "name": "Modern",
+        "category": "Creative",
+        "description": "Contemporary design with geometric elements and bold typography"
+      },
+      "technical": {
+        "name": "Technical",
+        "category": "Tech",
+        "description": "Tailored for developers with skills matrix and GitHub-style layout"
+      },
+      "creative": {
+        "name": "Creative",
+        "category": "Design",
+        "description": "Artistic layout for designers and creative professionals"
+      }
+    }
+  },
+  "testimonials": {
+    "title": "Success Stories",
+    "subtitle": "Join thousands of professionals who landed their dream jobs with Civify",
+    "stats": {
+      "users": { "value": "50,000+", "label": "Happy Users" },
+      "rating": { "value": "4.9/5", "label": "Average Rating" },
+      "reviews": { "value": "2,000+", "label": "5-Star Reviews" }
+    },
+    "items": {
+      "t1": {
+        "quote": "I got 3 interviews in 2 weeks after using Civify. The ATS optimization really works!",
+        "role": "Software Engineer",
+        "company": "Google",
+        "metric": "3 interviews in 2 weeks"
+      },
+      "t2": {
+        "quote": "The AI rewrite feature turned my boring bullet points into powerful achievements. Landed my dream job!",
+        "role": "Product Manager",
+        "company": "Microsoft",
+        "metric": "Landed Dream Job"
+      },
+      "t3": {
+        "quote": "My resume match score went from 45% to 92%. The skill gap suggestions were incredibly helpful.",
+        "role": "Data Analyst",
+        "company": "Amazon",
+        "metric": "92% Match Score"
+      },
+      "t4": {
+        "quote": "Finally, a resume tool that understands what recruiters actually look for. Worth every penny!",
+        "role": "Marketing Manager",
+        "company": "Meta"
+      }
+    }
+  },
+  "roles": {
+    "title": "Tailored to Your Role",
+    "subtitle": "Industry-specific optimization for every career path",
+    "create": "Create {role} Resume",
+    "sections": {
+      "keywords": "Optimized Keywords",
+      "language": "Industry Language",
+      "examples": "Custom Examples"
+    },
+    "items": {
+      "software-engineer": {
+        "name": "Software Engineer",
+        "keywords": "JavaScript, Python, React, Node.js, AWS, Docker, Git, Agile",
+        "language": "Full-stack development, microservices, CI/CD pipelines, RESTful APIs",
+        "examples": [
+          "Developed scalable web applications serving 1M+ users",
+          "Reduced API latency by 40% through optimization"
+        ]
+      },
+      "data-scientist": {
+        "name": "Data Scientist",
+        "keywords": "Python, Machine Learning, SQL, TensorFlow, Pandas, Statistics",
+        "language": "Predictive modeling, data visualization, A/B testing, ETL pipelines",
+        "examples": [
+          "Built ML models improving forecast accuracy by 25%",
+          "Analyzed datasets of 10M+ records to extract business insights"
+        ]
+      },
+      "product-manager": {
+        "name": "Product Manager",
+        "keywords": "Product Strategy, Roadmap, Stakeholder Management, Analytics, Agile",
+        "language": "Product-market fit, user stories, KPIs, go-to-market strategy",
+        "examples": [
+          "Launched 5 features increasing user engagement by 35%",
+          "Managed cross-functional teams of 15+ members"
+        ]
+      },
+      "accountant": {
+        "name": "Accountant",
+        "keywords": "QuickBooks, Excel, GAAP, Financial Reporting, Tax Preparation",
+        "language": "General ledger, reconciliation, auditing, compliance",
+        "examples": [
+          "Managed AP/AR for a $5M annual budget",
+          "Reduced month-end close time by 30%"
+        ]
+      },
+      "customer-support": {
+        "name": "Customer Support",
+        "keywords": "Zendesk, Customer Service, Communication, Problem Solving, CRM",
+        "language": "Ticket resolution, CSAT, SLA, escalation",
+        "examples": [
+          "Maintained a 95% CSAT score",
+          "Resolved 50+ tickets daily with 2-hour avg response time"
+        ]
+      },
+      "sales-rep": {
+        "name": "Sales Representative",
+        "keywords": "Salesforce, Lead Generation, Negotiation, B2B Sales, CRM",
+        "language": "Pipeline management, quota attainment, cold calling, account management",
+        "examples": [
+          "Exceeded sales quota by 120% for 3 consecutive quarters",
+          "Generated $2M in new business revenue"
+        ]
+      },
+      "marketing-specialist": {
+        "name": "Marketing Specialist",
+        "keywords": "SEO, Google Analytics, Content Marketing, Social Media, Email Campaigns",
+        "language": "Brand awareness, lead generation, conversion rate, marketing automation",
+        "examples": [
+          "Increased organic traffic by 150% through SEO optimization",
+          "Managed campaigns generating 10k+ qualified leads"
+        ]
+      },
+      "project-manager": {
+        "name": "Project Manager",
+        "keywords": "PMP, Agile, Scrum, Risk Management, Budget Management, Jira",
+        "language": "Project lifecycle, stakeholder engagement, resource allocation, deliverables",
+        "examples": [
+          "Delivered 20+ projects on time and within budget",
+          "Managed project portfolios valued over $10M"
+        ]
+      }
+    }
+  },
+  "beforeAfter": {
+    "badge": "✨ See the Transformation",
+    "title": "From Generic to Exceptional",
+    "subtitle": "Watch how AI transforms ordinary bullet points into powerful achievements",
+    "before": {
+      "badge": "⚪ Before",
+      "score": "Match Score: 45%",
+      "items": {
+        "item1": "Responsible for managing team projects and meetings",
+        "item2": "Worked on improving customer satisfaction",
+        "item3": "Helped with various marketing tasks"
+      },
+      "issuesTitle": "Issues Detected:",
+      "issues": {
+        "item1": "No quantifiable metrics",
+        "item2": "Vague responsibilities",
+        "item3": "Missing keywords",
+        "item4": "Weak action verbs"
+      }
+    },
+    "after": {
+      "badge": "✨ After",
+      "score": "Match Score: 92%",
+      "items": {
+        "item1": "<strong1>Led</strong1> cross-functional team of 8 to deliver <strong2>15+ projects</strong2> on schedule, increasing client satisfaction by <strong3>35%</strong3> through improved stakeholder communication",
+        "item2": "<strong1>Implemented</strong1> customer feedback loop that raised NPS from 42 to <strong2>78</strong2>, resulting in a <strong3>25% increase</strong3> in retention",
+        "item3": "<strong1>Managed</strong1> multi-channel marketing campaigns generating <strong2>$500k</strong2> in revenue and <strong3>10,000+</strong3> qualified leads"
+      },
+      "improvementsTitle": "Improvements Made:",
+      "improvements": {
+        "item1": "Quantifiable metrics added",
+        "item2": "Strong action verbs (Led, Implemented)",
+        "item3": "Industry-specific keywords",
+        "item4": "Clear business impact"
+      }
+    }
+  },
+  "ctaSection": {
+    "title": "Stop Sending Resumes into the Void",
+    "subtitle": "Join the beta and be among the first to experience AI-native resume optimization.",
+    "highlight": "Full Arabic Support. 92% Match Rate. Free to Start.",
+    "cta": "Build My Resume Now",
+    "trust": "Free to Start"
+  },
+  "blog": {
+    "title": "Career Resources",
+    "subtitle": "Expert advice and guides to supercharge your job search",
+    "readMore": "Read More",
+    "viewAll": "View All Articles",
+    "posts": {
+      "post1": {
+        "readTime": "5 min read",
+        "title": "How to Write an ATS-Friendly Resume in 2025",
+        "excerpt": "Learn the essential strategies to ensure your resume passes Applicant Tracking Systems and reaches human recruiters.",
+        "slug": "ats-friendly-cv-2025"
+      },
+      "post2": {
+        "readTime": "7 min read",
+        "title": "Top Keywords for Software Engineering Roles in 2025",
+        "excerpt": "Discover the most critical keywords and skills tech recruiters are looking for this year.",
+        "slug": "software-engineering-keywords-2025"
+      },
+      "post3": {
+        "readTime": "6 min read",
+        "title": "How to Tailor Your Resume to Job Descriptions",
+        "excerpt": "Step-by-step guide to customizing your CV for each application to maximize your interview chances.",
+        "slug": "tailor-cv-job-descriptions"
+      }
+    }
+  }
+}
