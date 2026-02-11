@@ -27,6 +27,15 @@
     "enableSuccess": "تم تفعيل المستخدم بنجاح",
     "disableSuccess": "تم تعطيل المستخدم بنجاح",
     "toggleError": "فشل تغيير حالة المستخدم",
+    "searchPlaceholder": "البحث عن مستخدمين",
+    "allStatuses": "الكل",
+    "allPlans": "الكل",
+    "verified": "موثق",
+    "unverified": "غير موثق",
+    "statusFilter": "الحالة",
+    "planFilter": "الخطة",
+    "sourceFilter": "المصدر",
+    "allSources": "الكل",
     "columns": {
       "id": "المعرف",
       "email": "البريد الإلكتروني",
@@ -34,7 +43,13 @@
       "plan": "الخطة",
       "status": "الحالة",
       "date": "تاريخ التسجيل",
-      "actions": "الإجراءات"
+      "actions": "الإجراءات",
+      "userDetails": "تفاصيل المستخدم",
+      "emailStatus": "حالة البريد",
+      "accountStatus": "حالة الحساب",
+      "registeredDate": "تاريخ التسجيل",
+      "action": "إجراء",
+      "source": "المصدر"
     }
   },
   "subscriptions": {

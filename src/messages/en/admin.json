@@ -27,6 +27,15 @@
     "enableSuccess": "User enabled successfully",
     "disableSuccess": "User disabled successfully",
     "toggleError": "Failed to toggle user status",
+    "searchPlaceholder": "Search users",
+    "allStatuses": "All",
+    "allPlans": "All",
+    "verified": "Verified",
+    "unverified": "Unverified",
+    "statusFilter": "Status",
+    "planFilter": "Plan",
+    "sourceFilter": "Source",
+    "allSources": "All",
     "columns": {
       "id": "ID",
       "email": "Email",
@@ -34,7 +43,13 @@
       "plan": "Plan",
       "status": "Status",
       "date": "Joined",
-      "actions": "Actions"
+      "actions": "Actions",
+      "userDetails": "User Details",
+      "emailStatus": "Email Status",
+      "accountStatus": "Account Status",
+      "registeredDate": "Registered Date",
+      "action": "Action",
+      "source": "Source"
     }
   },
   "subscriptions": {
