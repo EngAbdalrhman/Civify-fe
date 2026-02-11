@@ -15,7 +15,6 @@ import {
   Check,
   AtSign,
   X as XIcon,
-  MoreVertical,
   Hash,
   User,
   Globe,
@@ -29,16 +28,14 @@ import { adminService } from "@/services/admin.service";
 import { useAdminUsers } from "@/features/admin-dashboard/users/hooks/useAdminUsers";
 import type { AdminUser } from "@/services/admin.service";
 import { FilterOperation } from "@/components/generic-list/types";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -118,6 +115,13 @@ function getUserDisplayName(user: AdminUser): string {
     "Unknown"
   );
 }
+
+const actionButtonStyles =
+  "h-8 w-8 text-muted-foreground hover:text-white hover:bg-primary transition-colors";
+const banButtonStyles =
+  "h-8 w-8 text-red-500 hover:text-white hover:bg-red-600 transition-colors";
+const unbanButtonStyles =
+  "h-8 w-8 text-emerald-500 hover:text-white hover:bg-emerald-600 transition-colors";
 
 export default function UsersPage() {
   const t = useTranslations("admin.users");
@@ -614,13 +618,22 @@ export default function UsersPage() {
                       </TableCell>
 
                       {/* Plan */}
+                      {/* Plan */}
                       <TableCell className="py-3">
                         <span
                           className={cn(
-                            "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border",
-                            user.currentPlan && user.currentPlan !== "Free"
-                              ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800"
-                              : "bg-muted text-muted-foreground border-border",
+                            "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
+                            !user.currentPlan || user.currentPlan === "Free"
+                              ? "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                              : user.currentPlan
+                                    .toLowerCase()
+                                    .includes("premium")
+                                ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
+                                : user.currentPlan
+                                      .toLowerCase()
+                                      .includes("lifetime")
+                                  ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
+                                  : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
                           )}
                         >
                           {user.currentPlan || "Free"}
@@ -628,20 +641,16 @@ export default function UsersPage() {
                       </TableCell>
 
                       {/* Account Status */}
+                      {/* Account Status */}
                       <TableCell className="py-3">
                         <span
                           className={cn(
-                            "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border",
+                            "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
                             user.status === "ACTIVE"
-                              ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800"
-                              : "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-800",
+                              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
+                              : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
                           )}
                         >
-                          {user.status === "ACTIVE" ? (
-                            <Check className="h-3 w-3" />
-                          ) : (
-                            <XIcon className="h-3 w-3" />
-                          )}
                           {user.status === "ACTIVE"
                             ? tc("active")
                             : tc("inactive")}
@@ -664,73 +673,101 @@ export default function UsersPage() {
 
                       {/* Action */}
                       <TableCell className="py-3 text-center">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-muted-foreground hover:text-muted-foreground!"
-                            >
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuItem
-                              onClick={() => handleViewUser(user)}
-                            >
-                              <Eye className="h-4 w-4 mr-2" />
-                              {common("view")}
-                            </DropdownMenuItem>
+                        <div className="flex items-center justify-center gap-1">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className={actionButtonStyles}
+                                  onClick={() => handleViewUser(user)}
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>{common("view")}</TooltipContent>
+                            </Tooltip>
+
                             {canModify && (
-                              <DropdownMenuItem
-                                onClick={() => handleToggleBan(user)}
-                              >
-                                <Ban className="h-4 w-4 mr-2" />
-                                {tc("banUnban")}
-                              </DropdownMenuItem>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className={
+                                      user.status === "ACTIVE"
+                                        ? banButtonStyles
+                                        : unbanButtonStyles
+                                    }
+                                    onClick={() => handleToggleBan(user)}
+                                  >
+                                    <Ban className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  {user.status === "ACTIVE"
+                                    ? "Ban User"
+                                    : "Unban User"}
+                                </TooltipContent>
+                              </Tooltip>
                             )}
-                            {(canModifyGroupPerm ||
-                              canModifyLimits ||
-                              canModifyTokens) && (
-                              <>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuLabel>
-                                  Admin Actions
-                                </DropdownMenuLabel>
-                                {canModifyGroupPerm && (
-                                  <DropdownMenuItem
+
+                            {canModifyGroupPerm && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className={actionButtonStyles}
                                     onClick={() =>
                                       openActionDialog("group", user)
                                     }
                                   >
-                                    <Shield className="h-4 w-4 mr-2" />
-                                    Change Group
-                                  </DropdownMenuItem>
-                                )}
-                                {canModifyLimits && (
-                                  <DropdownMenuItem
+                                    <Shield className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Change Group</TooltipContent>
+                              </Tooltip>
+                            )}
+
+                            {canModifyLimits && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className={actionButtonStyles}
                                     onClick={() =>
                                       openActionDialog("limits", user)
                                     }
                                   >
-                                    <FileText className="h-4 w-4 mr-2" />
-                                    Update CV Limit
-                                  </DropdownMenuItem>
-                                )}
-                                {canModifyTokens && (
-                                  <DropdownMenuItem
+                                    <FileText className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Update CV Limit</TooltipContent>
+                              </Tooltip>
+                            )}
+
+                            {canModifyTokens && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className={actionButtonStyles}
                                     onClick={() =>
                                       openActionDialog("tokens", user)
                                     }
                                   >
-                                    <Coins className="h-4 w-4 mr-2" />
-                                    Update Tokens
-                                  </DropdownMenuItem>
-                                )}
-                              </>
+                                    <Coins className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Update Tokens</TooltipContent>
+                              </Tooltip>
                             )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                          </TooltipProvider>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
