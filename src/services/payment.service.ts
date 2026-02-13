@@ -39,8 +39,7 @@ class PaymentService {
     }
 
     if (paymentMethod) {
-      // Backend expects 'method', we use 'paymentMethod' in frontend
-      params.append('method', paymentMethod);
+      params.append('paymentMethod', paymentMethod);
     }
 
     if (phoneNumber) {
@@ -171,9 +170,11 @@ class PaymentService {
     error?: string;
   } {
     const success = searchParams.get('success') === 'true';
-    // Use 'order' as transactionId because that's what we store in Invoice.paymentTransactionId
-    const transactionId = searchParams.get('order') || undefined;
-    const orderId = searchParams.get('order') || undefined;
+    // Prefer merchant_order_id (our special_reference stored as orderId in DB)
+    // over Paymob's numeric 'order' which differs from what we store
+    const merchantOrderId = searchParams.get('merchant_order_id') || undefined;
+    const transactionId = merchantOrderId || searchParams.get('order') || undefined;
+    const orderId = transactionId;
     const amount = searchParams.get('amount_cents') || undefined;
     const currency = searchParams.get('currency') || undefined;
     const error = searchParams.get('error') || undefined;
