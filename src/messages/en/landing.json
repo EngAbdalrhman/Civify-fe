@@ -6,8 +6,7 @@
     "subtitle": "Stand out with our AI-powered resume builder. ATS-friendly templates, expert tips, and instant formatting.",
     "cta": "Build My Resume Now",
     "ctaPrimary": "Build Your First Resume",
-    "ctaSecondary": "Try a Resume Sample",
-    "ctaSubtext": "See results before signing up — no account needed to preview.",
+
     "ctaFree": "Try for Free",
     "badge": "Full Arabic Support!",
     "matchScore": "92%",
@@ -19,19 +18,23 @@
     "steps": {
       "step1": {
         "title": "Upload Your Resume",
-        "description": "Start from scratch or upload your existing CV in any format"
+        "description": "Start from scratch or upload your existing CV in any format",
+        "cta": "Upload Now"
       },
       "step2": {
         "title": "Paste Job Description",
-        "description": "Copy and paste the job description or select a job category"
+        "description": "Copy and paste the job description or select a job category",
+        "cta": "Try It"
       },
       "step3": {
         "title": "AI Analysis",
-        "description": "Civify analyzes ATS keywords and role requirements instantly"
+        "description": "Civify analyzes ATS keywords and role requirements instantly",
+        "cta": "See It Work"
       },
       "step4": {
         "title": "Download Optimized CV",
-        "description": "Get your polished, tailored resume with optimization score"
+        "description": "Get your polished, tailored resume with optimization score",
+        "cta": "Get Started"
       }
     }
   },

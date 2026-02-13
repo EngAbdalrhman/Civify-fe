@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Play, Globe } from "lucide-react";
+import { ArrowRight, Globe } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -77,21 +77,7 @@ export function HeroSection() {
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
             </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="h-12 px-8 text-base font-semibold"
-            >
-              <Link href="/guest/preview">
-                <Play className="mr-2 h-5 w-5" />
-                {t("ctaSecondary")}
-              </Link>
-            </Button>
           </div>
-          <p className="mt-4 text-sm text-muted-foreground">
-            {t("ctaSubtext")}
-          </p>
 
           {/* Trust indicators */}
           <div className="mt-12 flex flex-col items-center justify-center gap-6 sm:flex-row sm:gap-8">

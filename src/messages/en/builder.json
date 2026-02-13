@@ -46,7 +46,7 @@
     "parseSuccess": "Resume parsed successfully!",
     "parseError": "Failed to parse resume. Please try again.",
     "fullscreenError": "Fullscreen not supported",
-    "guestUpload": "Please login to upload a resume",
+
     "loginAction": "Login"
   }
 }
