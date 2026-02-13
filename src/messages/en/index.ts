@@ -10,7 +10,6 @@ import dashboard from "./dashboard.json";
 import design from "./design.json";
 import editor from "./editor.json";
 import footer from "./footer.json";
-import guestPreview from "./guestPreview.json";
 import help from "./help.json";
 import landing from "./landing.json";
 import nav from "./nav.json";
@@ -38,7 +37,6 @@ export default {
   design,
   editor,
   footer,
-  guestPreview,
   help,
   landing,
   nav,
