@@ -39,8 +39,7 @@ class PaymentService {
     }
 
     if (paymentMethod) {
-      // Backend expects 'method', we use 'paymentMethod' in frontend
-      params.append('method', paymentMethod);
+      params.append('paymentMethod', paymentMethod);
     }
 
     if (phoneNumber) {
