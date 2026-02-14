@@ -69,7 +69,13 @@ export default function LoginForm() {
         setIsRedirecting(true);
 
         // Fetch permissions before redirecting
-        await fetchPermissions();
+        const perms = await fetchPermissions();
+        // Optional: Log if permissions are empty to help debugging
+        if (!perms || perms.length === 0) {
+          console.warn(
+            "Login successful but no permissions returned immediately.",
+          );
+        }
         router.push("/app");
       }
     };

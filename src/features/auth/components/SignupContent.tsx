@@ -5,10 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Link, useRouter } from "@/i18n/routing";
 import { SubmitHandler } from "react-hook-form";
 import { useSignup, SignupSchemaType } from "@/features/auth/hooks";
+import { usePermissions } from "@/contexts/PermissionContext";
+import { useEffect, useState } from "react";
 
 export default function SignupContent() {
   const t = useTranslations("auth");
   const router = useRouter();
+  const { fetchPermissions } = usePermissions();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
   const { form, signup, isSignupPending, isSignupSuccess } = useSignup();
 
   const {
@@ -21,9 +26,18 @@ export default function SignupContent() {
     signup(data);
   };
 
-  if (isSignupSuccess) {
-    router.push("/app");
-  }
+  useEffect(() => {
+    const handleSignupSuccess = async () => {
+      if (isSignupSuccess && !isRedirecting) {
+        setIsRedirecting(true);
+        // Fetch permissions before redirecting to ensure side menu is populated
+        await fetchPermissions();
+        router.push("/app");
+      }
+    };
+
+    handleSignupSuccess();
+  }, [isSignupSuccess, isRedirecting, fetchPermissions, router]);
 
   const handleGoogleSignup = () => {
     // Redirect to backend Google OAuth endpoint

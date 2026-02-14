@@ -25,7 +25,7 @@ interface PermissionContextType {
   hasPermission: (permission: string) => boolean;
   hasAnyPermission: (permissions: string[]) => boolean;
   hasAllPermissions: (permissions: string[]) => boolean;
-  fetchPermissions: () => Promise<void>;
+  fetchPermissions: () => Promise<string[]>;
   clearPermissions: () => void;
 }
 
@@ -51,7 +51,7 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({
     if (!token) {
       setPermissions([]);
       setGroupName(null);
-      return;
+      return [];
     }
 
     setIsLoading(true);
@@ -61,8 +61,10 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({
       const response =
         await apiClient.get<PermissionsResponse>("/auth/permissions");
       const data = response.data;
-      setPermissions(data.permissions || []);
+      const newPermissions = data.permissions || [];
+      setPermissions(newPermissions);
       setGroupName(data.groupName || null);
+      return newPermissions;
     } catch (err) {
       console.error("Failed to fetch permissions:", err);
       setError(
@@ -70,6 +72,7 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({
       );
       setPermissions([]);
       setGroupName(null);
+      return [];
     } finally {
       setIsLoading(false);
     }
