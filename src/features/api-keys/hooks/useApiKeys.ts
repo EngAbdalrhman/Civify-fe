@@ -37,7 +37,7 @@ export function useApiKeys() {
     setIsGenerating(true);
 
     try {
-      const rawKey = await apiKeyService.createApiKey();
+      const rawKey = await apiKeyService.createApiKey(newKeyName);
       setGeneratedKey(rawKey);
       toast.success(t("generateSuccess"));
       await fetchApiKeys();

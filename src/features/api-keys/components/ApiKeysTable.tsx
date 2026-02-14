@@ -26,6 +26,7 @@ export function ApiKeysTable({ keys, onRevoke }: ApiKeysTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>{t("name")}</TableHead>
             <TableHead>{t("maskedKey")}</TableHead>
             <TableHead>{t("created")}</TableHead>
             <TableHead>{t("lastUsed")}</TableHead>
@@ -36,6 +37,9 @@ export function ApiKeysTable({ keys, onRevoke }: ApiKeysTableProps) {
         <TableBody>
           {keys.map((key) => (
             <TableRow key={key.id}>
+              <TableCell className="font-medium">
+                {key.name || "-"}
+              </TableCell>
               <TableCell className="font-mono text-xs">
                 {key.keyPreview}
               </TableCell>

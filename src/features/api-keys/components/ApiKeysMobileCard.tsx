@@ -18,9 +18,14 @@ export function ApiKeysMobileCard({ keys, onRevoke }: ApiKeysMobileCardProps) {
       {keys.map((key) => (
         <div key={key.id} className="border rounded-md p-2.5 space-y-2">
           <div className="flex items-center justify-between gap-2">
-            <code className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded truncate">
-              {key.keyPreview}
-            </code>
+            <div className="flex flex-col gap-1 overflow-hidden">
+              {key.name && (
+                <span className="font-medium text-sm truncate">{key.name}</span>
+              )}
+              <code className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded truncate">
+                {key.keyPreview}
+              </code>
+            </div>
             <Badge
               variant={key.isActive ? "default" : "destructive"}
               className={`text-xs shrink-0 ${key.isActive ? "bg-green-600 hover:bg-green-700" : ""}`}
