@@ -13,7 +13,7 @@ export const useCreateApiKey = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => apiKeyService.createApiKey(),
+    mutationFn: (name: string) => apiKeyService.createApiKey(name),
     onSuccess: () => {
       toast.success("API key created successfully");
       queryClient.invalidateQueries({ queryKey: ["api-keys"] });
