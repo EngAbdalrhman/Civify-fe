@@ -16,6 +16,7 @@
   "existingKeysDesc": "List of all API keys associated with your account.",
   "noKeys": "No API keys found. Create your first key to get started.",
   "keyId": "Key ID",
+  "name": "Name",
   "maskedKey": "Masked Key",
   "created": "Created",
   "lastUsed": "Last Used",
