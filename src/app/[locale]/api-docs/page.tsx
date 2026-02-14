@@ -1,25 +1,38 @@
-"use client";
+import ApiDocsContent from "@/features/api-docs/components/ApiDocsContent";
+import { getTranslations } from "next-intl/server";
+import { Metadata } from "next";
 
-import { useTranslations } from "next-intl";
-import { ApiDocumentation } from "@/components/api-docs/ApiDocumentation";
+type Props = {
+  params: Promise<{ locale: string }>;
+};
 
-export default function PublicApiDocsPage() {
-  const t = useTranslations("common"); 
-  
-  return (
-    <div className="py-16 md:py-24">
-      <div className="container mx-auto px-4 max-w-4xl">
-        <div className="mb-12 text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl mb-4">
-            API Documentation
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Complete guide to integrating Civify CV API into your applications
-          </p>
-        </div>
-        
-        <ApiDocumentation />
-      </div>
-    </div>
-  );
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "metadata.api-docs" });
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://civify.cv";
+
+  return {
+    title: t("title"),
+    description: t("description"),
+    openGraph: {
+      title: t("ogTitle"),
+      description: t("ogDescription"),
+      url: `${baseUrl}/${locale}/api-docs`,
+    },
+    twitter: {
+      title: t("twitterTitle"),
+      description: t("twitterDescription"),
+    },
+    alternates: {
+      canonical: `/${locale}/api-docs`,
+      languages: {
+        en: "/en/api-docs",
+        ar: "/ar/api-docs",
+      },
+    },
+  };
+}
+
+export default function ApiDocsPage() {
+  return <ApiDocsContent />;
 }

@@ -11,10 +11,13 @@ import {
   Globe,
   Search,
   X,
-  Check
+  Check,
+  Mail,
+  Smartphone,
+  Layers
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { adminService, type AdminUser, FilterOperation } from '@/services/admin.service';
+import { adminService, type AdminUser, FilterOperation, type NotificationChannel } from '@/services/admin.service';
 import { newsletterService } from '@/services/newsletter.service';
 import { usePermissions } from '@/contexts/PermissionContext';
 import { Button } from '@/components/ui/button';
@@ -40,6 +43,8 @@ export default function NotificationsPage() {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [type, setType] = useState<'INFO' | 'WARNING' | 'PROMO' | 'SUCCESS'>('INFO');
+
+  const [channel, setChannel] = useState<NotificationChannel>('PUSH');
   const [isSending, setIsSending] = useState(false);
   const { hasPermission } = usePermissions();
 
@@ -91,8 +96,9 @@ export default function NotificationsPage() {
     }
 
     setIsSending(true);
+
     try {
-      await adminService.sendBroadcast({ title, message, type });
+      await adminService.sendBroadcast({ title, message, type, channel });
       toast.success('Broadcast notification sent to all users!');
       setTitle('');
       setMessage('');
@@ -120,6 +126,7 @@ export default function NotificationsPage() {
         title,
         message,
         type,
+        channel,
         userIds: selectedUsers.map(u => u.id),
       });
       toast.success(`Notification sent to ${selectedUsers.length} user(s)!`);
@@ -242,6 +249,35 @@ export default function NotificationsPage() {
                   </SelectContent>
                 </Select>
               </div>
+              
+              <div className="space-y-2">
+                <Label>Notification Channel</Label>
+                <Select value={channel} onValueChange={(v) => setChannel(v as NotificationChannel)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PUSH">
+                      <span className="flex items-center gap-2">
+                        <Smartphone className="w-4 h-4" />
+                        Push Notification
+                      </span>
+                    </SelectItem>
+                    <SelectItem value="EMAIL">
+                      <span className="flex items-center gap-2">
+                        <Mail className="w-4 h-4" />
+                        Email
+                      </span>
+                    </SelectItem>
+                    <SelectItem value="ALL">
+                      <span className="flex items-center gap-2">
+                        <Layers className="w-4 h-4" />
+                        Both (Push & Email)
+                      </span>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="title">Title</Label>
@@ -359,6 +395,35 @@ export default function NotificationsPage() {
                     <SelectItem value="SUCCESS">Success</SelectItem>
                     <SelectItem value="WARNING">Warning</SelectItem>
                     <SelectItem value="PROMO">Promotion</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Notification Channel</Label>
+                <Select value={channel} onValueChange={(v) => setChannel(v as NotificationChannel)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PUSH">
+                      <span className="flex items-center gap-2">
+                        <Smartphone className="w-4 h-4" />
+                        Push Notification
+                      </span>
+                    </SelectItem>
+                    <SelectItem value="EMAIL">
+                      <span className="flex items-center gap-2">
+                        <Mail className="w-4 h-4" />
+                        Email
+                      </span>
+                    </SelectItem>
+                    <SelectItem value="ALL">
+                      <span className="flex items-center gap-2">
+                        <Layers className="w-4 h-4" />
+                        Both (Push & Email)
+                      </span>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>

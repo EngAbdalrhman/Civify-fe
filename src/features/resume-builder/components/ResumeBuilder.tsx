@@ -18,21 +18,15 @@ import { AtsScoreDialog } from "./AtsScoreDialog";
 interface ResumeBuilderProps {
   initialData: ResumeData;
   resumeId?: string | null;
-  isGuest: boolean;
 }
 
-export function ResumeBuilder({
-  initialData,
-  resumeId,
-  isGuest,
-}: ResumeBuilderProps) {
+export function ResumeBuilder({ initialData, resumeId }: ResumeBuilderProps) {
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const t = useTranslations("builder");
 
-  const builder = useResumeBuilder({ initialData, resumeId, isGuest });
+  const builder = useResumeBuilder({ initialData, resumeId });
   const { isFullScreen, toggleFullscreen } = useFullscreen();
   const upload = useFileUpload({
-    isGuest,
     onSuccess: builder.handleResumeDataUpdate,
   });
 
