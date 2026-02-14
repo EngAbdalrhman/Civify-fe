@@ -43,7 +43,13 @@
     "saveToResumes": "Save to My Resumes",
     "exporting": "Exporting...",
     "downloadPdf": "Download PDF",
-    "downloadDocx": "Download DOCX"
+    "downloadDocx": "Download DOCX",
+    "importUrl": "Import from URL",
+    "importUrlDesc": "Paste a job link (LinkedIn, Indeed, etc.) or plain text.",
+    "tracked": "Added to Job Tracker!",
+    "trackApplication": "Track Application",
+    "startOver": "Start Over",
+    "dashboard": "Go to Dashboard"
   },
   "pageTitle": "Build Your ATS-Ready Resume",
   "pageSubtitle": "Upload your current CV, review parsed data, and let our AI tailor it for your dream job.",
@@ -177,7 +183,10 @@
     "saveFailed": "Failed to save resume. Please try again.",
     "trackFailed": "Failed to track application. Please try again.",
     "jobDescRequired": "Job description is required",
-    "jobDescMinLength": "Job description must be at least 50 characters for accurate tailoring"
+    "jobDescMinLength": "Job description must be at least 50 characters for accurate tailoring",
+    "invalidUrl": "Invalid URL",
+    "scrapeEmpty": "No content found",
+    "scrapeFailed": "Failed to import job description"
   },
   "tokenLimit": {
     "title": "Token Limit Reached",
@@ -185,5 +194,17 @@
     "upgrade": "Upgrade Plan",
     "buyTokens": "Buy Token Pack",
     "cancel": "Maybe Later"
+  },
+  "scrapeSuccess": "Job description imported!",
+  "placeholders": {
+    "fullName": "John Doe",
+    "email": "john@example.com",
+    "phone": "+1 234 567 8900",
+    "jobTitle": "Software Engineer",
+    "address": "San Francisco, CA",
+    "website": "https://johndoe.com",
+    "linkedin": "https://linkedin.com/in/johndoe",
+    "github": "https://github.com/johndoe",
+    "summary": "Experienced Software Engineer..."
   }
 }

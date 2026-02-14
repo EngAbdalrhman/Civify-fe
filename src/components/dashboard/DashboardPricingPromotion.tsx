@@ -66,27 +66,29 @@ export function DashboardPricingPromotion({
           <CardContent className="p-0">
             <div className="flex flex-col md:flex-row items-stretch">
               {/* Left Content Section */}
-              <div className="flex-1 p-2 px-4 relative z-10">
-                <div className="flex items-center gap-2">
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.2, duration: 0.3 }}
-                    className="inline-flex items-center justify-center rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary ring-1 ring-inset ring-primary/20"
-                  >
-                    <Crown className="mr-1 h-3 w-3" />
-                    Pro
-                  </motion.div>
-                  <span className="text-sm text-muted-foreground">
-                    {t("subtitle")}
-                  </span>
+              <div className="flex-1 p-3 sm:p-2 sm:px-4 relative z-10">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-2">
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.2, duration: 0.3 }}
+                      className="inline-flex shrink-0 items-center justify-center rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary ring-1 ring-inset ring-primary/20"
+                    >
+                      <Crown className="mr-1 h-3 w-3" />
+                      Pro
+                    </motion.div>
+                    <span className="text-sm text-muted-foreground line-clamp-1 sm:line-clamp-none">
+                      {t("subtitle")}
+                    </span>
+                  </div>
                   <Button
                     asChild
                     size="sm"
-                    className="w-full ml-auto rounded-full sm:w-auto font-medium shadow-sm hover:shadow-md transition-all relative overflow-hidden"
+                    className="w-full sm:w-auto sm:ml-auto rounded-full font-medium shadow-sm hover:shadow-md transition-all relative overflow-hidden"
                   >
                     <Link href={promotedPlan.ctaLink}>
-                      <span className="relative z-10 flex items-center">
+                      <span className="relative z-10 flex items-center justify-center">
                         {t("upgradeNow")}
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </span>

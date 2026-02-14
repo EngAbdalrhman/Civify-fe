@@ -1,5 +1,6 @@
 "use client";
 
+import { FLAGS } from "@/config/flags";
 import { useOnboarding } from "@/features/onboarding";
 import { OnboardingHub } from "@/features/onboarding";
 import { PersonalizedDashboard } from "@/features/user-dashboard/components/PersonalizedDashboard";
@@ -7,7 +8,7 @@ import { PersonalizedDashboard } from "@/features/user-dashboard/components/Pers
 export default function PersonalPage() {
   const { hasCompletedOnboarding } = useOnboarding();
 
-  if (!hasCompletedOnboarding) {
+  if (FLAGS.ENABLE_INLINE_ONBOARDING && !hasCompletedOnboarding) {
     return <OnboardingHub />;
   }
 

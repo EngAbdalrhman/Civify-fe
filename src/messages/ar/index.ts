@@ -12,6 +12,7 @@ import editor from "./editor.json";
 import footer from "./footer.json";
 import help from "./help.json";
 import landing from "./landing.json";
+import metadata from "./metadata.json";
 import nav from "./nav.json";
 import onboarding from "./onboarding.json";
 import payment from "./payment.json";
@@ -39,6 +40,7 @@ export default {
   footer,
   help,
   landing,
+  metadata,
   nav,
   onboarding,
   payment,
