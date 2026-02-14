@@ -45,6 +45,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     metadataBase: new URL(baseUrl),
+    verification: {
+      other: {
+        "msvalidate.01": "143872F0A850B77A1ACBD2E4D2CBA1B0",
+      },
+    },
     title: {
       default: t("title"),
       template: `%s`,
