@@ -50,6 +50,7 @@ jobs:
             NEXT_PUBLIC_GA_MEASUREMENT_ID=${{ vars.NEXT_PUBLIC_GA_MEASUREMENT_ID }}
             NEXT_PUBLIC_CLARITY_PROJECT_ID=${{ vars.NEXT_PUBLIC_CLARITY_PROJECT_ID }}
             NEXT_TELEMETRY_DISABLED=${{ vars.NEXT_TELEMETRY_DISABLED }}
+          secrets: |
             SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
 
       # 5. Trigger Dokploy to Pull and Deploy
