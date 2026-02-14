@@ -1,3 +1,5 @@
+export const STORAGE_KEY = "civify_guest_resume";
+
 export const ALLOWED_FILE_TYPES = [
   "application/pdf",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

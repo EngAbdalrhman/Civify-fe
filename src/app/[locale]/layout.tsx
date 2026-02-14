@@ -1,17 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import {
-  getMessages,
-  setRequestLocale,
-  getTranslations,
-} from "next-intl/server";
+import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { QueryProvider } from "@/providers/query-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { PermissionProvider } from "@/contexts/PermissionContext";
-
 import LayoutWrapper from "@/components/LayoutWrapper";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import "../globals.css";
@@ -27,64 +22,62 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-type Props = {
-  children: React.ReactNode;
-  params: { locale: string };
-};
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale } = await params;
-
-  // Validate locale
-  if (!routing.locales.includes(locale as any)) {
-    notFound();
-  }
-
-  const t = await getTranslations({ locale, namespace: "metadata" });
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://civify.cv";
-
-  return {
-    metadataBase: new URL(baseUrl),
-    verification: {
-      other: {
-        "msvalidate.01": "143872F0A850B77A1ACBD2E4D2CBA1B0",
+export const metadata: Metadata = {
+  metadataBase: new URL("https://civify.cv"),
+  title: "Civify - AI CV Builder with ATS Optimization | 92% Match Rate",
+  description:
+    "75% of CVs never get seen by humans. Civify uses AI to analyze job descriptions and tailor your CV for ATS systems. Full Arabic support. Start free, no credit card required.",
+  keywords: [
+    "AI CV builder",
+    "ATS resume optimization",
+    "Arabic resume builder",
+    "CV tailoring",
+    "resume match score",
+    "job description analyzer",
+    "ATS-friendly CV",
+    "CV masking",
+    "multilingual CV",
+    "Arabic OCR CV",
+  ],
+  authors: [{ name: "Civify" }],
+  creator: "Civify",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    alternateLocale: "ar_SA",
+    url: "https://civify.cv",
+    siteName: "Civify",
+    title: "Civify - AI CV Builder | Make Your CV Get Seen",
+    description:
+      "75% of CVs are rejected by ATS. Civify uses AI to tailor your CV, achieving 92% average match scores. Full Arabic support.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Civify - AI-Powered CV Builder",
       },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Civify - AI CV Builder with ATS Optimization",
+    description:
+      "75% of CVs never get seen. Make yours the exception with AI-powered optimization. 92% match rate. Full Arabic support.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
-    title: {
-      default: t("title"),
-      template: `%s`,
-    },
-    description: t("description"),
-    keywords: t("keywords")
-      .split(",")
-      .map((k) => k.trim()),
-    authors: [{ name: "Civify" }],
-    creator: "Civify",
-    openGraph: {
-      type: "website",
-      locale: locale === "ar" ? "ar_SA" : "en_US",
-      alternateLocale: locale === "ar" ? "en_US" : "ar_SA",
-      url: "https://civify.cv",
-      siteName: "Civify",
-      title: t("ogTitle"),
-      description: t("ogDescription"),
-      images: [
-        {
-          url: "/og-image.png",
-          width: 1200,
-          height: 630,
-          alt: "Civify - AI-Powered Resume Builder",
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: t("twitterTitle"),
-      description: t("twitterDescription"),
-      images: ["/og-image.png"],
-    },
-  };
-}
+  },
+};
 
 export const viewport: Viewport = {
   themeColor: "#000000",

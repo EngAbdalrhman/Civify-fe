@@ -16,16 +16,12 @@ export const useInitiatePayment = () => {
       isAnnual,
       promoCode,
       gateway,
-      paymentMethod,
-      phoneNumber,
     }: {
       planId: number;
       isAnnual?: boolean;
       promoCode?: string;
       gateway?: string;
-      paymentMethod?: string;
-      phoneNumber?: string;
-    }) => paymentService.initiatePayment(planId, isAnnual, promoCode, gateway, paymentMethod, phoneNumber),
+    }) => paymentService.initiatePayment(planId, isAnnual, promoCode, gateway),
     onError: (error: any) => {
       toast.error(error?.message || "Failed to initiate payment");
     },

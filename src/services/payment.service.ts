@@ -22,7 +22,6 @@ class PaymentService {
     promoCode?: string,
     gateway?: string,
     paymentMethod?: string,
-    phoneNumber?: string,
     currency?: string
   ): Promise<PaymentInitiationResponse> {
     const params = new URLSearchParams({
@@ -40,10 +39,6 @@ class PaymentService {
 
     if (paymentMethod) {
       params.append('paymentMethod', paymentMethod);
-    }
-
-    if (phoneNumber) {
-      params.append('phoneNumber', phoneNumber);
     }
 
     if (currency) {
@@ -68,11 +63,11 @@ class PaymentService {
   /**
    * Verify payment transaction
    */
-  async verifyPayment(transactionId: string, gateway?: string): Promise<{ verified: boolean; message: string; retryable?: boolean }> {
+  async verifyPayment(transactionId: string, gateway?: string): Promise<{ verified: boolean; message: string }> {
     const url = gateway
       ? `${API_ENDPOINTS.VERIFY(transactionId)}?gateway=${gateway}`
       : API_ENDPOINTS.VERIFY(transactionId);
-    const response = await apiClient.get<{ verified: boolean; message: string; retryable?: boolean }>(url);
+    const response = await apiClient.get<{ verified: boolean; message: string }>(url);
     return response.data;
   }
 
@@ -84,7 +79,7 @@ class PaymentService {
     gateway?: string,
     maxRetries: number = 5,
     retryDelay: number = 2000
-  ): Promise<{ verified: boolean; message: string; retryable?: boolean }> {
+  ): Promise<{ verified: boolean; message: string }> {
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
         const result = await this.verifyPayment(transactionId, gateway);
@@ -93,23 +88,11 @@ class PaymentService {
           return result;
         }
 
-        // If explicitly not retryable (payment genuinely failed), stop retrying
-        if (result.retryable === false) {
-          return result;
-        }
-
         // If not verified yet, wait and retry
         if (attempt < maxRetries - 1) {
           await new Promise(resolve => setTimeout(resolve, retryDelay));
         }
-      } catch (error: any) {
-        // 503 errors contain retryable body — extract and retry
-        const responseData = error?.response?.data;
-        if (responseData?.retryable && attempt < maxRetries - 1) {
-          await new Promise(resolve => setTimeout(resolve, retryDelay));
-          continue;
-        }
-
+      } catch (error) {
         if (attempt < maxRetries - 1) {
           await new Promise(resolve => setTimeout(resolve, retryDelay));
           continue;
@@ -118,7 +101,7 @@ class PaymentService {
       }
     }
 
-    return { verified: false, message: 'Payment verification timed out', retryable: true };
+    return { verified: false, message: 'Payment verification timed out' };
   }
 
   /**
@@ -170,11 +153,9 @@ class PaymentService {
     error?: string;
   } {
     const success = searchParams.get('success') === 'true';
-    // Prefer merchant_order_id (our special_reference stored as orderId in DB)
-    // over Paymob's numeric 'order' which differs from what we store
-    const merchantOrderId = searchParams.get('merchant_order_id') || undefined;
-    const transactionId = merchantOrderId || searchParams.get('order') || undefined;
-    const orderId = transactionId;
+    // Use 'order' as transactionId because that's what we store in Invoice.paymentTransactionId
+    const transactionId = searchParams.get('order') || undefined;
+    const orderId = searchParams.get('order') || undefined;
     const amount = searchParams.get('amount_cents') || undefined;
     const currency = searchParams.get('currency') || undefined;
     const error = searchParams.get('error') || undefined;

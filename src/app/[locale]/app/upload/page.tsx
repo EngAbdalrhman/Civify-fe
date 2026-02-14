@@ -89,8 +89,6 @@ import { JobApplicationService } from "@/services/job-application.service";
 import { Save, Bookmark } from "lucide-react";
 import { getAccessToken } from "@/utils/cookies";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-
 export default function UploadPage() {
   const t = useTranslations("upload");
   const router = useRouter();
@@ -154,11 +152,6 @@ export default function UploadPage() {
       ];
       if (!validTypes.includes(file.type)) {
         toast.error(t("errors.invalidFileType"));
-        return;
-      }
-
-      if (file.size > MAX_FILE_SIZE) {
-        toast.error(t("errors.FILE_TOO_LARGE"));
         return;
       }
 
@@ -227,11 +220,6 @@ export default function UploadPage() {
       ];
       if (!validTypes.includes(file.type)) {
         toast.error(t("errors.invalidFileType"));
-        return;
-      }
-
-      if (file.size > MAX_FILE_SIZE) {
-        toast.error(t("errors.FILE_TOO_LARGE"));
         return;
       }
 
