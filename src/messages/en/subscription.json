@@ -13,6 +13,9 @@
     "agreement": "Agreement",
     "agreementDesc": "By completing the payment process, the subscriber acknowledges that they have read and agreed to this policy and to waive their right to a refund for the current period once usage has begun."
   },
+  "active": {
+    "exists": "You already have an active subscription."
+  },
   "confirm": {
     "title": "Confirm Subscription",
     "plan": "Plan",
