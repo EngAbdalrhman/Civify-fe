@@ -54,6 +54,7 @@ export function useFileUpload({
         {
           headers: { "Content-Type": "multipart/form-data" },
           timeout: UPLOAD_TIMEOUT,
+          skipErrorToast: true,
         },
       );
 
