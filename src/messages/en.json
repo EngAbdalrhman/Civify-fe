@@ -1,0 +1,1400 @@
+{
+  "common": {
+    "appName": "Civify",
+    "welcome": "Welcome",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "download": "Download",
+    "upload": "Upload",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "toggleTheme": "Toggle theme",
+    "theme": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "upload": "Tailor CV",
+    "plans": "Plans",
+    "billing": "Billing",
+    "admin": "Admin",
+    "users": "Users",
+    "promos": "Promotions",
+    "stats": "Statistics",
+    "apiUsage": "API Usage",
+    "groups": "Groups",
+    "subscriptions": "Subscriptions",
+    "notifications": "Notifications",
+    "auditMonitor": "Audit Monitor",
+    "scheduler": "Scheduler",
+    "logout": "Logout",
+    "resumeBuilder": "Resume Builder",
+    "apiKeys": "API Keys",
+    "buyTokens": "Buy Tokens",
+    "helpCenter": "Help Center",
+    "adminDashboard": "Admin Dashboard",
+    "freePlan": "Free Plan",
+    "guest": "Guest",
+    "apiDocumentation": "API Documentation",
+    "apiDocSubtitle": "Complete guide to integrating Civify CV API into your applications",
+    "language": {
+      "switch": "Switch Language"
+    },
+    "signIn": "Sign in",
+    "startForFree": "Sign up"
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "rememberMe": "Remember Me",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "loginWithGoogle": "Login with Google",
+    "signupWithGoogle": "Sign up with Google",
+    "invalidEmail": "Please enter a valid email address",
+    "passwordRequired": "Password is required",
+    "usernameMin": "Username must be at least 3 characters long",
+    "passwordMin": "Password must be at least 8 characters long",
+    "confirmPasswordMin": "Confirm Password must be at least 8 characters long",
+    "passwordsMatch": "Passwords do not match",
+    "subtitle": "Create your account to get started",
+    "terms": "I accept the <terms>Terms & Conditions</terms> and <privacy>Privacy Policy</privacy>.",
+    "orContinueWith": "Or continue with",
+    "emailNotVerified": "Please verify your email before logging in.",
+    "verificationSentAutomatically": "Verification email sent automatically! Please check your inbox.",
+    "identifier": "Email or Username",
+    "identifierPlaceholder": "your@email.com or username",
+    "identifierRequired": "Please enter your email or username",
+    "name": "Full Name",
+    "namePlaceholder": "John Doe",
+    "nameMin": "Name must be at least 2 characters",
+    "passwordComplexity": "Password must contain at least 8 characters, one uppercase, one lowercase, one number, and one special character",
+    "passwordPwned": "This password has been found in a data breach. Please choose a different password",
+    "agreement": "By confirming, you agree to our <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>."
+  },
+  "dashboard": {
+    "personalPage": {
+      "title": "Personal Page",
+      "subtitle": "Manage your profile and view your CVs",
+      "profile": "Profile",
+      "profileDesc": "Update your personal information",
+      "cvs": "My CVs",
+      "recent": "Recent Activity",
+      "recentDesc": "Your recent activity"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "overview": "Overview",
+      "cvViews": "CV Views",
+      "downloads": "Downloads",
+      "performance": "Performance"
+    },
+    "settings": {
+      "title": "Settings",
+      "account": "Account Settings",
+      "preferences": "Preferences",
+      "notifications": "Notifications",
+      "security": "Security"
+    },
+    "resumes": {
+      "myResumes": "My Resumes",
+      "viewAll": "View All",
+      "createNew": "Create New Resume",
+      "loadError": "Failed to load your resumes",
+      "deleted": "Resume deleted",
+      "deleteError": "Failed to delete resume"
+    }
+  },
+  "upload": {
+    "title": "Tailor CV",
+    "upload": {
+      "title": "Tailor your CV",
+      "subtitle": "Upload your existing CV, review the extracted data, and let our AI tailor it for your dream job.",
+      "dragDrop": "Drag & drop your resume here",
+      "or": "or",
+      "browseFiles": "browse files",
+      "supportMsg": "Supports PDF and DOCX files up to 5MB",
+      "analyzing": "Analyzing your resume...",
+      "selectFromResumes": "Select from My Resumes",
+      "manualEntry": "Enter Data Manually",
+      "step1": "Upload Resume",
+      "step2": "Review Data",
+      "step3": "Tailor CV",
+      "step4": "Result",
+      "targetJobDescription": "Target Job Description",
+      "pasteJobDesc": "Paste the job description you're applying for. Our AI will optimize your CV to match.",
+      "jobTitleOptional": "Job Title (optional)",
+      "companyOptional": "Company Name (optional)",
+      "jobDescLabel": "Job Description",
+      "pasteJobDescPlaceholder": "Paste the full job description here...",
+      "charsMin": "characters minimum",
+      "additionalOptions": "Additional Options",
+      "generateCoverLetter": "Generate Cover Letter",
+      "coverLetterDesc": "Create a tailored cover letter",
+      "interviewQuestions": "Interview Questions",
+      "interviewDesc": "Get potential interview questions",
+      "careerRoadmap": "Career Roadmap",
+      "roadmapDesc": "Skills roadmap to improve your fit",
+      "generateTailoredCv": "Generate Tailored CV",
+      "generating": "Generating...",
+      "cvGenerated": "CV Generated!",
+      "cvReadyDesc": "Your AI-optimized CV is ready. Review the result or regenerate if needed.",
+      "refineResult": "Refine Result",
+      "editSections": "Edit Sections",
+      "regenerateVariant": "Regenerate Variant",
+      "atsMatchScore": "ATS Match Score",
+      "before": "Before",
+      "after": "After",
+      "saving": "Saving...",
+      "saved": "Saved to Resumes",
+      "saveToResumes": "Save to My Resumes",
+      "exporting": "Exporting...",
+      "downloadPdf": "Download PDF",
+      "downloadDocx": "Download DOCX"
+    },
+    "pageTitle": "Build Your ATS-Friendly CV",
+    "pageSubtitle": "Upload your current CV, review the extracted data, and let AI tailor it to your dream job.",
+    "dragDrop": "Drag and drop your CV here",
+    "or": "Or",
+    "browse": "Browse Files",
+    "selectFile": "Select File",
+    "addManually": "Add Details Manually",
+    "supportedFormats": "Supported formats: PDF, DOC, DOCX",
+    "maxSize": "Maximum file size: 5MB",
+    "processing": "Processing your CV...",
+    "analyzing": "Analyzing...",
+    "success": "CV uploaded successfully!",
+    "authRequired": "Please sign in to upload and tailor your CV",
+    "uploadCv": "Upload your CV",
+    "uploadCvDesc": "Drag and drop a PDF or DOCX file (max 5MB), or click to browse. We'll extract your details automatically.",
+    "importUrl": "Import from URL",
+    "importUrlDesc": "Paste a job post URL (LinkedIn, Indeed, etc.) or just plain text.",
+    "steps": {
+      "uploadCv": "Upload CV",
+      "reviewData": "Review Data",
+      "generate": "Generate",
+      "result": "Result"
+    },
+    "personalInfo": {
+      "title": "Personal Information",
+      "subtitle": "Your contact details (required fields marked with *)",
+      "fullName": "Full Name",
+      "email": "Email",
+      "phone": "Phone",
+      "jobTitle": "Job Title",
+      "summary": "Professional Summary",
+      "summaryPlaceholder": "Brief overview of your experience and skills...",
+      "linkedin": "LinkedIn",
+      "github": "GitHub",
+      "website": "Website",
+      "placeholders": {
+        "fullName": "John Doe",
+        "email": "john@example.com",
+        "phone": "+1 234 567 890",
+        "jobTitle": "Software Engineer",
+        "address": "New York, NY",
+        "website": "https://johndoe.com",
+        "linkedin": "https://linkedin.com/in/johndoe",
+        "github": "https://github.com/johndoe",
+        "summary": "Experienced software engineer..."
+      }
+    },
+    "sections": {
+      "skills": "Skills",
+      "skillsInput": "Skills (comma-separated)",
+      "skillsPlaceholder": "Java, Spring Boot, Angular, TypeScript, React...",
+      "noItems": "No items yet. Click \"Add\" to add your",
+      "add": "Add",
+      "experience": "Experience",
+      "education": "Education",
+      "projects": "Projects",
+      "languages": "Languages",
+      "certifications": "Courses",
+      "interests": "Interests",
+      "activities": "Activities & Volunteering",
+      "placeholders": {
+        "date": "2020 - Present",
+        "location": "City, Country",
+        "description": "Describe your responsibilities and achievements..."
+      }
+    },
+    "jobDetails": {
+      "title": "Job Details",
+      "subtitle": "Paste the job description to tailor your CV",
+      "jobTitle": "Job Title (optional)",
+      "jobTitlePlaceholder": "e.g., Senior Software Engineer",
+      "company": "Company Name (optional)",
+      "companyPlaceholder": "e.g., Google",
+      "description": "Job Description",
+      "descriptionPlaceholder": "Paste the job description here...",
+      "descriptionRequired": "Job description is required",
+      "descriptionMinLength": "Job description must be at least 50 characters for accurate tailoring"
+    },
+    "options": {
+      "title": "Additional Options",
+      "coverLetter": "Generate Cover Letter",
+      "coverLetterDesc": "AI-generated cover letter tailored to the job",
+      "interviewQuestions": "Interview Prep Questions",
+      "interviewDesc": "Practice questions based on your CV and the job",
+      "roadmap": "Learning Roadmap",
+      "roadmapDesc": "Skills gap analysis and recommended courses"
+    },
+    "actions": {
+      "back": "Back",
+      "next": "Next",
+      "generate": "Generate Tailored CV",
+      "generating": "Generating...",
+      "downloadPdf": "Download PDF",
+      "downloadDocx": "Download DOCX",
+      "saveToResumes": "Save to My Resumes",
+      "trackApplication": "Track Application",
+      "import": "Import",
+      "startOver": "Start Over"
+    },
+    "result": {
+      "title": "Your Tailored CV",
+      "matchScore": "Match Score",
+      "atsScore": "ATS Score",
+      "suggestions": "Improvement Suggestions",
+      "coverLetter": "Cover Letter",
+      "interviewPrep": "Interview Prep",
+      "roadmap": "Learning Roadmap"
+    },
+    "fillFromResumes": "Fill from My Resumes",
+    "selectResume": {
+      "title": "Select a Resume",
+      "subtitle": "Choose a resume to use as a starting point",
+      "noResumes": "No saved resumes found",
+      "noResumesDesc": "Create a resume first to use this feature",
+      "createNew": "Create New Resume",
+      "loading": "Loading your resumes...",
+      "loadError": "Failed to load resumes",
+      "selected": "Resume selected!"
+    },
+    "errors": {
+      "invalidFileType": "Please upload a PDF or DOCX file",
+      "parseFailed": "Failed to parse CV data",
+      "tailorFailed": "Failed to tailor CV",
+      "INTERNAL_SERVER_ERROR": "Something went wrong. Please try again later.",
+      "FILE_TOO_LARGE": "File is too large. Maximum size is 5MB.",
+      "DEFAULT": "An unexpected error occurred.",
+      "exportPdfFailed": "Failed to download PDF. Please try again.",
+      "exportDocxFailed": "Failed to download DOCX. Please try again.",
+      "saveFailed": "Failed to save CV. Please try again.",
+      "trackFailed": "Failed to track application. Please try again.",
+      "jobDescRequired": "Job description is required",
+      "jobDescMinLength": "Job description must be at least 50 characters for accurate tailoring"
+    },
+    "tokenLimit": {
+      "title": "Token Limit Reached",
+      "description": "You've used all your monthly tokens. Upgrade your plan for more usage or purchase additional tokens to continue.",
+      "upgrade": "Upgrade Plan",
+      "buyTokens": "Buy Token Package",
+      "cancel": "Maybe Later"
+    }
+  },
+  "plans": {
+    "title": "Choose Your Plan",
+    "subtitle": "Choose the perfect plan for your career journey",
+    "free": "Free",
+    "pro": "Pro",
+    "enterprise": "Enterprise",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "save20": "Save 20%",
+    "mostPopular": "Most Popular",
+    "selectPlan": "Select Plan",
+    "currentPlan": "Current Plan",
+    "upgrade": "Upgrade",
+    "features": "Features",
+    "errorLoading": "Failed to load plans. Please try again.",
+    "retry": "Retry",
+    "faqTitle": "Frequently Asked Questions",
+    "faq": {
+      "q1": "What payment methods do you accept?",
+      "a1": "We accept all major credit cards (Visa, Mastercard) through Fawaterak for local payments.",
+      "q2": "Can I cancel my subscription at any time?",
+      "a2": "Yes, you can cancel your subscription at any time. Your access will continue until the end of your current billing period.",
+      "q3": "What is the difference between CV generations and parsing?",
+      "a3": "CV generation creates a new CV from scratch or template. Parsing extracts data from an existing CV to populate your profile.",
+      "stillQuestions": "Still have questions?",
+      "contactSupportTeam": "Contact our support team"
+    },
+    "pricesNote": "Prices are in EGP. Local taxes may apply.",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "contactSupport": "Contact Support"
+  },
+  "checkout": {
+    "orderSummary": "Order Summary",
+    "billingCycle": "Billing Cycle",
+    "promoCode": "Promo Code",
+    "total": "Total",
+    "paymentMethod": "Payment Method",
+    "pay": "Pay",
+    "processing": "Processing...",
+    "backToPlans": "Back to Plans",
+    "planNotFound": "Plan not found",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "perMonth": "per month",
+    "perYear": "per year",
+    "save20": "Save 20%",
+    "enterPromoCode": "Enter promo code",
+    "apply": "Apply",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "securePayment": "Secure Payment",
+    "securePaymentDesc": "Your payment information is encrypted and secure. We never store your card details.",
+    "fawaterak": "Fawaterak",
+    "fawaterakDesc": "Credit/Debit Card, Fawry, Wallets",
+    "paymob": "Paymob",
+    "paymobDesc": "Credit/Debit Card, Mobile Wallets",
+    "selectPaymentMethod": "Select Payment Method",
+    "visa": "Credit/Debit Card",
+    "visaDesc": "Visa, Mastercard, Meeza",
+    "fawryPay": "Fawry",
+    "fawryPayDesc": "Pay at any Fawry outlet",
+    "mobileWallet": "Mobile Wallet",
+    "mobileWalletDesc": "Vodafone Cash, Orange, Etisalat, WE",
+    "termsAgreement": "By confirming, you agree to our",
+    "termsOfService": "Terms of Service",
+    "and": "and",
+    "privacyPolicy": "Privacy Policy"
+  },
+  "apiKeys": {
+    "title": "API Keys",
+    "subtitle": "Manage your API keys for accessing the Civify API programmatically.",
+    "yourKeys": "Your API Keys",
+    "manageKeys": "Manage API keys to access the Civify API programmatically",
+    "viewDocs": "View Documentation",
+    "generateNew": "Generate New Key",
+    "createTitle": "Create API Key",
+    "createDesc": "Enter a name for your new API key to help you identify it later.",
+    "namePlaceholder": "e.g. Website Checkout",
+    "generateKey": "Generate Key",
+    "keyGenerated": "API Key Generated",
+    "copyWarning": "Please copy this key now. You won't be able to see it again!",
+    "done": "Done",
+    "existingKeys": "Existing Keys",
+    "existingKeysDesc": "A list of all API keys associated with your account.",
+    "noKeys": "No API keys found. Generate your first key to get started.",
+    "keyId": "Key ID",
+    "maskedKey": "Masked Key",
+    "created": "Created",
+    "lastUsed": "Last Used",
+    "never": "Never",
+    "status": "Status",
+    "active": "Active",
+    "revoked": "Revoked",
+    "actions": "Actions",
+    "revoke": "Revoke",
+    "revokeConfirm": "Are you sure you want to revoke this API key? This action cannot be undone.",
+    "copied": "Copied to clipboard",
+    "loadError": "Failed to load API keys",
+    "generateError": "Failed to generate API key",
+    "generateSuccess": "API key generated successfully",
+    "revokeError": "Failed to revoke API key",
+    "revokeSuccess": "API key revoked successfully"
+  },
+  "tokens": {
+    "title": "Buy Tokens",
+    "subtitle": "Purchase additional tokens to continue using AI features",
+    "backToDashboard": "Back to Dashboard",
+    "walletBalance": "Wallet Balance",
+    "walletDesc": "Purchased tokens (never expire)",
+    "monthlyLimit": "Monthly Limit",
+    "monthlyLimitDesc": "From your subscription plan",
+    "usedThisMonth": "Used This Month",
+    "usedDesc": "Resets monthly",
+    "totalAvailable": "Total Available",
+    "totalDesc": "Monthly + Wallet",
+    "noPackages": "No Token Packages Available",
+    "noPackagesDesc": "Token packages are not available at the moment.",
+    "upgradeYourPlan": "Upgrade Your Plan",
+    "instantActivation": "Instant Activation",
+    "neverExpire": "Never Expire",
+    "securePayment": "Secure Payment",
+    "bestValue": "Best Value",
+    "tokens": "tokens",
+    "perToken": "per token",
+    "buyNow": "Buy Now",
+    "lookingForMore": "Looking for more tokens?",
+    "upgradePrompt": "Upgrade your subscription plan for higher monthly token allowances",
+    "viewPlans": "View Plans",
+    "loadError": "Failed to load token packages"
+  },
+  "help": {
+    "title": "Help Center",
+    "subtitle": "Find answers to common questions and learn how to get the most out of Civify",
+    "gettingStarted": {
+      "title": "Getting Started",
+      "desc": "Learn the basics of uploading and tailoring your CV",
+      "createFirstCv": "Create your first CV",
+      "tailorFirstCv": "Tailoring your first CV",
+      "howTailoringWorks": "How CV tailoring works",
+      "understandingAts": "Understanding ATS scores"
+    },
+    "features": {
+      "title": "Features",
+      "desc": "Explore all the tools available to optimize your CV",
+      "aiOptimization": "AI-powered optimization",
+      "infoMasking": "Personal info masking",
+      "exportOptions": "Export options (PDF/DOCX)"
+    },
+    "account": {
+      "title": "Account & Security",
+      "desc": "Manage your account settings and security",
+      "changePassword": "Change password",
+      "twoFactor": "Two-factor authentication",
+      "apiKeyManagement": "API key management"
+    },
+    "apiDocs": {
+      "title": "API Documentation",
+      "desc": "For developers integrating with our API",
+      "apiReference": "API reference",
+      "authGuide": "Authentication guide",
+      "rateLimits": "Rate limits"
+    },
+    "contact": {
+      "title": "Still need help?",
+      "desc": "Our support team is here to assist you with any questions",
+      "contactSupport": "Contact Support",
+      "liveChat": "Live Chat"
+    }
+  },
+  "payment": {
+    "success": {
+      "title": "Payment Successful!",
+      "subtitle": "Your subscription has been activated",
+      "message": "Thank you for your purchase! Your account has been upgraded and you now have access to all premium features.",
+      "goToDashboard": "Go to Dashboard",
+      "startCreating": "Start Creating CVs",
+      "verifying": "Verifying Payment...",
+      "verifyingMessage": "Please wait while we confirm your payment.",
+      "verificationPending": "Verification Pending",
+      "verificationPendingMessage": "We're still processing your payment."
+    },
+    "failure": {
+      "title": "Payment Failed",
+      "subtitle": "We couldn't process your payment",
+      "whatYouCanDo": "What you can do:",
+      "tryAgain": "Try Again",
+      "backToDashboard": "Back to Dashboard",
+      "contactSupport": "Contact Support"
+    }
+  },
+  "subscription": {
+    "policy": {
+      "consentDisclaimer": "By clicking 'Pay', you agree to our <terms>Terms & Conditions</terms> and <cancellation>Cancellation Policy</cancellation>.",
+      "cancellationPolicy": "Cancellation Policy",
+      "nature": "Subscription Nature",
+      "natureDesc": "Our services operate on a periodic subscription basis (monthly/yearly). Upon completing the payment, the subscriber immediately obtains full access to the agreed-upon digital services.",
+      "noRefund": "Non-Refund Policy",
+      "noRefundDesc": "Due to the digital nature of the service and its immediate availability for use, all payments collected for current subscription periods are non-refundable in whole or in part. The subscriber is not entitled to claim a refund after service activation, in accordance with laws governing digital goods and services.",
+      "autoRenew": "Cancellation of Auto-Renewal",
+      "autoRenewDesc": "The subscriber has the right to cancel 'Auto-Renewal' at any time through their account control panel.",
+      "cancellationEffect": "Effect of Cancellation",
+      "cancellationEffectDesc": "Upon cancellation, the service will remain active until the end of the pre-paid subscription period. No future charges will be deducted, and the subscription will terminate permanently at the end of the current period.",
+      "agreement": "Agreement",
+      "agreementDesc": "By completing the payment, the subscriber acknowledges having read and agreed to this policy and waives their right to refund the current period's value once usage begins."
+    },
+    "confirm": {
+      "title": "Confirm Subscription",
+      "plan": "Plan",
+      "price": "Price",
+      "billingCycle": "Billing Cycle",
+      "paymentMethod": "Payment Method",
+      "confirmPayment": "Confirm Payment"
+    },
+    "success": {
+      "title": "Payment Successful!",
+      "message": "Your subscription has been activated",
+      "goToDashboard": "Go to Dashboard",
+      "viewReceipt": "View Receipt"
+    }
+  },
+  "admin": {
+    "common": {
+      "subtitle": "Manage platform data",
+      "active": "Active",
+      "disabled": "Disabled",
+      "inactive": "Inactive",
+      "banUnban": "Ban/Unban",
+      "subscribedUsers": "Subscribed Users",
+      "free": "Free",
+      "never": "Never",
+      "noData": "No data available",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deactivate": "Deactivate",
+      "activate": "Activate",
+      "actions": "Actions",
+      "save": "Save",
+      "cancel": "Cancel",
+      "retry": "Retry"
+    },
+    "users": {
+      "title": "User Management",
+      "subtitle": "Manage platform users and roles",
+      "totalUsers": "Total Users",
+      "activeUsers": "Active Users",
+      "newUsers": "New Users",
+      "enableSuccess": "User enabled successfully",
+      "disableSuccess": "User disabled successfully",
+      "toggleError": "Failed to toggle user status",
+      "columns": {
+        "id": "ID",
+        "email": "Email",
+        "name": "Name",
+        "plan": "Plan",
+        "status": "Status",
+        "date": "Registration Date",
+        "actions": "Actions"
+      }
+    },
+    "subscriptions": {
+      "title": "Subscription Management",
+      "subtitle": "Manage user subscriptions",
+      "user": "User",
+      "plan": "Plan",
+      "billingCycle": "Billing Cycle",
+      "status": "Status",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "renew": "Auto Renew"
+    },
+    "billing": {
+      "title": "Billing Management",
+      "subtitle": "Manage plans and token packages",
+      "plans": "Plans",
+      "tokenPackages": "Token Packages",
+      "plansDesc": "Configure subscription plans that users can purchase",
+      "tokensDesc": "Configure token packages that users can purchase for additional usage",
+      "createPlan": "Create Plan",
+      "editPlan": "Edit Plan",
+      "createPackage": "Create Package",
+      "popular": "Popular",
+      "form": {
+        "name": "Name",
+        "namePlaceholder": "e.g., Pro Plan",
+        "description": "Description",
+        "descriptionPlaceholder": "Brief description of the plan",
+        "monthlyPrice": "Monthly Price ($)",
+        "annualPrice": "Annual Price ($)",
+        "cvLimit": "CV Limit (empty = unlimited)",
+        "cvLimitPlaceholder": "Leave empty for unlimited",
+        "tokenLimit": "Token Limit (empty = unlimited)",
+        "tokenLimitPlaceholder": "Monthly AI token allowance",
+        "linkedGroup": "Linked Permission Group",
+        "linkedGroupPlaceholder": "Select a group (optional)",
+        "linkedGroupHint": "Users subscribing to this plan will inherit the group's permissions",
+        "none": "None",
+        "billingRestrictions": "Billing Restrictions",
+        "allowAnnualBilling": "Allow Annual Billing",
+        "allowRenewal": "Allow Renewal",
+        "maxBillingCycles": "Max Billing Cycles (empty = unlimited)",
+        "maxBillingCyclesPlaceholder": "e.g., 1 for one-time purchase",
+        "displaySettings": "Display Settings",
+        "featured": "Featured (Popular)",
+        "showWatermark": "Show Watermark",
+        "sortOrder": "Sort Order",
+        "apiAccess": "API Access",
+        "update": "Update"
+      }
+    },
+    "plans": {
+      "title": "Plan Management",
+      "createPlan": "Create Plan",
+      "editPlan": "Edit Plan"
+    },
+    "promos": {
+      "title": "Promotion Management",
+      "subtitle": "Manage discount codes and promotions",
+      "createPromo": "Create Promotion",
+      "code": "Code",
+      "discount": "Discount",
+      "appliesTo": "Applies To",
+      "usage": "Usage",
+      "expires": "Expires",
+      "status": "Status",
+      "expiryDate": "Expiry Date",
+      "noExpiry": "No Expiry",
+      "noPromos": "No promo codes found"
+    },
+    "stats": {
+      "title": "Statistics",
+      "subtitle": "Platform analytics and insights",
+      "period": "Period",
+      "totalUsers": "Total Users",
+      "revenue": "Revenue",
+      "conversions": "Conversions",
+      "growth": "Growth"
+    },
+    "apiUsage": {
+      "title": "API Logs",
+      "subtitle": "Monitor system API usage",
+      "monthlyApiCalls": "Monthly API Calls",
+      "requests": "Requests",
+      "limit": "Limit",
+      "remaining": "Remaining"
+    },
+    "notifications": {
+      "title": "Notification Management",
+      "subtitle": "Send push notifications to users",
+      "broadcast": "Broadcast",
+      "targeted": "Targeted",
+      "broadcastToAll": "Broadcast to All Users",
+      "broadcastDesc": "Send a notification to all registered users at once",
+      "sendToAll": "Send to All Users",
+      "sendToSpecific": "Send to Specific Users",
+      "selectUsersDesc": "Select users to receive this notification",
+      "send": "Send Notification",
+      "templates": "Templates"
+    },
+    "auditMonitor": {
+      "title": "Audit Monitor",
+      "subtitle": "View and search system audit logs",
+      "cvLogs": "CV Operation Logs",
+      "apiLogs": "API Logs",
+      "tabs": {
+        "users": "Users",
+        "plans": "Plans",
+        "promos": "Promos",
+        "cvLogs": "CV Logs",
+        "all": "All"
+      },
+      "sections": {
+        "userLogs": "User Activity Logs",
+        "userLogsDesc": "Logs for user entity changes"
+      }
+    },
+    "groups": {
+      "title": "Group Management",
+      "subtitle": "Manage user groups and permissions",
+      "totalGroups": "Total Groups",
+      "systemGroups": "System Groups",
+      "totalPermissions": "Total Permissions"
+    }
+  },
+  "footer": {
+    "product": {
+      "title": "Product",
+      "overview": "Overview",
+      "pricing": "Pricing",
+      "apiDocs": "API Documentation"
+    },
+    "company": {
+      "title": "Company",
+      "about": "About",
+      "team": "Team",
+      "blog": "Blog",
+      "careers": "Careers",
+      "contact": "Contact",
+      "privacy": "Privacy",
+      "terms": "Terms"
+    },
+    "resources": {
+      "title": "Resources",
+      "help": "Help",
+      "sales": "Sales",
+      "advertise": "Advertise"
+    },
+    "social": {
+      "title": "Social",
+      "twitter": "Twitter",
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn"
+    },
+    "newsletter": {
+      "title": "Subscribe to our Newsletter",
+      "description": "Get the latest updates and news delivered to your inbox",
+      "placeholder": "Enter your email",
+      "subscribe": "Subscribe",
+      "success": "Subscribed successfully!",
+      "error": "Failed to subscribe. Please try again."
+    },
+    "followUs": "Follow us",
+    "mobileApp": "Mobile App",
+    "downloadOn": "Download on the",
+    "getItOn": "Get it on",
+    "copyright": "© {year} Civify.cv. All rights reserved.",
+    "poweredBy": "Powered by Technolabs"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Get in touch with our team",
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "subject": "Subject",
+      "message": "Message",
+      "submit": "Send Message",
+      "sending": "Sending...",
+      "success": "Message sent successfully!",
+      "error": "Failed to send message."
+    },
+    "info": {
+      "address": "Address",
+      "email": "Email",
+      "phone": "Phone"
+    }
+  },
+  "policy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: {date}"
+  },
+  "terms": {
+    "title": "Terms and Conditions",
+    "lastUpdated": "Last updated: {date}"
+  },
+  "resume": {
+    "sections": {
+      "summary": "Professional Summary",
+      "experience": "Experience",
+      "education": "Education",
+      "skills": "Skills",
+      "languages": "Languages",
+      "courses": "Courses & Certifications",
+      "certifications": "Certifications",
+      "projects": "Projects",
+      "activities": "Activities & Volunteering",
+      "contact": "Contact",
+      "links": "Links"
+    },
+    "levels": {
+      "native": "Native",
+      "fluent": "Fluent",
+      "expert": "Expert",
+      "advanced": "Advanced",
+      "intermediate": "Intermediate",
+      "beginner": "Beginner"
+    }
+  },
+  "builder": {
+    "title": "Civify Builder",
+    "tabs": {
+      "content": "Content",
+      "design": "Design",
+      "export": "Export"
+    },
+    "actions": {
+      "upload": "Upload CV",
+      "parsing": "Parsing...",
+      "save": "Save",
+      "saving": "Saving...",
+      "reset": "Reset to original",
+      "fullscreen": "Full Screen",
+      "exitFullscreen": "Exit Full Screen"
+    },
+    "saveDialog": {
+      "title": "Save Resume",
+      "description": "Enter a title for your resume. This will help you identify it later.",
+      "label": "Resume Title",
+      "placeholder": "e.g., Software Engineer Resume",
+      "cancel": "Cancel",
+      "confirm": "Save Resume"
+    },
+    "exportPanel": {
+      "title": "Ready to download?",
+      "subtitle": "Select a format to export your resume.",
+      "pdf": {
+        "title": "PDF Document",
+        "description": "Best for sharing and printing. Preserves layout."
+      },
+      "docx": {
+        "title": "Word Document",
+        "description": "Editable in Microsoft Word or Google Docs."
+      },
+      "tip": "Tip: Review your resume in the preview panel before downloading to ensure everything looks perfect."
+    },
+    "toasts": {
+      "enterTitle": "Please enter a title for your resume",
+      "saveSuccess": "Resume saved successfully",
+      "saveError": "Failed to save resume",
+      "resetInfo": "Resume reset to original state",
+      "uploadError": "Please upload a PDF or Word document",
+      "parseSuccess": "CV parsed successfully!",
+      "parseError": "Failed to parse CV. Please try again.",
+      "fullscreenError": "Fullscreen not supported",
+      "guestUpload": "Please sign in to upload a CV",
+      "loginAction": "Login"
+    }
+  },
+  "editor": {
+    "sections": {
+      "personal": "Personal Information",
+      "add": "Add Section",
+      "rename": "Rename Section",
+      "custom": "Custom"
+    },
+    "personalForm": {
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "John Doe",
+      "jobTitle": "Job Title",
+      "jobTitlePlaceholder": "Software Engineer",
+      "email": "Email",
+      "emailPlaceholder": "john@example.com",
+      "phone": "Phone",
+      "phonePlaceholder": "+1 234 567 890",
+      "address": "Address / Location",
+      "addressPlaceholder": "New York, NY",
+      "summary": "Summary",
+      "summaryPlaceholder": "Brief professional summary...",
+      "linkedin": "LinkedIn",
+      "linkedinPlaceholder": "linkedin.com/in/speedy",
+      "github": "GitHub",
+      "githubPlaceholder": "github.com/speedy",
+      "website": "Website",
+      "websitePlaceholder": "speedy.com"
+    },
+    "experience": {
+      "add": "Add Experience",
+      "company": "Company Name",
+      "companyPlaceholder": "Company Inc.",
+      "position": "Job Title",
+      "positionPlaceholder": "Senior Developer",
+      "location": "Location",
+      "locationPlaceholder": "Remote / City, Country",
+      "description": "Description",
+      "descriptionPlaceholder": "• Achieved X results...",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "present": "Present / Current"
+    },
+    "education": {
+      "add": "Add Education",
+      "school": "School / University",
+      "schoolPlaceholder": "Harvard University",
+      "degree": "Degree / Field",
+      "degreePlaceholder": "BSc Computer Science",
+      "location": "Location",
+      "locationPlaceholder": "Cambridge, MA",
+      "gpa": "GPA / Notes (Optional)",
+      "gpaPlaceholder": "GPA 3.8 / Honors",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "present": "Present / Currently studying"
+    },
+    "skills": {
+      "addPlaceholder": "Skill name...",
+      "noItems": "No skills added yet"
+    },
+    "languages": {
+      "addPlaceholder": "Language name...",
+      "noItems": "No languages added yet",
+      "none": "None",
+      "levels": {
+        "native": "Native",
+        "fluent": "Fluent",
+        "advanced": "Advanced",
+        "intermediate": "Intermediate",
+        "beginner": "Beginner"
+      }
+    },
+    "generic": {
+      "item": "Item",
+      "title": "Title *",
+      "titlePlaceholder": "e.g., Project Name, Course Title...",
+      "subtitle": "Subtitle / Organization",
+      "subtitlePlaceholder": "e.g., Role, Organization...",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "present": "Present / Ongoing",
+      "description": "Description",
+      "descriptionPlaceholder": "Brief description...",
+      "addItem": "Add Item",
+      "addSimplePlaceholder": "e.g. Reading, Chess, Photography...",
+      "noItems": "No items added yet",
+      "newItemTitle": "New item title...",
+      "add": "Add"
+    },
+    "dialog": {
+      "title": "Add New Section",
+      "description": "Create a new section for your resume. Choose a type to inherit its layout.",
+      "nameLabel": "Section Name",
+      "namePlaceholder": "e.g., Volunteer Work, Awards, Publications...",
+      "typeLabel": "Section Type (inherits layout)",
+      "cancel": "Cancel",
+      "confirm": "Add Section"
+    }
+  },
+  "design": {
+    "template": {
+      "title": "Template",
+      "modern": { "name": "Modern", "description": "Clean and professional" },
+      "classic": {
+        "name": "Classic",
+        "description": "Timeless and traditional"
+      },
+      "creative": { "name": "Creative", "description": "Bold and standout" }
+    },
+    "colors": "Accent Color",
+    "typography": "Typography",
+    "sectionStyles": {
+      "skills": "Skills Display",
+      "languages": "Languages Display",
+      "courses": "Courses / Certifications Display",
+      "tags": "Tags",
+      "level": "Level",
+      "dots": "Dots",
+      "bar": "Bar",
+      "detailed": { "name": "Detailed", "description": "Full cards" },
+      "simple": { "name": "Simple", "description": "Bullet list" }
+    },
+    "layoutDirection": {
+      "title": "Layout Direction",
+      "auto": "Auto",
+      "matchLocale": "Match Locale",
+      "ltr": "LTR",
+      "rtl": "RTL"
+    }
+  },
+  "landing": {
+    "hero": {
+      "titlePart1": "75% of CVs",
+      "titlePart2": "Never Get Seen.",
+      "titlePart3": "Make Yours the Exception.",
+      "subtitle": "Stand out from the crowd with our AI-powered resume builder. ATS-friendly templates, expert tips, and instant formatting.",
+      "cta": "Start Free — No Credit Card",
+      "ctaFree": "Try for Free",
+      "badge": "Full Arabic Support!",
+      "matchScore": "92%",
+      "interviews": "More interviews"
+    },
+    "howItWorks": {
+      "title": "How Civify Works",
+      "subtitle": "From upload to download in just 4 simple steps",
+      "steps": {
+        "step1": {
+          "title": "Upload Your CV",
+          "description": "Start from scratch or upload your existing CV in any format"
+        },
+        "step2": {
+          "title": "Paste Job Description",
+          "description": "Copy and paste the job description or select a role category"
+        },
+        "step3": {
+          "title": "AI Analysis",
+          "description": "Civify analyzes ATS keywords and role requirements instantly"
+        },
+        "step4": {
+          "title": "Download Optimized CV",
+          "description": "Get your polished, tailored CV with optimization score"
+        }
+      }
+    },
+    "features": {
+      "title": "Powerful Features",
+      "subtitle": "Everything you need to land your dream job",
+      "items": {
+        "parser": {
+          "title": "AI Job Description Parser",
+          "description": "Extracts required skills & keywords for better match with job postings"
+        },
+        "ats": {
+          "title": "ATS Optimization Engine",
+          "description": "Ensures formatting & keyword density match ATS standards for maximum visibility"
+        },
+        "templates": {
+          "title": "Role-Based CV Templates",
+          "description": "Developer, Designer, Data Analyst, HR, Marketing, Sales, and more specialized templates"
+        },
+        "aiRewrite": {
+          "title": "Achievement Rewriting with AI",
+          "description": "Turns simple tasks into quantifiable impact statements that impress recruiters"
+        },
+        "skills": {
+          "title": "Skill Gap Suggestions",
+          "description": "Shows missing skills and recommends additions based on job requirements"
+        },
+        "arabic": {
+          "title": "Full Arabic Support 🇸🇦",
+          "description": "Native RTL support, Arabic OCR for scanned documents, and bilingual CV generation"
+        },
+        "score": {
+          "title": "Real-time Score Indicator",
+          "description": "Displays CV Match Score before download so you know exactly where you stand"
+        },
+        "privacy": {
+          "title": "CV Masking & Privacy",
+          "description": "Protect your personal info when sharing CVs—mask emails, phones, and addresses"
+        }
+      }
+    },
+    "resumeBuilder": {
+      "title": "Advanced Resume Builder",
+      "titleAccent": "Enhanced with AI",
+      "description": "Build, edit, and perfect your resume with our state-of-the-art tools. Real-time changes, instant previews, and smart suggestions.",
+      "badge": "Full Arabic Support!",
+      "cta": "Open Builder",
+      "features": {
+        "preview": {
+          "title": "Real-time Preview",
+          "description": "See changes instantly as you type"
+        },
+        "ai": {
+          "title": "AI Enhancement",
+          "description": "Get smart suggestions to improve your content"
+        },
+        "multiLang": {
+          "title": "Multi-language",
+          "description": "Full support for English and Arabic layouts"
+        }
+      }
+    },
+    "pricing": {
+      "title": "Simple, Transparent Pricing",
+      "subtitle": "Choose the plan that fits your job search needs",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "save": "Save 20%",
+      "mostPopular": "Most Popular",
+      "selectPlan": "Select Plan",
+      "getStarted": "Get Started",
+      "noCreditCard": "No credit card needed for free plan",
+      "cancelAnytime": "Cancel anytime",
+      "errorLoading": "Failed to load pricing plans",
+      "errorContact": "Please try again later or contact support",
+      "features": {
+        "cvStorageUnlimited": "Unlimited CV storage",
+        "cvStorage": "{count} CVs storage",
+        "aiTailoring": "AI-powered CV tailoring",
+        "masking": "Personal information masking",
+        "pdfExport": "PDF export",
+        "noWatermark": "No watermark",
+        "apiAccess": "API access for integrations",
+        "dashboardAccess": "Dashboard access",
+        "prioritySupport": "Priority support",
+        "advancedAi": "Advanced AI features",
+        "basicSupport": "Basic support"
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Everything you need to know about Civify",
+      "items": {
+        "q1": {
+          "question": "Is my data private?",
+          "answer": "Absolutely. We use enterprise-grade encryption and never share your personal information with third parties. Your CV data is stored securely and you can delete it anytime."
+        },
+        "q2": {
+          "question": "What makes a CV ATS-friendly?",
+          "answer": "ATS (Applicant Tracking Systems) scan CVs for specific keywords, proper formatting, and standard section headers. Our templates are designed to pass ATS scans while still looking professional to human recruiters."
+        },
+        "q3": {
+          "question": "Can I customize the CV manually?",
+          "answer": "Yes! After AI optimization, you have full control to edit any section, adjust formatting, and customize the content to match your personal style."
+        },
+        "q4": {
+          "question": "Do you save my documents?",
+          "answer": "Your CVs are saved securely in your account so you can access and edit them anytime. You can also download them locally and delete them from our servers whenever you want."
+        },
+        "q5": {
+          "question": "How accurate is the match score?",
+          "answer": "Our match score is based on industry-standard ATS algorithms and keyword analysis. While no score is 100% predictive, our users report significantly higher interview rates with scores above 80%."
+        }
+      }
+    },
+    "integrations": {
+      "title": "Seamless Integrations",
+      "subtitle": "Connect with your favorite platforms and tools",
+      "items": {
+        "linkedin": {
+          "name": "LinkedIn",
+          "description": "Import your profile data instantly"
+        },
+        "google-docs": {
+          "name": "Google Docs",
+          "description": "Export and edit in Google Docs"
+        },
+        "word": {
+          "name": "Microsoft Word",
+          "description": "Download in .docx format"
+        },
+        "indeed": {
+          "name": "Indeed",
+          "description": "Optimize for Indeed applications"
+        },
+        "glassdoor": {
+          "name": "Glassdoor",
+          "description": "Tailor for Glassdoor postings"
+        },
+        "google-drive": {
+          "name": "Google Drive",
+          "description": "Save directly to Drive"
+        }
+      }
+    },
+    "templates": {
+      "title": "Professional CV Templates",
+      "subtitle": "Choose from our collection of ATS-optimized templates designed for every industry",
+      "badge": "ATS Compliant",
+      "note": {
+        "bold": "All templates are 100% ATS compliant",
+        "text": "— Optimized to pass applicant tracking systems"
+      },
+      "items": {
+        "ats-clean": {
+          "name": "Clean ATS",
+          "category": "Professional",
+          "description": "Simple, scannable format optimized for applicant tracking systems"
+        },
+        "professional": {
+          "name": "Professional",
+          "category": "Business",
+          "description": "Elegant design perfect for corporate and traditional industries"
+        },
+        "minimalist": {
+          "name": "Minimalist",
+          "category": "Modern",
+          "description": "Ultra-clean design with sophisticated use of white space"
+        },
+        "modern": {
+          "name": "Modern",
+          "category": "Creative",
+          "description": "Contemporary design with geometric elements and bold typography"
+        },
+        "technical": {
+          "name": "Technical",
+          "category": "Tech",
+          "description": "Developer-focused with skills matrix and GitHub-style layout"
+        },
+        "creative": {
+          "name": "Creative",
+          "category": "Design",
+          "description": "Artistic layout for designers and creative professionals"
+        }
+      }
+    },
+    "testimonials": {
+      "title": "Success Stories",
+      "subtitle": "Join thousands of professionals who landed their dream jobs with Civify",
+      "stats": {
+        "users": { "value": "50,000+", "label": "Happy Users" },
+        "rating": { "value": "4.9/5", "label": "Average Rating" },
+        "reviews": { "value": "2,000+", "label": "5-Star Reviews" }
+      },
+      "items": {
+        "t1": {
+          "quote": "Got 3 interviews in 2 weeks after using Civify. The ATS optimization really works!",
+          "role": "Software Engineer",
+          "company": "Google",
+          "metric": "3 interviews in 2 weeks"
+        },
+        "t2": {
+          "quote": "The AI rewriting feature transformed my generic bullet points into powerful achievements. Landed my dream job!",
+          "role": "Product Manager",
+          "company": "Microsoft",
+          "metric": "Landed dream job"
+        },
+        "t3": {
+          "quote": "My CV match score went from 45% to 92%. The skill gap suggestions were incredibly helpful.",
+          "role": "Data Analyst",
+          "company": "Amazon",
+          "metric": "92% match score"
+        },
+        "t4": {
+          "quote": "Finally, a CV tool that understands what recruiters actually look for. Worth every penny!",
+          "role": "Marketing Manager",
+          "company": "Meta"
+        }
+      }
+    },
+    "roles": {
+      "title": "Tailored for Your Role",
+      "subtitle": "Industry-specific optimization for every profession",
+      "create": "Create {role} CV",
+      "sections": {
+        "keywords": "Optimized Keywords",
+        "language": "Industry Language",
+        "examples": "Tailored Examples"
+      },
+      "items": {
+        "software-engineer": {
+          "name": "Software Engineer",
+          "keywords": "JavaScript, Python, React, Node.js, AWS, Docker, Git, Agile",
+          "language": "Full-stack development, Microservices, CI/CD, RESTful APIs",
+          "examples": [
+            "Developed scalable web applications serving 1M+ users",
+            "Reduced API response time by 40% through optimization"
+          ]
+        },
+        "data-scientist": {
+          "name": "Data Scientist",
+          "keywords": "Python, Machine Learning, SQL, TensorFlow, Pandas, Statistics",
+          "language": "Predictive modeling, Data visualization, A/B testing, ETL pipelines",
+          "examples": [
+            "Built ML models improving prediction accuracy by 25%",
+            "Analyzed datasets of 10M+ records to drive business insights"
+          ]
+        },
+        "product-manager": {
+          "name": "Product Manager",
+          "keywords": "Product Strategy, Roadmap, Stakeholder Management, Analytics, Agile",
+          "language": "Product-market fit, User stories, KPIs, Go-to-market strategy",
+          "examples": [
+            "Launched 5 features increasing user engagement by 35%",
+            "Managed cross-functional teams of 15+ members"
+          ]
+        },
+        "accountant": {
+          "name": "Accountant",
+          "keywords": "QuickBooks, Excel, GAAP, Financial Reporting, Tax Preparation",
+          "language": "General ledger, Reconciliation, Audit, Compliance",
+          "examples": [
+            "Managed accounts payable/receivable for $5M budget",
+            "Reduced month-end close time by 30%"
+          ]
+        },
+        "customer-support": {
+          "name": "Customer Support",
+          "keywords": "Zendesk, Customer Service, Communication, Problem Solving, CRM",
+          "language": "Ticket resolution, Customer satisfaction, SLA, Escalation",
+          "examples": [
+            "Maintained 95% customer satisfaction rating",
+            "Resolved 50+ tickets daily with 2-hour average response time"
+          ]
+        },
+        "sales-rep": {
+          "name": "Sales Representative",
+          "keywords": "Salesforce, Lead Generation, Negotiation, B2B Sales, CRM",
+          "language": "Pipeline management, Quota attainment, Cold calling, Account management",
+          "examples": [
+            "Exceeded sales quota by 120% for 3 consecutive quarters",
+            "Generated $2M in new business revenue"
+          ]
+        },
+        "marketing-specialist": {
+          "name": "Marketing Specialist",
+          "keywords": "SEO, Google Analytics, Content Marketing, Social Media, Email Campaigns",
+          "language": "Brand awareness, Lead generation, Conversion rate, Marketing automation",
+          "examples": [
+            "Increased organic traffic by 150% through SEO optimization",
+            "Managed campaigns generating 10K+ qualified leads"
+          ]
+        },
+        "project-manager": {
+          "name": "Project Manager",
+          "keywords": "PMP, Agile, Scrum, Risk Management, Budget Management, Jira",
+          "language": "Project lifecycle, Stakeholder engagement, Resource allocation, Deliverables",
+          "examples": [
+            "Delivered 20+ projects on time and under budget",
+            "Managed project portfolios worth $10M+"
+          ]
+        }
+      }
+    },
+    "beforeAfter": {
+      "badge": "✨ See the Transformation",
+      "title": "From Generic to Game-Changing",
+      "subtitle": "Watch how our AI transforms ordinary bullet points into powerful achievements",
+      "before": {
+        "badge": "⚪ Before",
+        "score": "Match Score: 45%",
+        "items": {
+          "item1": "Responsible for managing team projects and meetings",
+          "item2": "Worked on improving customer satisfaction",
+          "item3": "Helped with various marketing tasks"
+        },
+        "issuesTitle": "Issues detected:",
+        "issues": {
+          "item1": "No quantifiable metrics",
+          "item2": "Vague responsibilities",
+          "item3": "Missing keywords",
+          "item4": "Weak action verbs"
+        }
+      },
+      "after": {
+        "badge": "✨ After",
+        "score": "Match Score: 92%",
+        "items": {
+          "item1": "<strong1>Led</strong1> cross-functional team of 8 members to deliver <strong2>15+ projects</strong2> on time, increasing client satisfaction by <strong3>35%</strong3> through improved stakeholder communication",
+          "item2": "<strong1>Implemented</strong1> customer feedback system that boosted NPS score from 42 to <strong2>78</strong2>, resulting in <strong3>25% increase</strong3> in customer retention",
+          "item3": "<strong1>Executed</strong1> multi-channel marketing campaigns generating <strong2>$500K</strong2> in revenue and <strong3>10,000+</strong3> qualified leads"
+        },
+        "improvementsTitle": "Improvements made:",
+        "improvements": {
+          "item1": "Quantified achievements with metrics",
+          "item2": "Strong action verbs (Led, Implemented)",
+          "item3": "Industry-specific keywords",
+          "item4": "Clear business impact"
+        }
+      }
+    },
+    "ctaSection": {
+      "title": "Stop Sending CVs Into the Void",
+      "subtitle": "Join our Beta and be among the first to experience AI-powered CV optimization.",
+      "highlight": "Full Arabic support. 92% match rate. Free to start.",
+      "cta": "Create Your CV Now",
+      "trust": "Free to start"
+    },
+    "blog": {
+      "title": "Career Resources",
+      "subtitle": "Expert tips and guides to boost your job search",
+      "readMore": "Read more",
+      "viewAll": "View All Articles",
+      "posts": {
+        "post1": {
+          "readTime": "5 min read",
+          "title": "How to Write an ATS-Friendly CV in 2025",
+          "excerpt": "Learn the essential strategies to ensure your CV passes applicant tracking systems and reaches human recruiters.",
+          "slug": "ats-friendly-cv-2025"
+        },
+        "post2": {
+          "readTime": "7 min read",
+          "title": "Top Keywords for Software Engineering Roles in 2025",
+          "excerpt": "Discover the most important keywords and skills that tech recruiters are looking for this year.",
+          "slug": "software-engineering-keywords-2025"
+        },
+        "post3": {
+          "readTime": "6 min read",
+          "title": "How to Tailor Your CV to Job Descriptions",
+          "excerpt": "A step-by-step guide to customizing your CV for each application to maximize your chances of getting interviews.",
+          "slug": "tailor-cv-job-descriptions"
+        }
+      }
+    }
+  },
+  "atsScore": {
+    "title": "General ATS Score",
+    "description": "Analyzing your CV against industry best practices for ATS compatibility.",
+    "analyzing": "Analyzing your CV...",
+    "overallCompatibility": "Overall ATS Compatibility",
+    "contentQuality": "Content Quality",
+    "skillsPresentation": "Skills Presentation",
+    "areasToImprove": "Areas to Improve",
+    "suggestions": "Suggestions",
+    "close": "Close",
+    "noScore": "No score available"
+  }
+}

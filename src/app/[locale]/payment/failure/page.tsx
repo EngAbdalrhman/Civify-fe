@@ -54,19 +54,19 @@ function PaymentFailureContent() {
             <ul className="text-sm text-muted-foreground space-y-2">
               <li className="flex items-start gap-2">
                 <span className="text-primary mt-0.5">•</span>
-                {t("tip1")}
+                Check your payment details and try again
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary mt-0.5">•</span>
-                {t("tip2")}
+                Try a different payment method
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary mt-0.5">•</span>
-                {t("tip3")}
+                Contact your bank if the issue persists
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary mt-0.5">•</span>
-                {t("tip4")}
+                Reach out to our support team for assistance
               </li>
             </ul>
           </div>

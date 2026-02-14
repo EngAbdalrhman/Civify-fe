@@ -65,8 +65,6 @@ export interface AdminUser {
   // Subscription (display only)
   currentPlan?: string;
   subscriptionStatus?: string;
-  oauthProvider?: string;
-  oauthSubject?: string;
 }
 
 // ============================================
@@ -201,15 +199,10 @@ export interface AdminSubscription {
 // Notification Types
 // ============================================
 
-export type NotificationChannel = 'PUSH' | 'EMAIL' | 'ALL';
-
 export interface SendNotificationRequest {
   title: string;
   message: string;
   type: 'INFO' | 'WARNING' | 'PROMO' | 'SUCCESS';
-  channel?: NotificationChannel;
-  broadcast?: boolean;
-  userIds?: number[];
 }
 
 export interface SendToUsersRequest extends SendNotificationRequest {
@@ -583,27 +576,17 @@ class AdminService {
   // ==========================================
 
   async sendBroadcast(request: SendNotificationRequest): Promise<{ message: string }> {
-    const payload = {
-      ...request,
-      broadcast: true,
-      channel: request.channel || 'PUSH'
-    };
     const response = await apiClient.post<{ message: string }>(
-      `${ADMIN_API.NOTIFICATIONS}/send`,
-      payload
+      `${ADMIN_API.NOTIFICATIONS}/send-all`,
+      request
     );
     return response.data;
   }
 
   async sendToUsers(request: SendToUsersRequest): Promise<{ message: string }> {
-    const payload = {
-      ...request,
-      broadcast: false,
-      channel: request.channel || 'PUSH'
-    };
     const response = await apiClient.post<{ message: string }>(
-      `${ADMIN_API.NOTIFICATIONS}/send`,
-      payload
+      `${ADMIN_API.NOTIFICATIONS}/send-to-users`,
+      request
     );
     return response.data;
   }

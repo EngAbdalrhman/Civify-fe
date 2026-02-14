@@ -2,12 +2,14 @@
 
 import { useState, useRef } from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import apiClient from "@/api/client";
 import { CvParseResponse, ResumeData } from "@/features/upload-cv/types";
 import { ALLOWED_FILE_TYPES, UPLOAD_TIMEOUT } from "../utils/constants";
 
 interface UseFileUploadParams {
+  isGuest: boolean;
   onSuccess: (data: ResumeData) => void;
 }
 
@@ -21,13 +23,24 @@ interface UseFileUploadReturn {
 }
 
 export function useFileUpload({
+  isGuest,
   onSuccess,
 }: UseFileUploadParams): UseFileUploadReturn {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
   const t = useTranslations("builder");
 
   const triggerFileUpload = () => {
+    if (isGuest) {
+      toast.info(t("toasts.guestUpload"), {
+        action: {
+          label: t("toasts.loginAction"),
+          onClick: () => router.push("/login?callbackUrl=/app/resume-builder"),
+        },
+      });
+      return;
+    }
     fileInputRef.current?.click();
   };
 

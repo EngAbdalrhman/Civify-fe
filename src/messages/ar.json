@@ -1,0 +1,1393 @@
+{
+  "common": {
+    "appName": "Civify",
+    "welcome": "مرحباً",
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجح",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "create": "إنشاء",
+    "update": "تحديث",
+    "search": "بحث",
+    "filter": "تصفية",
+    "export": "تصدير",
+    "import": "استيراد",
+    "download": "تحميل",
+    "upload": "رفع",
+    "submit": "إرسال",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "close": "إغلاق",
+    "confirm": "تأكيد",
+    "yes": "نعم",
+    "no": "لا",
+    "view": "عرض",
+    "collapse": "طوي",
+    "expand": "توسيع",
+    "toggleTheme": "تغيير السمة",
+    "theme": {
+      "light": "فاتح",
+      "dark": "داكن",
+      "system": "النظام"
+    }
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "dashboard": "لوحة التحكم",
+    "analytics": "التحليلات",
+    "settings": "الإعدادات",
+    "upload": "تخصيص السيرة الذاتية",
+    "plans": "الخطط",
+    "billing": "الفواتير",
+    "admin": "الإدارة",
+    "users": "المستخدمون",
+    "promos": "العروض الترويجية",
+    "stats": "الإحصائيات",
+    "apiUsage": "استخدام API",
+    "groups": "المجموعات",
+    "subscriptions": "الاشتراكات",
+    "notifications": "الإشعارات",
+    "auditMonitor": "مراقب السجلات",
+    "scheduler": "الجدولة",
+    "logout": "تسجيل الخروج",
+    "resumeBuilder": "منشئ السيرة الذاتية",
+    "apiKeys": "مفاتيح API",
+    "buyTokens": "شراء الرموز",
+    "helpCenter": "مركز المساعدة",
+    "adminDashboard": "لوحة تحكم المسؤول",
+    "freePlan": "الخطة المجانية",
+    "guest": "زائر",
+    "apiDocumentation": "وثائق API",
+    "apiDocSubtitle": "دليل شامل لدمج واجهة برمجة تطبيقات السيرة الذاتية في تطبيقاتك",
+    "language": {
+      "switch": "تغيير اللغة"
+    },
+    "signIn": "تسجيل الدخول",
+    "startForFree": "إنشاء حساب"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "signup": "إنشاء حساب",
+    "username": "اسم المستخدم",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "rememberMe": "تذكرني",
+    "noAccount": "ليس لديك حساب؟",
+    "hasAccount": "لديك حساب بالفعل؟",
+    "loginWithGoogle": "تسجيل الدخول بواسطة جوجل",
+    "signupWithGoogle": "إنشاء حساب بواسطة جوجل",
+    "invalidEmail": "يرجى إدخال عنوان بريد إلكتروني صحيح",
+    "passwordRequired": "كلمة المرور مطلوبة",
+    "usernameMin": "اسم المستخدم يجب أن يتكون من 3 أحرف على الأقل",
+    "passwordMin": "كلمة المرور يجب أن تتكون من 8 أحرف على الأقل",
+    "confirmPasswordMin": "تأكيد كلمة المرور يجب أن يتكون من 8 أحرف على الأقل",
+    "passwordsMatch": "كلمات المرور غير متطابقة",
+    "subtitle": "أنشئ حسابك للبدء",
+    "terms": "أوافق على <terms>الشروط والأحكام</terms> و<privacy>سياسة الخصوصية</privacy>.",
+    "orContinueWith": "أو تابع بواسطة",
+    "emailNotVerified": "يرجى التحقق من بريدك الإلكتروني قبل تسجيل الدخول.",
+    "verificationSentAutomatically": "تم إرسال رسالة التحقق تلقائياً! يرجى التحقق من صندوق الوارد.",
+    "name": "الاسم الكامل",
+    "namePlaceholder": "محمد أحمد",
+    "nameMin": "يجب أن يتكون الاسم من حرفين على الأقل",
+    "identifier": "البريد الإلكتروني أو اسم المستخدم",
+    "identifierPlaceholder": "بريدك الإلكتروني أو اسم المستخدم",
+    "identifierRequired": "يرجى إدخال بريدك الإلكتروني أو اسم المستخدم",
+    "passwordComplexity": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل، حرف كبير، حرف صغير، رقم، ورمز خاص",
+    "passwordPwned": "تم العثور على كلمة المرور هذه في خرق بيانات. يرجى اختيار كلمة مرور مختلفة",
+    "agreement": "من خلال التأكيد، فإنك توافق على <terms>شروط الخدمة</terms> و <privacy>سياسة الخصوصية</privacy>."
+  },
+  "dashboard": {
+    "personalPage": {
+      "title": "الصفحة الشخصية",
+      "subtitle": "إدارة ملفك الشخصي وعرض سيرك الذاتية",
+      "profile": "الملف الشخصي",
+      "profileDesc": "تحديث معلوماتك الشخصية",
+      "cvs": "سيرتي الذاتية",
+      "recent": "النشاط الأخير",
+      "recentDesc": "نشاطك الأخير"
+    },
+    "analytics": {
+      "title": "التحليلات",
+      "overview": "نظرة عامة",
+      "cvViews": "مشاهدات السيرة الذاتية",
+      "downloads": "التحميلات",
+      "performance": "الأداء"
+    },
+    "settings": {
+      "title": "الإعدادات",
+      "account": "إعدادات الحساب",
+      "preferences": "التفضيلات",
+      "notifications": "الإشعارات",
+      "security": "الأمان"
+    },
+    "resumes": {
+      "myResumes": "سيري الذاتية",
+      "viewAll": "عرض الكل",
+      "createNew": "إنشاء سيرة ذاتية جديدة",
+      "loadError": "فشل تحميل سيرك الذاتية",
+      "deleted": "تم حذف السيرة الذاتية",
+      "deleteError": "فشل حذف السيرة الذاتية"
+    }
+  },
+  "upload": {
+    "title": "تخصيص السيرة الذاتية",
+    "upload": {
+      "title": "أنشئ سيرتك الذاتية المتوافقة مع ATS",
+      "subtitle": "ارفع سيرتك الذاتية الحالية، راجع البيانات المستخرجة، ودع الذكاء الاصطناعي يخصصها لوظيفة أحلامك.",
+      "dragDrop": "اسحب وأفلت سيرتك الذاتية هنا",
+      "or": "أو",
+      "browseFiles": "تصفح الملفات",
+      "supportMsg": "ندعم ملفات PDF و DOCX حتى 5 ميجابايت",
+      "analyzing": "جاري تحليل سيرتك الذاتية...",
+      "selectFromResumes": "اختر من سيرك الذاتية",
+      "manualEntry": "إدخال البيانات يدوياً",
+      "step1": "رفع السيرة الذاتية",
+      "step2": "مراجعة البيانات",
+      "step3": "تخصيص السيرة الذاتية",
+      "step4": "النتيجة",
+      "targetJobDescription": "وصف الوظيفة المستهدفة",
+      "pasteJobDesc": "الصق وصف الوظيفة التي تتقدم لها. سيقوم ذكاؤنا الاصطناعي بتحسين سيرتك الذاتية لتتناسب معها.",
+      "jobTitleOptional": "المسمى الوظيفي (اختياري)",
+      "companyOptional": "اسم الشركة (اختياري)",
+      "jobDescLabel": "وصف الوظيفة",
+      "pasteJobDescPlaceholder": "الصق وصف الوظيفة الكامل هنا...",
+      "charsMin": "حد أدنى للحروف",
+      "additionalOptions": "خيارات إضافية",
+      "generateCoverLetter": "إنشاء خطاب تغطية",
+      "coverLetterDesc": "إنشاء خطاب تغطية مخصص",
+      "interviewQuestions": "أسئلة المقابلة",
+      "interviewDesc": "احصل على أسئلة مقابلة محتملة",
+      "careerRoadmap": "خارطة الطريق المهنية",
+      "roadmapDesc": "خارطة طريق للمهارات لتحسين ملاءمتك",
+      "generateTailoredCv": "توليد سيرة ذاتية مخصصة",
+      "generating": "جاري التوليد...",
+      "cvGenerated": "تم إنشاء السيرة الذاتية!",
+      "cvReadyDesc": "سيرتك الذاتية المحسنة بالذكاء الاصطناعي جاهزة. راجع النتيجة أو أعد التوليد إذا لزم الأمر.",
+      "refineResult": "تحسين النتيجة",
+      "editSections": "تعديل الأقسام",
+      "regenerateVariant": "إعادة توليد نسخة أخرى",
+      "atsMatchScore": "درجة توافق ATS",
+      "before": "قبل",
+      "after": "بعد",
+      "saving": "جاري الحفظ...",
+      "saved": "تم الحفظ في السير الذاتية",
+      "saveToResumes": "حفظ في سيري الذاتية",
+      "exporting": "جاري التصدير...",
+      "downloadPdf": "تحميل PDF",
+      "downloadDocx": "تحميل DOCX"
+    },
+    "pageTitle": "أنشئ سيرتك الذاتية المتوافقة مع ATS",
+    "pageSubtitle": "ارفع سيرتك الذاتية الحالية، راجع البيانات المستخرجة، ودع الذكاء الاصطناعي يخصصها لوظيفة أحلامك.",
+    "dragDrop": "اسحب وأفلت سيرتك الذاتية هنا",
+    "or": "أو",
+    "browse": "تصفح الملفات",
+    "selectFile": "اختر ملف",
+    "addManually": "أضف البيانات يدوياً",
+    "supportedFormats": "الصيغ المدعومة: PDF, DOC, DOCX",
+    "maxSize": "الحد الأقصى لحجم الملف: 5 ميجابايت",
+    "processing": "جاري معالجة سيرتك الذاتية...",
+    "analyzing": "جاري التحليل...",
+    "success": "تم رفع السيرة الذاتية بنجاح!",
+    "authRequired": "يرجى تسجيل الدخول لرفع وتخصيص سيرتك الذاتية",
+    "uploadCv": "ارفع سيرتك الذاتية",
+    "uploadCvDesc": "اسحب وأفلت ملف PDF أو DOCX (الحد الأقصى لحجم الملف: 5 ميجابايت)، أو انقر للتصفح. سنستخرج بياناتك تلقائياً.",
+    "importUrl": "استيراد من رابط",
+    "importUrlDesc": "الصق رابط وظيفة (LinkedIn, Indeed, إلخ) أو نص عادي.",
+    "steps": {
+      "uploadCv": "رفع السيرة الذاتية",
+      "reviewData": "مراجعة البيانات",
+      "generate": "توليد",
+      "result": "النتيجة"
+    },
+    "personalInfo": {
+      "title": "المعلومات الشخصية",
+      "subtitle": "بيانات الاتصال الخاصة بك (الحقول المطلوبة معلمة بـ *)",
+      "fullName": "الاسم الكامل",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "jobTitle": "المسمى الوظيفي",
+      "summary": "الملخص المهني",
+      "summaryPlaceholder": "نبذة مختصرة عن خبرتك ومهاراتك...",
+      "linkedin": "لينكد إن",
+      "github": "جيت هب",
+      "website": "الموقع الإلكتروني",
+      "placeholders": {
+        "fullName": "محمد أحمد",
+        "email": "mohamed@example.com",
+        "phone": "+20 123 456 7890",
+        "jobTitle": "مهندس برمجيات",
+        "address": "القاهرة، مصر",
+        "website": "https://mohamedahmed.com",
+        "linkedin": "https://linkedin.com/in/mohamedahmed",
+        "github": "https://github.com/mohamedahmed",
+        "summary": "مهندس برمجيات ذو خبرة..."
+      }
+    },
+    "sections": {
+      "skills": "المهارات",
+      "skillsInput": "المهارات (مفصولة بفاصلة)",
+      "skillsPlaceholder": "Java, Spring Boot, Angular, TypeScript, React...",
+      "noItems": "لا توجد عناصر بعد. انقر \"إضافة\" لإضافة",
+      "add": "إضافة",
+      "experience": "الخبرة",
+      "education": "التعليم",
+      "projects": "المشاريع",
+      "languages": "اللغات",
+      "certifications": "الدورات",
+      "interests": "الاهتمامات",
+      "activities": "الأنشطة والتطوع",
+      "placeholders": {
+        "date": "2020 - الحاضر",
+        "location": "المدينة، الدولة",
+        "description": "صف مسؤولياتك وإنجازاتك..."
+      }
+    },
+    "jobDetails": {
+      "title": "تفاصيل الوظيفة",
+      "subtitle": "الصق وصف الوظيفة لتخصيص سيرتك الذاتية",
+      "jobTitle": "المسمى الوظيفي (اختياري)",
+      "jobTitlePlaceholder": "مثال: مهندس برمجيات أول",
+      "company": "اسم الشركة (اختياري)",
+      "companyPlaceholder": "مثال: جوجل",
+      "description": "وصف الوظيفة",
+      "descriptionPlaceholder": "الصق وصف الوظيفة هنا...",
+      "descriptionRequired": "وصف الوظيفة مطلوب",
+      "descriptionMinLength": "يجب أن يكون وصف الوظيفة 50 حرفاً على الأقل للتخصيص الدقيق"
+    },
+    "options": {
+      "title": "خيارات إضافية",
+      "coverLetter": "إنشاء خطاب تقديمي",
+      "coverLetterDesc": "خطاب تقديمي بالذكاء الاصطناعي مخصص للوظيفة",
+      "interviewQuestions": "أسئلة التحضير للمقابلة",
+      "interviewDesc": "أسئلة تدريبية بناءً على سيرتك الذاتية والوظيفة",
+      "roadmap": "خارطة التعلم",
+      "roadmapDesc": "تحليل فجوة المهارات والدورات الموصى بها"
+    },
+    "actions": {
+      "back": "رجوع",
+      "next": "التالي",
+      "generate": "إنشاء سيرة ذاتية مخصصة",
+      "generating": "جاري الإنشاء...",
+      "downloadPdf": "تحميل PDF",
+      "downloadDocx": "تحميل DOCX",
+      "addSection": "إضافة قسم",
+      "saveToResumes": "حفظ في سيري الذاتية",
+      "trackApplication": "تتبع الطلب",
+      "import": "استيراد",
+      "startOver": "ابدأ من جديد"
+    },
+    "result": {
+      "title": "سيرتك الذاتية المخصصة",
+      "matchScore": "نسبة التطابق",
+      "atsScore": "نقاط ATS",
+      "suggestions": "اقتراحات التحسين",
+      "coverLetter": "خطاب التقديم",
+      "interviewPrep": "التحضير للمقابلة",
+      "roadmap": "خارطة التعلم"
+    },
+    "fillFromResumes": "تعبئة من سيرتي الذاتية",
+    "selectResume": {
+      "title": "اختر سيرة ذاتية",
+      "subtitle": "اختر سيرة ذاتية كنقطة بداية",
+      "noResumes": "لا توجد سير ذاتية محفوظة",
+      "noResumesDesc": "أنشئ سيرة ذاتية أولاً لاستخدام هذه الميزة",
+      "createNew": "إنشاء سيرة ذاتية جديدة",
+      "loading": "جارٍ تحميل السير الذاتية...",
+      "loadError": "فشل تحميل السير الذاتية",
+      "selected": "تم اختيار السيرة الذاتية!"
+    },
+    "errors": {
+      "invalidFileType": "يرجى تحميل ملف PDF أو DOCX",
+      "parseFailed": "فشل تحليل بيانات السيرة الذاتية",
+      "tailorFailed": "فشل تخصيص السيرة الذاتية",
+      "INTERNAL_SERVER_ERROR": "حدث خطأ ما. يرجى المحاولة مرة أخرى لاحقاً.",
+      "FILE_TOO_LARGE": "حجم الملف كبير جداً. الحد الأقصى هو 5 ميجابايت.",
+      "DEFAULT": "حدث خطأ غير متوقع.",
+      "exportPdfFailed": "فشل تحميل PDF. يرجى المحاولة مرة أخرى.",
+      "exportDocxFailed": "فشل تحميل DOCX. يرجى المحاولة مرة أخرى.",
+      "saveFailed": "فشل حفظ السيرة الذاتية. يرجى المحاولة مرة أخرى.",
+      "trackFailed": "فشل تتبع الطلب. يرجى المحاولة مرة أخرى.",
+      "jobDescRequired": "وصف الوظيفة مطلوب",
+      "jobDescMinLength": "يجب أن يكون وصف الوظيفة 50 حرفاً على الأقل للتخصيص الدقيق"
+    },
+    "tokenLimit": {
+      "title": "تم الوصول إلى حد الرموز",
+      "description": "لقد استهلكت جميع رموزك الشهرية. قم بترقية خطتك للحصول على المزيد أو شراء رموز إضافية للمتابعة.",
+      "upgrade": "ترقية الخطة",
+      "buyTokens": "شراء حزمة رموز",
+      "cancel": "ربما لاحقاً"
+    }
+  },
+  "plans": {
+    "title": "اختر خطتك",
+    "subtitle": "اختر الخطة المثالية لمسيرتك المهنية",
+    "free": "مجاني",
+    "pro": "احترافي",
+    "enterprise": "للمؤسسات",
+    "monthly": "شهري",
+    "yearly": "سنوي",
+    "save20": "وفر 20%",
+    "mostPopular": "الأكثر شعبية",
+    "selectPlan": "اختر الخطة",
+    "currentPlan": "الخطة الحالية",
+    "upgrade": "ترقية",
+    "features": "المميزات",
+    "errorLoading": "فشل في تحميل الخطط. يرجى المحاولة مرة أخرى.",
+    "retry": "إعادة المحاولة",
+    "faqTitle": "الأسئلة الشائعة",
+    "faq": {
+      "q1": "ما طرق الدفع التي تقبلونها؟",
+      "a1": "نقبل جميع بطاقات الائتمان الرئيسية (فيزا، ماستركارد) عبر فواتيرك للمدفوعات المحلية.",
+      "q2": "هل يمكنني إلغاء اشتراكي في أي وقت؟",
+      "a2": "نعم، يمكنك إلغاء اشتراكك في أي وقت. سيستمر وصولك حتى نهاية فترة الفوترة الحالية.",
+      "q3": "ما الفرق بين إنشاء السيرة الذاتية وتحليلها؟",
+      "a3": "إنشاء السيرة الذاتية ينشئ سيرة ذاتية جديدة من الصفر أو من قالب. التحليل يستخرج البيانات من سيرة ذاتية موجودة لملء ملفك الشخصي.",
+      "stillQuestions": "هل لا تزال لديك أسئلة؟",
+      "contactSupportTeam": "تواصل مع فريق الدعم"
+    },
+    "pricesNote": "الأسعار بالجنيه المصري. قد تُطبق الضرائب المحلية.",
+    "termsOfService": "شروط الخدمة",
+    "privacyPolicy": "سياسة الخصوصية",
+    "contactSupport": "اتصل بالدعم"
+  },
+  "checkout": {
+    "orderSummary": "ملخص الطلب",
+    "billingCycle": "دورة الفوترة",
+    "promoCode": "رمز الخصم",
+    "total": "الإجمالي",
+    "paymentMethod": "طريقة الدفع",
+    "pay": "ادفع",
+    "processing": "جاري المعالجة...",
+    "backToPlans": "العودة إلى الخطط",
+    "planNotFound": "الخطة غير موجودة",
+    "monthly": "شهري",
+    "yearly": "سنوي",
+    "perMonth": "شهرياً",
+    "perYear": "سنوياً",
+    "save20": "وفر 20%",
+    "enterPromoCode": "أدخل رمز الخصم",
+    "apply": "تطبيق",
+    "subtotal": "المجموع الفرعي",
+    "discount": "الخصم",
+    "securePayment": "دفع آمن",
+    "securePaymentDesc": "معلومات الدفع الخاصة بك مشفرة وآمنة. نحن لا نخزن بيانات بطاقتك أبداً.",
+    "fawaterak": "فواتيرك",
+    "fawaterakDesc": "بطاقة ائتمان/خصم، فوري، المحافظ",
+    "paymob": "باي موب",
+    "paymobDesc": "بطاقة ائتمان/خصم، المحافظ الإلكترونية",
+    "selectPaymentMethod": "اختر طريقة الدفع",
+    "visa": "بطاقة ائتمان/خصم",
+    "visaDesc": "فيزا، ماستركارد، ميزة",
+    "fawryPay": "فوري",
+    "fawryPayDesc": "ادفع في أي منفذ فوري",
+    "mobileWallet": "المحفظة الإلكترونية",
+    "mobileWalletDesc": "فودافون كاش، أورانج، اتصالات، وي",
+    "termsAgreement": "بالمتابعة، أنت توافق على",
+    "termsOfService": "شروط الخدمة",
+    "and": "و",
+    "privacyPolicy": "سياسة الخصوصية"
+  },
+  "apiKeys": {
+    "title": "مفاتيح API",
+    "subtitle": "إدارة مفاتيح API الخاصة بك للوصول إلى واجهة برمجة تطبيقات Civify.",
+    "yourKeys": "مفاتيح API الخاصة بك",
+    "manageKeys": "إدارة مفاتيح API للوصول إلى واجهة البرمجة برمجياً",
+    "viewDocs": "عرض الوثائق",
+    "generateNew": "إنشاء مفتاح جديد",
+    "createTitle": "إنشاء مفتاح API",
+    "createDesc": "أدخل اسماً للمفتاح الجديد لمساعدتك على التعرف عليه لاحقاً.",
+    "namePlaceholder": "مثال: موقع الدفع",
+    "generateKey": "إنشاء المفتاح",
+    "keyGenerated": "تم إنشاء مفتاح API",
+    "copyWarning": "يرجى نسخ هذا المفتاح الآن. لن تتمكن من رؤيته مرة أخرى!",
+    "done": "تم",
+    "existingKeys": "المفاتيح الموجودة",
+    "existingKeysDesc": "قائمة بجميع مفاتيح API المرتبطة بحسابك.",
+    "noKeys": "لم يتم العثور على مفاتيح API. أنشئ أول مفتاح للبدء.",
+    "keyId": "معرف المفتاح",
+    "maskedKey": "المفتاح المخفي",
+    "created": "تاريخ الإنشاء",
+    "lastUsed": "آخر استخدام",
+    "never": "أبداً",
+    "status": "الحالة",
+    "active": "نشط",
+    "revoked": "ملغي",
+    "actions": "الإجراءات",
+    "revoke": "إلغاء",
+    "revokeConfirm": "هل أنت متأكد من إلغاء هذا المفتاح؟ لا يمكن التراجع عن هذا الإجراء.",
+    "copied": "تم النسخ إلى الحافظة",
+    "loadError": "فشل تحميل مفاتيح API",
+    "generateError": "فشل إنشاء مفتاح API",
+    "generateSuccess": "تم إنشاء مفتاح API بنجاح",
+    "revokeError": "فشل إلغاء مفتاح API",
+    "revokeSuccess": "تم إلغاء مفتاح API بنجاح"
+  },
+  "tokens": {
+    "title": "شراء الرموز",
+    "subtitle": "اشتر رموزاً إضافية لمتابعة استخدام ميزات الذكاء الاصطناعي",
+    "backToDashboard": "العودة إلى لوحة التحكم",
+    "walletBalance": "رصيد المحفظة",
+    "walletDesc": "الرموز المشتراة (لا تنتهي صلاحيتها)",
+    "monthlyLimit": "الحد الشهري",
+    "monthlyLimitDesc": "من خطة اشتراكك",
+    "usedThisMonth": "المستخدم هذا الشهر",
+    "usedDesc": "يتجدد شهرياً",
+    "totalAvailable": "الإجمالي المتاح",
+    "totalDesc": "الشهري + المحفظة",
+    "noPackages": "لا تتوفر حزم رموز",
+    "noPackagesDesc": "حزم الرموز غير متاحة في الوقت الحالي.",
+    "upgradeYourPlan": "ترقية خطتك",
+    "instantActivation": "تفعيل فوري",
+    "neverExpire": "لا تنتهي صلاحيتها",
+    "securePayment": "دفع آمن",
+    "bestValue": "أفضل قيمة",
+    "tokens": "رمز",
+    "perToken": "لكل رمز",
+    "buyNow": "اشتر الآن",
+    "lookingForMore": "تبحث عن المزيد من الرموز؟",
+    "upgradePrompt": "قم بترقية خطة اشتراكك للحصول على حصص شهرية أعلى من الرموز",
+    "viewPlans": "عرض الخطط",
+    "loadError": "فشل تحميل حزم الرموز"
+  },
+  "help": {
+    "title": "مركز المساعدة",
+    "subtitle": "اعثر على إجابات للأسئلة الشائعة وتعلم كيفية الاستفادة القصوى من Civify",
+    "gettingStarted": {
+      "title": "البدء",
+      "desc": "تعلم أساسيات رفع وتخصيص سيرتك الذاتية",
+      "createFirstCv": "إنشاء أول سيرة ذاتية",
+      "tailorFirstCv": "تخصيص أول سيرة ذاتية",
+      "howTailoringWorks": "كيف يعمل تخصيص السيرة الذاتية",
+      "understandingAts": "فهم درجات ATS"
+    },
+    "features": {
+      "title": "الميزات",
+      "desc": "استكشف جميع الأدوات المتاحة لتحسين سيرتك الذاتية",
+      "aiOptimization": "التحسين بالذكاء الاصطناعي",
+      "infoMasking": "إخفاء المعلومات الشخصية",
+      "exportOptions": "خيارات التصدير (PDF/DOCX)"
+    },
+    "account": {
+      "title": "الحساب والأمان",
+      "desc": "إدارة إعدادات حسابك والأمان",
+      "changePassword": "تغيير كلمة المرور",
+      "twoFactor": "المصادقة الثنائية",
+      "apiKeyManagement": "إدارة مفاتيح API"
+    },
+    "apiDocs": {
+      "title": "وثائق API",
+      "desc": "للمطورين الذين يتكاملون مع API الخاص بنا",
+      "apiReference": "مرجع API",
+      "authGuide": "دليل المصادقة",
+      "rateLimits": "حدود المعدل"
+    },
+    "contact": {
+      "title": "هل تحتاج لمزيد من المساعدة؟",
+      "desc": "فريق الدعم لدينا هنا لمساعدتك في أي أسئلة",
+      "contactSupport": "اتصل بالدعم",
+      "liveChat": "الدردشة المباشرة"
+    }
+  },
+  "payment": {
+    "success": {
+      "title": "تم الدفع بنجاح!",
+      "subtitle": "تم تفعيل اشتراكك",
+      "message": "شكراً لعملية الشراء! تم ترقية حسابك ويمكنك الآن الوصول إلى جميع الميزات المميزة.",
+      "goToDashboard": "الذهاب إلى لوحة التحكم",
+      "startCreating": "ابدأ بإنشاء السيرة الذاتية",
+      "verifying": "جاري التحقق من الدفع...",
+      "verifyingMessage": "يرجى الانتظار بينما نؤكد دفعك.",
+      "verificationPending": "التحقق معلق",
+      "verificationPendingMessage": "لا نزال نعالج دفعك."
+    },
+    "failure": {
+      "title": "فشل الدفع",
+      "subtitle": "لم نتمكن من معالجة دفعك",
+      "whatYouCanDo": "ما يمكنك فعله:",
+      "tryAgain": "حاول مرة أخرى",
+      "backToDashboard": "العودة إلى لوحة التحكم",
+      "contactSupport": "تواصل مع الدعم"
+    }
+  },
+  "subscription": {
+    "policy": {
+      "cancellationPolicy": "سياسة الإلغاء",
+      "consentDisclaimer": "بالنقر على \"ادفع\"، فإنك توافق على <terms>الشروط والأحكام</terms> و<cancellation>سياسة الإلغاء</cancellation>.",
+      "nature": "طبيعة الاشتراك",
+      "natureDesc": "تعمل خدماتنا بنظام الاشتراك الدوري (شهري/سنوي). عند إتمام عملية الدفع، يحصل المشترك فوراً على صلاحية الوصول الكاملة للخدمات الرقمية المتفق عليها.",
+      "noRefund": "سياسة عدم الاسترداد",
+      "noRefundDesc": "نظراً للطبيعة الرقمية للخدمة وإتاحتها للاستخدام الفوري، فإن جميع المدفوعات التي تم تحصيلها عن فترات الاشتراك الحالية غير قابلة للاسترداد كلياً أو جزئياً، ولا يحق للمشترك المطالبة باسترجاع المبلغ بعد تفعيل الخدمة، وذلك وفقاً لما تقتضيه القوانين المنظمة للسلع والخدمات الرقمية.",
+      "autoRenew": "إلغاء التجديد التلقائي",
+      "autoRenewDesc": "يحق للمشترك في أي وقت إلغاء \"التجديد التلقائي\" للاشتراك من خلال لوحة التحكم الخاصة بحسابه.",
+      "cancellationEffect": "تأثير الإلغاء",
+      "cancellationEffectDesc": "عند الإلغاء، ستستمر الخدمة فعالة حتى نهاية فترة الاشتراك المدفوعة مسبقاً. لن يتم خصم أي مبالغ جديدة مستقبلاً، وسيتوقف الاشتراك نهائياً بنهاية الفترة الحالية.",
+      "agreement": "الموافقة",
+      "agreementDesc": "بإتمام عملية الدفع، يقر المشترك بأنه قد قرأ ووافق على هذه السياسة وعلى التنازل عن حقه في استرداد قيمة الفترة الحالية بمجرد بدء الاستخدام."
+    },
+    "confirm": {
+      "title": "تأكيد الاشتراك",
+      "plan": "الخطة",
+      "price": "السعر",
+      "billingCycle": "دورة الفوترة",
+      "paymentMethod": "طريقة الدفع",
+      "confirmPayment": "تأكيد الدفع"
+    },
+    "success": {
+      "title": "تم الدفع بنجاح!",
+      "message": "تم تفعيل اشتراكك",
+      "goToDashboard": "الذهاب إلى لوحة التحكم",
+      "viewReceipt": "عرض الإيصال"
+    }
+  },
+  "admin": {
+    "common": {
+      "subtitle": "إدارة بيانات المنصة",
+      "active": "نشط",
+      "disabled": "معطل",
+      "inactive": "غير نشط",
+      "banUnban": "حظر/إلغاء الحظر",
+      "subscribedUsers": "المستخدمون المشتركون",
+      "free": "مجاني",
+      "never": "أبداً",
+      "noData": "لا توجد بيانات",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "deactivate": "إلغاء التفعيل",
+      "activate": "تفعيل",
+      "actions": "الإجراءات",
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "retry": "إعادة المحاولة"
+    },
+    "users": {
+      "title": "إدارة المستخدمين",
+      "subtitle": "إدارة مستخدمي المنصة والأدوار",
+      "totalUsers": "إجمالي المستخدمين",
+      "activeUsers": "المستخدمون النشطون",
+      "newUsers": "مستخدمون جدد",
+      "enableSuccess": "تم تفعيل المستخدم بنجاح",
+      "disableSuccess": "تم تعطيل المستخدم بنجاح",
+      "toggleError": "فشل تغيير حالة المستخدم",
+      "columns": {
+        "id": "المعرف",
+        "email": "البريد الإلكتروني",
+        "name": "الاسم",
+        "plan": "الخطة",
+        "status": "الحالة",
+        "date": "تاريخ التسجيل",
+        "actions": "الإجراءات"
+      }
+    },
+    "subscriptions": {
+      "title": "إدارة الاشتراكات",
+      "subtitle": "إدارة اشتراكات المستخدمين",
+      "user": "المستخدم",
+      "plan": "الخطة",
+      "billingCycle": "دورة الفوترة",
+      "status": "الحالة",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "renew": "تجديد تلقائي"
+    },
+    "billing": {
+      "title": "إدارة الفواتير",
+      "subtitle": "إدارة الخطط وحزم الرموز",
+      "plans": "الخطط",
+      "tokenPackages": "حزم الرموز",
+      "plansDesc": "تكوين خطط الاشتراك التي يمكن للمستخدمين شراؤها",
+      "tokensDesc": "تكوين حزم الرموز التي يمكن للمستخدمين شراؤها للاستخدام الإضافي",
+      "createPlan": "إنشاء خطة",
+      "editPlan": "تعديل الخطة",
+      "createPackage": "إنشاء حزمة",
+      "popular": "شائع",
+      "form": {
+        "name": "الاسم",
+        "namePlaceholder": "مثال: الخطة الاحترافية",
+        "description": "الوصف",
+        "descriptionPlaceholder": "وصف مختصر للخطة",
+        "monthlyPrice": "السعر الشهري ($)",
+        "annualPrice": "السعر السنوي ($)",
+        "cvLimit": "حد السير الذاتية (فارغ = غير محدود)",
+        "cvLimitPlaceholder": "اتركه فارغاً للسماح بعدد غير محدود",
+        "tokenLimit": "حد الرموز (فارغ = غير محدود)",
+        "tokenLimitPlaceholder": "حصة رموز الذكاء الاصطناعي الشهرية",
+        "linkedGroup": "المجموعة المرتبطة",
+        "linkedGroupPlaceholder": "اختر مجموعة (اختياري)",
+        "linkedGroupHint": "المستخدمون المشتركون في هذه الخطة سيرثون صلاحيات المجموعة",
+        "none": "لا يوجد",
+        "billingRestrictions": "قيود الفوترة",
+        "allowAnnualBilling": "السماح بالفوترة السنوية",
+        "allowRenewal": "السماح بالتجديد",
+        "maxBillingCycles": "الحد الأقصى لدورات الفوترة (فارغ = غير محدود)",
+        "maxBillingCyclesPlaceholder": "مثال: 1 للشراء لمرة واحدة",
+        "displaySettings": "إعدادات العرض",
+        "featured": "مميز (شائع)",
+        "showWatermark": "إظهار العلامة المائية",
+        "sortOrder": "ترتيب العرض",
+        "apiAccess": "الوصول للـ API",
+        "update": "تحديث"
+      }
+    },
+    "plans": {
+      "title": "إدارة الخطط",
+      "createPlan": "إنشاء خطة",
+      "editPlan": "تعديل الخطة"
+    },
+    "promos": {
+      "title": "إدارة العروض الترويجية",
+      "subtitle": "إدارة رموز الخصم والعروض",
+      "createPromo": "إنشاء عرض ترويجي",
+      "code": "الرمز",
+      "discount": "الخصم",
+      "appliesTo": "ينطبق على",
+      "usage": "الاستخدام",
+      "expires": "ينتهي",
+      "status": "الحالة",
+      "expiryDate": "تاريخ الانتهاء",
+      "noExpiry": "بدون انتهاء",
+      "noPromos": "لم يتم العثور على رموز ترويجية"
+    },
+    "stats": {
+      "title": "الإحصائيات",
+      "subtitle": "تحليلات ورؤى المنصة",
+      "period": "الفترة",
+      "totalUsers": "إجمالي المستخدمين",
+      "revenue": "الإيرادات",
+      "conversions": "التحويلات",
+      "growth": "النمو"
+    },
+    "apiUsage": {
+      "title": "سجلات API",
+      "subtitle": "مراقبة استخدام API في النظام",
+      "monthlyApiCalls": "استدعاءات API الشهرية",
+      "requests": "الطلبات",
+      "limit": "الحد الأقصى",
+      "remaining": "المتبقي"
+    },
+    "notifications": {
+      "title": "إدارة الإشعارات",
+      "subtitle": "إرسال إشعارات للمستخدمين",
+      "broadcast": "بث عام",
+      "targeted": "مستهدف",
+      "broadcastToAll": "بث لجميع المستخدمين",
+      "broadcastDesc": "إرسال إشعار لجميع المستخدمين المسجلين دفعة واحدة",
+      "sendToAll": "إرسال للجميع",
+      "sendToSpecific": "إرسال لمستخدمين محددين",
+      "selectUsersDesc": "اختر المستخدمين لاستلام هذا الإشعار",
+      "send": "إرسال إشعار",
+      "templates": "القوالب"
+    },
+    "auditMonitor": {
+      "title": "مراقب السجلات",
+      "subtitle": "عرض والبحث في سجلات النظام",
+      "cvLogs": "سجلات عمليات السيرة الذاتية",
+      "apiLogs": "سجلات API",
+      "tabs": {
+        "users": "المستخدم",
+        "plans": "الخطط",
+        "promos": "العروض",
+        "cvLogs": "سجلات CV",
+        "all": "الكل"
+      },
+      "sections": {
+        "userLogs": "سجلات نشاط المستخدم",
+        "userLogsDesc": "سجلات تغييرات المستخدمين"
+      }
+    },
+    "groups": {
+      "title": "إدارة المجموعات",
+      "subtitle": "إدارة مجموعات المستخدمين والصلاحيات",
+      "totalGroups": "إجمالي المجموعات",
+      "systemGroups": "المجموعات النظامية",
+      "totalPermissions": "إجمالي الصلاحيات"
+    }
+  },
+  "footer": {
+    "product": {
+      "title": "المنتج",
+      "overview": "نظرة عامة",
+      "pricing": "الأسعار",
+      "apiDocs": "وثائق API"
+    },
+    "company": {
+      "title": "الشركة",
+      "about": "عن الشركة",
+      "team": "الفريق",
+      "blog": "المدونة",
+      "careers": "الوظائف",
+      "contact": "اتصل بنا",
+      "privacy": "الخصوصية",
+      "terms": "الشروط والأحكام"
+    },
+    "resources": {
+      "title": "الموارد",
+      "help": "المساعدة",
+      "sales": "المبيعات",
+      "advertise": "الإعلان"
+    },
+    "social": {
+      "title": "التواصل الاجتماعي",
+      "twitter": "تويتر",
+      "instagram": "إنستغرام",
+      "linkedin": "لينكد إن"
+    },
+    "newsletter": {
+      "title": "اشترك في نشرتنا الإخبارية",
+      "description": "احصل على آخر التحديثات والأخبار في بريدك الإلكتروني",
+      "placeholder": "أدخل بريدك الإلكتروني",
+      "subscribe": "اشترك",
+      "success": "تم الاشتراك بنجاح!",
+      "error": "فشل الاشتراك. حاول مرة أخرى."
+    },
+    "followUs": "تابعنا",
+    "mobileApp": "تطبيق الجوال",
+    "downloadOn": "حمّل من",
+    "getItOn": "احصل عليه من",
+    "copyright": "© {year} Civify.cv. جميع الحقوق محفوظة.",
+    "poweredBy": "مدعوم بواسطة Technolabs"
+  },
+  "contact": {
+    "title": "اتصل بنا",
+    "subtitle": "تواصل مع فريقنا",
+    "form": {
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "subject": "الموضوع",
+      "message": "الرسالة",
+      "submit": "إرسال الرسالة",
+      "sending": "جاري الإرسال...",
+      "success": "تم إرسال الرسالة بنجاح!",
+      "error": "فشل إرسال الرسالة."
+    },
+    "info": {
+      "address": "العنوان",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف"
+    }
+  },
+  "policy": {
+    "title": "سياسة الخصوصية",
+    "lastUpdated": "آخر تحديث: {date}"
+  },
+  "terms": {
+    "title": "الشروط والأحكام",
+    "lastUpdated": "آخر تحديث: {date}"
+  },
+  "resume": {
+    "sections": {
+      "summary": "الملف الشخصي",
+      "experience": "الخبرة المهنية",
+      "education": "التعليم والمؤهلات",
+      "skills": "المهارات",
+      "languages": "اللغات",
+      "courses": "الدورات والشهادات",
+      "certifications": "الشهادات",
+      "projects": "المشاريع",
+      "activities": "الأنشطة والتطوع",
+      "contact": "معلومات الاتصال",
+      "links": "الروابط"
+    },
+    "levels": {
+      "native": "لغة أم",
+      "fluent": "طلاقة",
+      "expert": "خبير",
+      "advanced": "متقدم",
+      "intermediate": "متوسط",
+      "beginner": "مبتدئ"
+    }
+  },
+  "builder": {
+    "title": "منشئ السيرة الذاتية",
+    "tabs": {
+      "content": "المحتوى",
+      "design": "التصميم",
+      "export": "التصدير"
+    },
+    "actions": {
+      "upload": "رفع سيرة ذاتية",
+      "parsing": "جاري التحليل...",
+      "save": "حفظ",
+      "saving": "جاري الحفظ...",
+      "reset": "استعادة الأصل",
+      "fullscreen": "ملء الشاشة",
+      "exitFullscreen": "خروج من ملء الشاشة"
+    },
+    "saveDialog": {
+      "title": "حفظ السيرة الذاتية",
+      "description": "أدخل عنواناً لسيرتك الذاتية. سيساعدك هذا في التعرف عليها لاحقاً.",
+      "label": "عنوان السيرة الذاتية",
+      "placeholder": "مثال: سيرة ذاتية لمهندس برمجيات",
+      "cancel": "إلغاء",
+      "confirm": "حفظ"
+    },
+    "exportPanel": {
+      "title": "جاهز للتحميل؟",
+      "subtitle": "اختر صيغة لتصدير سيرتك الذاتية.",
+      "pdf": {
+        "title": "ملف PDF",
+        "description": "الأفضل للمشاركة والطباعة. يحافظ على التنسيق."
+      },
+      "docx": {
+        "title": "ملف Word",
+        "description": "قابل للتعديل في Microsoft Word أو Google Docs."
+      },
+      "tip": "نصيحة: راجع سيرتك الذاتية في لوحة المعاينة قبل التحميل للتأكد من أن كل شيء يبدو مثالياً."
+    },
+    "toasts": {
+      "enterTitle": "الرجاء إدخال عنوان لسيرتك الذاتية",
+      "saveSuccess": "تم حفظ السيرة الذاتية بنجاح",
+      "saveError": "فشل حفظ السيرة الذاتية",
+      "resetInfo": "تم إعادة تعيين السيرة الذاتية إلى الحالة الأصلية",
+      "uploadError": "يرجى تحميل ملف PDF أو Word",
+      "parseSuccess": "تم تحليل السيرة الذاتية بنجاح!",
+      "parseError": "فشل تحليل السيرة الذاتية. يرجى المحاولة مرة أخرى.",
+      "fullscreenError": "ملء الشاشة غير مدعوم",
+      "guestUpload": "يرجى تسجيل الدخول لتحميل سيرة ذاتية",
+      "loginAction": "تسجيل الدخول"
+    }
+  },
+  "editor": {
+    "sections": {
+      "personal": "المعلومات الشخصية",
+      "add": "إضافة قسم",
+      "rename": "إعادة تسمية القسم",
+      "custom": "مخصص"
+    },
+    "personalForm": {
+      "fullName": "الاسم الكامل",
+      "fullNamePlaceholder": "محمد أحمد",
+      "jobTitle": "المسمى الوظيفي",
+      "jobTitlePlaceholder": "مهندس برمجيات",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "email@example.com",
+      "phone": "رقم الهاتف",
+      "phonePlaceholder": "+966 50 123 4567",
+      "address": "العنوان / الموقع",
+      "addressPlaceholder": "الرياض، السعودية",
+      "summary": "الملخص",
+      "summaryPlaceholder": "ملخص مهني موجز...",
+      "linkedin": "لينكد إن",
+      "linkedinPlaceholder": "linkedin.com/in/speedy",
+      "github": "جيت هب",
+      "githubPlaceholder": "github.com/speedy",
+      "website": "الموقع الإلكتروني",
+      "websitePlaceholder": "speedy.com"
+    },
+    "experience": {
+      "add": "إضافة خبرة",
+      "company": "اسم الشركة",
+      "companyPlaceholder": "شركة المجد.",
+      "position": "المسمى الوظيفي",
+      "positionPlaceholder": "مطور أول",
+      "location": "الموقع",
+      "locationPlaceholder": "عن بعد / المدينة، البلد",
+      "description": "الوصف",
+      "descriptionPlaceholder": "• حققت نتائج...",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "present": "الحالي / حتى الآن"
+    },
+    "education": {
+      "add": "إضافة تعليم",
+      "school": "المدرسة / الجامعة",
+      "schoolPlaceholder": "جامعة هارفارد",
+      "degree": "الدرجة / التخصص",
+      "degreePlaceholder": "بكالوريوس علوم حاسب",
+      "location": "الموقع",
+      "locationPlaceholder": "الرياض، السعودية",
+      "gpa": "المعدل / ملاحظات (اختياري)",
+      "gpaPlaceholder": "معدل 3.8 / مرتبة الشرف",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "present": "الحالي / ما زلت أدرس"
+    },
+    "skills": {
+      "addPlaceholder": "اسم المهارة...",
+      "noItems": "لم تتم إضافة مهارات بعد"
+    },
+    "languages": {
+      "addPlaceholder": "اسم اللغة...",
+      "noItems": "لم تتم إضافة لغات بعد",
+      "none": "لا يوجد"
+    },
+    "generic": {
+      "item": "عنصر",
+      "title": "العنوان *",
+      "titlePlaceholder": "مثال: اسم المشروع، عنوان الدورة التدريبية...",
+      "subtitle": "العنوان الفرعي / المنظمة",
+      "subtitlePlaceholder": "مثال: الدور، المنظمة...",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "present": "الحالي",
+      "description": "الوصف",
+      "descriptionPlaceholder": "وصف موجز...",
+      "addItem": "إضافة عنصر",
+      "addSimplePlaceholder": "مثال: القراءة، الشطرنج، التصوير...",
+      "noItems": "لم تتم إضافة عناصر بعد",
+      "newItemTitle": "عنوان العنصر الجديد...",
+      "add": "إضافة"
+    },
+    "dialog": {
+      "title": "إضافة قسم جديد",
+      "description": "أنشئ قسماً جديداً لسيرتك الذاتية. اختر نوعاً ليرث تخطيطه.",
+      "nameLabel": "اسم القسم",
+      "namePlaceholder": "مثال: العمل التطوعي، الجوائز، المنشورات...",
+      "typeLabel": "نوع القسم (يرث التخطيط)",
+      "cancel": "إلغاء",
+      "confirm": "إضافة قسم"
+    }
+  },
+  "design": {
+    "template": {
+      "title": "القالب",
+      "modern": { "name": "حديث", "description": "نظيف واحترافي" },
+      "classic": { "name": "كلاسيكي", "description": "خالد وتقليدي" },
+      "creative": { "name": "إبداعي", "description": "جريء ومتميز" }
+    },
+    "colors": "اللون الأساسي",
+    "typography": "الخطوط",
+    "sectionStyles": {
+      "skills": "عرض المهارات",
+      "languages": "عرض اللغات",
+      "courses": "عرض الدورات / الشهادات",
+      "tags": "وسوم",
+      "level": "مستوى",
+      "dots": "نقاط",
+      "bar": "شريط",
+      "detailed": { "name": "مفصل", "description": "بطاقات كاملة" },
+      "simple": { "name": "بسيط", "description": "قائمة نقطية" }
+    },
+    "layoutDirection": {
+      "title": "اتجاه التخطيط",
+      "auto": "تلقائي",
+      "matchLocale": "حسب اللغة",
+      "ltr": "من اليسار لليمين",
+      "rtl": "من اليمين لليسار"
+    }
+  },
+  "landing": {
+    "hero": {
+      "titlePart1": "75% من السير الذاتية",
+      "titlePart2": "لا تظهر",
+      "titlePart3": "جعلها الخاصة.",
+      "subtitle": "تميز عن الآخرين مع باني السيرة الذاتية المدعوم بالذكاء الاصطناعي. قوالب صديقة لأنظمة ATS، نصائح الخبراء، وتنسيق فوري.",
+      "cta": "ابنِ سيرتي الذاتية الآن",
+      "ctaFree": "جرب مجاناً",
+      "badge": "دعم كامل للغة العربية!",
+      "matchScore": "92%",
+      "interviews": "مقابلات أكثر"
+    },
+    "howItWorks": {
+      "title": "كيف يعمل Civify",
+      "subtitle": "من الرفع إلى التحميل في 4 خطوات بسيطة",
+      "steps": {
+        "step1": {
+          "title": "ارفع سيرتك الذاتية",
+          "description": "ابدأ من الصفر أو ارفع سيرتك الذاتية الحالية بأي تنسيق"
+        },
+        "step2": {
+          "title": "الصق الوصف الوظيفي",
+          "description": "انسخ والصق الوصف الوظيفي أو اختر فئة الوظيفة"
+        },
+        "step3": {
+          "title": "تحليل الذكاء الاصطناعي",
+          "description": "يحلل Civify كلمات ATS ومتطلبات الدور فوراً"
+        },
+        "step4": {
+          "title": "حمل السيرة الذاتية المحسنة",
+          "description": "احصل على سيرتك الذاتية المصقولة والمخصصة مع درجة التحسين"
+        }
+      }
+    },
+    "features": {
+      "title": "ميزات قوية",
+      "subtitle": "كل ما تحتاجه للحصول على وظيفة أحلامك",
+      "items": {
+        "parser": {
+          "title": "محلل الوصف الوظيفي بالذكاء الاصطناعي",
+          "description": "يستخرج المهارات والكلمات الرئيسية المطلوبة لمطابقة أفضل مع إعلانات الوظائف"
+        },
+        "ats": {
+          "title": "محرك تحسين ATS",
+          "description": "يضمن التنسيق وكثافة الكلمات الرئيسية مطابقة معايير ATS لأقصى قدر من الظهور"
+        },
+        "templates": {
+          "title": "قوالب سيرة ذاتية قائمة على الأدوار",
+          "description": "مطور، مصمم، محلل بيانات، موارد بشرية، تسويق، مبيعات، وقوالب متخصصة أخرى"
+        },
+        "aiRewrite": {
+          "title": "إعادة صياغة الإنجازات بالذكاء الاصطناعي",
+          "description": "يحول المهام البسيطة إلى عبارات تأثير قابلة للقياس تبهر مسؤولي التوظيف"
+        },
+        "skills": {
+          "title": "اقتراحات فجوة المهارات",
+          "description": "يظهر المهارات المفقودة ويوصي بإضافات بناءً على متطلبات الوظيفة"
+        },
+        "arabic": {
+          "title": "دعم كامل للغة العربية 🇸🇦",
+          "description": "دعم أصلي للكتابة من اليمين لليسار، OCR عربي للمستندات الممسوحة ضوئياً، وتوليد سيرة ذاتية ثنائية اللغة"
+        },
+        "score": {
+          "title": "مؤشر النتيجة في الوقت الفعلي",
+          "description": "يعرض درجة مطابقة السيرة الذاتية قبل التحميل لتعرف بالضبط أين تقف"
+        },
+        "privacy": {
+          "title": "إخفاء السيرة الذاتية والخصوصية",
+          "description": "احمِ معلوماتك الشخصية عند مشاركة السير الذاتية - إخفاء رسائل البريد الإلكتروني، الهواتف، والعناوين"
+        }
+      }
+    },
+    "resumeBuilder": {
+      "title": "منشئ سيرة ذاتية متقدم",
+      "titleAccent": "محسن بالذكاء الاصطناعي",
+      "description": "ابنِ، عدل، وأتقن سيرتك الذاتية بأدواتنا الحديثة. تغييرات فورية، معاينات لحظية، واقتراحات ذكية.",
+      "badge": "دعم كامل للغة العربية",
+      "cta": "افتح المنشئ",
+      "features": {
+        "preview": {
+          "title": "معاينة فورية",
+          "description": "شاهد التغييرات فوراً أثناء الكتابة"
+        },
+        "ai": {
+          "title": "تحسين الذكاء الاصطناعي",
+          "description": "احصل على اقتراحات ذكية لتحسين المحتوى الخاص بك"
+        },
+        "multiLang": {
+          "title": "متعدد اللغات",
+          "description": "دعم كامل لتخطيطات الإنجليزية والعربية"
+        }
+      }
+    },
+    "pricing": {
+      "title": "أسعار بسيطة وشفافة",
+      "subtitle": "اختر الخطة التي تناسب احتياجات البحث عن عملك",
+      "monthly": "شهري",
+      "yearly": "سنوي",
+      "save": "وفر 20%",
+      "mostPopular": "الأكثر شعبية",
+      "selectPlan": "اختر الخطة",
+      "getStarted": "ابدأ الآن",
+      "noCreditCard": "لا حاجة لبطاقة ائتمان للخطة المجانية",
+      "cancelAnytime": "إلغاء في أي وقت",
+      "errorLoading": "فشل تحميل خطط الأسعار",
+      "errorContact": "يرجى المحاولة مرة أخرى لاحقاً أو الاتصال بالدعم",
+      "features": {
+        "cvStorageUnlimited": "تخزين سير ذاتية غير محدود",
+        "cvStorage": "تخزين {count} سيرة ذاتية",
+        "aiTailoring": "تخصيص السيرة الذاتية بالذكاء الاصطناعي",
+        "masking": "إخفاء المعلومات الشخصية",
+        "pdfExport": "تصدير PDF",
+        "noWatermark": "بدون علامة مائية",
+        "apiAccess": "الوصول للـ API للتكاملات",
+        "dashboardAccess": "الوصول إلى لوحة التحكم",
+        "prioritySupport": "دعم ذو أولوية",
+        "advancedAi": "ميزات الذكاء الاصطناعي المتقدمة",
+        "basicSupport": "دعم أساسي"
+      }
+    },
+    "faq": {
+      "title": "الأسئلة الشائعة",
+      "subtitle": "كل ما تحتاج لمعرفته عن Civify",
+      "items": {
+        "q1": {
+          "question": "هل بياناتي خاصة؟",
+          "answer": "بالتأكيد. نحن نستخدم تشفيراً على مستوى المؤسسات ولا نشارك معلوماتك الشخصية أبداً مع أطراف ثالثة. يتم تخزين بيانات سيرتك الذاتية بشكل آمن ويمكنك حذفها في أي وقت."
+        },
+        "q2": {
+          "question": "ما الذي يجعل السيرة الذاتية صديقة لنظام ATS؟",
+          "answer": "تقوم أنظمة تتبع المتقدمين (ATS) بمسح السير الذاتية بحثاً عن كلمات رئيسية محددة، وتنسيق سليم، وعناوين أقسام قياسية. تم تصميم قوالبنا لاجتياز مسح ATS مع الحفاظ على مظهر احترافي لمسؤولي التوظيف البشر."
+        },
+        "q3": {
+          "question": "هل يمكنني تخصيص السيرة الذاتية يدوياً؟",
+          "answer": "نعم! بعد تحسين الذكاء الاصطناعي، لديك تحكم كامل لتعديل أي قسم، وضبط التنسيق، وتخصيص المحتوى ليتناسب مع أسلوبك الشخصي."
+        },
+        "q4": {
+          "question": "هل تحفظون مستنداتي؟",
+          "answer": "يتم حفظ سيرك الذاتية بشكل آمن في حسابك حتى تتمكن من الوصول إليها وتعديلها في أي وقت. يمكنك أيضاً تحميلها محلياً وحذفها من خوادمنا متى شئت."
+        },
+        "q5": {
+          "question": "ما مدى دقة درجة المطابقة؟",
+          "answer": "تعتمد درجة المطابقة لدينا على خوارزميات ATS المتوافقة مع معايير الصناعة وتحليل الكلمات الرئيسية. بينما لا توجد درجة تنبؤية بنسبة 100%، يبلغ مستخدمونا عن معدلات مقابلات أعلى بكثير مع درجات أعلى من 80%."
+        }
+      }
+    },
+    "integrations": {
+      "title": "تكامل سلس",
+      "subtitle": "تواصل مع منصاتك وأدواتك المفضلة",
+      "items": {
+        "linkedin": {
+          "name": "LinkedIn",
+          "description": "استورد بيانات ملفك الشخصي فوراً"
+        },
+        "google-docs": {
+          "name": "Google Docs",
+          "description": "تصدير وتعديل في Google Docs"
+        },
+        "word": {
+          "name": "Microsoft Word",
+          "description": "تحميل بصيغة .docx"
+        },
+        "indeed": {
+          "name": "Indeed",
+          "description": "تحسين لطلبات التقديم على Indeed"
+        },
+        "glassdoor": {
+          "name": "Glassdoor",
+          "description": "تخصيص لإعلانات Glassdoor"
+        },
+        "google-drive": {
+          "name": "Google Drive",
+          "description": "حفظ مباشرة إلى Drive"
+        }
+      }
+    },
+    "templates": {
+      "title": "قوالب سيرة ذاتية احترافية",
+      "subtitle": "اختر من مجموعتنا من القوالب المحسنة لأنظمة ATS والمصممة لكل صناعة",
+      "badge": "متوافق مع ATS",
+      "note": {
+        "bold": "جميع القوالب متوافقة 100% مع ATS",
+        "text": "— محسنة لاجتياز أنظمة تتبع المتقدمين"
+      },
+      "items": {
+        "ats-clean": {
+          "name": "Clean ATS",
+          "category": "احترافي",
+          "description": "تنسيق بسيط وقابل للمسح محسن لأنظمة تتبع المتقدمين"
+        },
+        "professional": {
+          "name": "Professional",
+          "category": "أعمال",
+          "description": "تصميم أنيق مثالي للشركات والصناعات التقليدية"
+        },
+        "minimalist": {
+          "name": "Minimalist",
+          "category": "عصري",
+          "description": "تصميم نظيف للغاية مع استخدام متطور للمساحة البيضاء"
+        },
+        "modern": {
+          "name": "Modern",
+          "category": "إبداعي",
+          "description": "تصميم معاصر بعناصر هندسية وطباعة جريئة"
+        },
+        "technical": {
+          "name": "Technical",
+          "category": "تقني",
+          "description": "مخصص للمطورين مع مصفوفة مهارات وتخطيط بنمط GitHub"
+        },
+        "creative": {
+          "name": "Creative",
+          "category": "تصميم",
+          "description": "تخطيط فني للمصممين والمحترفين المبدعين"
+        }
+      }
+    },
+    "testimonials": {
+      "title": "قصص نجاح",
+      "subtitle": "انضم إلى آلاف المحترفين الذين حصلوا على وظائف أحلامهم مع Civify",
+      "stats": {
+        "users": { "value": "+50,000", "label": "مستخدم سعيد" },
+        "rating": { "value": "4.9/5", "label": "متوسط التقييم" },
+        "reviews": { "value": "+2,000", "label": "مراجعة 5 نجوم" }
+      },
+      "items": {
+        "t1": {
+          "quote": "حصلت على 3 مقابلات في أسبوعين بعد استخدام Civify. تحسين ATS يعمل حقاً!",
+          "role": "مهندس برمجيات",
+          "company": "Google",
+          "metric": "3 مقابلات في أسبوعين"
+        },
+        "t2": {
+          "quote": "ميزة إعادة الصياغة بالذكاء الاصطناعي حولت نقاطي البسيطة إلى إنجازات قوية. حصلت على وظيفة أحلامي!",
+          "role": "مدير منتج",
+          "company": "Microsoft",
+          "metric": "حصلت على وظيفة الأحلام"
+        },
+        "t3": {
+          "quote": "ارتفعت درجة مطابقة سيرتي الذاتية من 45% إلى 92%. اقتراحات فجوة المهارات كانت مفيدة للغاية.",
+          "role": "محلل بيانات",
+          "company": "Amazon",
+          "metric": "درجة مطابقة 92%"
+        },
+        "t4": {
+          "quote": "أخيراً، أداة سيرة ذاتية تفهم ما يبحث عنه مسؤولو التوظيف بالفعل. تستحق كل قرش!",
+          "role": "مدير تسويق",
+          "company": "Meta"
+        }
+      }
+    },
+    "roles": {
+      "title": "مخصص لدورك",
+      "subtitle": "تحسين خاص بالصناعة لكل مهنة",
+      "create": "إنشاء سيرة ذاتية لـ {role}",
+      "sections": {
+        "keywords": "كلمات رئيسية محسنة",
+        "language": "لغة الصناعة",
+        "examples": "أمثلة مخصصة"
+      },
+      "items": {
+        "software-engineer": {
+          "name": "مهندس برمجيات",
+          "keywords": "JavaScript, Python, React, Node.js, AWS, Docker, Git, Agile",
+          "language": "تطوير Full-stack، خدمات مصغرة، CI/CD، واجهات برمجة تطبيقات RESTful",
+          "examples": [
+            "تطوير تطبيقات ويب قابلة للتوسع تخدم أكثر من مليون مستخدم",
+            "تقليل وقت استجابة API بنسبة 40% من خلال التحسين"
+          ]
+        },
+        "data-scientist": {
+          "name": "عالم بيانات",
+          "keywords": "Python, Machine Learning, SQL, TensorFlow, Pandas, Statistics",
+          "language": "نمذجة تنبؤية، تصور البيانات، اختبار A/B، خطوط أنابيب ETL",
+          "examples": [
+            "بناء نماذج تعلم آلي تحسن دقة التنبؤ بنسبة 25%",
+            "تحليل مجموعات بيانات تزيد عن 10 ملايين سجل لاستخراج رؤى تجارية"
+          ]
+        },
+        "product-manager": {
+          "name": "مدير منتج",
+          "keywords": "Product Strategy, Roadmap, Stakeholder Management, Analytics, Agile",
+          "language": "ملاءمة المنتج للسوق، قصص المستخدم، مؤشرات الأداء الرئيسية، استراتيجية الذهاب للسوق",
+          "examples": [
+            "إطلاق 5 ميزات تزيد من تفاعل المستخدمين بنسبة 35%",
+            "إدارة فرق متعددة الوظائف تضم أكثر من 15 عضواً"
+          ]
+        },
+        "accountant": {
+          "name": "محاسب",
+          "keywords": "QuickBooks, Excel, GAAP, Financial Reporting, Tax Preparation",
+          "language": "دفتر الأستاذ العام، المطابقة، التدقيق، الامتثال",
+          "examples": [
+            "إدارة حسابات الدفع/القبض لميزانية قدرها 5 ملايين دولار",
+            "تقليل وقت إغلاق الشهر بنسبة 30%"
+          ]
+        },
+        "customer-support": {
+          "name": "دعم العملاء",
+          "keywords": "Zendesk, Customer Service, Communication, Problem Solving, CRM",
+          "language": "حل التذاكر، رضا العملاء، اتفاقية مستوى الخدمة، التصعيد",
+          "examples": [
+            "الحفاظ على تقييم رضا العملاء بنسبة 95%",
+            "حل أكثر من 50 تذكرة يومياً بمتوسط وقت استجابة ساعتين"
+          ]
+        },
+        "sales-rep": {
+          "name": "مندوب مبيعات",
+          "keywords": "Salesforce, Lead Generation, Negotiation, B2B Sales, CRM",
+          "language": "إدارة خطوط الأنابيب، تحقيق الحصة، الاتصال البارد، إدارة الحسابات",
+          "examples": [
+            "تجاوز حصة المبيعات بنسبة 120% لثلاثة أرباع متتالية",
+            "توليد إيرادات أعمال جديدة بقيمة 2 مليون دولار"
+          ]
+        },
+        "marketing-specialist": {
+          "name": "أخصائي تسويق",
+          "keywords": "SEO, Google Analytics, Content Marketing, Social Media, Email Campaigns",
+          "language": "الوعي بالعلامة التجارية، توليد العملاء المحتملين، معدل التحويل، أتمتة التسويق",
+          "examples": [
+            "زيادة الزيارات العضوية بنسبة 150% من خلال تحسين محركات البحث",
+            "إدارة حملات تولد أكثر من 10 آلاف عميل محتمل مؤهل"
+          ]
+        },
+        "project-manager": {
+          "name": "مدير مشروع",
+          "keywords": "PMP, Agile, Scrum, Risk Management, Budget Management, Jira",
+          "language": "دورة حياة المشروع، مشاركة أصحاب المصلحة، تخصيص الموارد، التسليمات",
+          "examples": [
+            "تسليم أكثر من 20 مشروعاً في الوقت المحدد وفي حدود الميزانية",
+            "إدارة محافظ مشاريع بقيمة تزيد عن 10 ملايين دولار"
+          ]
+        }
+      }
+    },
+    "beforeAfter": {
+      "badge": "✨ شاهد التحول",
+      "title": "من عام إلى استثنائي",
+      "subtitle": "شاهد كيف يحول الذكاء الاصطناعي النقاط العادية إلى إنجازات قوية",
+      "before": {
+        "badge": "⚪ قبل",
+        "score": "درجة التطابق: 45%",
+        "items": {
+          "item1": "مسؤول عن إدارة مشاريع الفريق والاجتماعات",
+          "item2": "عملت على تحسين رضا العملاء",
+          "item3": "ساعدت في مهام تسويقية مختلفة"
+        },
+        "issuesTitle": "المشاكل المكتشفة:",
+        "issues": {
+          "item1": "لا توجد مقاييس قابلة للقياس",
+          "item2": "مسؤوليات غامضة",
+          "item3": "كلمات رئيسية مفقودة",
+          "item4": "أفعال ضعيفة"
+        }
+      },
+      "after": {
+        "badge": "✨ بعد",
+        "score": "درجة التطابق: 92%",
+        "items": {
+          "item1": "<strong1>قدت</strong1> فريقاً متعدد الوظائف من 8 أعضاء لتسليم <strong2>أكثر من 15 مشروعاً</strong2> في الوقت المحدد، مما زاد رضا العملاء بنسبة <strong3>35%</strong3> من خلال تحسين التواصل مع أصحاب المصلحة",
+          "item2": "<strong1>نفذت</strong1> نظام ملاحظات العملاء الذي رفع درجة NPS من 42 إلى <strong2>78</strong2>، مما أدى إلى <strong3>زيادة بنسبة 25%</strong3> في الاحتفاظ بالعملاء",
+          "item3": "<strong1>أدرت</strong1> حملات تسويقية متعددة القنوات ولدت <strong2>500 ألف دولار</strong2> من الإيرادات و <strong3>أكثر من 10,000</strong3> عميل محتمل مؤهل"
+        },
+        "improvementsTitle": "التحسينات التي تمت:",
+        "improvements": {
+          "item1": "إنجازات محددة بمقاييس",
+          "item2": "أفعال قوية (قدت، نفذت)",
+          "item3": "كلمات رئيسية خاصة بالصناعة",
+          "item4": "تأثير تجاري واضح"
+        }
+      }
+    },
+    "ctaSection": {
+      "title": "توقف عن إرسال السير الذاتية إلى الفراغ",
+      "subtitle": "انضم إلى النسخة التجريبية وكن من بين الأوائل الذين يجربون تحسين السيرة الذاتية بالذكاء الاصطناعي.",
+      "highlight": "دعم كامل للعربية. معدل تطابق 92%. مجاني للبدء.",
+      "cta": "أنشئ سيرتك الذاتية الآن",
+      "trust": "مجاني للبدء"
+    },
+    "blog": {
+      "title": "موارد وظيفية",
+      "subtitle": "نصائح وإرشادات الخبراء لتعزيز بحثك عن عمل",
+      "readMore": "اقرأ المزيد",
+      "viewAll": "عرض جميع المقالات",
+      "posts": {
+        "post1": {
+          "readTime": "5 دقائق قراءة",
+          "title": "كيف تكتب سيرة ذاتية صديقة لـ ATS في 2025",
+          "excerpt": "تعلم الاستراتيجيات الأساسية لضمان اجتياز سيرتك الذاتية لأنظمة تتبع المتقدمين والوصول إلى مسؤولي التوظيف البشر.",
+          "slug": "ats-friendly-cv-2025"
+        },
+        "post2": {
+          "readTime": "7 دقائق قراءة",
+          "title": "أهم الكلمات الرئيسية لأدوار هندسة البرمجيات في 2025",
+          "excerpt": "اكتشف أهم الكلمات الرئيسية والمهارات التي يبحث عنها مسؤولو التوظيف التقني هذا العام.",
+          "slug": "software-engineering-keywords-2025"
+        },
+        "post3": {
+          "readTime": "6 دقائق قراءة",
+          "title": "كيف تخصص سيرتك الذاتية للوصف الوظيفي",
+          "excerpt": "دليل خطوة بخطوة لتخصيص سيرتك الذاتية لكل طلب لزيادة فرصك في الحصول على مقابلات.",
+          "slug": "tailor-cv-job-descriptions"
+        }
+      }
+    }
+  },
+  "atsScore": {
+    "title": "نقاط ATS العامة",
+    "description": "تحليل سيرتك الذاتية وفقاً لأفضل الممارسات للتوافق مع أنظمة ATS.",
+    "analyzing": "جاري تحليل سيرتك الذاتية...",
+    "overallCompatibility": "التوافق العام مع ATS",
+    "contentQuality": "جودة المحتوى",
+    "skillsPresentation": "عرض المهارات",
+    "areasToImprove": "مجالات للتحسين",
+    "suggestions": "الاقتراحات",
+    "close": "إغلاق",
+    "noScore": "لا توجد نتيجة متاحة"
+  }
+}
