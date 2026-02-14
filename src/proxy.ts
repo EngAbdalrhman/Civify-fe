@@ -5,5 +5,7 @@ export default createMiddleware(routing);
 
 export const config = {
   // Match all paths except API routes, static files, sitemap, and robots
-  matcher: ["/((?!api/|_next|_vercel|robots.txt|.*\\..*).*)"],
+  matcher: [
+    "/((?!api/|_next|_vercel|robots.txt|manifest.webmanifest|manifest.json|manifest|.*\\..*).*)",
+  ],
 };
