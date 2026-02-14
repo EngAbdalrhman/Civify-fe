@@ -1,0 +1,29 @@
+{
+  "success": {
+    "verifiedToast": "Payment verified successfully!",
+    "verificationFailedToast": "Payment verification failed. Please contact support.",
+    "title": "Payment Successful!",
+    "subtitle": "Your subscription is now active",
+    "message": "Thank you for your purchase! Your account has been upgraded and you now have access to all premium features.",
+    "goToDashboard": "Go to Dashboard",
+    "startCreating": "Start Creating CV",
+    "verifying": "Verifying Payment...",
+    "verifyingMessage": "Please wait while we confirm your payment.",
+    "verificationPending": "Verification Pending",
+    "verificationPendingMessage": "We are still processing your payment.",
+    "processingNote": "Your payment might still be processing. Please check your email for confirmation or contact support.",
+    "retryVerification": "Retry Verification"
+  },
+  "failure": {
+    "title": "Payment Failed",
+    "subtitle": "We couldn't process your payment",
+    "whatYouCanDo": "What you can do:",
+    "tip1": "Check your payment details and try again",
+    "tip2": "Try a different payment method",
+    "tip3": "Contact your bank if the issue persists",
+    "tip4": "Contact our support team for help",
+    "tryAgain": "Try Again",
+    "backToDashboard": "Back to Dashboard",
+    "contactSupport": "Contact Support"
+  }
+}

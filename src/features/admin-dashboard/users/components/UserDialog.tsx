@@ -6,10 +6,10 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { AdminUser } from '@/services/admin.service';
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { AdminUser } from "@/services/admin.service";
 
 interface UserDialogProps {
   open: boolean;
@@ -17,11 +17,7 @@ interface UserDialogProps {
   user: AdminUser | null;
 }
 
-export function UserDialog({ 
-  open, 
-  onOpenChange, 
-  user
-}: UserDialogProps) {
+export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
   if (!user) return null;
 
   return (
@@ -33,20 +29,22 @@ export function UserDialog({
             View user information. Use actions menu to modify group, limits, or tokens.
           </DialogDescription> */}
         </DialogHeader>
-        
+
         <div className="space-y-4">
           {/* Basic Info */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Name</p>
               <p className="font-medium">
-                {user.firstName || ''} {user.lastName || ''} 
+                {user.firstName || ""} {user.lastName || ""}
                 {!user.firstName && !user.lastName && user.username}
               </p>
             </div>
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Status</p>
-              <Badge variant={user.status === 'ACTIVE' ? 'default' : 'destructive'}>
+              <Badge
+                variant={user.status === "ACTIVE" ? "default" : "destructive"}
+              >
                 {user.status}
               </Badge>
             </div>
@@ -70,18 +68,18 @@ export function UserDialog({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Current Plan</p>
-              <Badge variant="outline">{user.currentPlan || 'Free'}</Badge>
+              <Badge variant="outline">{user.currentPlan || "Free"}</Badge>
             </div>
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Group</p>
-              <p className="font-medium">{user.groupName || 'None'}</p>
+              <p className="font-medium">{user.groupName || "None"}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">CV Limit Override</p>
-              <p className="font-medium">{user.cvLimit ?? 'Plan Default'}</p>
+              <p className="font-medium">{user.cvLimit ?? "Plan Default"}</p>
             </div>
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Extra Tokens</p>

@@ -1,0 +1,23 @@
+{
+  "sections": {
+    "summary": "Professional Summary",
+    "experience": "Work Experience",
+    "education": "Education",
+    "skills": "Skills",
+    "languages": "Languages",
+    "courses": "Courses & Certifications",
+    "certifications": "Certifications",
+    "projects": "Projects",
+    "activities": "Activities & Volunteering",
+    "contact": "Contact Information",
+    "links": "Links"
+  },
+  "levels": {
+    "native": "Native",
+    "fluent": "Fluent",
+    "expert": "Expert",
+    "advanced": "Advanced",
+    "intermediate": "Intermediate",
+    "beginner": "Beginner"
+  }
+}
