@@ -28,6 +28,7 @@ export const useUploadCv = () => {
           "Content-Type": "multipart/form-data",
         },
         timeout: 120000, // 2 min timeout for file processing
+        skipErrorToast: true,
       });
 
       // Handle CommonResponse wrapper
@@ -77,6 +78,7 @@ export const useTailorCv = () => {
         { data?: CvTailorResponse } & CvTailorResponse
       >("/v1/cvs/tailor", request as unknown as object, {
         timeout: 180000, // 3 min timeout for AI processing
+        skipErrorToast: true,
       });
 
       // Handle CommonResponse wrapper

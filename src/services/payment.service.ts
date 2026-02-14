@@ -51,7 +51,9 @@ class PaymentService {
     }
 
     const response = await apiClient.post<PaymentInitiationResponse>(
-      `${API_ENDPOINTS.INITIATE}?${params.toString()}`
+      `${API_ENDPOINTS.INITIATE}?${params.toString()}`,
+      undefined,
+      { skipErrorToast: true }
     );
 
     return response.data;

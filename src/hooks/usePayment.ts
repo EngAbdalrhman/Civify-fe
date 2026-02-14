@@ -1,4 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { paymentService } from "@/services/payment.service";
 import { toast } from "sonner";
 
@@ -10,6 +11,7 @@ export const usePaymentGateways = () => {
 };
 
 export const useInitiatePayment = () => {
+  const t = useTranslations("subscription");
   return useMutation({
     mutationFn: ({
       planId,
@@ -27,6 +29,12 @@ export const useInitiatePayment = () => {
       phoneNumber?: string;
     }) => paymentService.initiatePayment(planId, isAnnual, promoCode, gateway, paymentMethod, phoneNumber),
     onError: (error: any) => {
+      // Handle known errors with translations
+      if (error?.message === "subscription.active.exists") {
+        toast.error(t("active.exists"));
+        return;
+      }
+      
       toast.error(error?.message || "Failed to initiate payment");
     },
   });

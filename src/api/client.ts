@@ -26,6 +26,7 @@ interface ApiRequestConfig extends Omit<RequestInit, "body"> {
   timeout?: number;
   params?: Record<string, string | number | boolean | undefined>;
   _retry?: boolean;
+  skipErrorToast?: boolean;
   body?: BodyInit | null | object;
 }
 
@@ -432,7 +433,7 @@ async function apiClient<T = unknown>(
   url: string,
   options: ApiRequestConfig = {},
 ): Promise<ApiResponse<T>> {
-  const { params, _retry, body, ...restOptions } = options;
+  const { params, _retry, skipErrorToast, body, ...restOptions } = options;
   const fullUrl = buildUrl(url, params);
   const headers = addAuthHeaders(restOptions.headers);
 
@@ -476,8 +477,8 @@ async function apiClient<T = unknown>(
       const errorMessage =
         errorData?.message || `Request failed with status ${response.status}`;
 
-      // Only show toast for non-auth errors
-      if (response.status !== 401) {
+      // Only show toast for non-auth errors if not skipped
+      if (response.status !== 401 && !skipErrorToast) {
         toast.error(errorMessage);
       }
 
@@ -522,7 +523,10 @@ async function apiClient<T = unknown>(
     // Handle other errors
     const message =
       error instanceof Error ? error.message : "An error occurred";
-    toast.error(message);
+    
+    if (!skipErrorToast) {
+      toast.error(message);
+    }
     throw { message } as ApiError;
   }
 }

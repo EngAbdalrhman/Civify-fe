@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { User, LogIn, Settings, LogOut, Receipt } from "lucide-react";
+import { User, LogIn, Settings, LogOut, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import {
@@ -10,7 +10,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useLogout } from "@/features/auth/hooks";
 import { ThemeToggle } from "./theme-toggle";
 import { Link } from "@/i18n/routing";
@@ -18,12 +21,19 @@ import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { getAccessToken } from "@/utils/cookies";
 import apiClient from "@/api/client";
 
+interface UserProfile {
+  firstName: string;
+  username: string;
+  email: string;
+  profilePictureUrl?: string;
+}
+
 export function DashboardNavbar() {
   const t = useTranslations();
   const locale = useLocale();
   const { logout, isLoggingOut } = useLogout();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userProfile, setUserProfile] = useState<{ firstName: string; username: string } | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   // Check authentication status on mount and fetch profile
   useEffect(() => {
@@ -34,7 +44,7 @@ export function DashboardNavbar() {
 
       if (isAuth && !userProfile) {
         try {
-          const response = await apiClient.get<{ firstName: string; username: string }>('/v1/users/me');
+          const response = await apiClient.get<UserProfile>("/v1/users/me");
           setUserProfile(response.data);
         } catch (error) {
           console.error("Failed to fetch user profile:", error);
@@ -53,20 +63,20 @@ export function DashboardNavbar() {
       window.removeEventListener("focus", checkAuth);
       clearInterval(interval);
     };
-  }, [userProfile]); // Added userProfile to dependency to avoid refetching loop if strict mode, though logic prevents it. Actually checkAuth calls setUserProfile only if !userProfile.
+  }, [userProfile]);
 
   // Date Logic
   const getFormattedDate = () => {
     const now = new Date();
-    if (locale === 'ar') {
-       return new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+    if (locale === "ar") {
+      return new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       }).format(now);
     }
-    
+
     return new Intl.DateTimeFormat(locale, {
       weekday: "long",
       year: "numeric",
@@ -77,6 +87,13 @@ export function DashboardNavbar() {
 
   const formattedDate = getFormattedDate();
   const displayName = userProfile?.firstName || userProfile?.username || "User";
+  const email = userProfile?.email || "";
+  const initials = displayName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
     <div className="flex items-center justify-between p-4 border-b bg-background">
@@ -84,11 +101,11 @@ export function DashboardNavbar() {
         {/* Date / Welcome */}
         <div className="hidden md:block text-sm text-muted-foreground mr-4">
           <div className="font-medium text-foreground">
-             {isAuthenticated && (
-               <span>
-                 {t('common.welcome')}, {displayName}
-               </span>
-             )}
+            {isAuthenticated && (
+              <span>
+                {t("common.welcome")}, {displayName}
+              </span>
+            )}
           </div>
           <div>{formattedDate}</div>
         </div>
@@ -107,50 +124,99 @@ export function DashboardNavbar() {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                size="icon"
-                className="text-muted-foreground hover:text-foreground"
+                className="relative h-10 w-10 rounded-full hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 data-[state=open]:bg-transparent"
               >
-                <User className="h-5 w-5" />
+                <Avatar className="h-10 w-10 border border-border transition-all duration-200 hover:scale-105 hover:border-primary/20 hover:ring-2 hover:ring-primary/10 data-[state=open]:scale-105 data-[state=open]:border-primary/20 data-[state=open]:ring-2 data-[state=open]:ring-primary/10">
+                  <AvatarImage
+                    src={userProfile?.profilePictureUrl}
+                    alt={displayName}
+                  />
+                  <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild>
-                <Link
-                  href="/app/profile"
-                  className="w-full cursor-pointer flex items-center"
+            <DropdownMenuContent
+              className="w-[280px] p-0 rounded-[20px] shadow-2xl border-none overflow-hidden"
+              align="end"
+              forceMount
+            >
+              <div className="flex items-center gap-3 p-4 pb-3">
+                <Avatar className="h-10 w-10 border border-border/10">
+                  <AvatarImage
+                    src={userProfile?.profilePictureUrl}
+                    alt={displayName}
+                  />
+                  <AvatarFallback className="bg-primary/5 text-primary text-sm font-bold">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col">
+                  <p className="text-[15px] font-semibold text-foreground leading-tight tracking-tight">
+                    {displayName}
+                  </p>
+                  <p className="text-[13px] text-muted-foreground/80 leading-normal">
+                    {email}
+                  </p>
+                </div>
+              </div>
+              <div className="h-px bg-border/40 mx-4 mb-2" />
+              <DropdownMenuGroup className="px-2 pb-2">
+                <DropdownMenuItem
+                  asChild
+                  className="group p-2.5 rounded-xl cursor-pointer focus:bg-primary/5 focus:text-primary data-[state=open]:bg-primary/5 data-[state=open]:text-primary transition-all duration-200"
                 >
-                  <User className="mr-2 h-4 w-4" />
-                  <span>{t("dashboard.personalPage.profile")}</span>
-                </Link>
-              </DropdownMenuItem>
-
-              <DropdownMenuItem asChild>
-                <Link
-                  href="/app/billing"
-                  className="w-full cursor-pointer flex items-center"
+                  <Link
+                    href="/app/profile"
+                    className="flex items-center w-full"
+                  >
+                    <User className="mr-3 h-[18px] w-[18px] text-muted-foreground group-focus:text-primary transition-colors stroke-2" />
+                    <span className="font-medium text-[14px]">
+                      View Profile
+                    </span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  asChild
+                  className="group p-2.5 rounded-xl cursor-pointer focus:bg-primary/5 focus:text-primary transition-all duration-200"
                 >
-                  <Receipt className="mr-2 h-4 w-4" />
-                  <span>{t("nav.billing")}</span>
-                </Link>
-              </DropdownMenuItem>
-
-              <DropdownMenuItem asChild>
-                <Link
-                  href="/app/settings"
-                  className="w-full cursor-pointer flex items-center"
+                  <Link
+                    href="/app/settings"
+                    className="flex items-center w-full"
+                  >
+                    <Settings className="mr-3 h-[18px] w-[18px] text-muted-foreground group-focus:text-primary transition-colors stroke-2" />
+                    <span className="font-medium text-[14px]">Settings</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  asChild
+                  className="group p-2.5 rounded-xl cursor-pointer focus:bg-primary/5 focus:text-primary transition-all duration-200"
                 >
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>{t("nav.settings")}</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-red-500 cursor-pointer flex items-center"
-                onClick={logout}
-                disabled={isLoggingOut}
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>{isLoggingOut ? t("nav.logout") + "..." : t("nav.logout")}</span>
-              </DropdownMenuItem>
+                  <Link
+                    href="/app/billing"
+                    className="flex items-center w-full"
+                  >
+                    <CreditCard className="mr-3 h-[18px] w-[18px] text-muted-foreground group-focus:text-primary transition-colors stroke-2" />
+                    <span className="font-medium text-[14px]">
+                      Subscription
+                    </span>
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <div className="h-px bg-border/40 mx-4 my-1" />
+              <div className="px-2 pb-2 pt-1">
+                <DropdownMenuItem
+                  className="group p-2.5 rounded-xl cursor-pointer focus:bg-red-50 text-foreground focus:text-red-600 transition-all duration-200"
+                  onClick={logout}
+                  disabled={isLoggingOut}
+                >
+                  <LogOut className="mr-3 h-[18px] w-[18px] text-muted-foreground group-focus:text-red-600 transition-colors stroke-2" />
+                  <span className="font-medium text-[14px]">
+                    {isLoggingOut ? "Signing out..." : "Sign Out"}
+                  </span>
+                </DropdownMenuItem>
+              </div>
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
