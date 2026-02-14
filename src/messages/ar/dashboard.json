@@ -1,0 +1,47 @@
+{
+  "personalPage": {
+    "title": "الصفحة الشخصية",
+    "subtitle": "إدارة ملفك الشخصي وعرض سيرك الذاتية",
+    "profile": "الملف الشخصي",
+    "profileDesc": "تحديث معلوماتك الشخصية",
+    "cvs": "سيرتي الذاتية",
+    "recent": "النشاط الأخير",
+    "recentDesc": "نشاطك الأخير"
+  },
+  "analytics": {
+    "title": "التحليلات",
+    "overview": "نظرة عامة",
+    "cvViews": "مشاهدات السيرة الذاتية",
+    "downloads": "التحميلات",
+    "performance": "الأداء"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "account": "إعدادات الحساب",
+    "preferences": "التفضيلات",
+    "notifications": "الإشعارات",
+    "security": "الأمان"
+  },
+  "resumes": {
+    "myResumes": "سيري الذاتية",
+    "viewAll": "عرض الكل",
+    "createNew": "إنشاء سيرة ذاتية جديدة",
+    "loadError": "فشل تحميل سيرك الذاتية",
+    "deleted": "تم حذف السيرة الذاتية",
+    "deleteError": "فشل حذف السيرة الذاتية"
+  },
+  "promotion": {
+    "title": "أطلق العنان لإمكاناتك الكاملة",
+    "subtitle": "احصل على وصول غير محدود لجميع الميزات مع الخطط المدفوعة",
+    "upgradeToPro": "ترقية إلى الاحترافية",
+    "features": {
+      "unlimitedCvs": "سير ذاتية غير محدودة",
+      "aiTailoring": "تخصيص بالذكاء الاصطناعي",
+      "pdfExports": "تصدير PDF",
+      "noWatermark": "بدون علامة مائية"
+    },
+    "startFrom": "يبدأ من",
+    "upgradeNow": "جرب الآن",
+    "learnMore": "اعرف المزيد"
+  }
+}

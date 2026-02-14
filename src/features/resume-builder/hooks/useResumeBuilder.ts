@@ -2,16 +2,14 @@
 
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ResumeData, AtsScore } from "@/features/upload-cv/types";
 import { ResumeService } from "@/services/resume.service";
-import { STORAGE_KEY } from "../utils/constants";
 
 interface UseResumeBuilderParams {
   initialData: ResumeData;
   resumeId?: string | null;
-  isGuest: boolean;
 }
 
 interface UseResumeBuilderReturn {
@@ -49,10 +47,11 @@ interface UseResumeBuilderReturn {
 export function useResumeBuilder({
   initialData,
   resumeId,
-  isGuest,
 }: UseResumeBuilderParams): UseResumeBuilderReturn {
   const [resumeData, setResumeData] = useState<ResumeData>(initialData);
-  const [activeTab, setActiveTab] = useState("content");
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get("tab") || "content";
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [isSaving, setIsSaving] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [resumeTitle, setResumeTitle] = useState(
@@ -73,7 +72,6 @@ export function useResumeBuilder({
   const router = useRouter();
   const originalDataRef = useRef<ResumeData>(initialData);
   const t = useTranslations("builder");
-  const tCommon = useTranslations("common");
 
   // Update ref when initialData changes
   useEffect(() => {
@@ -82,15 +80,6 @@ export function useResumeBuilder({
   }, [initialData]);
 
   const handleSaveClick = () => {
-    if (isGuest) {
-      toast.info(t("saveDialog.description"), {
-        action: {
-          label: tCommon("login"),
-          onClick: () => router.push("/login?callbackUrl=/app/resume-builder"),
-        },
-      });
-      return;
-    }
     setShowSaveDialog(true);
   };
 
@@ -109,8 +98,6 @@ export function useResumeBuilder({
       } else {
         const created = await ResumeService.create(resumeTitle, resumeData);
         setCurrentResumeId(created.id);
-        // Clear guest cache after successful save
-        localStorage.removeItem(STORAGE_KEY);
       }
       toast.success(t("toasts.saveSuccess"));
     } catch (error) {
@@ -123,23 +110,10 @@ export function useResumeBuilder({
 
   const handleReset = () => {
     setResumeData(originalDataRef.current);
-    if (isGuest) {
-      localStorage.removeItem(STORAGE_KEY);
-    }
     toast.info(t("toasts.resetInfo"));
   };
 
   const handleCalculateScore = async () => {
-    if (isGuest) {
-      toast.info("Please login to use ATS Score analysis", {
-        action: {
-          label: tCommon("login"),
-          onClick: () => router.push("/login?callbackUrl=/app/resume-builder"),
-        },
-      });
-      return;
-    }
-
     setShowScoreDialog(true);
     setIsCalculatingScore(true);
     setAtsScore(null);

@@ -1,0 +1,132 @@
+{
+  "welcome": {
+    "title": "مرحباً بك في Civify!",
+    "subtitle": "دعنا نجهزك للنجاح في خطوات بسيطة.",
+    "benefit1": "أنشئ سير ذاتية متوافقة مع أنظمة ATS",
+    "benefit2": "خصص سيرتك الذاتية لأي وظيفة في ثوانٍ",
+    "benefit3": "تتبع طلباتك في مكان واحد",
+    "startButton": "ابدأ الآن",
+    "skipButton": "تخطي للآن"
+  },
+  "wizard": {
+    "title": "إنشاء سيرتك الذاتية",
+    "back": "رجوع",
+    "next": "التالي",
+    "skip": "تخطي",
+    "finish": "ابدأ البناء"
+  },
+  "goals": {
+    "create_new": {
+      "title": "إنشاء سيرة ذاتية جديدة",
+      "description": "ابدأ من الصفر مع قالب احترافي"
+    },
+    "improve_existing": {
+      "title": "تحسين سيرتي الذاتية",
+      "description": "ارفع سيرتك وحسّنها"
+    }
+  },
+  "steps": {
+    "jobTarget": {
+      "title": "ما هي الوظيفة المستهدفة؟",
+      "subtitle": "ساعدنا في تخصيص سيرتك للفرص المناسبة",
+      "jobTitle": "المسمى الوظيفي",
+      "jobTitlePlaceholder": "مثال: مهندس برمجيات",
+      "company": "الشركة",
+      "companyPlaceholder": "مثال: جوجل",
+      "jobDescription": "وصف الوظيفة",
+      "jobDescriptionPlaceholder": "الصق وصف الوظيفة هنا...",
+      "jobDescriptionHint": "إضافة وصف الوظيفة يساعدنا في تحسين سيرتك",
+      "optional": "اختياري"
+    },
+    "template": {
+      "title": "اختر قالباً",
+      "subtitle": "اختر أسلوباً يناسب مهنتك",
+      "hint": "يمكنك تغيير القوالب في أي وقت",
+      "templates": {
+        "modern": "عصري",
+        "classic": "كلاسيكي",
+        "minimal": "بسيط",
+        "professional": "احترافي"
+      }
+    },
+    "import": {
+      "title": "استيراد سيرتك الذاتية",
+      "subtitle": "ارفع سيرة موجودة أو ابدأ من الصفر",
+      "upload": {
+        "title": "رفع سيرة موجودة",
+        "description": "صيغة PDF أو DOCX"
+      },
+      "scratch": {
+        "title": "البدء من الصفر",
+        "description": "ابنِ سيرتك خطوة بخطوة"
+      },
+      "hint": "بياناتك لا تُشارك مع أي طرف ثالث"
+    },
+    "finish": {
+      "title": "أنت جاهز!",
+      "subtitle": "راجع اختياراتك وابدأ البناء",
+      "summary": "الملخص",
+      "targetJob": "الوظيفة المستهدفة",
+      "template": "القالب",
+      "cvSource": "مصدر السيرة",
+      "notSpecified": "غير محدد",
+      "notSelected": "غير محدد",
+      "uploadedCv": "سيرة مرفوعة",
+      "startFresh": "البدء من الصفر",
+      "readyMessage": "انقر 'ابدأ البناء' لإنشاء سيرتك",
+      "templates": {
+        "modern": "عصري",
+        "classic": "كلاسيكي",
+        "minimal": "بسيط",
+        "professional": "احترافي"
+      }
+    }
+  },
+  "hub": {
+    "title": "مرحباً بك في Civify!",
+    "subtitle": "ماذا تريد أن تفعل اليوم؟",
+    "build": {
+      "title": "بناء سيرة ذاتية من الصفر",
+      "description": "أنشئ سيرة ذاتية احترافية متوافقة مع ATS بمساعدة الذكاء الاصطناعي"
+    },
+    "tailor": {
+      "title": "تخصيص السيرة الذاتية لوظيفة",
+      "description": "ارفع سيرتك الذاتية وحسّنها لإعلان وظيفي محدد"
+    },
+    "api": {
+      "title": "استخدام API",
+      "description": "ادمج محرك السير الذاتية من Civify في تطبيقك الخاص"
+    },
+    "getStarted": "ابدأ الآن",
+    "explore": "أتصفح فقط — انتقل للوحة التحكم"
+  },
+  "dashboard": {
+    "builder": {
+      "title": "منشئ السيرة الذاتية",
+      "subtitle": "ابنِ وأدِر سيرك الذاتية الاحترافية",
+      "continueCta": "متابعة البناء",
+      "continueDesc": "أكمل من حيث توقفت",
+      "createNew": "إنشاء سيرة جديدة",
+      "createNewDesc": "ابدأ سيرة ذاتية جديدة من الصفر"
+    },
+    "tailor": {
+      "title": "خصص سيرتك الذاتية",
+      "subtitle": "حسّن سيرتك الذاتية لإعلانات وظيفية محددة",
+      "tailorCta": "تخصيص لوظيفة",
+      "tailorCtaDesc": "ارفع سيرة ذاتية ووصف وظيفي للتحسين",
+      "buildFirst": "أنشئ سيرة ذاتية أولاً",
+      "buildFirstDesc": "أنشئ سيرة ذاتية لتخصيصها لطلبات التوظيف"
+    },
+    "api": {
+      "title": "لوحة تحكم API",
+      "subtitle": "أدر مفاتيح API والتكامل",
+      "manageKeys": "إدارة مفاتيح API",
+      "manageKeysDesc": "إنشاء وإدارة مفاتيحك",
+      "viewDocs": "التوثيق",
+      "viewDocsDesc": "دليل مرجع API الكامل",
+      "usageStats": "إحصائيات الاستخدام",
+      "usageStatsDesc": "راقب استخدام API الخاص بك"
+    },
+    "changePreference": "تغيير تفضيلاتي"
+  }
+}

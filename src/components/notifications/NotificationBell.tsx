@@ -45,8 +45,8 @@ export function NotificationBell() {
       if (listRes.data && Array.isArray(listRes.data.content)) {
         const mappedNotifications = listRes.data.content.map((n: any) => ({
           ...n,
-          timestamp: n.createdAt || n.timestamp, // Handle both API (createdAt) and SSE (timestamp) formats
-          read: n.delivered, // Map delivered to read status if needed, though logic might differ
+          timestamp: n.createdAt || n.timestamp,
+          read: n.read ?? false,
         }));
         setNotifications(mappedNotifications);
       }
@@ -99,16 +99,26 @@ export function NotificationBell() {
     };
   }, [fetchNotifications]);
 
-  const markAsRead = (id: number) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
-    );
-    setUnreadCount((prev) => Math.max(0, prev - 1));
+  const markAsRead = async (id: number) => {
+    try {
+      await apiClient.put(`/v1/notifications/${id}/read`);
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+    } catch (err) {
+      console.error("Failed to mark notification as read:", err);
+    }
   };
 
-  const clearAll = () => {
-    setNotifications([]);
-    setUnreadCount(0);
+  const markAllAsRead = async () => {
+    try {
+      await apiClient.put("/v1/notifications/read-all");
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+      setUnreadCount(0);
+    } catch (err) {
+      console.error("Failed to mark all notifications as read:", err);
+    }
   };
 
   const getTypeColor = (type: string) => {
@@ -164,8 +174,8 @@ export function NotificationBell() {
         <div className="flex items-center justify-between px-4 py-3 border-b">
           <h4 className="font-semibold">Notifications</h4>
           {notifications.length > 0 && (
-            <Button variant="ghost" size="sm" onClick={clearAll}>
-              Clear all
+            <Button variant="ghost" size="sm" onClick={markAllAsRead}>
+              Mark all read
             </Button>
           )}
         </div>

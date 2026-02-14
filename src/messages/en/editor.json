@@ -1,0 +1,91 @@
+{
+  "sections": {
+    "personal": "Personal Info",
+    "add": "Add Section",
+    "rename": "Rename Section",
+    "custom": "Custom"
+  },
+  "personalForm": {
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "John Doe",
+    "jobTitle": "Job Title",
+    "jobTitlePlaceholder": "Software Engineer",
+    "email": "Email",
+    "emailPlaceholder": "email@example.com",
+    "phone": "Phone",
+    "phonePlaceholder": "+1 234 567 8900",
+    "address": "Address / Location",
+    "addressPlaceholder": "San Francisco, CA",
+    "summary": "Summary",
+    "summaryPlaceholder": "Brief professional summary...",
+    "linkedin": "LinkedIn",
+    "linkedinPlaceholder": "linkedin.com/in/johndoe",
+    "github": "GitHub",
+    "githubPlaceholder": "github.com/johndoe",
+    "website": "Website",
+    "websitePlaceholder": "johndoe.com"
+  },
+  "experience": {
+    "add": "Add Experience",
+    "company": "Company Name",
+    "companyPlaceholder": "Acme Inc.",
+    "position": "Job Title",
+    "positionPlaceholder": "Senior Developer",
+    "location": "Location",
+    "locationPlaceholder": "Remote / City, Country",
+    "description": "Description",
+    "descriptionPlaceholder": "• Achieved results...",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "present": "Present"
+  },
+  "education": {
+    "add": "Add Education",
+    "school": "School / University",
+    "schoolPlaceholder": "Harvard University",
+    "degree": "Degree / Major",
+    "degreePlaceholder": "BSc Computer Science",
+    "location": "Location",
+    "locationPlaceholder": "Cambridge, MA",
+    "gpa": "GPA / Notes (Optional)",
+    "gpaPlaceholder": "3.8 GPA / Cum Laude",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "present": "Present"
+  },
+  "skills": {
+    "addPlaceholder": "Skill name...",
+    "noItems": "No skills added yet"
+  },
+  "languages": {
+    "addPlaceholder": "Language name...",
+    "noItems": "No languages added yet",
+    "none": "None"
+  },
+  "generic": {
+    "item": "Item",
+    "title": "Title *",
+    "titlePlaceholder": "e.g. Project Name, Course Title...",
+    "subtitle": "Subtitle / Organization",
+    "subtitlePlaceholder": "e.g. Role, Organization...",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "present": "Present",
+    "description": "Description",
+    "descriptionPlaceholder": "Brief description...",
+    "addItem": "Add Item",
+    "addSimplePlaceholder": "e.g. Reading, Chess, Photography...",
+    "noItems": "No items added yet",
+    "newItemTitle": "New Item Title...",
+    "add": "Add"
+  },
+  "dialog": {
+    "title": "Add New Section",
+    "description": "Create a new section for your resume. Choose a type to inherit layout.",
+    "nameLabel": "Section Name",
+    "namePlaceholder": "e.g. Volunteering, Awards, Publications...",
+    "typeLabel": "Section Type (Inherits Layout)",
+    "cancel": "Cancel",
+    "confirm": "Add Section"
+  }
+}

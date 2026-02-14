@@ -60,7 +60,7 @@ function PaymentSuccessContent() {
 
       if (result.verified) {
         setVerified(true);
-        toast.success('Payment verified successfully!');
+        toast.success(t('verifiedToast'));
         // Refresh permissions/group to update UI (e.g. remove "Free Plan" badge)
         await fetchPermissions();
       } else {
@@ -69,7 +69,7 @@ function PaymentSuccessContent() {
     } catch (err) {
       console.error('Payment verification error:', err);
       setError(err instanceof Error ? err.message : 'Failed to verify payment');
-      toast.error('Payment verification failed. Please contact support.');
+      toast.error(t('verificationFailedToast'));
     } finally {
       setVerifying(false);
     }
@@ -118,16 +118,16 @@ function PaymentSuccessContent() {
               </p>
             </div>
             <p className="text-sm text-muted-foreground text-center">
-              Your payment may still be processing. Please check your email for confirmation or contact support.
+              {t('processingNote')}
             </p>
             <div className="space-y-2">
               <Button onClick={verifyPayment} className="w-full" size="lg">
-                Try Again
+                {t('retryVerification')}
               </Button>
               <Button variant="outline" asChild className="w-full" size="lg">
                 <Link href="/app">
                   <Home className="mr-2 h-4 w-4" />
-                  Go to Dashboard
+                  {t('goToDashboard')}
                 </Link>
               </Button>
             </div>
