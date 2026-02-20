@@ -55,7 +55,8 @@
       "description": "Create a personalized, role-specific cover letter using the auto-extracted job description and your CV. Professional tone, relevant highlights, ready to send.",
       "bestFor": "Best for: Applications that require or benefit from a strong cover letter.",
       "example": "Dear Hiring Manager, As a data engineer with 4+ years..."
-    }
+    },
+    "learnMore": "Learn more"
   },
   "howItWorks": {
     "badge": "Getting Started",

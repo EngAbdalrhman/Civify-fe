@@ -32,9 +32,9 @@ export function PrivacySecuritySection() {
           {cards.map(({ key, icon: Icon }) => (
             <div
               key={key}
-              className="rounded-2xl border border-emerald-200 dark:border-emerald-900/40 bg-card p-8 transition-all hover:shadow-lg"
+              className="rounded-2xl border border-primary/20 bg-card p-8 transition-all hover:shadow-lg"
             >
-              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400">
+              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary">
                 <Icon className="h-7 w-7" />
               </div>
               <h3 className="mb-3 text-lg font-bold">{t(`${key}Title`)}</h3>
@@ -47,11 +47,9 @@ export function PrivacySecuritySection() {
 
         {/* Transparency Note */}
         <div className="mx-auto mt-10 max-w-3xl">
-          <div className="flex items-start gap-3 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/40 p-4">
-            <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-blue-800 dark:text-blue-300 leading-relaxed">
-              {t("note")}
-            </p>
+          <div className="flex items-start gap-3 rounded-xl bg-primary/5 border border-primary/20 p-4">
+            <Info className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+            <p className="text-sm text-primary leading-relaxed">{t("note")}</p>
           </div>
         </div>
       </div>

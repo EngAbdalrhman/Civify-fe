@@ -63,7 +63,7 @@ export function ProblemSolutionSection() {
         <div className="mx-auto max-w-3xl text-center mb-12">
           <Badge
             variant="secondary"
-            className="mb-4 px-3 py-1.5 text-sm bg-success/10 text-success"
+            className="mb-4 px-3 py-1.5 text-sm bg-primary/10 text-primary"
           >
             {t("solutionBadge")}
           </Badge>
@@ -75,8 +75,8 @@ export function ProblemSolutionSection() {
 
         {/* Solution visual */}
         <div className="mx-auto max-w-lg">
-          <div className="relative p-8 rounded-2xl border border-success/20 bg-success/5 text-center">
-            <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-success/10 text-success">
+          <div className="relative p-8 rounded-2xl border border-primary/20 bg-primary/5 text-center">
+            <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
               <MousePointerClick className="h-8 w-8" />
             </div>
             <div className="flex flex-wrap justify-center gap-3">
