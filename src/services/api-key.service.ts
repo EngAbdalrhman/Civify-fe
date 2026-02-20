@@ -27,8 +27,8 @@ class ApiKeyService {
   /**
    * Create a new API key
    */
-  async createApiKey(): Promise<string> {
-    const response = await apiClient.post<CreateApiKeyResponse>('/api-keys');
+  async createApiKey(name: string): Promise<string> {
+    const response = await apiClient.post<CreateApiKeyResponse>('/api-keys', { name });
     return response.data.key;
   }
 
