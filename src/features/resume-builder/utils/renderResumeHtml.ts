@@ -73,7 +73,19 @@ function escapeHtml(text: string): string {
 // Base HTML Template
 // ============================================================================
 
-function wrapInHtmlDocument(content: string, direction: "ltr" | "rtl"): string {
+function wrapInHtmlDocument(content: string, direction: "ltr" | "rtl", fontFamily: string = "Inter"): string {
+  let fontLink = "";
+  if (fontFamily === "Inter") {
+    fontLink = '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">';
+  } else if (fontFamily === "Roboto") {
+    fontLink = '<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">';
+  }
+
+  let fontFamilyCss = `'${fontFamily}', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
+  if (fontFamily === "Georgia") {
+    fontFamilyCss = "Georgia, 'Times New Roman', serif";
+  }
+
   return `
 <!DOCTYPE html>
 <html lang="en" dir="${direction}">
@@ -83,7 +95,7 @@ function wrapInHtmlDocument(content: string, direction: "ltr" | "rtl"): string {
   <title>Resume</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  ${fontLink}
   <style>
     * {
       margin: 0;
@@ -91,7 +103,7 @@ function wrapInHtmlDocument(content: string, direction: "ltr" | "rtl"): string {
       box-sizing: border-box;
     }
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: ${fontFamilyCss};
       line-height: 1.5;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
@@ -250,7 +262,7 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
   };
 
   const content = `
-    <div style="padding: 40px; min-height: 100%; background-color: white; color: #111827; font-family: Georgia, 'Times New Roman', serif; line-height: 1.6;">
+    <div style="padding: 40px; min-height: 100%; background-color: white; color: #111827; line-height: 1.6;">
       <header style="text-align: center; margin-bottom: 32px; border-bottom: 4px double #d1d5db; padding-bottom: 24px;">
         <h1 style="font-size: 30px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.05em; color: #111827;">
           ${escapeHtml(personalInfo.fullName)}
@@ -328,7 +340,8 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
     </div>
   `;
 
-  return wrapInHtmlDocument(content, direction);
+  const fontFamily = metadata?.fontFamily || 'Inter';
+  return wrapInHtmlDocument(content, direction, fontFamily);
 }
 
 // ============================================================================
@@ -480,7 +493,7 @@ function renderModernTemplate(data: ResumeData, color: string): string {
   const globeIcon = `<svg style="width: 12px; height: 12px; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`;
 
   const content = `
-    <div style="padding: 32px; min-height: 100%; background-color: white; color: #111827; font-family: 'Inter', sans-serif;">
+    <div style="padding: 32px; min-height: 100%; background-color: white; color: #111827;">
       <!-- Header -->
       <header style="border-bottom: 2px solid ${color}; padding-bottom: 24px; margin-bottom: 24px;">
         <h1 style="font-size: 36px; font-weight: 700; text-transform: uppercase; letter-spacing: -0.025em; margin-bottom: 8px; color: ${color};">
@@ -557,7 +570,8 @@ function renderModernTemplate(data: ResumeData, color: string): string {
     </div>
   `;
 
-  return wrapInHtmlDocument(content, direction);
+  const fontFamily = metadata?.fontFamily || 'Inter';
+  return wrapInHtmlDocument(content, direction, fontFamily);
 }
 
 // ============================================================================
@@ -808,7 +822,8 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
     </div>
   `;
 
-  return wrapInHtmlDocument(content, direction);
+  const fontFamily = metadata?.fontFamily || 'Inter';
+  return wrapInHtmlDocument(content, direction, fontFamily);
 }
 
 // ============================================================================

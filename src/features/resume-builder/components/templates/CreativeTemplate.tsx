@@ -129,7 +129,7 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
   };
 
   return (
-    <div className="flex h-full bg-white" dir={direction}>
+    <div className="flex h-full bg-white text-gray-900" dir={direction}>
       {/* Left Sidebar */}
       <aside className="w-[30%] text-white p-6 space-y-6" style={{ backgroundColor: color }}>
         <div className="text-center">

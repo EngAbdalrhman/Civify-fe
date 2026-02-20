@@ -3,7 +3,8 @@
     "title": "Product",
     "overview": "Overview",
     "pricing": "Pricing",
-    "apiDocs": "API Docs"
+    "apiDocs": "API Docs",
+    "extension": "Browser Extension"
   },
   "company": {
     "title": "Company",

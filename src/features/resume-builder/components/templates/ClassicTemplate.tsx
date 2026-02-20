@@ -128,7 +128,7 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
   };
 
   return (
-    <div className="p-10 h-full bg-white text-gray-900 font-serif leading-relaxed" dir={direction}>
+    <div className="p-10 h-full bg-white text-gray-900 leading-relaxed" dir={direction}>
        <header className="text-center mb-8 border-b-2 border-double border-gray-300 pb-6">
          <h1 className="text-3xl font-bold uppercase mb-2 tracking-wide text-gray-900">
            {personalInfo.fullName}
