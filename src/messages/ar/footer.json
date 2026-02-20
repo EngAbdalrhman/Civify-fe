@@ -3,7 +3,8 @@
     "title": "المنتج",
     "overview": "نظرة عامة",
     "pricing": "الأسعار",
-    "apiDocs": "وثائق API"
+    "apiDocs": "وثائق API",
+    "extension": "إضافة المتصفح"
   },
   "company": {
     "title": "الشركة",

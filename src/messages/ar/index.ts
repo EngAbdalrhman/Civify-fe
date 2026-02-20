@@ -9,6 +9,7 @@ import contact from "./contact.json";
 import dashboard from "./dashboard.json";
 import design from "./design.json";
 import editor from "./editor.json";
+import extension from "./extension.json";
 import footer from "./footer.json";
 import help from "./help.json";
 import landing from "./landing.json";
@@ -37,6 +38,7 @@ export default {
   dashboard,
   design,
   editor,
+  extension,
   footer,
   help,
   landing,

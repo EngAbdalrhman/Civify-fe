@@ -60,6 +60,14 @@ export function Footer() {
                   {t("product.apiDocs")}
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/extension"
+                  className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
+                >
+                  {t("product.extension")}
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -124,7 +132,12 @@ export function Footer() {
                 required
                 className="h-8 text-xs"
               />
-              <Button type="submit" size="sm" className="text-xs" disabled={loading}>
+              <Button
+                type="submit"
+                size="sm"
+                className="text-xs"
+                disabled={loading}
+              >
                 {loading ? "..." : t("newsletter.subscribe")}
               </Button>
             </form>

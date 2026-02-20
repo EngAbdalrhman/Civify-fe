@@ -1,0 +1,10 @@
+export { ExtensionHeroSection } from "./ExtensionHeroSection";
+export { ProblemSolutionSection } from "./ProblemSolutionSection";
+export { FeatureHighlightsSection } from "./FeatureHighlightsSection";
+export { ExtensionHowItWorksSection } from "./ExtensionHowItWorksSection";
+export { LanguageSection } from "./LanguageSection";
+export { PrivacySecuritySection } from "./PrivacySecuritySection";
+export { ExtensionTestimonialsSection } from "./ExtensionTestimonialsSection";
+export { ComparisonTableSection } from "./ComparisonTableSection";
+export { ExtensionFAQSection } from "./ExtensionFAQSection";
+export { ExtensionCTASection } from "./ExtensionCTASection";

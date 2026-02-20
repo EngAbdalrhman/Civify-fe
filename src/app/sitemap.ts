@@ -17,6 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { href: "/terms", changeFrequency: "yearly", priority: 0.3 },
     { href: "/policy", changeFrequency: "yearly", priority: 0.3 },
     { href: "/policy/cancellation", changeFrequency: "yearly", priority: 0.3 },
+    { href: "/extension", changeFrequency: "weekly", priority: 0.8 },
   ] as const;
 
   // 2. Use flatMap to generate entries for every locale for every route

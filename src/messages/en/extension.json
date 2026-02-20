@@ -1,0 +1,221 @@
+{
+  "metadata": {
+    "title": "AI Chrome Extension for Resumes — Civify",
+    "description": "Tailor resumes, generate cover letters, and mask CVs on LinkedIn with Civify's AI Chrome extension. English & Arabic.",
+    "ogTitle": "Civify CV Browser Extension — AI Resume Tools for LinkedIn",
+    "ogDescription": "One-click resume tailoring, cover letter generation, and CV masking directly on LinkedIn job descriptions."
+  },
+  "hero": {
+    "badge": "Chrome Extension",
+    "title": "Your AI Resume Assistant,",
+    "titleAccent": "Right Inside LinkedIn.",
+    "subtitle": "Automatically extract job descriptions from LinkedIn, Indeed, or Wuzzuf — then tailor your CV, generate cover letters, and mask personal details in one click.",
+    "ctaPrimary": "Generate API Key",
+    "ctaSecondary": "Get the Extension",
+    "trustLine": "Supports English & Arabic",
+    "statUsers": "10,000+",
+    "statUsersLabel": "Active Users",
+    "statTime": "< 30s",
+    "statTimeLabel": "Per Action",
+    "statLanguages": "EN / AR",
+    "statLanguagesLabel": "Bilingual Support"
+  },
+  "problem": {
+    "badge": "The Problem",
+    "title": "Job Applications Shouldn't Feel Like a Second Job",
+    "subtitle": "Most job seekers waste hours on tasks that should be instant.",
+    "pain1Title": "Manually copying job descriptions",
+    "pain1Desc": "Switching between LinkedIn, Indeed, and Wuzzuf — manually copying job requirements into separate tools, losing context and wasting time on every application.",
+    "pain2Title": "Rewriting your CV from scratch",
+    "pain2Desc": "Spending 30+ minutes tailoring each resume to match different job descriptions — and still missing key terms.",
+    "pain3Title": "Privacy risks when sharing",
+    "pain3Desc": "Sending your full personal details to recruiters and platforms without knowing who sees your phone number or address.",
+    "solutionBadge": "The Solution",
+    "solutionTitle": "One Extension. Three Powerful Actions.",
+    "solutionDesc": "The Civify Chrome Extension automatically extracts job descriptions from LinkedIn, Indeed, and Wuzzuf. Just click the button on any job page and choose your action — it takes seconds."
+  },
+  "features": {
+    "badge": "Core Features",
+    "title": "Three Actions. Unlimited Impact.",
+    "subtitle": "Everything you need to stand out — works with LinkedIn, Indeed, and Wuzzuf.",
+    "mask": {
+      "title": "Mask Your CV",
+      "description": "Instantly redact personal details like your full name, phone number, email, and address. Share your resume safely with recruiters or on job boards.",
+      "bestFor": "Best for: Sharing CVs with recruitment agencies or on public platforms.",
+      "example": "John D. → J•••• D. | +1 (555) 123-4567 → •••-••••"
+    },
+    "tailor": {
+      "title": "Tailor Resume to Job Description",
+      "description": "AI automatically extracts and analyzes the job description, then restructures your resume to highlight matching skills, optimize keywords, and align your experience with role requirements.",
+      "bestFor": "Best for: Maximizing ATS match score and relevance for each application.",
+      "example": "Match Score: 47% → 91% after tailoring"
+    },
+    "coverLetter": {
+      "title": "Generate Cover Letter",
+      "description": "Create a personalized, role-specific cover letter using the auto-extracted job description and your CV. Professional tone, relevant highlights, ready to send.",
+      "bestFor": "Best for: Applications that require or benefit from a strong cover letter.",
+      "example": "Dear Hiring Manager, As a data engineer with 4+ years..."
+    }
+  },
+  "howItWorks": {
+    "badge": "Getting Started",
+    "title": "Up and Running in 4 Simple Steps",
+    "subtitle": "From setup to your first optimized resume in under 2 minutes.",
+    "step1": {
+      "title": "Generate Your API Key",
+      "description": "Log in to the Civify dashboard and generate your personal API key. It's free and takes 10 seconds."
+    },
+    "step2": {
+      "title": "Install the Extension",
+      "description": "Download the Civify CV Browser Extension from the Chrome Web Store and pin it to your toolbar."
+    },
+    "step3": {
+      "title": "Log In with Your API Key",
+      "description": "Open the extension popup, paste your API key, and you're connected to your Civify account."
+    },
+    "step4": {
+      "title": "Click on Any Job Page",
+      "description": "Visit any job listing on LinkedIn, Indeed, or Wuzzuf. The extension automatically extracts the job description — just click and choose your action: Mask CV, Tailor Resume, or Generate Cover Letter."
+    }
+  },
+  "language": {
+    "badge": "Language Support",
+    "title": "Built for a Bilingual World",
+    "subtitle": "Switch between English and Arabic with full RTL support — your output matches your audience.",
+    "toggleLabel": "العربية / English",
+    "outputLabel": "Output language",
+    "rtlBadge": "Full RTL Support",
+    "feature1Title": "Language Toggle",
+    "feature1Desc": "Switch the extension UI between English and Arabic with a single click. The interface adapts direction automatically.",
+    "feature2Title": "Output Language",
+    "feature2Desc": "Choose whether your tailored resume or cover letter is generated in English or Arabic — independent of the UI language.",
+    "feature3Title": "RTL-Ready Output",
+    "feature3Desc": "Arabic documents are generated with proper right-to-left formatting, correct alignment, and native typography."
+  },
+  "privacy": {
+    "badge": "Privacy & Security",
+    "title": "Your Data, Your Control",
+    "subtitle": "We built the extension with privacy-first principles. Here's exactly how it works.",
+    "card1Title": "CV Masking You Control",
+    "card1Desc": "Choose exactly which fields to redact — name, email, phone, address. You preview the masked version before sharing. Nothing is changed permanently.",
+    "card2Title": "Minimal Data Processing",
+    "card2Desc": "The extension sends only the job description text and your CV content to our servers for processing. No browsing data, no LinkedIn credentials, no tracking.",
+    "card3Title": "Transparent Storage",
+    "card3Desc": "Generated documents are saved to your Civify account. You can view, download, or delete them at any time from the dashboard.",
+    "note": "We don't access your LinkedIn account, passwords, or any data beyond the job description text visible on the page."
+  },
+  "testimonials": {
+    "badge": "What Users Say",
+    "title": "Trusted by Job Seekers Worldwide",
+    "subtitle": "Hear from professionals who transformed their job search with the extension.",
+    "t1": {
+      "quote": "I used to spend 30 minutes tailoring each resume. Now I click one button on LinkedIn and it's done in seconds. Game changer.",
+      "name": "Sarah K.",
+      "role": "UX Designer",
+      "company": "Remote"
+    },
+    "t2": {
+      "quote": "The masking feature saved me when I needed to share my CV on a public job board. Simple, fast, and my data stayed private.",
+      "name": "Ahmed M.",
+      "role": "Software Engineer",
+      "company": "Dubai"
+    },
+    "t3": {
+      "quote": "Being able to generate cover letters in Arabic directly from LinkedIn was exactly what I needed. No other tool does this.",
+      "name": "Nour A.",
+      "role": "Marketing Manager",
+      "company": "Riyadh"
+    },
+    "logos": ""
+  },
+  "comparison": {
+    "badge": "Why the Extension?",
+    "title": "See the Difference",
+    "subtitle": "Compare how the Chrome Extension stacks up against doing things the old way.",
+    "headerManual": "Manual Process",
+    "headerExtension": "CV Browser Extension",
+    "headerDashboard": "Full Dashboard",
+    "rowTailor": "Resume Tailoring",
+    "rowMask": "CV Masking",
+    "rowCoverLetter": "Cover Letter",
+    "rowEffort": "Effort per Application",
+    "rowSpeed": "Speed",
+    "rowLanguage": "Language Support",
+    "rowLinkedIn": "Job Platform Support",
+    "manual": {
+      "tailor": "Copy-paste & rewrite manually",
+      "mask": "Edit in Word/PDF editor",
+      "coverLetter": "Write from scratch",
+      "effort": "30-45 min",
+      "speed": "Slow",
+      "language": "Depends on you",
+      "linkedIn": "None"
+    },
+    "extension": {
+      "tailor": "One-click AI tailoring",
+      "mask": "Instant field redaction",
+      "coverLetter": "AI-generated from job + CV",
+      "effort": "< 1 min",
+      "speed": "Instant",
+      "language": "English & Arabic",
+      "linkedIn": "LinkedIn, Indeed & Wuzzuf"
+    },
+    "dashboard": {
+      "tailor": "Full editor + AI",
+      "mask": "Full control + preview",
+      "coverLetter": "AI + manual editing",
+      "effort": "5-10 min",
+      "speed": "Fast",
+      "language": "English & Arabic",
+      "linkedIn": "Via upload"
+    }
+  },
+  "faq": {
+    "badge": "FAQ",
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know about the CV Browser Extension.",
+    "items": {
+      "q1": {
+        "question": "How does the extension work with job platforms?",
+        "answer": "When you're on a job listing page on LinkedIn, Indeed, or Wuzzuf, click the extension button. It automatically extracts the job description from the page and lets you choose your action — tailor your resume, generate a cover letter, or mask your CV. It does not access any job platform accounts or credentials."
+      },
+      "q2": {
+        "question": "What is an API key and how do I get one?",
+        "answer": "An API key is a unique code that connects the Chrome extension to your Civify account. You can generate one for free by logging into your dashboard at civify.cv/dashboard and navigating to the API Keys section. Simply copy the key and paste it into the extension."
+      },
+      "q3": {
+        "question": "Does the extension support Arabic?",
+        "answer": "Yes! The extension fully supports both English and Arabic. You can switch the UI language and choose your output language independently. Arabic outputs are generated with proper RTL formatting and native typography."
+      },
+      "q4": {
+        "question": "What does CV masking do exactly?",
+        "answer": "CV masking redacts personal details from your resume — such as your full name, email address, phone number, and physical address — so you can share it safely with recruiters or on public job boards without exposing sensitive information."
+      },
+      "q5": {
+        "question": "Is my data private and safe?",
+        "answer": "Yes. The extension only sends the job description text and your CV content for processing. We don't collect browsing data, LinkedIn credentials, or any other personal information. Generated documents are stored in your Civify account and can be deleted at any time."
+      },
+      "q6": {
+        "question": "How accurate is the cover letter generation?",
+        "answer": "The AI generates cover letters based on the specific LinkedIn job description and your CV content, ensuring relevance to the role. While we recommend reviewing and personalizing the output, most users find the generated letters are 80-90% ready to send."
+      },
+      "q7": {
+        "question": "Will the tailored resume pass ATS systems?",
+        "answer": "Yes. The tailoring engine optimizes your resume by aligning keywords, skills, and experience phrasing with the job description — which is exactly what Applicant Tracking Systems scan for. Users report significantly improved match scores after tailoring."
+      },
+      "q8": {
+        "question": "Is the extension free? What about pricing?",
+        "answer": "The extension itself is free to install. Your usage is tied to your Civify account plan. Free accounts include a limited number of actions per month, while paid plans offer unlimited usage. Visit the Plans page for current pricing details."
+      }
+    },
+    "stillQuestions": "Still have questions?",
+    "contactSupport": "Contact our support team"
+  },
+  "cta": {
+    "title": "Ready to Supercharge Your Job Search?",
+    "subtitle": "Generate your API key, install the extension, and start tailoring resumes on LinkedIn in under 2 minutes.",
+    "ctaPrimary": "Generate API Key",
+    "ctaSecondary": "Install Extension",
+    "reassurance": "Free to start · Takes 2 minutes · No credit card required"
+  }
+}
