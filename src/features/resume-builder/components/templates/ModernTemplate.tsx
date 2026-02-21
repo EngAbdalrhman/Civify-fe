@@ -42,7 +42,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
       </div>
       {item.subtitle && <div className="text-sm font-semibold text-gray-700 mb-1">{item.subtitle}</div>}
       {item.description && (
-        <div className={`text-sm text-gray-600 whitespace-pre-wrap leading-snug ${isRtl ? 'text-right' : 'text-justify'}`}>
+        <div className={`text-sm text-gray-600 whitespace-pre-wrap ${compactClass === 'leading-tight' ? 'leading-snug' : 'leading-relaxed'} ${isRtl ? 'text-right' : 'text-justify'}`}>
            {item.description}
         </div>
       )}
@@ -145,10 +145,25 @@ export function ModernTemplate({ data, color }: TemplateProps) {
     github: metadata?.language === 'ar' ? "جيت هب" : "GitHub",
   };
 
+  const compactClass = metadata?.compactMode ? 'leading-tight' : 'leading-relaxed';
+  const margins = metadata?.margins || { top: 32, bottom: 32, left: 32, right: 32 };
+  const spacingLevel = metadata?.spacingLevel ?? 3;
+  const sectionMargin = spacingLevel * 8; // e.g. 24px
+  const itemGap = spacingLevel * 4; // e.g. 16px
+
   return (
-    <div className="p-8 h-full bg-white text-gray-900" dir={direction}>
+    <div 
+      className={`h-full bg-white text-gray-900 ${compactClass}`} 
+      dir={direction}
+      style={{
+        paddingTop: `${margins.top}px`,
+        paddingBottom: `${margins.bottom}px`,
+        paddingLeft: `${margins.left}px`,
+        paddingRight: `${margins.right}px`,
+      }}
+    >
       {/* Header */}
-      <header className="border-b-2 pb-6 mb-6" style={{ borderColor: color }}>
+      <header className="border-b-2 pb-6" style={{ borderColor: color, marginBottom: `${sectionMargin}px` }}>
         <h1 className="text-4xl font-bold uppercase tracking-tight mb-2" style={{ color }}>
           {personalInfo.fullName}
         </h1>
@@ -180,7 +195,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
 
       {/* Summary */}
       {personalInfo.summary && (
-        <section className="mb-6">
+        <section style={{ marginBottom: `${sectionMargin}px` }}>
           <h3 className="text-xs font-bold uppercase tracking-wider mb-3 border-b pb-1" style={{ color, borderColor: color + '40' }}>
             {labels.summary}
           </h3>
@@ -190,7 +205,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
 
       {/* Dynamic Sections */}
       {visibleSections.map(section => (
-        <section key={section.id} className="mb-6">
+        <section key={section.id} style={{ marginBottom: `${sectionMargin}px` }}>
           <h3 className="text-xs font-bold uppercase tracking-wider mb-4 border-b pb-1" style={{ color, borderColor: color + '40' }}>
             {section.title}
           </h3>
@@ -202,7 +217,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
           ) : isCertOrCourse(section.type, section.title) && coursesStyle === 'simple' ? (
             renderSimpleCourses(section)
           ) : (
-            <div className="space-y-4">
+            <div className="flex flex-col" style={{ gap: `${itemGap}px` }}>
               {section.items.filter((i: any) => i.visible !== false).map(renderSectionItem)}
             </div>
           )}

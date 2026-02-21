@@ -12,8 +12,10 @@ interface ResumePreviewProps {
 export function ResumePreview({ data }: ResumePreviewProps) {
   const { metadata } = data;
   const templateId = metadata?.templateId || 'modern';
-  const fontFamily = metadata?.fontFamily || 'Inter';
+  const bodyFont = metadata?.bodyFontFamily || metadata?.fontFamily || 'Inter';
+  const headingFont = metadata?.headingFontFamily || metadata?.fontFamily || 'Inter';
   const primaryColor = metadata?.primaryColor || '#000000';
+
 
   // Map template ID to component
   const renderTemplate = () => {
@@ -32,7 +34,10 @@ export function ResumePreview({ data }: ResumePreviewProps) {
   return (
     <div 
       className="bg-white shadow-2xl p-0 w-[210mm] min-h-[297mm] mx-auto origin-top transition-all"
-      style={{ fontFamily }}
+      style={{ 
+        fontFamily: bodyFont,
+        '--heading-font': `"${headingFont}", sans-serif`,
+      } as React.CSSProperties}
       id="resume-preview-content"
     >
       {renderTemplate()}

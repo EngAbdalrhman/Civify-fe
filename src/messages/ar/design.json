@@ -7,6 +7,17 @@
   },
   "colors": "اللون الأساسي",
   "typography": "الخطوط",
+  "headingFont": "خط العناوين",
+  "bodyFont": "خط النصوص",
+  "compactMode": "الوضع المضغوط",
+  "spacing": "تباعد الأقسام والعناصر",
+  "margins": {
+    "title": "هوامش الصفحة",
+    "top": "أعلى",
+    "bottom": "أسفل",
+    "left": "يسار",
+    "right": "يمين"
+  },
   "sectionStyles": {
     "skills": "عرض المهارات",
     "languages": "عرض اللغات",

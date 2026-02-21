@@ -3,7 +3,8 @@
 import { ResumeData, SkillsDisplayStyle, LanguagesDisplayStyle, CoursesDisplayStyle } from '@/features/upload-cv/types';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { LayoutTemplate, Type, Palette, Code, Languages, BookOpen, AlignLeft, AlignRight } from 'lucide-react';
+import { LayoutTemplate, Type, Palette, Code, Languages, BookOpen, AlignLeft, AlignRight, Maximize, FileText } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 
 interface DesignPanelProps {
   data: ResumeData;
@@ -55,12 +56,25 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
   const metadata = data.metadata || {};
   const t = useTranslations('design');
 
-  const updateMetadata = (key: string, value: string) => {
+  const updateMetadata = (key: string, value: any) => {
     onChange({
       ...data,
       metadata: {
         ...metadata,
         [key]: value,
+      },
+    });
+  };
+
+  const updateMargins = (key: 'top' | 'bottom' | 'left' | 'right', value: number) => {
+    onChange({
+      ...data,
+      metadata: {
+        ...metadata,
+        margins: {
+          ...(metadata.margins || { top: 40, bottom: 40, left: 40, right: 40 }),
+          [key]: value,
+        },
       },
     });
   };
@@ -120,17 +134,166 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
            <Type className="h-4 w-4" />
            {t('typography')}
         </h3>
-        <RadioGroup 
-          value={metadata.fontFamily || 'Inter'} 
-          onValueChange={(val) => updateMetadata('fontFamily', val)}
-        >
-          {FONTS.map((font) => (
-            <div key={font.id} className="flex items-center space-x-2">
-              <RadioGroupItem value={font.id} id={`font-${font.id}`} />
-              <Label htmlFor={`font-${font.id}`}>{font.name}</Label>
+        
+        <div className="space-y-6">
+          {/* Heading Font */}
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-muted-foreground">{t('headingFont')}</h4>
+            <RadioGroup 
+              value={metadata.headingFontFamily || metadata.fontFamily || 'Inter'} 
+              onValueChange={(val) => updateMetadata('headingFontFamily', val)}
+              className="grid grid-cols-3 gap-2"
+            >
+              {FONTS.map((font) => (
+                <div key={`heading-${font.id}`} className="flex items-center space-x-2 border rounded-md p-2 hover:bg-muted/50 transition-colors">
+                  <RadioGroupItem value={font.id} id={`heading-font-${font.id}`} />
+                  <Label htmlFor={`heading-font-${font.id}`} className="flex-1 cursor-pointer text-xs">{font.name}</Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </div>
+
+          {/* Body Font */}
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-muted-foreground">{t('bodyFont')}</h4>
+            <RadioGroup 
+              value={metadata.bodyFontFamily || metadata.fontFamily || 'Inter'} 
+              onValueChange={(val) => updateMetadata('bodyFontFamily', val)}
+              className="grid grid-cols-3 gap-2"
+            >
+              {FONTS.map((font) => (
+                <div key={`body-${font.id}`} className="flex items-center space-x-2 border rounded-md p-2 hover:bg-muted/50 transition-colors">
+                  <RadioGroupItem value={font.id} id={`body-font-${font.id}`} />
+                  <Label htmlFor={`body-font-${font.id}`} className="flex-1 cursor-pointer text-xs">{font.name}</Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </div>
+        </div>
+      </div>
+
+      {/* Advanced Layout Controls */}
+      <div className="space-y-6 border-t pt-6">
+        <h3 className="font-semibold flex items-center gap-2">
+          <Maximize className="h-4 w-4" />
+          Layout & Spacing
+        </h3>
+        
+        {/* Compact Mode */}
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label htmlFor="compact-mode" className="text-sm">
+              {t('compactMode')}
+            </Label>
+            <p className="text-xs text-muted-foreground">
+              Reduce line heights to fit more content.
+            </p>
+          </div>
+          <Switch
+            id="compact-mode"
+            checked={metadata.compactMode || false}
+            onCheckedChange={(val) => updateMetadata('compactMode', val)}
+          />
+        </div>
+
+        {/* Section & Item Spacing */}
+        <div className="space-y-3">
+          <div className="flex justify-between items-center">
+            <Label htmlFor="spacing-slider" className="text-sm">
+              {t('spacing')}
+            </Label>
+            <span className="text-xs font-mono text-muted-foreground">
+              {metadata.spacingLevel || 3}
+            </span>
+          </div>
+          <input
+            id="spacing-slider"
+            type="range"
+            min="1"
+            max="5"
+            step="1"
+            value={metadata.spacingLevel || 3}
+            onChange={(e) => updateMetadata('spacingLevel', parseInt(e.target.value))}
+            className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
+          />
+          <div className="flex justify-between text-[10px] text-muted-foreground uppercase tracking-wider">
+            <span>Tight</span>
+            <span>Relaxed</span>
+          </div>
+        </div>
+
+        {/* Page Margins */}
+        <div className="space-y-4">
+          <Label className="text-sm block">
+            {t('margins.title') || 'Page Margins'}
+          </Label>
+          <div className="grid grid-cols-2 gap-4">
+            {/* Top Margin */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-muted-foreground">{t('margins.top') || 'Top'}</span>
+                <span className="font-mono">{metadata.margins?.top ?? 40}px</span>
+              </div>
+              <input
+                type="range"
+                min="5"
+                max="60"
+                step="1"
+                value={metadata.margins?.top ?? 40}
+                onChange={(e) => updateMargins('top', parseInt(e.target.value))}
+                className="w-full h-1.5 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
+              />
             </div>
-          ))}
-        </RadioGroup>
+            {/* Bottom Margin */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-muted-foreground">{t('margins.bottom') || 'Bottom'}</span>
+                <span className="font-mono">{metadata.margins?.bottom ?? 40}px</span>
+              </div>
+              <input
+                type="range"
+                min="5"
+                max="60"
+                step="1"
+                value={metadata.margins?.bottom ?? 40}
+                onChange={(e) => updateMargins('bottom', parseInt(e.target.value))}
+                className="w-full h-1.5 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
+              />
+            </div>
+            {/* Left Margin */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-muted-foreground">{t('margins.left') || 'Left'}</span>
+                <span className="font-mono">{metadata.margins?.left ?? 40}px</span>
+              </div>
+              <input
+                type="range"
+                min="5"
+                max="60"
+                step="1"
+                value={metadata.margins?.left ?? 40}
+                onChange={(e) => updateMargins('left', parseInt(e.target.value))}
+                className="w-full h-1.5 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
+              />
+            </div>
+            {/* Right Margin */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-muted-foreground">{t('margins.right') || 'Right'}</span>
+                <span className="font-mono">{metadata.margins?.right ?? 40}px</span>
+              </div>
+              <input
+                type="range"
+                min="5"
+                max="60"
+                step="1"
+                value={metadata.margins?.right ?? 40}
+                onChange={(e) => updateMargins('right', parseInt(e.target.value))}
+                className="w-full h-1.5 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Skills Display Style */}

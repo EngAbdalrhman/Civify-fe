@@ -59,6 +59,11 @@ export interface ResumeMetadata {
   coursesDisplayStyle?: CoursesDisplayStyle;
   layoutDirection?: 'ltr' | 'rtl' | 'auto';
   sectionOrder?: string[]; // Ordered array of section IDs
+  compactMode?: boolean;
+  spacingLevel?: number;
+  margins?: { top?: number; bottom?: number; left?: number; right?: number; };
+  headingFontFamily?: string;
+  bodyFontFamily?: string;
 }
 
 export interface ResumeData {
