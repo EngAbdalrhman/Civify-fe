@@ -48,5 +48,12 @@
     "fullscreenError": "Fullscreen not supported",
 
     "loginAction": "Login"
+  },
+  "tokenLimit": {
+    "title": "Token Limit Reached",
+    "description": "You've used all your monthly tokens. Upgrade your plan for more or buy a token add-on to continue.",
+    "upgrade": "Upgrade Plan",
+    "buyTokens": "Buy Token Pack",
+    "cancel": "Maybe Later"
   }
 }
