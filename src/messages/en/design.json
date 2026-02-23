@@ -7,6 +7,17 @@
   },
   "colors": "Primary Color",
   "typography": "Typography",
+  "headingFont": "Heading Font",
+  "bodyFont": "Body Font",
+  "compactMode": "Compact Mode",
+  "spacing": "Section & Item Spacing",
+  "margins": {
+    "title": "Page Margins",
+    "top": "Top",
+    "bottom": "Bottom",
+    "left": "Left",
+    "right": "Right"
+  },
   "sectionStyles": {
     "skills": "Skills Display",
     "languages": "Languages Display",

@@ -128,10 +128,17 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
     github: metadata?.language === 'ar' ? "جيت هب" : "GitHub",
   };
 
+  const compactClass = metadata?.compactMode ? 'leading-tight' : 'leading-relaxed';
+  const margins = metadata?.margins || { top: 32, bottom: 32, left: 32, right: 32 };
+  const spacingLevel = metadata?.spacingLevel ?? 3;
+  const sectionMargin = spacingLevel * 8; // e.g. 24px
+  const sidebarSectionMargin = spacingLevel * 6; // slightly tighter for sidebar
+  const itemGap = spacingLevel * 4; // e.g. 16px
+
   return (
     <div className="flex h-full bg-white text-gray-900" dir={direction}>
       {/* Left Sidebar */}
-      <aside className="w-[30%] text-white p-6 space-y-6" style={{ backgroundColor: color }}>
+      <aside className="w-[30%] text-white p-6" style={{ backgroundColor: color, display: 'flex', flexDirection: 'column', gap: `${sidebarSectionMargin}px` }}>
         <div className="text-center">
            <div className="w-32 h-32 bg-white/20 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl font-bold">
               {personalInfo.fullName.charAt(0)}
@@ -184,14 +191,14 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
       {/* Main Content */}
       <main className="flex-1 p-8 text-gray-800">
          {personalInfo.summary && (
-           <section className="mb-8">
+           <section style={{ marginBottom: `${sectionMargin}px` }}>
              <h2 className="text-xl font-bold uppercase mb-4 text-gray-900 border-b-2 pb-1" style={{ borderColor: color }}>{labels.profile}</h2>
              <p className="text-gray-600 leading-relaxed text-sm">{personalInfo.summary}</p>
            </section>
          )}
 
          {otherSections.map(section => (
-           <section key={section.id} className="mb-8">
+           <section key={section.id} style={{ marginBottom: `${sectionMargin}px` }}>
              <h2 className="text-xl font-bold uppercase mb-4 text-gray-900 border-b-2 pb-1" style={{ borderColor: color }}>
                {section.title}
              </h2>
@@ -199,7 +206,7 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
              {isCertOrCourse(section.type, section.title) && coursesStyle === 'simple' ? (
                renderSimpleCourses(section)
              ) : (
-               <div className="space-y-6">
+               <div className="flex flex-col" style={{ gap: `${itemGap}px` }}>
                   {section.items.filter((i: any) => i.visible !== false).map((item: any) => (
                      <div key={item.id} className="relative pl-4 border-l-2 border-gray-200">
                         <div className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full" style={{ backgroundColor: color }}></div>
@@ -208,7 +215,7 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
                         <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">
                           {[item.date, item.location].filter(Boolean).join(' | ')}
                         </div>
-                        {item.description && <p className="text-sm text-gray-600 whitespace-pre-wrap">{item.description}</p>}
+                        {item.description && <p className={`text-sm text-gray-600 whitespace-pre-wrap ${compactClass === 'leading-tight' ? 'leading-snug' : 'leading-relaxed'}`}>{item.description}</p>}
                      </div>
                   ))}
                </div>

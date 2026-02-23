@@ -15,6 +15,20 @@ import { PreviewPanel } from "./PreviewPanel";
 import { SaveDialog } from "./SaveDialog";
 import { AtsScoreDialog } from "./AtsScoreDialog";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Zap, CreditCard } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+
 interface ResumeBuilderProps {
   initialData: ResumeData;
   resumeId?: string | null;
@@ -96,6 +110,43 @@ export function ResumeBuilder({ initialData, resumeId }: ResumeBuilderProps) {
         score={builder.atsScore}
         isLoading={builder.isCalculatingScore}
       />
+
+      {/* Token Limit Exceeded Modal */}
+      <AlertDialog
+        open={upload.tokenLimitExceeded}
+        onOpenChange={(open) => {
+          if (!open) upload.resetTokenLimit();
+        }}
+      >
+        <AlertDialogContent className="sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Zap className="h-5 w-5 text-amber-500" />
+              {t("tokenLimit.title")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("tokenLimit.description")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0 mt-4">
+            <AlertDialogCancel className="sm:mr-auto sm:rtl:ml-auto sm:rtl:mr-0">
+              {t("tokenLimit.cancel")}
+            </AlertDialogCancel>
+            <Link href="/plans" className="w-full sm:w-auto">
+              <Button variant="outline" className="w-full gap-2">
+                <CreditCard className="h-4 w-4" />
+                {t("tokenLimit.buyTokens")}
+              </Button>
+            </Link>
+            <Link href="/plans" className="w-full sm:w-auto">
+              <AlertDialogAction className="w-full gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 border-0">
+                <Zap className="h-4 w-4 fill-current" />
+                {t("tokenLimit.upgrade")}
+              </AlertDialogAction>
+            </Link>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

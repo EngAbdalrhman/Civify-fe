@@ -127,6 +127,12 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
     github: metadata?.language === 'ar' ? "جيت هب" : "GitHub",
   };
 
+  const compactClass = metadata?.compactMode ? 'leading-tight' : 'leading-relaxed';
+  const margins = metadata?.margins || { top: 40, bottom: 40, left: 40, right: 40 };
+  const spacingLevel = metadata?.spacingLevel ?? 3;
+  const sectionMargin = spacingLevel * 8; // e.g. 24px for level 3
+  const itemGap = spacingLevel * 4; // e.g. 12px for level 3
+
   return (
     <div className="p-10 h-full bg-white text-gray-900 leading-relaxed" dir={direction}>
        <header className="text-center mb-8 border-b-2 border-double border-gray-300 pb-6">
@@ -162,14 +168,14 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
        </header>
 
        {personalInfo.summary && (
-         <section className="mb-6 text-center max-w-2xl mx-auto">
+         <section className="text-center max-w-2xl mx-auto" style={{ marginBottom: `${sectionMargin}px` }}>
            <h3 className="text-sm font-bold uppercase mb-2 border-b border-gray-300 inline-block px-4">{labels.summary}</h3>
            <p className="text-sm text-justify">{personalInfo.summary}</p>
          </section>
        )}
 
        {visibleSections.map(section => (
-         <section key={section.id} className="mb-6">
+         <section key={section.id} style={{ marginBottom: `${sectionMargin}px` }}>
            <h3 className="text-lg font-bold uppercase border-b border-gray-800 mb-4 flex items-center">
              <span className="bg-gray-800 text-white px-2 py-0.5 text-sm mr-2" style={{ backgroundColor: color }}>
                 {section.title.charAt(0)}

@@ -108,6 +108,9 @@ function wrapInHtmlDocument(content: string, direction: "ltr" | "rtl", fontFamil
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
+    h1, h2, h3, h4, h5, h6 {
+      font-family: ${headingFontFamilyCss};
+    }
     a {
       color: #2563eb;
       text-decoration: none;
@@ -155,6 +158,12 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
   const visibleSections = sections.filter(
     (s) => s.visible !== false && s.items && s.items.length > 0,
   );
+
+  const compactClass = metadata?.compactMode ? '1.2' : '1.6';
+  const margins = metadata?.margins || { top: 40, bottom: 40, left: 40, right: 40 };
+  const spacingLevel = metadata?.spacingLevel ?? 3;
+  const sectionMargin = spacingLevel * 8; // e.g. 24px
+  const itemGap = spacingLevel * 4; // e.g. 12px
 
   const renderSkills = (section: (typeof sections)[0]) => {
     const items = section.items.filter((item) => item.visible !== false);
@@ -283,7 +292,7 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
       ${
         personalInfo.summary
           ? `
-        <section style="margin-bottom: 24px; text-align: center; max-width: 672px; margin-left: auto; margin-right: auto;">
+        <section style="margin-bottom: ${sectionMargin}px; text-align: center; max-width: 672px; margin-left: auto; margin-right: auto;">
           <h3 style="font-size: 14px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; border-bottom: 1px solid #d1d5db; display: inline-block; padding: 0 16px;">${labels.summary}</h3>
           <p style="font-size: 14px; text-align: justify;">${escapeHtml(personalInfo.summary)}</p>
         </section>
@@ -294,7 +303,7 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
       ${visibleSections
         .map(
           (section) => `
-        <section style="margin-bottom: 24px;">
+        <section style="margin-bottom: ${sectionMargin}px;">
           <h3 style="font-size: 18px; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #1f2937; margin-bottom: 16px; display: flex; align-items: center;">
             <span style="background-color: ${color}; color: white; padding: 2px 8px; font-size: 14px; margin-right: 8px;">
               ${section.title.charAt(0)}
@@ -378,6 +387,12 @@ function renderModernTemplate(data: ResumeData, color: string): string {
   const visibleSections = sections.filter(
     (s) => s.visible !== false && s.items && s.items.length > 0,
   );
+
+  const compactClass = metadata?.compactMode ? '1.2' : '1.6';
+  const margins = metadata?.margins || { top: 32, bottom: 32, left: 32, right: 32 };
+  const spacingLevel = metadata?.spacingLevel ?? 3;
+  const sectionMargin = spacingLevel * 8; // e.g. 24px
+  const itemGap = spacingLevel * 4; // e.g. 16px
 
   const renderSkills = (section: (typeof sections)[0]) => {
     const items = section.items.filter((item) => item.visible !== false);
@@ -495,7 +510,7 @@ function renderModernTemplate(data: ResumeData, color: string): string {
   const content = `
     <div style="padding: 32px; min-height: 100%; background-color: white; color: #111827;">
       <!-- Header -->
-      <header style="border-bottom: 2px solid ${color}; padding-bottom: 24px; margin-bottom: 24px;">
+      <header style="border-bottom: 2px solid ${color}; padding-bottom: 24px; margin-bottom: ${sectionMargin}px;">
         <h1 style="font-size: 36px; font-weight: 700; text-transform: uppercase; letter-spacing: -0.025em; margin-bottom: 8px; color: ${color};">
           ${escapeHtml(personalInfo.fullName)}
         </h1>
@@ -514,7 +529,7 @@ function renderModernTemplate(data: ResumeData, color: string): string {
       ${
         personalInfo.summary
           ? `
-        <section style="margin-bottom: 24px;">
+        <section style="margin-bottom: ${sectionMargin}px;">
           <h3 style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; border-bottom: 1px solid ${color}40; padding-bottom: 4px; color: ${color};">
             ${labels.summary}
           </h3>
@@ -528,7 +543,7 @@ function renderModernTemplate(data: ResumeData, color: string): string {
       ${visibleSections
         .map(
           (section) => `
-        <section style="margin-bottom: 24px;">
+        <section style="margin-bottom: ${sectionMargin}px;">
           <h3 style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; border-bottom: 1px solid ${color}40; padding-bottom: 4px; color: ${color};">
             ${escapeHtml(section.title)}
           </h3>
@@ -542,7 +557,7 @@ function renderModernTemplate(data: ResumeData, color: string): string {
                     coursesStyle === "simple"
                   ? renderSimpleCourses(section)
                   : `
-              <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; flex-direction: column; gap: ${itemGap}px;">
                 ${section.items
                   .filter((i) => i.visible !== false)
                   .map(
@@ -616,6 +631,12 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
       s.items &&
       s.items.length > 0,
   );
+
+  const compactClass = metadata?.compactMode ? '1.2' : '1.6';
+  const margins = metadata?.margins || { top: 32, bottom: 32, left: 32, right: 32 };
+  const spacingLevel = metadata?.spacingLevel ?? 3;
+  const sectionMargin = spacingLevel * 8; // e.g. 24px
+  const itemGap = spacingLevel * 6; // e.g. 18px
 
   const renderSkills = (section: (typeof sections)[0]) => {
     const items = section.items.filter((item) => item.visible !== false);
@@ -723,9 +744,9 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
   };
 
   const content = `
-    <div style="display: flex; min-height: 100%; background-color: white;">
+    <div style="display: flex; min-height: 100%; background-color: white; line-height: ${compactClass};">
       <!-- Left Sidebar -->
-      <aside style="width: 30%; background-color: ${color}; color: white; padding: 24px; display: flex; flex-direction: column; gap: 24px;">
+      <aside style="width: 30%; background-color: ${color}; color: white; padding: ${margins.top}px 24px ${margins.bottom}px ${margins.left}px; display: flex; flex-direction: column; gap: ${sectionMargin}px;">
         <div style="text-align: center;">
           <div style="width: 128px; height: 128px; background-color: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700;">
             ${personalInfo.fullName.charAt(0)}
@@ -769,13 +790,13 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
       </aside>
 
       <!-- Main Content -->
-      <main style="flex: 1; padding: 32px; color: #1f2937;">
+      <main style="flex: 1; padding: ${margins.top}px ${margins.right}px ${margins.bottom}px 32px; color: #1f2937;">
         ${
           personalInfo.summary
             ? `
-          <section style="margin-bottom: 32px;">
+          <section style="margin-bottom: ${sectionMargin}px;">
             <h2 style="font-size: 20px; font-weight: 700; text-transform: uppercase; margin-bottom: 16px; color: #111827; border-bottom: 2px solid ${color}; padding-bottom: 4px;">${labels.profile}</h2>
-            <p style="color: #4b5563; line-height: 1.6; font-size: 14px;">${escapeHtml(personalInfo.summary)}</p>
+            <p style="color: #4b5563; font-size: 14px;">${escapeHtml(personalInfo.summary)}</p>
           </section>
         `
             : ""
@@ -784,7 +805,7 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
         ${otherSections
           .map(
             (section) => `
-          <section style="margin-bottom: 32px;">
+          <section style="margin-bottom: ${sectionMargin}px;">
             <h2 style="font-size: 20px; font-weight: 700; text-transform: uppercase; margin-bottom: 16px; color: #111827; border-bottom: 2px solid ${color}; padding-bottom: 4px;">
               ${escapeHtml(section.title)}
             </h2>
@@ -794,7 +815,7 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
               coursesStyle === "simple"
                 ? renderSimpleCourses(section)
                 : `
-              <div style="display: flex; flex-direction: column; gap: 24px;">
+              <div style="display: flex; flex-direction: column; gap: ${itemGap}px;">
                 ${section.items
                   .filter((i) => i.visible !== false)
                   .map(

@@ -209,6 +209,15 @@
   }
 }
 
+#resume-preview-content h1,
+#resume-preview-content h2,
+#resume-preview-content h3,
+#resume-preview-content h4,
+#resume-preview-content h5,
+#resume-preview-content h6 {
+  font-family: var(--heading-font, inherit);
+}
+
 /* Custom animations for landing page */
 @keyframes blob {
   0% {
