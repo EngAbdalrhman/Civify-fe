@@ -104,12 +104,12 @@ export function ResumeBuilder({ initialData, resumeId }: ResumeBuilderProps) {
       />
 
       {/* ATS Score Dialog */}
-      <AtsScoreDialog
+      {/* <AtsScoreDialog
         open={builder.showScoreDialog}
         onOpenChange={builder.setShowScoreDialog}
         score={builder.atsScore}
         isLoading={builder.isCalculatingScore}
-      />
+      /> */}
 
       {/* Token Limit Exceeded Modal */}
       <AlertDialog
