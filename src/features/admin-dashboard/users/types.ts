@@ -13,7 +13,9 @@ export interface User {
   isEmailVerified: boolean;
   createdAt: string;
   lastLoginAt?: string;
-  currentPlan?: string;
+  plan?: string;
+  cvCount?: number;
+  apiUsageCount?: number;
 }
 
 export interface UserFormData {

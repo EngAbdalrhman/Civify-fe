@@ -68,7 +68,7 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Current Plan</p>
-              <Badge variant="outline">{user.currentPlan || "Free"}</Badge>
+              <Badge variant="outline">{user.plan || "Free"}</Badge>
             </div>
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Group</p>
