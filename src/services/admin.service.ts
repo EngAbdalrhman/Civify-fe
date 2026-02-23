@@ -3,8 +3,12 @@
  * Handles all admin operations for the HICv dashboard
  */
 
-import apiClient from '@/api/client';
-import { InputDataModel, FilterOperation, FilterItem } from '@/components/generic-list/types';
+import apiClient from "@/api/client";
+import {
+  InputDataModel,
+  FilterOperation,
+  FilterItem,
+} from "@/components/generic-list/types";
 
 // Re-export for distinct usage if needed, or just use directly
 export { FilterOperation };
@@ -53,17 +57,19 @@ export interface AdminUser {
   profilePictureUrl?: string;
   isEmailVerified: boolean;
   twoFactorEnabled: boolean;
-  status: 'ACTIVE' | 'DISABLED';
+  status: "ACTIVE" | "DISABLED";
   createdAt: string;
   lastLoginAt?: string;
   // Limits
   cvLimit?: number;
   extraTokens: number;
+  cvCount?: number;
+  apiUsageCount?: number;
   // Group
   groupId?: number;
   groupName?: string;
   // Subscription (display only)
-  currentPlan?: string;
+  plan?: string;
   subscriptionStatus?: string;
   oauthProvider?: string;
   oauthSubject?: string;
@@ -139,13 +145,13 @@ export interface UpdatePlanRequest extends Partial<CreatePlanRequest> {}
 // Promo Codes Types
 // ============================================
 
-export type PromoApplicabilityType = 'ALL' | 'PLAN' | 'TOKEN';
+export type PromoApplicabilityType = "ALL" | "PLAN" | "TOKEN";
 
 export interface PromoCode {
   id: number;
   code: string;
   description?: string;
-  discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
+  discountType: "PERCENTAGE" | "FIXED_AMOUNT";
   discountValue: number;
   minimumPurchase?: number; // Matches BigDecimal
   usageLimit?: number;
@@ -161,7 +167,7 @@ export interface PromoCode {
 export interface ValidatePromoResponse {
   valid: boolean;
   discountAmount: number;
-  discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
+  discountType: "PERCENTAGE" | "FIXED_AMOUNT";
   discountValue: number;
   message?: string;
 }
@@ -174,7 +180,7 @@ export interface PriceCalculationResponse {
   totalPrice: number;
   promoCode?: string;
   isAnnual: boolean;
-  billingCycle: 'MONTHLY' | 'ANNUAL';
+  billingCycle: "MONTHLY" | "ANNUAL";
   currency: string;
 }
 
@@ -189,8 +195,8 @@ export interface AdminSubscription {
   userName: string;
   planId: number;
   planName: string;
-  status: 'ACTIVE' | 'EXPIRED' | 'CANCELLED' | 'PENDING';
-  billingCycle: 'MONTHLY' | 'ANNUAL';
+  status: "ACTIVE" | "EXPIRED" | "CANCELLED" | "PENDING";
+  billingCycle: "MONTHLY" | "ANNUAL";
   startDate: string;
   endDate: string;
   autoRenew: boolean;
@@ -201,12 +207,12 @@ export interface AdminSubscription {
 // Notification Types
 // ============================================
 
-export type NotificationChannel = 'PUSH' | 'EMAIL' | 'ALL';
+export type NotificationChannel = "PUSH" | "EMAIL" | "ALL";
 
 export interface SendNotificationRequest {
   title: string;
   message: string;
-  type: 'INFO' | 'WARNING' | 'PROMO' | 'SUCCESS';
+  type: "INFO" | "WARNING" | "PROMO" | "SUCCESS";
   channel?: NotificationChannel;
   broadcast?: boolean;
   userIds?: number[];
@@ -220,7 +226,15 @@ export interface SendToUsersRequest extends SendNotificationRequest {
 // Audit Log Types
 // ============================================
 
-export type AuditAction = 'INSERT' | 'UPDATE' | 'DELETE' | 'READ' | 'LOGIN' | 'LOGOUT' | 'ACTIVATE' | 'DEACTIVATE';
+export type AuditAction =
+  | "INSERT"
+  | "UPDATE"
+  | "DELETE"
+  | "READ"
+  | "LOGIN"
+  | "LOGOUT"
+  | "ACTIVATE"
+  | "DEACTIVATE";
 export interface AuditLog {
   id: number;
   entityType: string;
@@ -259,16 +273,16 @@ export interface CvOperationLog {
 // Subscription Audit Log Types
 // ============================================
 
-export type SubscriptionAuditType = 
-  | 'RENEW' 
-  | 'REMINDER_SENT' 
-  | 'DOWNGRADE' 
-  | 'EXPIRE' 
-  | 'AUTO_EXTEND' 
-  | 'INVOICE_CREATED' 
-  | 'PAYMENT_RECEIVED' 
-  | 'ACTIVATED' 
-  | 'CANCELLED';
+export type SubscriptionAuditType =
+  | "RENEW"
+  | "REMINDER_SENT"
+  | "DOWNGRADE"
+  | "EXPIRE"
+  | "AUTO_EXTEND"
+  | "INVOICE_CREATED"
+  | "PAYMENT_RECEIVED"
+  | "ACTIVATED"
+  | "CANCELLED";
 
 export interface SubscriptionAuditLog {
   id: number;
@@ -286,15 +300,15 @@ export interface SubscriptionAuditLog {
 // Billing Audit Log Types
 // ============================================
 
-export type BillingAuditType = 
-  | 'WEBHOOK_RECEIVED' 
-  | 'WEBHOOK_SUCCESS' 
-  | 'WEBHOOK_FAILED' 
-  | 'PAYMENT_COMPLETED' 
-  | 'PAYMENT_FAILED' 
-  | 'INVOICE_CANCELLED' 
-  | 'INVOICE_EXPIRED' 
-  | 'REFUND_INITIATED';
+export type BillingAuditType =
+  | "WEBHOOK_RECEIVED"
+  | "WEBHOOK_SUCCESS"
+  | "WEBHOOK_FAILED"
+  | "PAYMENT_COMPLETED"
+  | "PAYMENT_FAILED"
+  | "INVOICE_CANCELLED"
+  | "INVOICE_EXPIRED"
+  | "REFUND_INITIATED";
 
 export interface BillingAuditLog {
   id: number;
@@ -315,8 +329,12 @@ export interface BillingAuditLog {
 // Token Usage Log Types
 // ============================================
 
-export type TokenUsageType = 'CV_PARSE' | 'CV_TAILOR' | 'CONTENT_GENERATE' | 'OTHER';
-export type TokenSource = 'SUBSCRIPTION' | 'WALLET' | 'MIXED';
+export type TokenUsageType =
+  | "CV_PARSE"
+  | "CV_TAILOR"
+  | "CONTENT_GENERATE"
+  | "OTHER";
+export type TokenSource = "SUBSCRIPTION" | "WALLET" | "MIXED";
 
 export interface TokenUsageLog {
   id: number;
@@ -335,13 +353,13 @@ export interface TokenUsageLog {
 // ============================================
 
 const ADMIN_API = {
-  STATS: 'v1/admin/stats',
-  USERS: 'v1/admin/users',
-  PLANS: 'v1/admin/plans',
-  PROMO_CODES: 'v1/admin/promocodes',
-  SUBSCRIPTIONS: 'v1/admin/subscriptions',
-  NOTIFICATIONS: 'v1/admin/notifications',
-  AUDIT: 'v1/admin/audit',
+  STATS: "v1/admin/stats",
+  USERS: "v1/admin/users",
+  PLANS: "v1/admin/plans",
+  PROMO_CODES: "v1/admin/promocodes",
+  SUBSCRIPTIONS: "v1/admin/subscriptions",
+  NOTIFICATIONS: "v1/admin/notifications",
+  AUDIT: "v1/admin/audit",
 };
 
 // ============================================
@@ -353,8 +371,12 @@ class AdminService {
   // Stats
   // ==========================================
 
-  async getStats(period: 'MONTHLY' | 'QUARTERLY' | 'YEARLY' | 'OVERALL' = 'MONTHLY'): Promise<AdminStats> {
-    const response = await apiClient.get<AdminStats>(`${ADMIN_API.STATS}?period=${period}`);
+  async getStats(
+    period: "MONTHLY" | "QUARTERLY" | "YEARLY" | "OVERALL" = "MONTHLY",
+  ): Promise<AdminStats> {
+    const response = await apiClient.get<AdminStats>(
+      `${ADMIN_API.STATS}?period=${period}`,
+    );
     return response.data;
   }
 
@@ -362,38 +384,45 @@ class AdminService {
   // Users (Server-side filtering)
   // ==========================================
 
-  async filterUsers(inputData: InputDataModel): Promise<ApiResponse<PagedResponse<AdminUser>>> {
-    const response = await apiClient.post<ApiResponse<PagedResponse<AdminUser>>>(
-      `${ADMIN_API.USERS}/filter`,
-      inputData
-    );
+  async filterUsers(
+    inputData: InputDataModel,
+  ): Promise<ApiResponse<PagedResponse<AdminUser>>> {
+    const response = await apiClient.post<
+      ApiResponse<PagedResponse<AdminUser>>
+    >(`${ADMIN_API.USERS}/filter`, inputData);
     return response.data;
   }
 
-  async getAllUsers(page = 0, size = 10): Promise<ApiResponse<PagedResponse<AdminUser>>> {
+  async getAllUsers(
+    page = 0,
+    size = 10,
+  ): Promise<ApiResponse<PagedResponse<AdminUser>>> {
     const response = await apiClient.get<ApiResponse<PagedResponse<AdminUser>>>(
-      `${ADMIN_API.USERS}?page=${page}&size=${size}`
+      `${ADMIN_API.USERS}?page=${page}&size=${size}`,
     );
     return response.data;
   }
 
-  async getUserById(userId: number, includeStats = false): Promise<ApiResponse<AdminUser>> {
+  async getUserById(
+    userId: number,
+    includeStats = false,
+  ): Promise<ApiResponse<AdminUser>> {
     const response = await apiClient.get<ApiResponse<AdminUser>>(
-      `${ADMIN_API.USERS}/${userId}?includeStats=${includeStats}`
+      `${ADMIN_API.USERS}/${userId}?includeStats=${includeStats}`,
     );
     return response.data;
   }
 
   async updateUserLimits(
     userId: number,
-    cvLimit?: number
+    cvLimit?: number,
   ): Promise<ApiResponse<AdminUser>> {
     const params = new URLSearchParams();
-    if (cvLimit !== undefined) params.append('cvLimit', cvLimit.toString());
+    if (cvLimit !== undefined) params.append("cvLimit", cvLimit.toString());
 
     const response = await apiClient.put<ApiResponse<AdminUser>>(
       `${ADMIN_API.USERS}/${userId}/limits?${params.toString()}`,
-      {}
+      {},
     );
     return response.data;
   }
@@ -401,23 +430,29 @@ class AdminService {
   async toggleUserLock(userId: number): Promise<ApiResponse<AdminUser>> {
     const response = await apiClient.patch<ApiResponse<AdminUser>>(
       `${ADMIN_API.USERS}/${userId}/toggle-lock`,
-      {}
+      {},
     );
     return response.data;
   }
 
-  async updateUserGroup(userId: number, groupId: number): Promise<ApiResponse<AdminUser>> {
+  async updateUserGroup(
+    userId: number,
+    groupId: number,
+  ): Promise<ApiResponse<AdminUser>> {
     const response = await apiClient.patch<ApiResponse<AdminUser>>(
       `${ADMIN_API.USERS}/${userId}/group?groupId=${groupId}`,
-      {}
+      {},
     );
     return response.data;
   }
 
-  async updateUserTokens(userId: number, extraTokens: number): Promise<ApiResponse<AdminUser>> {
+  async updateUserTokens(
+    userId: number,
+    extraTokens: number,
+  ): Promise<ApiResponse<AdminUser>> {
     const response = await apiClient.patch<ApiResponse<AdminUser>>(
       `${ADMIN_API.USERS}/${userId}/tokens?extraTokens=${extraTokens}`,
-      {}
+      {},
     );
     return response.data;
   }
@@ -428,13 +463,15 @@ class AdminService {
 
   async getPlanLookup(): Promise<{ id: number; name: string }[]> {
     const response = await apiClient.get<{ id: number; name: string }[]>(
-      `${ADMIN_API.PLANS}/lookup`
+      `${ADMIN_API.PLANS}/lookup`,
     );
     return response.data;
   }
 
   async getAllPlans(): Promise<AdminPlan[]> {
-    const response = await apiClient.get<ApiResponse<AdminPlan[]> | AdminPlan[]>(ADMIN_API.PLANS);
+    const response = await apiClient.get<
+      ApiResponse<AdminPlan[]> | AdminPlan[]
+    >(ADMIN_API.PLANS);
     // Handle both wrapped and unwrapped responses
     const data = response.data;
     if (Array.isArray(data)) {
@@ -446,7 +483,7 @@ class AdminService {
 
   async getPlanById(planId: number): Promise<AdminPlan> {
     const response = await apiClient.get<ApiResponse<AdminPlan>>(
-      `${ADMIN_API.PLANS}/${planId}`
+      `${ADMIN_API.PLANS}/${planId}`,
     );
     return response.data.data;
   }
@@ -454,15 +491,18 @@ class AdminService {
   async createPlan(data: CreatePlanRequest): Promise<ApiResponse<AdminPlan>> {
     const response = await apiClient.post<ApiResponse<AdminPlan>>(
       ADMIN_API.PLANS,
-      data
+      data,
     );
     return response.data;
   }
 
-  async updatePlan(planId: number, data: UpdatePlanRequest): Promise<ApiResponse<AdminPlan>> {
+  async updatePlan(
+    planId: number,
+    data: UpdatePlanRequest,
+  ): Promise<ApiResponse<AdminPlan>> {
     const response = await apiClient.put<ApiResponse<AdminPlan>>(
       `${ADMIN_API.PLANS}/${planId}`,
-      data
+      data,
     );
     return response.data;
   }
@@ -470,7 +510,7 @@ class AdminService {
   async activatePlan(planId: number): Promise<ApiResponse<AdminPlan>> {
     const response = await apiClient.patch<ApiResponse<AdminPlan>>(
       `${ADMIN_API.PLANS}/${planId}/activate`,
-      {}
+      {},
     );
     return response.data;
   }
@@ -478,14 +518,14 @@ class AdminService {
   async deactivatePlan(planId: number): Promise<ApiResponse<AdminPlan>> {
     const response = await apiClient.patch<ApiResponse<AdminPlan>>(
       `${ADMIN_API.PLANS}/${planId}/deactivate`,
-      {}
+      {},
     );
     return response.data;
   }
 
   async deletePlan(planId: number): Promise<ApiResponse<void>> {
     const response = await apiClient.delete<ApiResponse<void>>(
-      `${ADMIN_API.PLANS}/${planId}`
+      `${ADMIN_API.PLANS}/${planId}`,
     );
     return response.data;
   }
@@ -494,11 +534,12 @@ class AdminService {
   // Promo Codes (Client-side filtering)
   // ==========================================
 
-  async filterPromoCodes(data: InputDataModel): Promise<PagedResponse<PromoCode>> {
-    const response = await apiClient.post<ApiResponse<PagedResponse<PromoCode>>>(
-      `${ADMIN_API.PROMO_CODES}/filter`,
-      data
-    );
+  async filterPromoCodes(
+    data: InputDataModel,
+  ): Promise<PagedResponse<PromoCode>> {
+    const response = await apiClient.post<
+      ApiResponse<PagedResponse<PromoCode>>
+    >(`${ADMIN_API.PROMO_CODES}/filter`, data);
     return response.data.data;
   }
 
@@ -508,25 +549,29 @@ class AdminService {
       page: 0,
       size: 1000, // Get all (rarely exceeds 1000)
     };
-    const response = await apiClient.post<ApiResponse<PagedResponse<PromoCode>>>(
-      `${ADMIN_API.PROMO_CODES}/filter`,
-      inputData
-    );
+    const response = await apiClient.post<
+      ApiResponse<PagedResponse<PromoCode>>
+    >(`${ADMIN_API.PROMO_CODES}/filter`, inputData);
     return response.data.data.content;
   }
 
-  async createPromoCode(data: Partial<PromoCode>): Promise<ApiResponse<PromoCode>> {
+  async createPromoCode(
+    data: Partial<PromoCode>,
+  ): Promise<ApiResponse<PromoCode>> {
     const response = await apiClient.post<ApiResponse<PromoCode>>(
       ADMIN_API.PROMO_CODES,
-      data
+      data,
     );
     return response.data;
   }
 
-  async updatePromoCode(id: number, data: Partial<PromoCode>): Promise<ApiResponse<PromoCode>> {
+  async updatePromoCode(
+    id: number,
+    data: Partial<PromoCode>,
+  ): Promise<ApiResponse<PromoCode>> {
     const response = await apiClient.put<ApiResponse<PromoCode>>(
       `${ADMIN_API.PROMO_CODES}/${id}`,
-      data
+      data,
     );
     return response.data;
   }
@@ -534,14 +579,14 @@ class AdminService {
   async deactivatePromoCode(id: number): Promise<ApiResponse<PromoCode>> {
     const response = await apiClient.post<ApiResponse<PromoCode>>(
       `${ADMIN_API.PROMO_CODES}/${id}/deactivate`,
-      {}
+      {},
     );
     return response.data;
   }
 
   async deletePromoCode(id: number): Promise<ApiResponse<void>> {
     const response = await apiClient.delete<ApiResponse<void>>(
-      `${ADMIN_API.PROMO_CODES}/${id}`
+      `${ADMIN_API.PROMO_CODES}/${id}`,
     );
     return response.data;
   }
@@ -553,15 +598,15 @@ class AdminService {
   async calculatePrice(
     planId: number,
     isAnnual: boolean,
-    promoCode?: string
+    promoCode?: string,
   ): Promise<PriceCalculationResponse> {
     const params = new URLSearchParams();
-    params.append('planId', planId.toString());
-    params.append('isAnnual', isAnnual.toString());
-    if (promoCode) params.append('promoCode', promoCode);
+    params.append("planId", planId.toString());
+    params.append("isAnnual", isAnnual.toString());
+    if (promoCode) params.append("promoCode", promoCode);
 
     const response = await apiClient.get<ApiResponse<PriceCalculationResponse>>(
-      `v1/subscriptions/calculate-price?${params.toString()}`
+      `v1/subscriptions/calculate-price?${params.toString()}`,
     );
     return response.data.data;
   }
@@ -570,10 +615,14 @@ class AdminService {
   // Subscriptions (Analytics - fetch all)
   // ==========================================
 
-  async getAllSubscriptions(status?: string, page = 0, size = 100): Promise<PagedResponse<AdminSubscription>> {
+  async getAllSubscriptions(
+    status?: string,
+    page = 0,
+    size = 100,
+  ): Promise<PagedResponse<AdminSubscription>> {
     let url = `${ADMIN_API.SUBSCRIPTIONS}?page=${page}&size=${size}`;
     if (status) url += `&status=${status}`;
-    
+
     const response = await apiClient.get<PagedResponse<AdminSubscription>>(url);
     return response.data;
   }
@@ -582,15 +631,17 @@ class AdminService {
   // Notifications
   // ==========================================
 
-  async sendBroadcast(request: SendNotificationRequest): Promise<{ message: string }> {
+  async sendBroadcast(
+    request: SendNotificationRequest,
+  ): Promise<{ message: string }> {
     const payload = {
       ...request,
       broadcast: true,
-      channel: request.channel || 'PUSH'
+      channel: request.channel || "PUSH",
     };
     const response = await apiClient.post<{ message: string }>(
       `${ADMIN_API.NOTIFICATIONS}/send`,
-      payload
+      payload,
     );
     return response.data;
   }
@@ -599,27 +650,27 @@ class AdminService {
     const payload = {
       ...request,
       broadcast: false,
-      channel: request.channel || 'PUSH'
+      channel: request.channel || "PUSH",
     };
     const response = await apiClient.post<{ message: string }>(
       `${ADMIN_API.NOTIFICATIONS}/send`,
-      payload
+      payload,
     );
     return response.data;
   }
 
   async filterSubscriptions(data: InputDataModel): Promise<PagedResponse<any>> {
     const response = await apiClient.post<ApiResponse<PagedResponse<any>>>(
-      'v1/admin/subscriptions/filter',
-      data
+      "v1/admin/subscriptions/filter",
+      data,
     );
     return response.data.data;
   }
 
   async filterApiLogs(data: InputDataModel): Promise<PagedResponse<any>> {
-     const response = await apiClient.post<ApiResponse<PagedResponse<any>>>(
-      '/v1/logs/admin/filter',
-      data
+    const response = await apiClient.post<ApiResponse<PagedResponse<any>>>(
+      "/v1/logs/admin/filter",
+      data,
     );
     return response.data.data;
   }
@@ -628,23 +679,33 @@ class AdminService {
   // Audit Logs
   // ==========================================
 
-  async getCvLogs(data: InputDataModel): Promise<PagedResponse<CvOperationLog>> {
-    const response = await apiClient.post<PagedResponse<CvOperationLog>>('/v1/admin/audit/cv-logs', data);
-    return response.data;
-  }
-
-  async getAllAuditLogs(data: InputDataModel): Promise<PagedResponse<AuditLog>> {
-    const response = await apiClient.post<PagedResponse<AuditLog>>(
-      `${ADMIN_API.AUDIT}/all`,
-      data
+  async getCvLogs(
+    data: InputDataModel,
+  ): Promise<PagedResponse<CvOperationLog>> {
+    const response = await apiClient.post<PagedResponse<CvOperationLog>>(
+      "/v1/admin/audit/cv-logs",
+      data,
     );
     return response.data;
   }
 
-  async getAuditLogsByType(entityType: string, data: InputDataModel): Promise<PagedResponse<AuditLog>> {
+  async getAllAuditLogs(
+    data: InputDataModel,
+  ): Promise<PagedResponse<AuditLog>> {
+    const response = await apiClient.post<PagedResponse<AuditLog>>(
+      `${ADMIN_API.AUDIT}/all`,
+      data,
+    );
+    return response.data;
+  }
+
+  async getAuditLogsByType(
+    entityType: string,
+    data: InputDataModel,
+  ): Promise<PagedResponse<AuditLog>> {
     const response = await apiClient.post<PagedResponse<AuditLog>>(
       `${ADMIN_API.AUDIT}/${entityType}`,
-      data
+      data,
     );
     return response.data;
   }
@@ -653,10 +714,12 @@ class AdminService {
   // Subscription Audit Logs
   // ==========================================
 
-  async filterSubscriptionAuditLogs(data: InputDataModel): Promise<PagedResponse<SubscriptionAuditLog>> {
+  async filterSubscriptionAuditLogs(
+    data: InputDataModel,
+  ): Promise<PagedResponse<SubscriptionAuditLog>> {
     const response = await apiClient.post<PagedResponse<SubscriptionAuditLog>>(
-      '/v1/admin/audit/subscription/filter',
-      data
+      "/v1/admin/audit/subscription/filter",
+      data,
     );
     return response.data;
   }
@@ -665,10 +728,12 @@ class AdminService {
   // Billing Audit Logs
   // ==========================================
 
-  async filterBillingAuditLogs(data: InputDataModel): Promise<PagedResponse<BillingAuditLog>> {
+  async filterBillingAuditLogs(
+    data: InputDataModel,
+  ): Promise<PagedResponse<BillingAuditLog>> {
     const response = await apiClient.post<PagedResponse<BillingAuditLog>>(
-      '/v1/admin/audit/billing/filter',
-      data
+      "/v1/admin/audit/billing/filter",
+      data,
     );
     return response.data;
   }
@@ -677,17 +742,23 @@ class AdminService {
   // Token Usage Logs (Admin)
   // ==========================================
 
-  async filterTokenUsageLogs(data: InputDataModel): Promise<PagedResponse<TokenUsageLog>> {
+  async filterTokenUsageLogs(
+    data: InputDataModel,
+  ): Promise<PagedResponse<TokenUsageLog>> {
     const response = await apiClient.post<PagedResponse<TokenUsageLog>>(
-      '/v1/token-usage/admin/filter',
-      data
+      "/v1/token-usage/admin/filter",
+      data,
     );
     return response.data;
   }
 
-  async getUserTokenUsage(userId: number, page = 0, size = 20): Promise<PagedResponse<TokenUsageLog>> {
+  async getUserTokenUsage(
+    userId: number,
+    page = 0,
+    size = 20,
+  ): Promise<PagedResponse<TokenUsageLog>> {
     const response = await apiClient.get<PagedResponse<TokenUsageLog>>(
-      `/v1/token-usage/admin/user/${userId}?page=${page}&size=${size}`
+      `/v1/token-usage/admin/user/${userId}?page=${page}&size=${size}`,
     );
     return response.data;
   }
