@@ -5,6 +5,7 @@ import {
   ExtensionHowItWorksSection,
   LanguageSection,
   PrivacySecuritySection,
+  ExtensionTestimonialsSection,
   ComparisonTableSection,
   ExtensionFAQSection,
   ExtensionCTASection,
@@ -104,6 +105,7 @@ export default async function ExtensionPage({
       <ExtensionHowItWorksSection />
       <LanguageSection />
       <PrivacySecuritySection />
+      <ExtensionTestimonialsSection />
       <ComparisonTableSection />
       <ExtensionFAQSection />
       <ExtensionCTASection />

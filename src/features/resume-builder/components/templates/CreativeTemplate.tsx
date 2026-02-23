@@ -136,16 +136,7 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
   const itemGap = spacingLevel * 4; // e.g. 16px
 
   return (
-    <div 
-      className={`flex h-full bg-white text-gray-900 ${compactClass}`} 
-      dir={direction}
-      style={{
-        paddingTop: `${margins.top}px`,
-        paddingBottom: `${margins.bottom}px`,
-        paddingLeft: `${margins.left}px`,
-        paddingRight: `${margins.right}px`,
-      }}
-    >
+    <div className="flex h-full bg-white text-gray-900" dir={direction}>
       {/* Left Sidebar */}
       <aside className="w-[30%] text-white p-6" style={{ backgroundColor: color, display: 'flex', flexDirection: 'column', gap: `${sidebarSectionMargin}px` }}>
         <div className="text-center">

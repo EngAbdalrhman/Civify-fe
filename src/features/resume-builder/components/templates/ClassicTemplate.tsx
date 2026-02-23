@@ -134,17 +134,8 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
   const itemGap = spacingLevel * 4; // e.g. 12px for level 3
 
   return (
-    <div 
-      className={`h-full bg-white text-gray-900 ${compactClass}`} 
-      dir={direction}
-      style={{
-        paddingTop: `${margins.top}px`,
-        paddingBottom: `${margins.bottom}px`,
-        paddingLeft: `${margins.left}px`,
-        paddingRight: `${margins.right}px`,
-      }}
-    >
-       <header className="text-center border-b-2 border-double border-gray-300 pb-6" style={{ marginBottom: `${sectionMargin}px` }}>
+    <div className="p-10 h-full bg-white text-gray-900 leading-relaxed" dir={direction}>
+       <header className="text-center mb-8 border-b-2 border-double border-gray-300 pb-6">
          <h1 className="text-3xl font-bold uppercase mb-2 tracking-wide text-gray-900">
            {personalInfo.fullName}
          </h1>
