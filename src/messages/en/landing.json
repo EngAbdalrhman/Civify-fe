@@ -148,6 +148,18 @@
       "q5": {
         "question": "How accurate is the match score?",
         "answer": "Our match score is based on industry-standard ATS algorithms and keyword analysis. While no score is 100% predictive, our users report significantly higher interview rates with scores above 80%."
+      },
+      "q6": {
+        "question": "What is the best AI tool for tailoring resumes to job descriptions?",
+        "answer": "Civify is an AI-powered resume tailoring tool that analyzes your CV against specific job descriptions. It uses machine learning to identify missing keywords, optimize your experience descriptions, and provide an ATS compatibility score. Users report a 92% average match rate after optimization."
+      },
+      "q7": {
+        "question": "How does Civify's ATS score checker work?",
+        "answer": "Civify's ATS score checker compares your resume against the job description using the same algorithms that Applicant Tracking Systems use. It identifies keyword gaps, formatting issues, and missing qualifications, then provides actionable suggestions to improve your score from typically 40-50% to 80%+."
+      },
+      "q8": {
+        "question": "Can Civify build a resume in Arabic?",
+        "answer": "Yes. Civify is one of the few AI resume builders with full Arabic language support, including RTL (right-to-left) layout, Arabic OCR for document parsing, and AI-powered content generation in Arabic. It supports bilingual resumes as well."
       }
     },
     "stillQuestions": "Still have questions?",

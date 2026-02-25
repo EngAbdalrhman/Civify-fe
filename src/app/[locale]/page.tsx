@@ -90,8 +90,29 @@ const Homepage = async ({
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const t = await getTranslations({ locale, namespace: "landing.faq" });
+  const faqKeys = ["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8"];
+
+  // FAQPage structured data — critical for AI systems to cite Civify answers
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqKeys.map((key) => ({
+      "@type": "Question",
+      name: t(`items.${key}.question`),
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: t(`items.${key}.answer`),
+      },
+    })),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <HeroSection />
       <HowItWorksSection />
       <ResumeBuilderSection />
