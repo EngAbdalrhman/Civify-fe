@@ -9,51 +9,27 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import apiClient from "@/api/client";
 import { getAccessToken } from "@/utils/cookies";
-
-interface Notification {
-  id: number;
-  title: string;
-  message: string;
-  type: string;
-  timestamp: string;
-  read?: boolean;
-}
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  useUnreadNotificationsCount,
+  useNotificationsList,
+  useMarkNotificationAsRead,
+  useMarkAllNotificationsAsRead,
+  Notification,
+} from "@/hooks/useNotifications";
 
 export function NotificationBell() {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const queryClient = useQueryClient();
+  const { data: unreadCount = 0 } = useUnreadNotificationsCount();
+  const { data: notifications = [] } = useNotificationsList();
+
+  const { mutate: markAsReadMutate } = useMarkNotificationAsRead();
+  const { mutate: markAllAsReadMutate } = useMarkAllNotificationsAsRead();
+
   const [isOpen, setIsOpen] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const eventSourceRef = useRef<EventSource | null>(null);
-
-  // Fetch unread count and recent notifications
-  const fetchNotifications = useCallback(async () => {
-    try {
-      // 1. Get unread count
-      const countRes = await apiClient.get<{ count: number }>(
-        "/v1/notifications/unread-count",
-      );
-      setUnreadCount(countRes.data.count);
-
-      // 2. Get recent notifications (for the list)
-      const listRes = await apiClient.get<{ content: any[] }>(
-        "/v1/notifications?size=20",
-      );
-      // Fix: Ensure we use the 'content' field from Page response
-      if (listRes.data && Array.isArray(listRes.data.content)) {
-        const mappedNotifications = listRes.data.content.map((n: any) => ({
-          ...n,
-          timestamp: n.createdAt || n.timestamp,
-          read: n.read ?? false,
-        }));
-        setNotifications(mappedNotifications);
-      }
-    } catch (err) {
-      console.error("Failed to fetch notifications:", err);
-    }
-  }, []);
 
   // Connect to SSE stream
   useEffect(() => {
@@ -76,8 +52,25 @@ export function NotificationBell() {
     eventSource.addEventListener("notification", (event) => {
       try {
         const notification: Notification = JSON.parse(event.data);
-        setNotifications((prev) => [notification, ...prev].slice(0, 20)); // Keep last 20
-        setUnreadCount((prev) => prev + 1);
+
+        // Optimistically update the list caching
+        queryClient.setQueryData<Notification[]>(
+          ["notifications", "list"],
+          (oldData) => {
+            const newData = oldData
+              ? [notification, ...oldData].slice(0, 20)
+              : [notification];
+            return newData;
+          },
+        );
+
+        // Optimistically update the unread count
+        queryClient.setQueryData<number>(
+          ["notifications", "unreadCount"],
+          (oldCount) => {
+            return (oldCount || 0) + 1;
+          },
+        );
       } catch (err) {
         console.error("[SSE] Failed to parse notification:", err);
       }
@@ -90,35 +83,18 @@ export function NotificationBell() {
 
     eventSourceRef.current = eventSource;
 
-    // Initial fetch
-    fetchNotifications();
-
     return () => {
       eventSource.close();
       setIsConnected(false);
     };
-  }, [fetchNotifications]);
+  }, [queryClient]);
 
-  const markAsRead = async (id: number) => {
-    try {
-      await apiClient.put(`/v1/notifications/${id}/read`);
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
-      );
-      setUnreadCount((prev) => Math.max(0, prev - 1));
-    } catch (err) {
-      console.error("Failed to mark notification as read:", err);
-    }
+  const markAsRead = (id: number) => {
+    markAsReadMutate(id);
   };
 
-  const markAllAsRead = async () => {
-    try {
-      await apiClient.put("/v1/notifications/read-all");
-      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-      setUnreadCount(0);
-    } catch (err) {
-      console.error("Failed to mark all notifications as read:", err);
-    }
+  const markAllAsRead = () => {
+    markAllAsReadMutate();
   };
 
   const getTypeColor = (type: string) => {

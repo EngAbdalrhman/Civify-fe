@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  Calendar, 
-  Shield, 
-  Activity, 
+import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
+import {
+  User,
+  Mail,
+  Phone,
+  Calendar,
+  Shield,
+  Activity,
   CreditCard,
   Receipt,
   Loader2,
@@ -16,30 +16,38 @@ import {
   Coins,
   FileText,
   CheckCircle2,
-  Crown
-} from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Progress } from '@/components/ui/progress';
+  Crown,
+} from "lucide-react";
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
-import { Link } from '@/i18n/routing';
-import apiClient from '@/api/client';
-import { useAuth } from '@/hooks/use-auth';
-import { format, isValid, parseISO } from 'date-fns';
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Link } from "@/i18n/routing";
+import apiClient from "@/api/client";
+import { useAuth } from "@/hooks/use-auth";
+import { format, isValid, parseISO } from "date-fns";
 
 // Safe date formatting helper to prevent "Invalid time value" errors
-const safeFormatDate = (dateString: string | null | undefined, formatString: string, fallback: string = 'N/A'): string => {
+const safeFormatDate = (
+  dateString: string | null | undefined,
+  formatString: string,
+  fallback: string = "N/A",
+): string => {
   if (!dateString) return fallback;
   try {
-    const date = typeof dateString === 'string' ? parseISO(dateString) : new Date(dateString);
+    const date =
+      typeof dateString === "string"
+        ? parseISO(dateString)
+        : new Date(dateString);
     if (!isValid(date)) return fallback;
     return format(date, formatString);
   } catch {
@@ -47,22 +55,7 @@ const safeFormatDate = (dateString: string | null | undefined, formatString: str
   }
 };
 
-interface UserProfile {
-  id: number;
-  username: string;
-  email: string;
-  firstName: string | null;
-  lastName: string | null;
-  phoneNumber?: string;
-  profilePictureUrl?: string;
-  permissions?: string[];
-  cvCount?: number;
-  apiUsageCount?: number;
-  extraTokens?: number;
-  createdAt?: string;
-  emailVerified?: boolean;
-}
-
+import { useUserProfile } from "@/hooks/useUserProfile";
 interface Subscription {
   id: number;
   planName: string;
@@ -84,46 +77,35 @@ interface Invoice {
   planName: string;
   finalAmount: number;
   currency: string;
-  status: 'PENDING' | 'PAID' | 'EXPIRED' | 'CANCELLED';
+  status: "PENDING" | "PAID" | "EXPIRED" | "CANCELLED";
   billingType: string;
   createdAt: string;
   paidAt: string | null;
 }
 
 export default function ProfilePage() {
-  const t = useTranslations('common');
+  const t = useTranslations("common");
   const { groupName } = useAuth();
-  
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+
+  const {
+    data: profile,
+    isLoading: isProfileLoading,
+    error: profileError,
+  } = useUserProfile();
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  
-  const [isProfileLoading, setIsProfileLoading] = useState(true);
+
   const [isSubLoading, setIsSubLoading] = useState(true);
   const [isInvoicesLoading, setIsInvoicesLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Fetch user profile
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await apiClient.get<UserProfile>('/v1/users/me');
-        setProfile(response.data);
-      } catch (err) {
-        console.error('Failed to fetch profile:', err);
-        setError('Failed to load profile data');
-      } finally {
-        setIsProfileLoading(false);
-      }
-    };
-    fetchProfile();
-  }, []);
+  const error = profileError ? "Failed to load profile data" : null;
 
   // Fetch subscription
   useEffect(() => {
     const fetchSubscription = async () => {
       try {
-        const response = await apiClient.get<Subscription>('/v1/subscriptions/my-subscription');
+        const response = await apiClient.get<Subscription>(
+          "/v1/subscriptions/my-subscription",
+        );
         setSubscription(response.data);
       } catch {
         // User might not have a subscription
@@ -138,7 +120,7 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const response = await apiClient.get<Invoice[]>('/v1/billing/invoices');
+        const response = await apiClient.get<Invoice[]>("/v1/billing/invoices");
         setInvoices(response.data);
       } catch {
         // User might not have invoices
@@ -161,36 +143,47 @@ export default function ProfilePage() {
     return (
       <div className="p-4">
         <div className="bg-red-50 dark:bg-red-950/20 text-red-500 p-4 rounded-md">
-          {error || 'Profile not found'}
+          {error || "Profile not found"}
         </div>
       </div>
     );
   }
 
-  const fullName = `${profile.firstName || ''} ${profile.lastName || ''}`.trim() || profile.username;
+  const fullName =
+    `${profile.firstName || ""} ${profile.lastName || ""}`.trim() ||
+    profile.username;
   const initials = fullName
-    .split(' ')
+    .split(" ")
     .map((n) => n[0])
-    .join('')
+    .join("")
     .toUpperCase()
     .slice(0, 2);
 
-  const cvUsagePercent = subscription?.cvLimit 
+  const cvUsagePercent = subscription?.cvLimit
     ? Math.min((subscription.currentCvCount / subscription.cvLimit) * 100, 100)
     : 0;
-  
-  const tokenUsagePercent = subscription?.tokenLimit 
-    ? Math.min((subscription.currentTokenUsage / subscription.tokenLimit) * 100, 100)
+
+  const tokenUsagePercent = subscription?.tokenLimit
+    ? Math.min(
+        (subscription.currentTokenUsage / subscription.tokenLimit) * 100,
+        100,
+      )
     : 0;
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'ACTIVE': return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-      case 'PAID': return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-      case 'PENDING': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
-      case 'EXPIRED': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
-      case 'CANCELLED': return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400';
+      case "ACTIVE":
+        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
+      case "PAID":
+        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
+      case "PENDING":
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400";
+      case "EXPIRED":
+        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
+      case "CANCELLED":
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400";
+      default:
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400";
     }
   };
 
@@ -206,30 +199,34 @@ export default function ProfilePage() {
                 {initials}
               </AvatarFallback>
             </Avatar>
-            
+
             <div className="flex-1 text-center md:text-left space-y-3">
               <div>
                 <h1 className="text-2xl font-bold">{fullName}</h1>
                 <p className="text-muted-foreground">@{profile.username}</p>
               </div>
-              
+
               <div className="flex flex-wrap justify-center md:justify-start gap-2">
                 <Badge variant="secondary" className="px-3 py-1">
                   <Shield className="w-3 h-3 mr-1" />
-                  {groupName || 'User'}
+                  {groupName || "User"}
                 </Badge>
                 {profile.emailVerified && (
-                  <Badge variant="outline" className="px-3 py-1 border-green-500 text-green-600">
+                  <Badge
+                    variant="outline"
+                    className="px-3 py-1 border-green-500 text-green-600"
+                  >
                     <CheckCircle2 className="w-3 h-3 mr-1" />
                     Verified
                   </Badge>
                 )}
-                {subscription?.planName && subscription.planName.toLowerCase() !== 'free' && (
-                  <Badge className="px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0">
-                    <Crown className="w-3 h-3 mr-1" />
-                    {subscription.planName}
-                  </Badge>
-                )}
+                {subscription?.planName &&
+                  subscription.planName.toLowerCase() !== "free" && (
+                    <Badge className="px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0">
+                      <Crown className="w-3 h-3 mr-1" />
+                      {subscription.planName}
+                    </Badge>
+                  )}
               </div>
             </div>
 
@@ -239,9 +236,12 @@ export default function ProfilePage() {
                   Edit Profile
                 </Button>
               </Link>
-              {subscription?.planName?.toLowerCase() === 'free' && (
+              {subscription?.planName?.toLowerCase() === "free" && (
                 <Link href="/plans">
-                  <Button size="sm" className="bg-gradient-to-r from-primary to-purple-600">
+                  <Button
+                    size="sm"
+                    className="bg-gradient-to-r from-primary to-purple-600"
+                  >
                     Upgrade Plan
                   </Button>
                 </Link>
@@ -292,7 +292,9 @@ export default function ProfilePage() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Phone</p>
-                    <p className="font-medium">{profile.phoneNumber || 'Not set'}</p>
+                    <p className="font-medium">
+                      {profile.phoneNumber || "Not set"}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -300,9 +302,11 @@ export default function ProfilePage() {
                     <Calendar className="w-4 h-4 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Member Since</p>
+                    <p className="text-sm text-muted-foreground">
+                      Member Since
+                    </p>
                     <p className="font-medium">
-                      {safeFormatDate(profile.createdAt, 'MMMM yyyy')}
+                      {safeFormatDate(profile.createdAt, "MMMM yyyy")}
                     </p>
                   </div>
                 </div>
@@ -322,7 +326,8 @@ export default function ProfilePage() {
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">CVs Created</span>
                     <span className="font-medium">
-                      {subscription?.currentCvCount || 0} / {subscription?.cvLimit ?? '∞'}
+                      {subscription?.currentCvCount || 0} /{" "}
+                      {subscription?.cvLimit ?? "∞"}
                     </span>
                   </div>
                   {subscription?.cvLimit && (
@@ -333,7 +338,8 @@ export default function ProfilePage() {
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Tokens Used</span>
                     <span className="font-medium">
-                      {subscription?.currentTokenUsage || 0} / {subscription?.tokenLimit ?? '∞'}
+                      {subscription?.currentTokenUsage || 0} /{" "}
+                      {subscription?.tokenLimit ?? "∞"}
                     </span>
                   </div>
                   {subscription?.tokenLimit && (
@@ -362,9 +368,15 @@ export default function ProfilePage() {
               <CardTitle>Your Subscription</CardTitle>
               <CardDescription>
                 {subscription ? (
-                  <>You are on the <span className="font-semibold text-primary">{subscription.planName}</span> plan.</>
+                  <>
+                    You are on the{" "}
+                    <span className="font-semibold text-primary">
+                      {subscription.planName}
+                    </span>{" "}
+                    plan.
+                  </>
                 ) : (
-                  'View and manage your subscription.'
+                  "View and manage your subscription."
                 )}
               </CardDescription>
             </CardHeader>
@@ -378,30 +390,53 @@ export default function ProfilePage() {
                   <div className="bg-gradient-to-r from-primary/5 to-purple-500/5 p-6 rounded-xl border">
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <h3 className="text-xl font-bold">{subscription.planName}</h3>
-                        <p className="text-muted-foreground">{subscription.planDescription}</p>
+                        <h3 className="text-xl font-bold">
+                          {subscription.planName}
+                        </h3>
+                        <p className="text-muted-foreground">
+                          {subscription.planDescription}
+                        </p>
                       </div>
                       <Badge className={getStatusColor(subscription.status)}>
                         {subscription.status}
                       </Badge>
                     </div>
-                    
+
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">CV Limit</p>
-                        <p className="font-semibold">{subscription.cvLimit ?? 'Unlimited'}</p>
+                        <p className="text-sm text-muted-foreground">
+                          CV Limit
+                        </p>
+                        <p className="font-semibold">
+                          {subscription.cvLimit ?? "Unlimited"}
+                        </p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">Token Limit</p>
-                        <p className="font-semibold">{subscription.tokenLimit ?? 'Unlimited'}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Token Limit
+                        </p>
+                        <p className="font-semibold">
+                          {subscription.tokenLimit ?? "Unlimited"}
+                        </p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">Started</p>
-                        <p className="font-semibold">{safeFormatDate(subscription.startDate, 'MMM dd, yyyy')}</p>
+                        <p className="font-semibold">
+                          {safeFormatDate(
+                            subscription.startDate,
+                            "MMM dd, yyyy",
+                          )}
+                        </p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">{subscription.autoRenew !== false ? 'Renews' : 'Expires'}</p>
-                        <p className="font-semibold">{safeFormatDate(subscription.endDate, 'MMM dd, yyyy')}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {subscription.autoRenew !== false
+                            ? "Renews"
+                            : "Expires"}
+                        </p>
+                        <p className="font-semibold">
+                          {safeFormatDate(subscription.endDate, "MMM dd, yyyy")}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -421,7 +456,9 @@ export default function ProfilePage() {
               ) : (
                 <div className="text-center py-8">
                   <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground mb-4">You don't have an active subscription.</p>
+                  <p className="text-muted-foreground mb-4">
+                    You don't have an active subscription.
+                  </p>
                   <Link href="/plans">
                     <Button className="bg-gradient-to-r from-primary to-purple-600">
                       View Plans
@@ -460,26 +497,36 @@ export default function ProfilePage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <p className="font-medium">{invoice.planName}</p>
-                          <Badge className={getStatusColor(invoice.status)} variant="secondary">
+                          <Badge
+                            className={getStatusColor(invoice.status)}
+                            variant="secondary"
+                          >
                             {invoice.status}
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          {invoice.billingType} • {safeFormatDate(invoice.createdAt, 'MMM dd, yyyy')}
+                          {invoice.billingType} •{" "}
+                          {safeFormatDate(invoice.createdAt, "MMM dd, yyyy")}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold">{invoice.finalAmount.toFixed(2)} {invoice.currency}</p>
-                        {invoice.status === 'PENDING' && (
+                        <p className="font-semibold">
+                          {invoice.finalAmount.toFixed(2)} {invoice.currency}
+                        </p>
+                        {invoice.status === "PENDING" && (
                           <Link href={`/checkout?invoice=${invoice.uuid}`}>
-                            <Button variant="link" size="sm" className="h-auto p-0 text-primary">
+                            <Button
+                              variant="link"
+                              size="sm"
+                              className="h-auto p-0 text-primary"
+                            >
                               Pay Now <ExternalLink className="h-3 w-3 ml-1" />
                             </Button>
                           </Link>
                         )}
-                        {invoice.status === 'PAID' && invoice.paidAt && (
+                        {invoice.status === "PAID" && invoice.paidAt && (
                           <p className="text-xs text-muted-foreground">
-                            Paid {safeFormatDate(invoice.paidAt, 'MMM dd')}
+                            Paid {safeFormatDate(invoice.paidAt, "MMM dd")}
                           </p>
                         )}
                       </div>
