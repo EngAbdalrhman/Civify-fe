@@ -42,6 +42,8 @@ export default function UserDashboardLayout({
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [planName, setPlanName] = useState<string | null>(null);
+  const [isPlanLoading, setIsPlanLoading] = useState(true);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
 
   // Sidebar collapse state - default collapsed for resume builder
   const isResumeBuilderPage = pathname.includes("/resume-builder");
@@ -62,7 +64,10 @@ export default function UserDashboardLayout({
   useEffect(() => {
     const fetchSubscription = async () => {
       const token = getAccessToken();
-      if (!token) return;
+      if (!token) {
+        setIsPlanLoading(false);
+        return;
+      }
 
       try {
         const response = await apiClient.get<{ planName?: string }>(
@@ -71,6 +76,8 @@ export default function UserDashboardLayout({
         setPlanName(response.data?.planName || null);
       } catch {
         // User might not have a subscription
+      } finally {
+        setIsPlanLoading(false);
       }
     };
     fetchSubscription();
@@ -81,6 +88,7 @@ export default function UserDashboardLayout({
     setMounted(true);
     const token = getAccessToken();
     setIsAuthenticated(!!token);
+    setIsAuthChecking(false);
   }, [pathname]);
 
   // Ensure permissions are fetched if navigating from auth
@@ -176,10 +184,16 @@ export default function UserDashboardLayout({
               {!shouldShowCollapsed && (
                 <div className="grid flex-1 ltr:text-left rtl:text-right text-sm leading-tight">
                   <span className="truncate font-semibold">Civify</span>
-                  <span className="truncate text-xs text-muted-foreground">
-                    {groupName ||
+                  <span className="truncate text-xs text-muted-foreground mt-1">
+                    {!mounted ||
+                    isAuthChecking ||
+                    (isAuthenticated && (isLoading || isPlanLoading)) ? (
+                      <span className="animate-pulse bg-muted rounded h-3 w-16 inline-block" />
+                    ) : (
+                      groupName ||
                       planName ||
-                      (isAuthenticated ? t("freePlan") : t("guest"))}
+                      (isAuthenticated ? t("freePlan") : t("guest"))
+                    )}
                   </span>
                 </div>
               )}
