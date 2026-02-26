@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
@@ -152,16 +152,8 @@ export default function UsersPage() {
   );
   const { data: groups = [] } = useGroups({ enabled: canModifyGroup });
 
-  const {
-    users,
-    isLoading,
-    pagination,
-    currentSort,
-    filterUsers,
-    setSortState,
-    refresh,
-    fetchUsers,
-  } = useAdminUsers({ pageSize: 10 });
+  const { users, isLoading, pagination, filterUsers, refresh, fetchUsers } =
+    useAdminUsers({ pageSize: 10 });
 
   const [metrics, setMetrics] = useState({
     totalUsers: 0,
@@ -390,13 +382,13 @@ export default function UsersPage() {
               />
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">
+            <div className="flex items-center gap-1.5 min-w-[120px]">
               <span className="text-sm text-muted-foreground whitespace-nowrap">
                 {t("statusFilter")}:
               </span>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="h-9 w-[100px] border-muted bg-transparent">
+                <SelectTrigger className="h-9 w-full sm:w-[100px] border-muted bg-transparent">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -406,12 +398,12 @@ export default function UsersPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 min-w-[120px] flex-1 sm:flex-none">
               <span className="text-sm text-muted-foreground whitespace-nowrap">
                 {t("planFilter")}:
               </span>
               <Select value={planFilter} onValueChange={setPlanFilter}>
-                <SelectTrigger className="h-9 w-[100px] border-muted bg-transparent">
+                <SelectTrigger className="h-9 w-full sm:w-[100px] border-muted bg-transparent">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -424,12 +416,12 @@ export default function UsersPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 min-w-[120px] flex-1 sm:flex-none">
               <span className="text-sm text-muted-foreground whitespace-nowrap">
                 {t("sourceFilter")}:
               </span>
               <Select value={sourceFilter} onValueChange={setSourceFilter}>
-                <SelectTrigger className="h-9 w-[110px] border-muted bg-transparent">
+                <SelectTrigger className="h-9 w-full sm:w-[110px] border-muted bg-transparent">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
