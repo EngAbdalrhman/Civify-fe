@@ -10,8 +10,8 @@ import {
 import { useTranslations } from "next-intl";
 
 export function FAQSection() {
-  const t = useTranslations('landing.faq');
-  const faqKeys = ['q1', 'q2', 'q3', 'q4', 'q5'];
+  const t = useTranslations("landing.faq");
+  const faqKeys = ["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8"];
 
   return (
     <section className="bg-gradient-to-b from-background to-blue-50/30 py-20 dark:to-gray-900 md:py-32">
@@ -19,11 +19,9 @@ export function FAQSection() {
         {/* Section Header */}
         <div className="mx-auto mb-16 max-w-3xl text-center">
           <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-            {t('title')}
+            {t("title")}
           </h2>
-          <p className="text-lg text-muted-foreground">
-            {t('subtitle')}
-          </p>
+          <p className="text-lg text-muted-foreground">{t("subtitle")}</p>
         </div>
 
         {/* FAQ Accordion */}
@@ -45,9 +43,12 @@ export function FAQSection() {
         {/* Contact CTA */}
         <div className="mt-12 text-center">
           <p className="text-muted-foreground">
-            {t('stillQuestions')}{" "}
-            <a href="/contact" className="font-semibold text-primary hover:underline">
-              {t('contactSupportTeam')}
+            {t("stillQuestions")}{" "}
+            <a
+              href="/contact"
+              className="font-semibold text-primary hover:underline"
+            >
+              {t("contactSupportTeam")}
             </a>
           </p>
         </div>
