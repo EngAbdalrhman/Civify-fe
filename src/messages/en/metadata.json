@@ -61,5 +61,21 @@
     "ogDescription": "Choose the right plan for your career goals. Explore Civify's free and premium options.",
     "twitterTitle": "Pricing Plans - Civify",
     "twitterDescription": "Choose the right plan for your career goals. Explore Civify's free and premium options."
+  },
+  "tokens": {
+    "title": "Buy Tokens - Civify",
+    "description": "Purchase additional tokens to continue using our AI-powered CV features.",
+    "ogTitle": "Buy Tokens - Civify",
+    "ogDescription": "Purchase additional tokens to continue using our AI-powered CV features.",
+    "twitterTitle": "Buy Tokens - Civify",
+    "twitterDescription": "Purchase additional tokens to continue using our AI-powered CV features."
+  },
+  "cancellation": {
+    "title": "Cancellation Policy - Civify",
+    "description": "Read our cancellation and refund policy.",
+    "ogTitle": "Cancellation Policy - Civify",
+    "ogDescription": "Read our cancellation and refund policy.",
+    "twitterTitle": "Cancellation Policy - Civify",
+    "twitterDescription": "Read our cancellation and refund policy."
   }
 }
