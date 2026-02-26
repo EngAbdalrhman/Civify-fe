@@ -61,7 +61,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGroups } from "@/features/admin-dashboard/groups";
-import { usePermissions } from "@/contexts/PermissionContext";
+import { usePermissions } from "@/hooks/use-permissions";
 import { ADMIN_ACTION_PERMISSIONS } from "@/config/adminMenuConfig";
 import { cn } from "@/lib/utils";
 import {

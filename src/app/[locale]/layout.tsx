@@ -10,7 +10,6 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { QueryProvider } from "@/providers/query-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
-import { PermissionProvider } from "@/contexts/PermissionContext";
 
 import LayoutWrapper from "@/components/LayoutWrapper";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
@@ -221,11 +220,9 @@ export default async function LocaleLayout({
         <ServiceWorkerRegister />
         <ThemeProvider>
           <QueryProvider>
-            <PermissionProvider>
-              <NextIntlClientProvider messages={messages}>
-                <LayoutWrapper>{children}</LayoutWrapper>
-              </NextIntlClientProvider>
-            </PermissionProvider>
+            <NextIntlClientProvider messages={messages}>
+              <LayoutWrapper>{children}</LayoutWrapper>
+            </NextIntlClientProvider>
           </QueryProvider>
         </ThemeProvider>
         <AnalyticsProvider />

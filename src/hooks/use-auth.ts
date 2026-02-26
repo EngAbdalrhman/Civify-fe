@@ -1,14 +1,15 @@
 "use client";
 
-import { usePermissions } from '@/contexts/PermissionContext';
-import { ADMIN_ACTION_PERMISSIONS } from '@/config/adminMenuConfig';
+import { usePermissions } from "@/hooks/use-permissions";
+import { ADMIN_ACTION_PERMISSIONS } from "@/config/adminMenuConfig";
 
 /**
  * Auth hook that integrates with the permission system
  * Provides user info and admin access checks
  */
 export function useAuth() {
-  const { permissions, groupName, isLoading, hasPermission, fetchPermissions } = usePermissions();
+  const { permissions, groupName, isLoading, hasPermission, refetch } =
+    usePermissions();
 
   // Check if user has admin dashboard access
   const isAdmin = hasPermission(ADMIN_ACTION_PERMISSIONS.ADMIN_DASHBOARD_VIEW);
@@ -19,7 +20,7 @@ export function useAuth() {
     name: groupName || "User",
     email: "",
     role: isAdmin ? "admin" : "user",
-    avatar: null
+    avatar: null,
   };
 
   return {
@@ -29,6 +30,6 @@ export function useAuth() {
     permissions,
     groupName,
     hasPermission,
-    fetchPermissions,
+    refetch,
   };
 }

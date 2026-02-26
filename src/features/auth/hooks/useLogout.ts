@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "@/i18n/routing";
 import apiClient from "@/api/client";
 import { toast } from "sonner";
-import { usePermissions } from "@/contexts/PermissionContext";
+import { usePermissions } from "@/hooks/use-permissions";
 import { getAccessToken, clearAuthTokens } from "@/utils/cookies";
 
 export const useLogout = () => {

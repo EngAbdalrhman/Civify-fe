@@ -1,63 +1,63 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Package, 
-  Zap, 
-  Briefcase, 
-  Plus, 
-  Loader2, 
-  Edit2, 
+import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Package,
+  Zap,
+  Briefcase,
+  Plus,
+  Loader2,
+  Edit2,
   Trash2,
   Power,
   PowerOff,
-  AlertCircle 
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { adminService, type AdminPlan } from '@/services/admin.service';
+  AlertCircle,
+} from "lucide-react";
+import { toast } from "sonner";
+import { adminService, type AdminPlan } from "@/services/admin.service";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { usePermissions } from '@/contexts/PermissionContext';
-import { ADMIN_ACTION_PERMISSIONS } from '@/config/adminMenuConfig';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { usePermissions } from "@/hooks/use-permissions";
+import { ADMIN_ACTION_PERMISSIONS } from "@/config/adminMenuConfig";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { useGroups } from '@/features/admin-dashboard/groups';
+} from "@/components/ui/select";
+import { useGroups } from "@/features/admin-dashboard/groups";
 
 function getPlanIcon(name: string) {
   const lower = name.toLowerCase();
-  if (lower.includes('enterprise') || lower.includes('business')) {
+  if (lower.includes("enterprise") || lower.includes("business")) {
     return <Briefcase className="h-5 w-5 text-primary" />;
   }
-  if (lower.includes('pro') || lower.includes('premium')) {
+  if (lower.includes("pro") || lower.includes("premium")) {
     return <Zap className="h-5 w-5 text-primary" />;
   }
   return <Package className="h-5 w-5 text-primary" />;
 }
 
 export function PlansManager() {
-  const t = useTranslations('admin.billing');
-  const tc = useTranslations('admin.common');
+  const t = useTranslations("admin.billing");
+  const tc = useTranslations("admin.common");
   const { hasPermission } = usePermissions();
-  
+
   const canModifyPlans = hasPermission(ADMIN_ACTION_PERMISSIONS.PLAN_EDIT);
-  
+
   // Plans state
   const [plans, setPlans] = useState<AdminPlan[]>([]);
   const [isLoadingPlans, setIsLoadingPlans] = useState(false);
@@ -71,20 +71,20 @@ export function PlansManager() {
 
   // Plan form state
   const [planFormData, setPlanFormData] = useState({
-    name: '',
-    description: '',
-    monthlyPrice: '',
-    annualPrice: '',
-    currency: 'EGP',
-    cvLimit: '',
-    tokenLimit: '',
+    name: "",
+    description: "",
+    monthlyPrice: "",
+    annualPrice: "",
+    currency: "EGP",
+    cvLimit: "",
+    tokenLimit: "",
     watermark: true,
-    linkedGroupId: '',
+    linkedGroupId: "",
     allowAnnualBilling: true,
     renewalAllowed: true,
-    maxBillingCycles: '',
+    maxBillingCycles: "",
     isFeatured: false,
-    sortOrder: '0',
+    sortOrder: "0",
     hasApiAccess: false,
   });
 
@@ -96,7 +96,8 @@ export function PlansManager() {
       const data = await adminService.getAllPlans();
       setPlans(data);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to fetch plans';
+      const message =
+        err instanceof Error ? err.message : "Failed to fetch plans";
       setPlansError(message);
     } finally {
       setIsLoadingPlans(false);
@@ -112,20 +113,20 @@ export function PlansManager() {
   const handleCreatePlan = () => {
     setEditingPlan(null);
     setPlanFormData({
-      name: '',
-      description: '',
-      monthlyPrice: '',
-      annualPrice: '',
-      currency: 'EGP',
-      cvLimit: '',
-      tokenLimit: '',
+      name: "",
+      description: "",
+      monthlyPrice: "",
+      annualPrice: "",
+      currency: "EGP",
+      cvLimit: "",
+      tokenLimit: "",
       watermark: true,
-      linkedGroupId: '',
+      linkedGroupId: "",
       allowAnnualBilling: true,
       renewalAllowed: true,
-      maxBillingCycles: '',
+      maxBillingCycles: "",
       isFeatured: false,
-      sortOrder: '0',
+      sortOrder: "0",
       hasApiAccess: false,
     });
     setIsPlanDialogOpen(true);
@@ -135,19 +136,19 @@ export function PlansManager() {
     setEditingPlan(plan);
     setPlanFormData({
       name: plan.name,
-      description: plan.description || '',
+      description: plan.description || "",
       monthlyPrice: plan.monthlyPrice,
       annualPrice: plan.annualPrice,
-      currency: plan.currency || 'EGP',
-      cvLimit: plan.cvLimit?.toString() || '',
-      tokenLimit: plan.tokenLimit?.toString() || '',
+      currency: plan.currency || "EGP",
+      cvLimit: plan.cvLimit?.toString() || "",
+      tokenLimit: plan.tokenLimit?.toString() || "",
       watermark: plan.watermark ?? true,
-      linkedGroupId: plan.linkedGroupId?.toString() || '',
+      linkedGroupId: plan.linkedGroupId?.toString() || "",
       allowAnnualBilling: plan.allowAnnualBilling ?? true,
       renewalAllowed: plan.renewalAllowed ?? true,
-      maxBillingCycles: plan.maxBillingCycles?.toString() || '',
+      maxBillingCycles: plan.maxBillingCycles?.toString() || "",
       isFeatured: plan.isFeatured ?? false,
-      sortOrder: plan.sortOrder?.toString() || '0',
+      sortOrder: plan.sortOrder?.toString() || "0",
       hasApiAccess: plan.hasApiAccess ?? false,
     });
     setIsPlanDialogOpen(true);
@@ -162,29 +163,38 @@ export function PlansManager() {
         monthlyPrice: parseFloat(planFormData.monthlyPrice),
         annualPrice: parseFloat(planFormData.annualPrice),
         currency: planFormData.currency,
-        cvLimit: planFormData.cvLimit ? parseInt(planFormData.cvLimit) : undefined,
-        tokenLimit: planFormData.tokenLimit ? parseInt(planFormData.tokenLimit) : undefined,
+        cvLimit: planFormData.cvLimit
+          ? parseInt(planFormData.cvLimit)
+          : undefined,
+        tokenLimit: planFormData.tokenLimit
+          ? parseInt(planFormData.tokenLimit)
+          : undefined,
         watermark: planFormData.watermark,
-        linkedGroupId: planFormData.linkedGroupId ? parseInt(planFormData.linkedGroupId) : undefined,
+        linkedGroupId: planFormData.linkedGroupId
+          ? parseInt(planFormData.linkedGroupId)
+          : undefined,
         allowAnnualBilling: planFormData.allowAnnualBilling,
         renewalAllowed: planFormData.renewalAllowed,
-        maxBillingCycles: planFormData.maxBillingCycles ? parseInt(planFormData.maxBillingCycles) : undefined,
+        maxBillingCycles: planFormData.maxBillingCycles
+          ? parseInt(planFormData.maxBillingCycles)
+          : undefined,
         isFeatured: planFormData.isFeatured,
         sortOrder: parseInt(planFormData.sortOrder) || 0,
         hasApiAccess: planFormData.hasApiAccess,
       };
-      
+
       if (editingPlan) {
         await adminService.updatePlan(editingPlan.id, planPayload);
-        toast.success('Plan updated successfully');
+        toast.success("Plan updated successfully");
       } else {
         await adminService.createPlan(planPayload);
-        toast.success('Plan created successfully');
+        toast.success("Plan created successfully");
       }
       setIsPlanDialogOpen(false);
       fetchPlans();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to save plan';
+      const message =
+        err instanceof Error ? err.message : "Failed to save plan";
       toast.error(message);
     } finally {
       setIsSavingPlan(false);
@@ -195,27 +205,29 @@ export function PlansManager() {
     try {
       if (plan.active) {
         await adminService.deactivatePlan(plan.id);
-        toast.success('Plan deactivated');
+        toast.success("Plan deactivated");
       } else {
         await adminService.activatePlan(plan.id);
-        toast.success('Plan activated');
+        toast.success("Plan activated");
       }
       fetchPlans();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to toggle plan status';
+      const message =
+        err instanceof Error ? err.message : "Failed to toggle plan status";
       toast.error(message);
     }
   };
 
   const handleDeletePlan = async (plan: AdminPlan) => {
     if (!confirm(`Are you sure you want to delete "${plan.name}"?`)) return;
-    
+
     try {
       await adminService.deletePlan(plan.id);
-      toast.success('Plan deleted');
+      toast.success("Plan deleted");
       fetchPlans();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to delete plan';
+      const message =
+        err instanceof Error ? err.message : "Failed to delete plan";
       toast.error(message);
     }
   };
@@ -223,13 +235,11 @@ export function PlansManager() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <p className="text-sm text-muted-foreground">
-          {t('plansDesc')}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("plansDesc")}</p>
         {canModifyPlans && (
           <Button onClick={handleCreatePlan}>
             <Plus className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
-            {t('createPlan')}
+            {t("createPlan")}
           </Button>
         )}
       </div>
@@ -247,10 +257,10 @@ export function PlansManager() {
       ) : (
         <div className="grid gap-6 md:grid-cols-3">
           {plans.map((plan) => (
-            <div 
+            <div
               key={plan.id}
               className={`rounded-lg border p-6 shadow-sm ${
-                plan.isFeatured ? 'border-primary/20 bg-primary/5' : 'bg-card'
+                plan.isFeatured ? "border-primary/20 bg-primary/5" : "bg-card"
               }`}
             >
               <div className="flex justify-between items-start mb-4">
@@ -258,53 +268,78 @@ export function PlansManager() {
                   {getPlanIcon(plan.name)}
                   <div>
                     <h3 className="font-bold text-xl">{plan.name}</h3>
-                    <p className="text-muted-foreground text-sm">{plan.description}</p>
+                    <p className="text-muted-foreground text-sm">
+                      {plan.description}
+                    </p>
                   </div>
                 </div>
                 <div className="flex gap-1">
                   {plan.isFeatured && (
-                    <Badge variant="default" className="text-xs">{t('popular')}</Badge>
+                    <Badge variant="default" className="text-xs">
+                      {t("popular")}
+                    </Badge>
                   )}
-                  <Badge variant={plan.active ? 'secondary' : 'destructive'} className="text-xs">
-                    {plan.active ? tc('active') : tc('inactive')}
+                  <Badge
+                    variant={plan.active ? "secondary" : "destructive"}
+                    className="text-xs"
+                  >
+                    {plan.active ? tc("active") : tc("inactive")}
                   </Badge>
                 </div>
               </div>
-              
+
               <div className="text-2xl font-bold mb-4">
                 ${parseFloat(plan.monthlyPrice).toFixed(0)}
-                <span className="text-sm font-normal text-muted-foreground">/mo</span>
+                <span className="text-sm font-normal text-muted-foreground">
+                  /mo
+                </span>
               </div>
 
               {/* Limits */}
               <div className="flex gap-4 mb-4 text-sm text-muted-foreground">
                 <div>
-                  <span className="font-medium text-foreground">{plan.cvLimit ?? '∞'}</span> CVs
+                  <span className="font-medium text-foreground">
+                    {plan.cvLimit ?? "∞"}
+                  </span>{" "}
+                  CVs
                 </div>
                 <div>
-                  <span className="font-medium text-foreground">{plan.tokenLimit ?? '∞'}</span> Tokens
+                  <span className="font-medium text-foreground">
+                    {plan.tokenLimit ?? "∞"}
+                  </span>{" "}
+                  Tokens
                 </div>
               </div>
 
               {canModifyPlans && (
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => handleEditPlan(plan)}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEditPlan(plan)}
+                  >
                     <Edit2 className="h-3 w-3 ltr:mr-1 rtl:ml-1" />
-                    {tc('edit')}
+                    {tc("edit")}
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleTogglePlanActive(plan)}
                   >
                     {plan.active ? (
-                      <><PowerOff className="h-3 w-3 ltr:mr-1 rtl:ml-1" />{tc('deactivate')}</>
+                      <>
+                        <PowerOff className="h-3 w-3 ltr:mr-1 rtl:ml-1" />
+                        {tc("deactivate")}
+                      </>
                     ) : (
-                      <><Power className="h-3 w-3 ltr:mr-1 rtl:ml-1" />{tc('activate')}</>
+                      <>
+                        <Power className="h-3 w-3 ltr:mr-1 rtl:ml-1" />
+                        {tc("activate")}
+                      </>
                     )}
                   </Button>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="sm"
                     className="text-destructive hover:text-destructive"
                     onClick={() => handleDeletePlan(plan)}
@@ -323,55 +358,76 @@ export function PlansManager() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingPlan ? t('editPlan') : t('createPlan')}
+              {editingPlan ? t("editPlan") : t("createPlan")}
             </DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto">
             <div className="space-y-2">
-              <Label htmlFor="planName">{t('form.name')} *</Label>
+              <Label htmlFor="planName">{t("form.name")} *</Label>
               <Input
                 id="planName"
                 value={planFormData.name}
-                onChange={(e) => setPlanFormData({ ...planFormData, name: e.target.value })}
-                placeholder={t('form.namePlaceholder')}
+                onChange={(e) =>
+                  setPlanFormData({ ...planFormData, name: e.target.value })
+                }
+                placeholder={t("form.namePlaceholder")}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="planDescription">{t('form.description')}</Label>
+              <Label htmlFor="planDescription">{t("form.description")}</Label>
               <Textarea
                 id="planDescription"
                 value={planFormData.description}
-                onChange={(e) => setPlanFormData({ ...planFormData, description: e.target.value })}
-                placeholder={t('form.descriptionPlaceholder')}
+                onChange={(e) =>
+                  setPlanFormData({
+                    ...planFormData,
+                    description: e.target.value,
+                  })
+                }
+                placeholder={t("form.descriptionPlaceholder")}
               />
             </div>
-            
+
             {/* Pricing */}
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="monthlyPrice">{t('form.monthlyPrice')} *</Label>
+                <Label htmlFor="monthlyPrice">{t("form.monthlyPrice")} *</Label>
                 <Input
                   id="monthlyPrice"
                   type="number"
                   value={planFormData.monthlyPrice}
-                  onChange={(e) => setPlanFormData({ ...planFormData, monthlyPrice: e.target.value })}
+                  onChange={(e) =>
+                    setPlanFormData({
+                      ...planFormData,
+                      monthlyPrice: e.target.value,
+                    })
+                  }
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="annualPrice">{t('form.annualPrice')} *</Label>
+                <Label htmlFor="annualPrice">{t("form.annualPrice")} *</Label>
                 <Input
                   id="annualPrice"
                   type="number"
                   value={planFormData.annualPrice}
-                  onChange={(e) => setPlanFormData({ ...planFormData, annualPrice: e.target.value })}
+                  onChange={(e) =>
+                    setPlanFormData({
+                      ...planFormData,
+                      annualPrice: e.target.value,
+                    })
+                  }
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="currency">{t('form.currency') || 'Currency'} *</Label>
+                <Label htmlFor="currency">
+                  {t("form.currency") || "Currency"} *
+                </Label>
                 <Select
                   value={planFormData.currency}
-                  onValueChange={(val) => setPlanFormData({ ...planFormData, currency: val })}
+                  onValueChange={(val) =>
+                    setPlanFormData({ ...planFormData, currency: val })
+                  }
                 >
                   <SelectTrigger id="currency">
                     <SelectValue placeholder="Currency" />
@@ -387,43 +443,58 @@ export function PlansManager() {
                 </Select>
               </div>
             </div>
-            
+
             {/* Limits */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="cvLimit">{t('form.cvLimit')}</Label>
+                <Label htmlFor="cvLimit">{t("form.cvLimit")}</Label>
                 <Input
                   id="cvLimit"
                   type="number"
                   value={planFormData.cvLimit}
-                  onChange={(e) => setPlanFormData({ ...planFormData, cvLimit: e.target.value })}
-                  placeholder={t('form.cvLimitPlaceholder')}
+                  onChange={(e) =>
+                    setPlanFormData({
+                      ...planFormData,
+                      cvLimit: e.target.value,
+                    })
+                  }
+                  placeholder={t("form.cvLimitPlaceholder")}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="tokenLimit">{t('form.tokenLimit')}</Label>
+                <Label htmlFor="tokenLimit">{t("form.tokenLimit")}</Label>
                 <Input
                   id="tokenLimit"
                   type="number"
                   value={planFormData.tokenLimit}
-                  onChange={(e) => setPlanFormData({ ...planFormData, tokenLimit: e.target.value })}
-                  placeholder={t('form.tokenLimitPlaceholder')}
+                  onChange={(e) =>
+                    setPlanFormData({
+                      ...planFormData,
+                      tokenLimit: e.target.value,
+                    })
+                  }
+                  placeholder={t("form.tokenLimitPlaceholder")}
                 />
               </div>
             </div>
-            
+
             {/* Linked Group */}
             <div className="space-y-2">
-              <Label htmlFor="linkedGroupId">{t('form.linkedGroup')}</Label>
-              <Select 
-                value={planFormData.linkedGroupId || 'none'} 
-                onValueChange={(value) => setPlanFormData({ ...planFormData, linkedGroupId: value === 'none' ? '' : value })}
+              <Label htmlFor="linkedGroupId">{t("form.linkedGroup")}</Label>
+              <Select
+                value={planFormData.linkedGroupId || "none"}
+                onValueChange={(value) =>
+                  setPlanFormData({
+                    ...planFormData,
+                    linkedGroupId: value === "none" ? "" : value,
+                  })
+                }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder={t('form.linkedGroupPlaceholder')} />
+                  <SelectValue placeholder={t("form.linkedGroupPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">{t('form.none')}</SelectItem>
+                  <SelectItem value="none">{t("form.none")}</SelectItem>
                   {groups.map((group) => (
                     <SelectItem key={group.id} value={group.id.toString()}>
                       {group.name}
@@ -432,80 +503,127 @@ export function PlansManager() {
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                {t('form.linkedGroupHint')}
+                {t("form.linkedGroupHint")}
               </p>
             </div>
-            
+
             {/* Billing Restrictions */}
             <div className="space-y-3 p-3 border rounded-lg bg-muted/30">
-              <h4 className="text-sm font-medium">{t('form.billingRestrictions')}</h4>
+              <h4 className="text-sm font-medium">
+                {t("form.billingRestrictions")}
+              </h4>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="allowAnnual"
                     checked={planFormData.allowAnnualBilling}
-                    onCheckedChange={(checked) => setPlanFormData({ ...planFormData, allowAnnualBilling: checked })}
+                    onCheckedChange={(checked) =>
+                      setPlanFormData({
+                        ...planFormData,
+                        allowAnnualBilling: checked,
+                      })
+                    }
                   />
-                  <Label htmlFor="allowAnnual" className="text-sm">{t('form.allowAnnualBilling')}</Label>
+                  <Label htmlFor="allowAnnual" className="text-sm">
+                    {t("form.allowAnnualBilling")}
+                  </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="renewal"
                     checked={planFormData.renewalAllowed}
-                    onCheckedChange={(checked) => setPlanFormData({ ...planFormData, renewalAllowed: checked })}
+                    onCheckedChange={(checked) =>
+                      setPlanFormData({
+                        ...planFormData,
+                        renewalAllowed: checked,
+                      })
+                    }
                   />
-                  <Label htmlFor="renewal" className="text-sm">{t('form.allowRenewal')}</Label>
+                  <Label htmlFor="renewal" className="text-sm">
+                    {t("form.allowRenewal")}
+                  </Label>
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="maxBillingCycles" className="text-sm">{t('form.maxBillingCycles')}</Label>
+                <Label htmlFor="maxBillingCycles" className="text-sm">
+                  {t("form.maxBillingCycles")}
+                </Label>
                 <Input
                   id="maxBillingCycles"
                   type="number"
                   value={planFormData.maxBillingCycles}
-                  onChange={(e) => setPlanFormData({ ...planFormData, maxBillingCycles: e.target.value })}
-                  placeholder={t('form.maxBillingCyclesPlaceholder')}
+                  onChange={(e) =>
+                    setPlanFormData({
+                      ...planFormData,
+                      maxBillingCycles: e.target.value,
+                    })
+                  }
+                  placeholder={t("form.maxBillingCyclesPlaceholder")}
                   className="h-8"
                 />
               </div>
             </div>
-            
+
             {/* Display Settings */}
             <div className="space-y-3 p-3 border rounded-lg bg-muted/30">
-              <h4 className="text-sm font-medium">{t('form.displaySettings')}</h4>
+              <h4 className="text-sm font-medium">
+                {t("form.displaySettings")}
+              </h4>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="featured"
                     checked={planFormData.isFeatured}
-                    onCheckedChange={(checked) => setPlanFormData({ ...planFormData, isFeatured: checked })}
+                    onCheckedChange={(checked) =>
+                      setPlanFormData({ ...planFormData, isFeatured: checked })
+                    }
                   />
-                  <Label htmlFor="featured" className="text-sm">{t('form.featured')}</Label>
+                  <Label htmlFor="featured" className="text-sm">
+                    {t("form.featured")}
+                  </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="watermark"
                     checked={planFormData.watermark}
-                    onCheckedChange={(checked) => setPlanFormData({ ...planFormData, watermark: checked })}
+                    onCheckedChange={(checked) =>
+                      setPlanFormData({ ...planFormData, watermark: checked })
+                    }
                   />
-                  <Label htmlFor="watermark" className="text-sm">{t('form.showWatermark')}</Label>
+                  <Label htmlFor="watermark" className="text-sm">
+                    {t("form.showWatermark")}
+                  </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="hasApiAccess"
                     checked={planFormData.hasApiAccess}
-                    onCheckedChange={(checked) => setPlanFormData({ ...planFormData, hasApiAccess: checked })}
+                    onCheckedChange={(checked) =>
+                      setPlanFormData({
+                        ...planFormData,
+                        hasApiAccess: checked,
+                      })
+                    }
                   />
-                  <Label htmlFor="hasApiAccess" className="text-sm">{t('form.apiAccess')}</Label>
+                  <Label htmlFor="hasApiAccess" className="text-sm">
+                    {t("form.apiAccess")}
+                  </Label>
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="sortOrder" className="text-sm">{t('form.sortOrder')}</Label>
+                <Label htmlFor="sortOrder" className="text-sm">
+                  {t("form.sortOrder")}
+                </Label>
                 <Input
                   id="sortOrder"
                   type="number"
                   value={planFormData.sortOrder}
-                  onChange={(e) => setPlanFormData({ ...planFormData, sortOrder: e.target.value })}
+                  onChange={(e) =>
+                    setPlanFormData({
+                      ...planFormData,
+                      sortOrder: e.target.value,
+                    })
+                  }
                   className="h-8 w-24"
                 />
               </div>
@@ -513,12 +631,17 @@ export function PlansManager() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsPlanDialogOpen(false)}>
-              {tc('cancel')}
+            <Button
+              variant="outline"
+              onClick={() => setIsPlanDialogOpen(false)}
+            >
+              {tc("cancel")}
             </Button>
             <Button onClick={handleSavePlan} disabled={isSavingPlan}>
-              {isSavingPlan && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {editingPlan ? t('form.update') : t('createPlan')}
+              {isSavingPlan && (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              )}
+              {editingPlan ? t("form.update") : t("createPlan")}
             </Button>
           </DialogFooter>
         </DialogContent>

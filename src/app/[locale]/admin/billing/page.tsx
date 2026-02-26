@@ -1,41 +1,37 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Package, 
-  Coins,
-  CreditCard,
-  Lock,
-  Loader2
-} from 'lucide-react';
-import { usePermissions } from '@/contexts/PermissionContext';
-import { ADMIN_ACTION_PERMISSIONS } from '@/config/adminMenuConfig';
-import { PlansManager } from '@/features/admin-dashboard/plans/components/PlansManager';
-import { TokenPackagesManager } from '@/features/admin-dashboard/token-packages/components/TokenPackagesManager';
+import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Package, Coins, CreditCard, Lock, Loader2 } from "lucide-react";
+import { usePermissions } from "@/hooks/use-permissions";
+import { ADMIN_ACTION_PERMISSIONS } from "@/config/adminMenuConfig";
+import { PlansManager } from "@/features/admin-dashboard/plans/components/PlansManager";
+import { TokenPackagesManager } from "@/features/admin-dashboard/token-packages/components/TokenPackagesManager";
 
 export default function BillingPage() {
-  const t = useTranslations('admin.billing');
+  const t = useTranslations("admin.billing");
   const { hasPermission, isLoading: isLoadingPermissions } = usePermissions();
 
   // Permissions
   const canViewPlans = hasPermission(ADMIN_ACTION_PERMISSIONS.PLAN_VIEW);
-  const canViewTokens = hasPermission(ADMIN_ACTION_PERMISSIONS.TOKEN_PACKAGE_VIEW);
-  
+  const canViewTokens = hasPermission(
+    ADMIN_ACTION_PERMISSIONS.TOKEN_PACKAGE_VIEW,
+  );
+
   // Tab state
-  const [activeTab, setActiveTab] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<string>("");
 
   // Set initial active tab based on permissions
   useEffect(() => {
     if (isLoadingPermissions) return;
-    
+
     // Only set default tab if no tab is currently active
     if (!activeTab) {
       if (canViewPlans) {
-        setActiveTab('plans');
+        setActiveTab("plans");
       } else if (canViewTokens) {
-        setActiveTab('tokens');
+        setActiveTab("tokens");
       }
     }
   }, [isLoadingPermissions, canViewPlans, canViewTokens, activeTab]);
@@ -56,7 +52,9 @@ export default function BillingPage() {
         </div>
         <div>
           <h2 className="text-xl font-semibold">Access Denied</h2>
-          <p className="text-muted-foreground">You don't have permission to view billing settings.</p>
+          <p className="text-muted-foreground">
+            You don't have permission to view billing settings.
+          </p>
         </div>
       </div>
     );
@@ -67,9 +65,9 @@ export default function BillingPage() {
       <div>
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <CreditCard className="h-8 w-8" />
-          {t('title')}
+          {t("title")}
         </h1>
-        <p className="text-muted-foreground">{t('subtitle')}</p>
+        <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -77,13 +75,13 @@ export default function BillingPage() {
           {canViewPlans && (
             <TabsTrigger value="plans" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
-              {t('plans')}
+              {t("plans")}
             </TabsTrigger>
           )}
           {canViewTokens && (
             <TabsTrigger value="tokens" className="flex items-center gap-2">
               <Coins className="h-4 w-4" />
-              {t('tokenPackages')}
+              {t("tokenPackages")}
             </TabsTrigger>
           )}
         </TabsList>

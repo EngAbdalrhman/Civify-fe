@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Image from "next/image";
-import { usePermissions } from "@/contexts/PermissionContext";
+import { usePermissions } from "@/hooks/use-permissions";
 import { ThemeToggle } from "./theme-toggle";
 import { useTheme } from "next-themes";
 import { getAccessToken, clearAuthTokens } from "@/utils/cookies";

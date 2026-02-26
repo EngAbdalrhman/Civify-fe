@@ -4,9 +4,9 @@ import { OnboardingProvider } from "@/features/onboarding";
 
 import { useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/routing";
-import { LayoutDashboard, Shield, ShieldX } from "lucide-react";
+import { LayoutDashboard, ShieldX } from "lucide-react";
 import { DashboardNavbar } from "@/components/DashboardNavbar";
-import { usePermissions } from "@/contexts/PermissionContext";
+import { usePermissions } from "@/hooks/use-permissions";
 import {
   ADMIN_MENU_ITEMS,
   ADMIN_ACTION_PERMISSIONS,
@@ -24,7 +24,7 @@ export default function AdminDashboardLayout({
   const t = useTranslations("nav");
   const pathname = usePathname();
   const router = useRouter();
-  const { permissions, isLoading, hasPermission } = usePermissions();
+  const { isLoading, hasPermission } = usePermissions();
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
