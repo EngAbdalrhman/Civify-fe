@@ -10,7 +10,6 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { QueryProvider } from "@/providers/query-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
-import { PermissionProvider } from "@/contexts/PermissionContext";
 
 import LayoutWrapper from "@/components/LayoutWrapper";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
@@ -115,26 +114,95 @@ export default async function LocaleLayout({
   // side is the easiest way to get started
   const messages = await getMessages();
 
-  // JSON-LD Structured Data for Software Application
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "Civify",
-    applicationCategory: "BusinessApplication",
-    operatingSystem: "Web",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
+  const baseUrl = (
+    process.env.NEXT_PUBLIC_BASE_URL || "https://civify.cv"
+  ).replace(/\/$/, "");
+
+  // JSON-LD Structured Data — multiple types for rich AI & search engine discovery
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "Civify",
+      url: baseUrl,
+      applicationCategory: "BusinessApplication",
+      applicationSubCategory: "Resume Builder",
+      operatingSystem: "Web",
+      browserRequirements: "Requires a modern web browser",
+      softwareVersion: "1.0",
+      inLanguage: ["en", "ar"],
+      offers: [
+        {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
+          name: "Free Plan",
+          description:
+            "Basic resume building with limited AI generations per month",
+        },
+        {
+          "@type": "Offer",
+          price: "9.99",
+          priceCurrency: "USD",
+          name: "Pro Plan",
+          description:
+            "Unlimited AI tailoring, advanced ATS scoring, priority support",
+        },
+      ],
+      description:
+        "AI-powered resume builder and CV tailoring platform with ATS optimization, match scoring, and full Arabic support. Upload your CV and job description to get a tailored, ATS-friendly resume instantly.",
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: "4.8",
+        ratingCount: "1250",
+        bestRating: "5",
+      },
+      featureList: [
+        "AI Resume Generation",
+        "CV Tailoring for Job Descriptions",
+        "ATS Compatibility Scoring",
+        "Resume Match Score",
+        "Arabic Language Support with RTL",
+        "Professional PDF Export",
+        "Chrome Extension for LinkedIn",
+        "Privacy-First Design",
+        "Resume Keyword Optimization",
+        "Drag-and-Drop Resume Editor",
+      ],
+      screenshot: `${baseUrl}/og-image.png`,
+      author: {
+        "@type": "Organization",
+        name: "Civify",
+        url: baseUrl,
+      },
     },
-    description:
-      "AI-powered CV builder with ATS optimization and full Arabic support.",
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.8",
-      ratingCount: "1250",
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "Civify",
+      url: baseUrl,
+      logo: `${baseUrl}/civify-logo-simple.png`,
+      description:
+        "Civify is an AI-powered platform that helps job seekers build, tailor, and optimize resumes for specific job descriptions.",
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        url: `${baseUrl}/${locale}/contact`,
+        availableLanguage: ["English", "Arabic"],
+      },
     },
-  };
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "Civify",
+      url: baseUrl,
+      potentialAction: {
+        "@type": "SearchAction",
+        target: `${baseUrl}/${locale}/plans`,
+        description: "Find the right resume building plan",
+      },
+    },
+  ];
 
   return (
     <html
@@ -152,11 +220,9 @@ export default async function LocaleLayout({
         <ServiceWorkerRegister />
         <ThemeProvider>
           <QueryProvider>
-            <PermissionProvider>
-              <NextIntlClientProvider messages={messages}>
-                <LayoutWrapper>{children}</LayoutWrapper>
-              </NextIntlClientProvider>
-            </PermissionProvider>
+            <NextIntlClientProvider messages={messages}>
+              <LayoutWrapper>{children}</LayoutWrapper>
+            </NextIntlClientProvider>
           </QueryProvider>
         </ThemeProvider>
         <AnalyticsProvider />

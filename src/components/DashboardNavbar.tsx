@@ -10,7 +10,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -19,37 +18,22 @@ import { ThemeToggle } from "./theme-toggle";
 import { Link } from "@/i18n/routing";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { getAccessToken } from "@/utils/cookies";
-import apiClient from "@/api/client";
 
-interface UserProfile {
-  firstName: string;
-  username: string;
-  email: string;
-  profilePictureUrl?: string;
-}
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 export function DashboardNavbar() {
   const t = useTranslations();
   const locale = useLocale();
   const { logout, isLoggingOut } = useLogout();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const { data: userProfile } = useUserProfile();
 
-  // Check authentication status on mount and fetch profile
+  // Check authentication status on mount
   useEffect(() => {
     const checkAuth = async () => {
       const token = getAccessToken();
       const isAuth = !!token;
       setIsAuthenticated(isAuth);
-
-      if (isAuth && !userProfile) {
-        try {
-          const response = await apiClient.get<UserProfile>("/v1/users/me");
-          setUserProfile(response.data);
-        } catch (error) {
-          console.error("Failed to fetch user profile:", error);
-        }
-      }
     };
 
     checkAuth();
@@ -63,7 +47,7 @@ export function DashboardNavbar() {
       window.removeEventListener("focus", checkAuth);
       clearInterval(interval);
     };
-  }, [userProfile]);
+  }, []);
 
   // Date Logic
   const getFormattedDate = () => {
@@ -126,9 +110,9 @@ export function DashboardNavbar() {
                 variant="ghost"
                 className="relative h-10 w-10 rounded-full hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 data-[state=open]:bg-transparent"
               >
-                <Avatar className="h-10 w-10 border border-border transition-all duration-200 hover:scale-105 hover:border-primary/20 hover:ring-2 hover:ring-primary/10 data-[state=open]:scale-105 data-[state=open]:border-primary/20 data-[state=open]:ring-2 data-[state=open]:ring-primary/10">
+                <Avatar className="h-10 w-10 border border-border">
                   <AvatarImage
-                    src={userProfile?.profilePictureUrl}
+                    src={userProfile?.profilePictureUrl || undefined}
                     alt={displayName}
                   />
                   <AvatarFallback className="bg-primary/10 text-primary font-bold">
@@ -145,7 +129,7 @@ export function DashboardNavbar() {
               <div className="flex items-center gap-3 p-4 pb-3">
                 <Avatar className="h-10 w-10 border border-border/10">
                   <AvatarImage
-                    src={userProfile?.profilePictureUrl}
+                    src={userProfile?.profilePictureUrl || undefined}
                     alt={displayName}
                   />
                   <AvatarFallback className="bg-primary/5 text-primary text-sm font-bold">

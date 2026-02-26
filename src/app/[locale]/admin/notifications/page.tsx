@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
-import { 
-  Bell, 
-  Send, 
-  Loader2, 
+import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
+import {
+  Bell,
+  Send,
+  Loader2,
   AlertCircle,
   Users,
   Globe,
@@ -14,48 +14,62 @@ import {
   Check,
   Mail,
   Smartphone,
-  Layers
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { adminService, type AdminUser, FilterOperation, type NotificationChannel } from '@/services/admin.service';
-import { newsletterService } from '@/services/newsletter.service';
-import { usePermissions } from '@/contexts/PermissionContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+  Layers,
+} from "lucide-react";
+import { toast } from "sonner";
+import {
+  adminService,
+  type AdminUser,
+  FilterOperation,
+  type NotificationChannel,
+} from "@/services/admin.service";
+import { newsletterService } from "@/services/newsletter.service";
+import { usePermissions } from "@/hooks/use-permissions";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function NotificationsPage() {
-  const t = useTranslations('admin.notifications');
+  const t = useTranslations("admin.notifications");
 
   // Form state
-  const [title, setTitle] = useState('');
-  const [message, setMessage] = useState('');
-  const [type, setType] = useState<'INFO' | 'WARNING' | 'PROMO' | 'SUCCESS'>('INFO');
+  const [title, setTitle] = useState("");
+  const [message, setMessage] = useState("");
+  const [type, setType] = useState<"INFO" | "WARNING" | "PROMO" | "SUCCESS">(
+    "INFO",
+  );
 
-  const [channel, setChannel] = useState<NotificationChannel>('PUSH');
+  const [channel, setChannel] = useState<NotificationChannel>("PUSH");
   const [isSending, setIsSending] = useState(false);
   const { hasPermission } = usePermissions();
 
   // Newsletter state
-  const [newsletterSubject, setNewsletterSubject] = useState('');
-  const [newsletterContent, setNewsletterContent] = useState('');
+  const [newsletterSubject, setNewsletterSubject] = useState("");
+  const [newsletterContent, setNewsletterContent] = useState("");
   const [isHtml, setIsHtml] = useState(false);
-  const [isBroadcastingNewsletter, setIsBroadcastingNewsletter] = useState(false);
+  const [isBroadcastingNewsletter, setIsBroadcastingNewsletter] =
+    useState(false);
 
   // User selection for targeted notifications
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<AdminUser[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<AdminUser[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -67,17 +81,19 @@ export default function NotificationsPage() {
         setIsSearching(true);
         try {
           const response = await adminService.filterUsers({
-            filters: [{
-              fieldName: 'email',
-              operation: FilterOperation.MATCH,
-              value: searchTerm,
-            }],
+            filters: [
+              {
+                fieldName: "email",
+                operation: FilterOperation.MATCH,
+                value: searchTerm,
+              },
+            ],
             page: 0,
             size: 10,
           });
           setSearchResults(response.data.content);
         } catch (err) {
-          console.error('Search failed:', err);
+          console.error("Search failed:", err);
         } finally {
           setIsSearching(false);
         }
@@ -91,7 +107,7 @@ export default function NotificationsPage() {
 
   const handleSendBroadcast = async () => {
     if (!title.trim() || !message.trim()) {
-      toast.error('Please enter title and message');
+      toast.error("Please enter title and message");
       return;
     }
 
@@ -99,11 +115,12 @@ export default function NotificationsPage() {
 
     try {
       await adminService.sendBroadcast({ title, message, type, channel });
-      toast.success('Broadcast notification sent to all users!');
-      setTitle('');
-      setMessage('');
+      toast.success("Broadcast notification sent to all users!");
+      setTitle("");
+      setMessage("");
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to send notification';
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to send notification";
       toast.error(errorMessage);
     } finally {
       setIsSending(false);
@@ -112,11 +129,11 @@ export default function NotificationsPage() {
 
   const handleSendToUsers = async () => {
     if (!title.trim() || !message.trim()) {
-      toast.error('Please enter title and message');
+      toast.error("Please enter title and message");
       return;
     }
     if (selectedUsers.length === 0) {
-      toast.error('Please select at least one user');
+      toast.error("Please select at least one user");
       return;
     }
 
@@ -127,14 +144,15 @@ export default function NotificationsPage() {
         message,
         type,
         channel,
-        userIds: selectedUsers.map(u => u.id),
+        userIds: selectedUsers.map((u) => u.id),
       });
       toast.success(`Notification sent to ${selectedUsers.length} user(s)!`);
-      setTitle('');
-      setMessage('');
+      setTitle("");
+      setMessage("");
       setSelectedUsers([]);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to send notification';
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to send notification";
       toast.error(errorMessage);
     } finally {
       setIsSending(false);
@@ -142,20 +160,20 @@ export default function NotificationsPage() {
   };
 
   const addUser = (user: AdminUser) => {
-    if (!selectedUsers.find(u => u.id === user.id)) {
+    if (!selectedUsers.find((u) => u.id === user.id)) {
       setSelectedUsers([...selectedUsers, user]);
     }
-    setSearchTerm('');
+    setSearchTerm("");
     setSearchResults([]);
   };
 
   const removeUser = (userId: number) => {
-    setSelectedUsers(selectedUsers.filter(u => u.id !== userId));
+    setSelectedUsers(selectedUsers.filter((u) => u.id !== userId));
   };
 
   const handleBroadcastNewsletter = async () => {
     if (!newsletterSubject.trim() || !newsletterContent.trim()) {
-      toast.error('Please enter subject and content');
+      toast.error("Please enter subject and content");
       return;
     }
 
@@ -164,13 +182,14 @@ export default function NotificationsPage() {
       await newsletterService.broadcast({
         subject: newsletterSubject,
         content: newsletterContent,
-        isHtml
+        isHtml,
       });
-      toast.success('Newsletter broadcast initiated successfully!');
-      setNewsletterSubject('');
-      setNewsletterContent('');
+      toast.success("Newsletter broadcast initiated successfully!");
+      setNewsletterSubject("");
+      setNewsletterContent("");
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to send newsletter';
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to send newsletter";
       toast.error(errorMessage);
     } finally {
       setIsBroadcastingNewsletter(false);
@@ -180,21 +199,21 @@ export default function NotificationsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">{t('title')}</h1>
-        <p className="text-muted-foreground">{t('subtitle')}</p>
+        <h1 className="text-3xl font-bold">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <Tabs defaultValue="broadcast" className="space-y-6">
         <TabsList>
           <TabsTrigger value="broadcast" className="flex items-center gap-2">
             <Globe className="h-4 w-4" />
-            {t('broadcast')}
+            {t("broadcast")}
           </TabsTrigger>
           <TabsTrigger value="targeted" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
-            {t('targeted')}
+            {t("targeted")}
           </TabsTrigger>
-          {hasPermission('NEWSLETTER.BROADCAST') && (
+          {hasPermission("NEWSLETTER.BROADCAST") && (
             <TabsTrigger value="newsletter" className="flex items-center gap-2">
               <Globe className="h-4 w-4" />
               Newsletter
@@ -208,16 +227,17 @@ export default function NotificationsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Globe className="h-5 w-5" />
-                {t('broadcastToAll')}
+                {t("broadcastToAll")}
               </CardTitle>
-              <CardDescription>
-                {t('broadcastDesc')}
-              </CardDescription>
+              <CardDescription>{t("broadcastDesc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>Notification Type</Label>
-                <Select value={type} onValueChange={(v) => setType(v as typeof type)}>
+                <Select
+                  value={type}
+                  onValueChange={(v) => setType(v as typeof type)}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -249,10 +269,13 @@ export default function NotificationsPage() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Notification Channel</Label>
-                <Select value={channel} onValueChange={(v) => setChannel(v as NotificationChannel)}>
+                <Select
+                  value={channel}
+                  onValueChange={(v) => setChannel(v as NotificationChannel)}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -300,8 +323,8 @@ export default function NotificationsPage() {
                 />
               </div>
 
-              <Button 
-                onClick={handleSendBroadcast} 
+              <Button
+                onClick={handleSendBroadcast}
                 disabled={isSending || !title.trim() || !message.trim()}
                 className="w-full"
               >
@@ -310,7 +333,7 @@ export default function NotificationsPage() {
                 ) : (
                   <Send className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
                 )}
-                {t('sendToAll')}
+                {t("sendToAll")}
               </Button>
             </CardContent>
           </Card>
@@ -322,11 +345,9 @@ export default function NotificationsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
-                {t('sendToSpecific')}
+                {t("sendToSpecific")}
               </CardTitle>
-              <CardDescription>
-                {t('selectUsersDesc')}
-              </CardDescription>
+              <CardDescription>{t("selectUsersDesc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* User Search */}
@@ -355,10 +376,14 @@ export default function NotificationsPage() {
                         className="w-full flex items-center justify-between px-3 py-2 hover:bg-muted text-left"
                       >
                         <div>
-                          <div className="font-medium">{user.name || user.email}</div>
-                          <div className="text-sm text-muted-foreground">{user.email}</div>
+                          <div className="font-medium">
+                            {user.name || user.email}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {user.email}
+                          </div>
                         </div>
-                        {selectedUsers.find(u => u.id === user.id) ? (
+                        {selectedUsers.find((u) => u.id === user.id) ? (
                           <Check className="h-4 w-4 text-green-500" />
                         ) : null}
                       </button>
@@ -373,9 +398,16 @@ export default function NotificationsPage() {
                   <Label>Selected Users ({selectedUsers.length})</Label>
                   <div className="flex flex-wrap gap-2">
                     {selectedUsers.map((user) => (
-                      <Badge key={user.id} variant="secondary" className="flex items-center gap-1">
+                      <Badge
+                        key={user.id}
+                        variant="secondary"
+                        className="flex items-center gap-1"
+                      >
                         {user.email}
-                        <button onClick={() => removeUser(user.id)} className="ml-1 hover:text-destructive">
+                        <button
+                          onClick={() => removeUser(user.id)}
+                          className="ml-1 hover:text-destructive"
+                        >
                           <X className="h-3 w-3" />
                         </button>
                       </Badge>
@@ -386,7 +418,10 @@ export default function NotificationsPage() {
 
               <div className="space-y-2">
                 <Label>Notification Type</Label>
-                <Select value={type} onValueChange={(v) => setType(v as typeof type)}>
+                <Select
+                  value={type}
+                  onValueChange={(v) => setType(v as typeof type)}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -401,7 +436,10 @@ export default function NotificationsPage() {
 
               <div className="space-y-2">
                 <Label>Notification Channel</Label>
-                <Select value={channel} onValueChange={(v) => setChannel(v as NotificationChannel)}>
+                <Select
+                  value={channel}
+                  onValueChange={(v) => setChannel(v as NotificationChannel)}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -449,9 +487,14 @@ export default function NotificationsPage() {
                 />
               </div>
 
-              <Button 
-                onClick={handleSendToUsers} 
-                disabled={isSending || !title.trim() || !message.trim() || selectedUsers.length === 0}
+              <Button
+                onClick={handleSendToUsers}
+                disabled={
+                  isSending ||
+                  !title.trim() ||
+                  !message.trim() ||
+                  selectedUsers.length === 0
+                }
                 className="w-full"
               >
                 {isSending ? (
@@ -465,9 +508,8 @@ export default function NotificationsPage() {
           </Card>
         </TabsContent>
 
-
         {/* Newsletter Tab */}
-        {hasPermission('NEWSLETTER.BROADCAST') && (
+        {hasPermission("NEWSLETTER.BROADCAST") && (
           <TabsContent value="newsletter">
             <Card>
               <CardHeader>
@@ -478,7 +520,9 @@ export default function NotificationsPage() {
                 <CardDescription>
                   Send HTML email newsletter to all active subscribers.
                   <br />
-                  <small className="text-muted-foreground">Note: Unsubscribe link is automatically appended.</small>
+                  <small className="text-muted-foreground">
+                    Note: Unsubscribe link is automatically appended.
+                  </small>
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -493,7 +537,9 @@ export default function NotificationsPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="newsletterContent">Content (HTML supported)</Label>
+                  <Label htmlFor="newsletterContent">
+                    Content (HTML supported)
+                  </Label>
                   <Textarea
                     id="newsletterContent"
                     value={newsletterContent}
@@ -513,9 +559,13 @@ export default function NotificationsPage() {
                   <Label htmlFor="isHtml">Send as HTML</Label>
                 </div>
 
-                <Button 
-                  onClick={handleBroadcastNewsletter} 
-                  disabled={isBroadcastingNewsletter || !newsletterSubject.trim() || !newsletterContent.trim()}
+                <Button
+                  onClick={handleBroadcastNewsletter}
+                  disabled={
+                    isBroadcastingNewsletter ||
+                    !newsletterSubject.trim() ||
+                    !newsletterContent.trim()
+                  }
                   className="w-full"
                 >
                   {isBroadcastingNewsletter ? (

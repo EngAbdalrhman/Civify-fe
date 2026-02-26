@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { DashboardNavbar } from "@/components/DashboardNavbar";
 import { useAuth } from "@/hooks/use-auth";
-import { usePermissions } from "@/contexts/PermissionContext";
+import { usePermissions } from "@/hooks/use-permissions";
 import { Link, usePathname } from "@/i18n/routing";
 import Image from "next/image";
 import { useTheme } from "next-themes";
@@ -35,12 +35,15 @@ export default function UserDashboardLayout({
 }) {
   const t = useTranslations("nav");
   const { isAdmin } = useAuth();
-  const { hasAnyPermission, groupName } = usePermissions();
+  const { hasAnyPermission, groupName, permissions, refetch, isLoading } =
+    usePermissions();
   const pathname = usePathname();
   const { resolvedTheme } = useTheme();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [planName, setPlanName] = useState<string | null>(null);
+  const [isPlanLoading, setIsPlanLoading] = useState(true);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
 
   // Sidebar collapse state - default collapsed for resume builder
   const isResumeBuilderPage = pathname.includes("/resume-builder");
@@ -52,25 +55,6 @@ export default function UserDashboardLayout({
   const canViewApiKeys = hasAnyPermission(["API.ACCESS", "API.KEY.CREATE"]);
   const canViewAnalytics = hasAnyPermission(["STATS.VIEW", "API_USAGE.VIEW"]);
 
-  // Check authentication status on mount
-  useEffect(() => {
-    const checkAuth = () => {
-      const token = getAccessToken();
-      setIsAuthenticated(!!token);
-    };
-
-    checkAuth();
-
-    // Re-check on window focus
-    window.addEventListener("focus", checkAuth);
-    const interval = setInterval(checkAuth, 1000);
-
-    return () => {
-      window.removeEventListener("focus", checkAuth);
-      clearInterval(interval);
-    };
-  }, []);
-
   // Update sidebar state when navigating to/from resume builder
   useEffect(() => {
     setIsSidebarCollapsed(isResumeBuilderPage);
@@ -80,7 +64,10 @@ export default function UserDashboardLayout({
   useEffect(() => {
     const fetchSubscription = async () => {
       const token = getAccessToken();
-      if (!token) return;
+      if (!token) {
+        setIsPlanLoading(false);
+        return;
+      }
 
       try {
         const response = await apiClient.get<{ planName?: string }>(
@@ -89,14 +76,28 @@ export default function UserDashboardLayout({
         setPlanName(response.data?.planName || null);
       } catch {
         // User might not have a subscription
+      } finally {
+        setIsPlanLoading(false);
       }
     };
     fetchSubscription();
   }, []);
 
-  // Avoid hydration mismatch
+  // Avoid hydration mismatch and verify auth state
   useEffect(() => {
     setMounted(true);
+    const token = getAccessToken();
+    setIsAuthenticated(!!token);
+    setIsAuthChecking(false);
+  }, [pathname]);
+
+  // Ensure permissions are fetched if navigating from auth
+  useEffect(() => {
+    const token = getAccessToken();
+    if (token && permissions.length === 0 && !isLoading) {
+      refetch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Helper to check if a link is active
@@ -106,8 +107,6 @@ export default function UserDashboardLayout({
     }
     return pathname.startsWith(path);
   };
-
-  const isUploadPage = pathname.includes("/upload");
 
   // Close mobile sidebar on route change
   useEffect(() => {
@@ -185,10 +184,16 @@ export default function UserDashboardLayout({
               {!shouldShowCollapsed && (
                 <div className="grid flex-1 ltr:text-left rtl:text-right text-sm leading-tight">
                   <span className="truncate font-semibold">Civify</span>
-                  <span className="truncate text-xs text-muted-foreground">
-                    {groupName ||
+                  <span className="truncate text-xs text-muted-foreground mt-1">
+                    {!mounted ||
+                    isAuthChecking ||
+                    (isAuthenticated && (isLoading || isPlanLoading)) ? (
+                      <span className="animate-pulse bg-muted rounded h-3 w-16 inline-block" />
+                    ) : (
+                      groupName ||
                       planName ||
-                      (isAuthenticated ? t("freePlan") : t("guest"))}
+                      (isAuthenticated ? t("freePlan") : t("guest"))
+                    )}
                   </span>
                 </div>
               )}
@@ -202,7 +207,7 @@ export default function UserDashboardLayout({
                   className={getLinkClasses("/app")}
                   title={shouldShowCollapsed ? t("dashboard") : undefined}
                 >
-                  <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
+                  <LayoutDashboard className="h-4 w-4 shrink-0" />
                   {!shouldShowCollapsed && t("dashboard")}
                 </Link>
               )}
@@ -213,7 +218,7 @@ export default function UserDashboardLayout({
                 className={getLinkClasses("/app/resume-builder")}
                 title={shouldShowCollapsed ? t("resumeBuilder") : undefined}
               >
-                <FileEdit className="h-4 w-4 flex-shrink-0" />
+                <FileEdit className="h-4 w-4 shrink-0" />
                 {!shouldShowCollapsed && t("resumeBuilder")}
               </Link>
 
@@ -223,7 +228,7 @@ export default function UserDashboardLayout({
                 className={getLinkClasses("/app/upload")}
                 title={shouldShowCollapsed ? t("upload") : undefined}
               >
-                <UploadCloud className="h-4 w-4 flex-shrink-0" />
+                <UploadCloud className="h-4 w-4 shrink-0" />
                 {!shouldShowCollapsed && t("upload")}
               </Link>
 
@@ -234,7 +239,7 @@ export default function UserDashboardLayout({
                   className={getLinkClasses("/app/analytics")}
                   title={shouldShowCollapsed ? t("analytics") : undefined}
                 >
-                  <BarChart2 className="h-4 w-4 flex-shrink-0" />
+                  <BarChart2 className="h-4 w-4 shrink-0" />
                   {!shouldShowCollapsed && t("analytics")}
                 </Link>
               )}
@@ -246,7 +251,7 @@ export default function UserDashboardLayout({
                   className={getLinkClasses("/app/api-keys")}
                   title={shouldShowCollapsed ? t("apiKeys") : undefined}
                 >
-                  <Key className="h-4 w-4 flex-shrink-0" />
+                  <Key className="h-4 w-4 shrink-0" />
                   {!shouldShowCollapsed && t("apiKeys")}
                 </Link>
               )}
@@ -258,7 +263,7 @@ export default function UserDashboardLayout({
                   className={getLinkClasses("/app/tokens")}
                   title={shouldShowCollapsed ? t("buyTokens") : undefined}
                 >
-                  <Zap className="h-4 w-4 flex-shrink-0" />
+                  <Zap className="h-4 w-4 shrink-0" />
                   {!shouldShowCollapsed && t("buyTokens")}
                 </Link>
               )}
@@ -269,7 +274,7 @@ export default function UserDashboardLayout({
                 className={cn(getLinkClasses("/app/help"), "mt-4")}
                 title={shouldShowCollapsed ? t("helpCenter") : undefined}
               >
-                <HelpCircle className="h-4 w-4 flex-shrink-0" />
+                <HelpCircle className="h-4 w-4 shrink-0" />
                 {!shouldShowCollapsed && t("helpCenter")}
               </Link>
 
@@ -282,7 +287,7 @@ export default function UserDashboardLayout({
                   )}
                   title={shouldShowCollapsed ? t("adminDashboard") : undefined}
                 >
-                  <Shield className="h-4 w-4 flex-shrink-0" />
+                  <Shield className="h-4 w-4 shrink-0" />
                   {!shouldShowCollapsed && t("adminDashboard")}
                 </Link>
               )}

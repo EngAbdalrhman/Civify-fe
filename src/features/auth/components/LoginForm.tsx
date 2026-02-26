@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Link, useRouter } from "@/i18n/routing";
 import { useLogin, LoginSchemaType, useVerifyOtp } from "@/features/auth/hooks";
 import { SubmitHandler } from "react-hook-form";
-import { usePermissions } from "@/contexts/PermissionContext";
+import { usePermissions } from "@/hooks/use-permissions";
 import { useEffect, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -14,7 +14,7 @@ const REMEMBER_ME_KEY = "civify_remember_identifier";
 export default function LoginForm() {
   const t = useTranslations("auth");
   const router = useRouter();
-  const { fetchPermissions } = usePermissions();
+  const { refetch } = usePermissions();
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -69,7 +69,8 @@ export default function LoginForm() {
         setIsRedirecting(true);
 
         // Fetch permissions before redirecting
-        const perms = await fetchPermissions();
+        const result = await refetch();
+        const perms = result.data?.permissions;
         // Optional: Log if permissions are empty to help debugging
         if (!perms || perms.length === 0) {
           console.warn(
@@ -85,7 +86,7 @@ export default function LoginForm() {
     isLoginSuccess,
     requires2FA,
     isVerifySuccess,
-    fetchPermissions,
+    refetch,
     router,
     isRedirecting,
   ]);

@@ -4,8 +4,8 @@ import { routing } from "./i18n/routing";
 export default createMiddleware(routing);
 
 export const config = {
-  // Match all paths except API routes, static files, sitemap, and robots
+  // Match all paths except API routes, static files, sitemap, robots, and monitoring
   matcher: [
-    "/((?!api/|_next|_vercel|robots.txt|api|manifest.webmanifest|manifest.json|manifest|.*\\..*).*)",
+    "/((?!api/|_next|_vercel|monitoring|api|robots.txt|manifest.webmanifest|manifest.json|manifest|.*\\..*).*)",
   ],
 };

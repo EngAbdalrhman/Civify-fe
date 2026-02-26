@@ -109,7 +109,7 @@ export function EditorSidebar({
           >
             <RotateCcw className="h-4 w-4" />
           </Button>
-          <Button
+          {/* <Button
             variant="outline"
             size="sm"
             onClick={onCalculateScore}
@@ -118,7 +118,7 @@ export function EditorSidebar({
             title="ATS Score"
           >
             <Target className="h-4 w-4" />
-          </Button>
+          </Button> */}
           <Button
             variant="default"
             size="sm"

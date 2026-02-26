@@ -4,9 +4,10 @@ import { OnboardingProvider } from "@/features/onboarding";
 
 import { useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/routing";
-import { LayoutDashboard, Shield, ShieldX } from "lucide-react";
+import { LayoutDashboard, ShieldX, Menu, X } from "lucide-react";
 import { DashboardNavbar } from "@/components/DashboardNavbar";
-import { usePermissions } from "@/contexts/PermissionContext";
+import { cn } from "@/lib/utils";
+import { usePermissions } from "@/hooks/use-permissions";
 import {
   ADMIN_MENU_ITEMS,
   ADMIN_ACTION_PERMISSIONS,
@@ -24,13 +25,19 @@ export default function AdminDashboardLayout({
   const t = useTranslations("nav");
   const pathname = usePathname();
   const router = useRouter();
-  const { permissions, isLoading, hasPermission } = usePermissions();
+  const { isLoading, hasPermission } = usePermissions();
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Close mobile sidebar on route change
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [pathname]);
 
   // Check if user has access to admin dashboard at all
   const hasAdminAccess =
@@ -84,9 +91,24 @@ export default function AdminDashboardLayout({
   return (
     <OnboardingProvider>
       <div className="flex min-h-screen bg-background">
+        {/* Mobile Overlay Backdrop */}
+        {isMobileOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-40 md:hidden"
+            onClick={() => setIsMobileOpen(false)}
+          />
+        )}
+
         {/* Admin Sidebar */}
-        <aside className="w-64 ltr:border-r rtl:border-l bg-background p-6">
-          <div className="space-y-6">
+        <aside
+          className={cn(
+            "w-64 border-r ltr:border-r rtl:border-l bg-background flex flex-col fixed inset-y-0 z-50 transition-all duration-300",
+            // Mobile: hidden by default, show when isMobileOpen is true
+            "max-md:-translate-x-full max-md:rtl:translate-x-full",
+            isMobileOpen && "max-md:translate-x-0 max-md:rtl:translate-x-0",
+          )}
+        >
+          <div className="space-y-6 p-6 flex-1 overflow-y-auto">
             <div className="flex items-center gap-2 mb-8">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg">
                 <Link href="/" className="flex items-center space-x-2">
@@ -133,7 +155,7 @@ export default function AdminDashboardLayout({
                       href={item.path}
                       className={getLinkClasses(item.path)}
                     >
-                      <Icon className="h-4 w-4" />
+                      <Icon className="h-4 w-4 shrink-0" />
                       {t(item.labelKey)}
                     </Link>
                   );
@@ -141,23 +163,51 @@ export default function AdminDashboardLayout({
               )}
             </nav>
 
-            <div className="pt-4 border-t">
+            <div className="pt-4 border-t mt-auto">
               <Link
                 href="/app"
                 className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted/50 transition-colors text-muted-foreground hover:text-foreground"
               >
-                <LayoutDashboard className="h-4 w-4" />
+                <LayoutDashboard className="h-4 w-4 shrink-0" />
                 {t("dashboard")}
               </Link>
             </div>
           </div>
         </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-auto">
-          <DashboardNavbar />
-          <div className="p-8 max-w-7xl mx-auto space-y-8">{children}</div>
-        </main>
+        {/* Main Content Wrapper */}
+        <div className="flex-1 flex flex-col transition-all duration-300 md:ltr:ml-64 md:rtl:mr-64 min-h-screen">
+          {/* Mobile Header with Menu Toggle */}
+          <div className="flex items-center md:hidden border-b bg-background">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMobileOpen(!isMobileOpen)}
+              className="m-2"
+              aria-label={isMobileOpen ? "Close menu" : "Open menu"}
+            >
+              {isMobileOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
+            </Button>
+            <div className="flex-1">
+              <DashboardNavbar />
+            </div>
+          </div>
+
+          {/* Desktop Navbar */}
+          <div className="hidden md:block">
+            <DashboardNavbar />
+          </div>
+
+          <main className="flex-1 overflow-auto">
+            <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8">
+              {children}
+            </div>
+          </main>
+        </div>
       </div>
     </OnboardingProvider>
   );

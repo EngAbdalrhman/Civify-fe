@@ -55,15 +55,7 @@ import {
 } from "@/features/plans/hooks/useSubscription";
 import { Progress } from "@/components/ui/progress";
 
-interface UserProfile {
-  id: number;
-  username: string;
-  email: string;
-  firstName: string | null;
-  lastName: string | null;
-  phoneNumber: string | null;
-  profilePictureUrl: string | null;
-}
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 interface UserPreferences {
   preferredLanguage: "EN" | "AR";
@@ -74,14 +66,28 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("profile");
 
   // Profile state
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const {
+    data: user,
+    isLoading: isProfileLoading,
+    refetch: refetchProfile,
+  } = useUserProfile();
   const [profileForm, setProfileForm] = useState({
     firstName: "",
     lastName: "",
     phoneNumber: "",
   });
-  const [isProfileLoading, setIsProfileLoading] = useState(true);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+
+  // Update form when user data loads
+  useEffect(() => {
+    if (user) {
+      setProfileForm({
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        phoneNumber: user.phoneNumber || "",
+      });
+    }
+  }, [user]);
 
   // Security state
   const [passwordForm, setPasswordForm] = useState({
@@ -121,26 +127,6 @@ export default function SettingsPage() {
   const cancelMutation = useCancelSubscription();
   const [showCancelDialog, setShowCancelDialog] = useState(false);
 
-  // Fetch user profile on mount
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await apiClient.get<UserProfile>("/v1/users/me");
-        setUser(response.data);
-        setProfileForm({
-          firstName: response.data.firstName || "",
-          lastName: response.data.lastName || "",
-          phoneNumber: response.data.phoneNumber || "",
-        });
-      } catch {
-        toast.error("Failed to load profile");
-      } finally {
-        setIsProfileLoading(false);
-      }
-    };
-    fetchProfile();
-  }, []);
-
   // Fetch preferences
   useEffect(() => {
     const fetchPreferences = async () => {
@@ -162,11 +148,8 @@ export default function SettingsPage() {
   const handleSaveProfile = async () => {
     setIsSavingProfile(true);
     try {
-      const response = await apiClient.put<UserProfile>(
-        "/v1/users/me",
-        profileForm,
-      );
-      setUser(response.data);
+      await apiClient.put("/v1/users/me", profileForm);
+      await refetchProfile();
       toast.success("Profile updated successfully");
     } catch {
       toast.error("Failed to update profile");
@@ -278,13 +261,10 @@ export default function SettingsPage() {
       reader.onloadend = async () => {
         const base64Image = reader.result as string;
         try {
-          const response = await apiClient.put<UserProfile>(
-            "/v1/users/me/profile-picture",
-            {
-              image: base64Image,
-            },
-          );
-          setUser(response.data);
+          await apiClient.put("/v1/users/me/profile-picture", {
+            image: base64Image,
+          });
+          await refetchProfile();
           toast.success("Profile picture updated!");
         } catch {
           toast.error("Failed to upload profile picture");

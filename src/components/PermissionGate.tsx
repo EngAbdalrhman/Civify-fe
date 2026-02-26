@@ -1,7 +1,7 @@
 "use client";
 
 import React, { ReactNode } from "react";
-import { usePermissions } from "@/contexts/PermissionContext";
+import { usePermissions } from "@/hooks/use-permissions";
 
 interface PermissionGateProps {
   /** Single permission required */
@@ -20,19 +20,19 @@ interface PermissionGateProps {
 
 /**
  * PermissionGate - Conditional rendering based on user permissions
- * 
+ *
  * @example
  * // Single permission
  * <PermissionGate permission="user.admin.view">
  *   <AdminPanel />
  * </PermissionGate>
- * 
+ *
  * @example
  * // Any of these permissions
  * <PermissionGate anyOf={["user.edit", "user.admin.manage"]}>
  *   <EditButton />
  * </PermissionGate>
- * 
+ *
  * @example
  * // All permissions required
  * <PermissionGate allOf={["payment.view", "payment.process"]} fallback={<UpgradePrompt />}>
@@ -47,7 +47,8 @@ export const PermissionGate: React.FC<PermissionGateProps> = ({
   fallback = null,
   showLoading = false,
 }) => {
-  const { hasPermission, hasAnyPermission, hasAllPermissions, isLoading } = usePermissions();
+  const { hasPermission, hasAnyPermission, hasAllPermissions, isLoading } =
+    usePermissions();
 
   // Show loading state if requested
   if (isLoading && showLoading) {
