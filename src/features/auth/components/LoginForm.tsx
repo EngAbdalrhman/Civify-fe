@@ -88,13 +88,7 @@ export default function LoginForm() {
             "Login successful but no permissions returned immediately.",
           );
         }
-        // TODO: TEMP DISABLED - re-enable after debugging token issue
-        console.log(
-          "[DEBUG] Login success! Would redirect to:",
-          returnTo || "/app",
-        );
-        console.log("[DEBUG] Access token cookie:", document.cookie);
-        // router.push(returnTo || "/app");
+        router.push(returnTo || "/app");
       }
     };
 

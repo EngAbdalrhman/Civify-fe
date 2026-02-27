@@ -282,18 +282,12 @@ const processResponse = async <T>(
 
   // Extract access token from response body (login responses)
   // and store it using centralized utility
-  console.log("[DEBUG processResponse] Parsed data:", data);
-  console.log(
-    "[DEBUG processResponse] Has accessToken:",
-    data && typeof data === "object" && "accessToken" in data,
-  );
   if (
     data &&
     typeof data === "object" &&
     "accessToken" in data &&
     typeof window !== "undefined"
   ) {
-    console.log("[DEBUG processResponse] Saving accessToken to cookie");
     setAccessToken((data as { accessToken: string }).accessToken);
   }
 
@@ -467,10 +461,6 @@ async function apiClient<T = unknown>(
 
   try {
     const response = await fetchWithTimeout(fullUrl, fetchOptions);
-
-    console.log(
-      `[DEBUG apiClient] ${restOptions.method || "GET"} ${fullUrl} → status: ${response.status}, ok: ${response.ok}`,
-    );
 
     // Handle 401 Unauthorized
     if (response.status === 401 && !_retry) {
