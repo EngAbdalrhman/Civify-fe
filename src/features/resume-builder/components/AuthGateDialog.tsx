@@ -25,19 +25,22 @@ export function AuthGateDialog({ open, onOpenChange }: AuthGateDialogProps) {
 
   const handleLogin = () => {
     onOpenChange(false);
-    router.push("/login?returnTo=/app/resume-builder");
+    router.push("/login?returnTo=/app/resume-builder?tab=export");
   };
 
   const handleSignup = () => {
     onOpenChange(false);
-    router.push("/signup?returnTo=/app/resume-builder");
+    router.push("/signup?returnTo=/app/resume-builder?tab=export");
   };
 
   const handleGoogleLogin = () => {
     onOpenChange(false);
     // Store return path for OAuth callback
     try {
-      localStorage.setItem(OAUTH_RETURN_TO_KEY, "/app/resume-builder");
+      localStorage.setItem(
+        OAUTH_RETURN_TO_KEY,
+        "/app/resume-builder?tab=export",
+      );
     } catch {}
     const backendUrl =
       process.env.NEXT_PUBLIC_API_URL || "http://localhost:8077/apis";
@@ -47,7 +50,10 @@ export function AuthGateDialog({ open, onOpenChange }: AuthGateDialogProps) {
   const handleLinkedInLogin = () => {
     onOpenChange(false);
     try {
-      localStorage.setItem(OAUTH_RETURN_TO_KEY, "/app/resume-builder");
+      localStorage.setItem(
+        OAUTH_RETURN_TO_KEY,
+        "/app/resume-builder?tab=export",
+      );
     } catch {}
     const backendUrl =
       process.env.NEXT_PUBLIC_API_URL || "http://localhost:8077/apis";

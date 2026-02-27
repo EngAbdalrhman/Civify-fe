@@ -6,7 +6,6 @@ import { useGuestResumeStorage } from "../hooks/useGuestResumeStorage";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { ResumeBuilder } from "./ResumeBuilder";
 import { CachePromptDialog } from "./CachePromptDialog";
-import { SyncGuestResumeDialog } from "./SyncGuestResumeDialog";
 import { emptyResumeData, ResumeData } from "@/features/upload-cv/types";
 import { isAuthenticated } from "@/utils/cookies";
 import { ResumeService } from "@/services/resume.service";
@@ -21,9 +20,6 @@ export function ResumeBuilderContent() {
   const [cachedData, setCachedData] = useState<ResumeData | null>(null);
 
   // Post-login sync state
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [syncSuccess, setSyncSuccess] = useState(false);
-  const [showSyncDialog, setShowSyncDialog] = useState(false);
   const [syncedResumeId, setSyncedResumeId] = useState<string | null>(null);
 
   // Detect cached guest resume on mount
@@ -56,16 +52,11 @@ export function ResumeBuilderContent() {
   }, [isLoading, isGuest]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const syncGuestResume = async (data: ResumeData) => {
-    setShowSyncDialog(true);
-    setIsSyncing(true);
-    setSyncSuccess(false);
-
     const title = guestStorage.getGuestResumeTitle();
 
     try {
       const created = await ResumeService.create(title, data);
       setSyncedResumeId(created.id);
-      setSyncSuccess(true);
       toast.success("Resume saved to your account!");
 
       // Clear localStorage after successful sync
@@ -73,21 +64,13 @@ export function ResumeBuilderContent() {
 
       // Set the synced data as resolved data
       setResolvedData({ ...data, id: created.id } as ResumeData);
-
-      // Auto-close sync dialog after a brief moment
-      setTimeout(() => {
-        setShowSyncDialog(false);
-      }, 1500);
     } catch (error) {
       console.error("Failed to sync guest resume:", error);
       toast.error(
         "Failed to save your resume. Don't worry, it's still saved locally.",
       );
-      setShowSyncDialog(false);
       // Fall back to the cached data
       setResolvedData(data);
-    } finally {
-      setIsSyncing(false);
     }
   };
 
@@ -119,13 +102,6 @@ export function ResumeBuilderContent() {
           onStartFresh={handleStartFresh}
         />
       )}
-
-      {/* Sync Dialog for post-login data transfer */}
-      <SyncGuestResumeDialog
-        open={showSyncDialog}
-        isSyncing={isSyncing}
-        isSuccess={syncSuccess}
-      />
 
       {/* Main Builder */}
       {resolvedData && (
