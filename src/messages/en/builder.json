@@ -55,5 +55,26 @@
     "upgrade": "Upgrade Plan",
     "buyTokens": "Buy Token Pack",
     "cancel": "Maybe Later"
+  },
+  "authGate": {
+    "title": "Sign in to continue",
+    "description": "Create an account to save, export, and tailor your resume to any job.",
+    "login": "Log In",
+    "signup": "Create Account",
+    "orContinueWith": "Or continue with",
+    "google": "Continue with Google",
+    "linkedin": "Continue with LinkedIn"
+  },
+  "sync": {
+    "savingTitle": "Saving your resume",
+    "savingDescription": "Saving your resume to your new account...",
+    "successTitle": "Resume saved!",
+    "successDescription": "Your resume has been saved to your account."
+  },
+  "cachePrompt": {
+    "title": "Resume in Progress Found",
+    "description": "You have an unsaved resume from a previous session. Would you like to continue editing it or start fresh?",
+    "continue": "Continue Editing",
+    "startFresh": "Start Fresh"
   }
 }

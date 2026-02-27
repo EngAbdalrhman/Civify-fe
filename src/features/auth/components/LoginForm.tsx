@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 
 const REMEMBER_ME_KEY = "civify_remember_identifier";
+const OAUTH_RETURN_TO_KEY = "civify_oauth_returnTo";
 
 export default function LoginForm() {
   const t = useTranslations("auth");
@@ -17,6 +18,16 @@ export default function LoginForm() {
   const { refetch } = usePermissions();
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+
+  // Get returnTo from URL search params
+  const [returnTo, setReturnTo] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      setReturnTo(params.get("returnTo"));
+    }
+  }, []);
 
   const {
     form,
@@ -77,7 +88,13 @@ export default function LoginForm() {
             "Login successful but no permissions returned immediately.",
           );
         }
-        router.push("/app");
+        // TODO: TEMP DISABLED - re-enable after debugging token issue
+        console.log(
+          "[DEBUG] Login success! Would redirect to:",
+          returnTo || "/app",
+        );
+        console.log("[DEBUG] Access token cookie:", document.cookie);
+        // router.push(returnTo || "/app");
       }
     };
 
@@ -94,13 +111,24 @@ export default function LoginForm() {
   const handleGoogleLogin = () => {
     const backendUrl =
       process.env.NEXT_PUBLIC_API_URL || "http://localhost:8077/apis";
+    // Store returnTo for OAuth callback
+    if (returnTo) {
+      try {
+        localStorage.setItem(OAUTH_RETURN_TO_KEY, returnTo);
+      } catch {}
+    }
     window.location.href = `${backendUrl}/oauth2/authorization/google`;
   };
 
   const handleLinkedInLogin = () => {
-    // Redirect to backend LinkedIn OAuth endpoint
     const backendUrl =
       process.env.NEXT_PUBLIC_API_URL || "http://localhost:8077/apis";
+    // Store returnTo for OAuth callback
+    if (returnTo) {
+      try {
+        localStorage.setItem(OAUTH_RETURN_TO_KEY, returnTo);
+      } catch {}
+    }
     window.location.href = `${backendUrl}/oauth2/authorization/linkedin`;
   };
 

@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { setAccessToken } from "@/utils/cookies";
 
+const OAUTH_RETURN_TO_KEY = "civify_oauth_returnTo";
+
 function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -23,9 +25,19 @@ function AuthCallbackContent() {
       // Show success message
       toast.success("Login successful! Redirecting...");
 
-      // Redirect to dashboard
+      // Check for returnTo in localStorage (from guest builder flow)
+      let redirectPath = "/app";
+      try {
+        const storedReturnTo = localStorage.getItem(OAUTH_RETURN_TO_KEY);
+        if (storedReturnTo) {
+          redirectPath = storedReturnTo;
+          localStorage.removeItem(OAUTH_RETURN_TO_KEY);
+        }
+      } catch {}
+
+      // Redirect to destination
       setTimeout(() => {
-        router.push("/app");
+        router.push(redirectPath);
       }, 1000);
     }
     // Handle email verification callback

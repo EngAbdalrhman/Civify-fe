@@ -1,15 +1,17 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ResumeData, AtsScore } from "@/features/upload-cv/types";
 import { ResumeService } from "@/services/resume.service";
+import { useGuestResumeStorage } from "./useGuestResumeStorage";
 
 interface UseResumeBuilderParams {
   initialData: ResumeData;
   resumeId?: string | null;
+  isGuest?: boolean;
 }
 
 interface UseResumeBuilderReturn {
@@ -26,6 +28,11 @@ interface UseResumeBuilderReturn {
   setMobileView: (view: "editor" | "preview") => void;
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  isGuest: boolean;
+
+  // Auth gate
+  showAuthGate: boolean;
+  setShowAuthGate: (show: boolean) => void;
 
   // ATS Score
   showScoreDialog: boolean;
@@ -42,11 +49,13 @@ interface UseResumeBuilderReturn {
   handleReset: () => void;
   handleCalculateScore: () => Promise<void>;
   handleResumeDataUpdate: (data: ResumeData) => void;
+  handleAuthGatedAction: () => void;
 }
 
 export function useResumeBuilder({
   initialData,
   resumeId,
+  isGuest = false,
 }: UseResumeBuilderParams): UseResumeBuilderReturn {
   const [resumeData, setResumeData] = useState<ResumeData>(initialData);
   const searchParams = useSearchParams();
@@ -54,6 +63,7 @@ export function useResumeBuilder({
   const [activeTab, setActiveTab] = useState(initialTab);
   const [isSaving, setIsSaving] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [showAuthGate, setShowAuthGate] = useState(false);
   const [resumeTitle, setResumeTitle] = useState(
     initialData.personalInfo?.fullName
       ? `${initialData.personalInfo.fullName}'s Resume`
@@ -73,13 +83,31 @@ export function useResumeBuilder({
   const originalDataRef = useRef<ResumeData>(initialData);
   const t = useTranslations("builder");
 
+  // Guest storage
+  const { saveGuestResume } = useGuestResumeStorage();
+
   // Update ref when initialData changes
   useEffect(() => {
     originalDataRef.current = initialData;
     setResumeData(initialData);
   }, [initialData]);
 
+  // Auto-save to localStorage for guests when data changes
+  useEffect(() => {
+    if (isGuest) {
+      saveGuestResume(resumeData, resumeTitle);
+    }
+  }, [resumeData, resumeTitle, isGuest, saveGuestResume]);
+
+  const handleAuthGatedAction = useCallback(() => {
+    setShowAuthGate(true);
+  }, []);
+
   const handleSaveClick = () => {
+    if (isGuest) {
+      handleAuthGatedAction();
+      return;
+    }
     setShowSaveDialog(true);
   };
 
@@ -149,6 +177,11 @@ export function useResumeBuilder({
     setMobileView,
     activeTab,
     setActiveTab,
+    isGuest,
+
+    // Auth gate
+    showAuthGate,
+    setShowAuthGate,
 
     // ATS Score
     showScoreDialog,
@@ -165,5 +198,6 @@ export function useResumeBuilder({
     handleReset,
     handleCalculateScore,
     handleResumeDataUpdate,
+    handleAuthGatedAction,
   };
 }

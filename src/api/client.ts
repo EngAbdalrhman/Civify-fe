@@ -85,7 +85,8 @@ const clearAuthAndRedirect = () => {
       path === "/en" ||
       path === "/ar" ||
       path.includes("/plans") ||
-      path.includes("/app/upload");
+      path.includes("/app/upload") ||
+      path.includes("/resume-builder");
 
     if (!isPublicPage) {
       console.log("[Auth] Redirecting to login from protected route");
@@ -281,12 +282,18 @@ const processResponse = async <T>(
 
   // Extract access token from response body (login responses)
   // and store it using centralized utility
+  console.log("[DEBUG processResponse] Parsed data:", data);
+  console.log(
+    "[DEBUG processResponse] Has accessToken:",
+    data && typeof data === "object" && "accessToken" in data,
+  );
   if (
     data &&
     typeof data === "object" &&
     "accessToken" in data &&
     typeof window !== "undefined"
   ) {
+    console.log("[DEBUG processResponse] Saving accessToken to cookie");
     setAccessToken((data as { accessToken: string }).accessToken);
   }
 
@@ -461,6 +468,10 @@ async function apiClient<T = unknown>(
   try {
     const response = await fetchWithTimeout(fullUrl, fetchOptions);
 
+    console.log(
+      `[DEBUG apiClient] ${restOptions.method || "GET"} ${fullUrl} → status: ${response.status}, ok: ${response.ok}`,
+    );
+
     // Handle 401 Unauthorized
     if (response.status === 401 && !_retry) {
       const errorData = await response.json().catch(() => ({}));
@@ -523,7 +534,7 @@ async function apiClient<T = unknown>(
     // Handle other errors
     const message =
       error instanceof Error ? error.message : "An error occurred";
-    
+
     if (!skipErrorToast) {
       toast.error(message);
     }
