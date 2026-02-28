@@ -13,7 +13,7 @@ import { MobileViewToggle } from "./MobileViewToggle";
 import { EditorSidebar } from "./EditorSidebar";
 import { PreviewPanel } from "./PreviewPanel";
 import { SaveDialog } from "./SaveDialog";
-import { AtsScoreDialog } from "./AtsScoreDialog";
+import { AuthGateDialog } from "./AuthGateDialog";
 
 import {
   AlertDialog,
@@ -32,13 +32,22 @@ import { Button } from "@/components/ui/button";
 interface ResumeBuilderProps {
   initialData: ResumeData;
   resumeId?: string | null;
+  isGuest?: boolean;
 }
 
-export function ResumeBuilder({ initialData, resumeId }: ResumeBuilderProps) {
+export function ResumeBuilder({
+  initialData,
+  resumeId,
+  isGuest: isGuestProp = false,
+}: ResumeBuilderProps) {
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const t = useTranslations("builder");
 
-  const builder = useResumeBuilder({ initialData, resumeId });
+  const builder = useResumeBuilder({
+    initialData,
+    resumeId,
+    isGuest: isGuestProp,
+  });
   const { isFullScreen, toggleFullscreen } = useFullscreen();
   const upload = useFileUpload({
     onSuccess: builder.handleResumeDataUpdate,
@@ -82,6 +91,8 @@ export function ResumeBuilder({ initialData, resumeId }: ResumeBuilderProps) {
           onUploadClick={upload.triggerFileUpload}
           isCalculatingScore={builder.isCalculatingScore}
           onCalculateScore={builder.handleCalculateScore}
+          isGuest={builder.isGuest}
+          onAuthGate={builder.handleAuthGatedAction}
         />
 
         {/* Right Area - Live Preview */}
@@ -94,7 +105,7 @@ export function ResumeBuilder({ initialData, resumeId }: ResumeBuilderProps) {
         />
       </div>
 
-      {/* Save Dialog */}
+      {/* Save Dialog (only for authenticated users) */}
       <SaveDialog
         open={builder.showSaveDialog}
         onOpenChange={builder.setShowSaveDialog}
@@ -103,13 +114,11 @@ export function ResumeBuilder({ initialData, resumeId }: ResumeBuilderProps) {
         onConfirm={builder.handleSaveConfirm}
       />
 
-      {/* ATS Score Dialog */}
-      {/* <AtsScoreDialog
-        open={builder.showScoreDialog}
-        onOpenChange={builder.setShowScoreDialog}
-        score={builder.atsScore}
-        isLoading={builder.isCalculatingScore}
-      /> */}
+      {/* Auth Gate Dialog (for guests) */}
+      <AuthGateDialog
+        open={builder.showAuthGate}
+        onOpenChange={builder.setShowAuthGate}
+      />
 
       {/* Token Limit Exceeded Modal */}
       <AlertDialog

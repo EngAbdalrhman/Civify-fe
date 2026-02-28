@@ -111,10 +111,73 @@ async function handleRequest(
 
     // Create response with backend's body
     const responseBody = await response.arrayBuffer();
-    const proxyResponse = new NextResponse(responseBody, {
+
+    // For login requests: the backend returns accessToken only via Set-Cookie headers,
+    // not in the body. On localhost, those cookies are rejected (wrong domain).
+    // Extract the accessToken from Set-Cookie and inject it into the response body.
+    let finalBody: BodyInit = responseBody;
+    let finalContentType: string | null = response.headers.get("content-type");
+
+    if (path.includes("login") && response.ok) {
+      const setCookieHeaders: string[] = [];
+      response.headers.forEach((value, key) => {
+        if (key.toLowerCase() === "set-cookie") {
+          setCookieHeaders.push(value);
+        }
+      });
+      console.log("[Proxy DEBUG] All backend response headers:");
+      response.headers.forEach((value, key) => {
+        console.log(`  ${key}: ${value}`);
+      });
+      console.log("[Proxy DEBUG] Set-Cookie headers:", setCookieHeaders);
+
+      // Extract accessToken from Set-Cookie headers
+      let accessToken: string | null = null;
+      for (const cookie of setCookieHeaders) {
+        const match = cookie.match(/accessToken=([^;]+)/);
+        if (match) {
+          accessToken = match[1];
+          break;
+        }
+      }
+
+      // Parse existing body (if any) and inject accessToken
+      const bodyText = new TextDecoder().decode(responseBody);
+      let bodyObj: Record<string, unknown> = {};
+      try {
+        if (bodyText.trim()) {
+          bodyObj = JSON.parse(bodyText);
+        }
+      } catch {
+        // Not JSON, start fresh
+      }
+
+      if (accessToken) {
+        bodyObj.accessToken = accessToken;
+        console.log(
+          "[Proxy] Injected accessToken from Set-Cookie into response body",
+        );
+      }
+
+      finalBody = JSON.stringify(bodyObj);
+      finalContentType = "application/json";
+    }
+
+    // 204, 205, and 304 responses cannot have a body
+    const isBodyAllowed =
+      response.status !== 204 &&
+      response.status !== 205 &&
+      response.status !== 304;
+
+    const proxyResponse = new NextResponse(isBodyAllowed ? finalBody : null, {
       status: response.status,
       statusText: response.statusText,
     });
+
+    // Set content-type explicitly
+    if (finalContentType) {
+      proxyResponse.headers.set("content-type", finalContentType);
+    }
 
     // Forward response headers, especially Set-Cookie
     response.headers.forEach((value, key) => {
@@ -125,7 +188,8 @@ async function handleRequest(
       } else if (
         key.toLowerCase() !== "content-encoding" &&
         key.toLowerCase() !== "transfer-encoding" &&
-        key.toLowerCase() !== "content-length"
+        key.toLowerCase() !== "content-length" &&
+        key.toLowerCase() !== "content-type" // Already set above
       ) {
         proxyResponse.headers.set(key, value);
       }

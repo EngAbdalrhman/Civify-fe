@@ -9,6 +9,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { LoadingSpinner } from "./LoadingSpinner";
+import { useTranslations } from "next-intl";
 
 interface CachePromptDialogProps {
   open: boolean;
@@ -23,24 +24,23 @@ export function CachePromptDialog({
   onContinue,
   onStartFresh,
 }: CachePromptDialogProps) {
+  const t = useTranslations("builder.cachePrompt");
+
   return (
     <>
       <LoadingSpinner />
       <AlertDialog open={open} onOpenChange={onOpenChange}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Resume in Progress Found</AlertDialogTitle>
-            <AlertDialogDescription>
-              You have an unsaved resume from a previous session. Would you like
-              to continue editing it or start fresh?
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t("title")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("description")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={onStartFresh}>
-              Start Fresh
+              {t("startFresh")}
             </AlertDialogCancel>
             <AlertDialogAction onClick={onContinue}>
-              Continue Editing
+              {t("continue")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

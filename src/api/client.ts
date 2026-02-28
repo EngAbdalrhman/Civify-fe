@@ -85,7 +85,8 @@ const clearAuthAndRedirect = () => {
       path === "/en" ||
       path === "/ar" ||
       path.includes("/plans") ||
-      path.includes("/app/upload");
+      path.includes("/app/upload") ||
+      path.includes("/resume-builder");
 
     if (!isPublicPage) {
       console.log("[Auth] Redirecting to login from protected route");
@@ -144,6 +145,11 @@ const attemptTokenRefresh = async (): Promise<string> => {
 
     // Set the new access token using centralized utility
     setAccessToken(accessToken);
+
+    // Notify React components that auth state has changed
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("auth-state-changed"));
+    }
 
     // Reset retry count on success
     refreshRetryCount = 0;
@@ -523,7 +529,7 @@ async function apiClient<T = unknown>(
     // Handle other errors
     const message =
       error instanceof Error ? error.message : "An error occurred";
-    
+
     if (!skipErrorToast) {
       toast.error(message);
     }

@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useAuth } from "@/hooks/use-auth";
 import { ResumeData, emptyResumeData } from "@/features/upload-cv/types";
 import { ResumeService } from "@/services/resume.service";
 import { toast } from "sonner";
+import { isAuthenticated } from "@/utils/cookies";
 
 interface UseResumeDataReturn {
   initialData: ResumeData | null;
   resumeId: string | null;
   isLoading: boolean;
+  isGuest: boolean;
 }
 
 export function useResumeData(): UseResumeDataReturn {
-  const { user } = useAuth();
   const searchParams = useSearchParams();
   const resumeIdParam = searchParams.get("id");
 
@@ -20,11 +20,13 @@ export function useResumeData(): UseResumeDataReturn {
   const [resumeId, setResumeId] = useState<string | null>(resumeIdParam);
   const [isLoading, setIsLoading] = useState(true);
 
+  const isGuest = !isAuthenticated();
+
   useEffect(() => {
     const loadData = async () => {
       try {
-        // If resumeId is provided, fetch from API
-        if (resumeIdParam && user?.id) {
+        // If authenticated and resumeId is provided, fetch from API
+        if (resumeIdParam && !isGuest) {
           try {
             const resume = await ResumeService.getById(resumeIdParam);
             const dataWithId = { ...resume.data, id: resume.id };
@@ -46,11 +48,12 @@ export function useResumeData(): UseResumeDataReturn {
     };
 
     loadData();
-  }, [resumeIdParam, user?.id]);
+  }, [resumeIdParam, isGuest]);
 
   return {
     initialData,
     resumeId,
     isLoading,
+    isGuest,
   };
 }

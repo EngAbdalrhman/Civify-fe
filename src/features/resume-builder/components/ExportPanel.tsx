@@ -21,11 +21,17 @@ import arTranslations from "@/messages/ar";
 
 interface ExportPanelProps {
   data: ResumeData;
+  isGuest?: boolean;
+  onAuthGate?: () => void;
 }
 
 import { useTranslations } from "next-intl";
 
-export function ExportPanel({ data }: ExportPanelProps) {
+export function ExportPanel({
+  data,
+  isGuest = false,
+  onAuthGate,
+}: ExportPanelProps) {
   const t = useTranslations("builder.exportPanel");
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
@@ -35,6 +41,10 @@ export function ExportPanel({ data }: ExportPanelProps) {
   };
 
   const handlePdfExport = async () => {
+    if (isGuest && onAuthGate) {
+      onAuthGate();
+      return;
+    }
     if (isExportingPdf || isExportingDocx) return;
 
     setIsExportingPdf(true);
@@ -58,6 +68,10 @@ export function ExportPanel({ data }: ExportPanelProps) {
   };
 
   const handleDocxExport = async () => {
+    if (isGuest && onAuthGate) {
+      onAuthGate();
+      return;
+    }
     if (isExportingPdf || isExportingDocx) return;
 
     setIsExportingDocx(true);

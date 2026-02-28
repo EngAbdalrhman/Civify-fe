@@ -2,11 +2,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ResumeService, ResumeSummary } from "@/services/resume.service";
 import { ResumeData } from "@/features/upload-cv/types";
 import { toast } from "sonner";
+import { getAccessToken } from "@/utils/cookies";
 
 export const useResumes = () => {
   return useQuery({
     queryKey: ["resumes"],
     queryFn: () => ResumeService.getAll(),
+    enabled: !!getAccessToken(),
   });
 };
 
@@ -14,7 +16,7 @@ export const useResume = (id: string) => {
   return useQuery({
     queryKey: ["resumes", id],
     queryFn: () => ResumeService.getById(id),
-    enabled: !!id,
+    enabled: !!id && !!getAccessToken(),
   });
 };
 

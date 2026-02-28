@@ -46,6 +46,10 @@ interface EditorSidebarProps {
   // ATS Score
   isCalculatingScore: boolean;
   onCalculateScore: () => void;
+
+  // Guest mode
+  isGuest?: boolean;
+  onAuthGate?: () => void;
 }
 
 export function EditorSidebar({
@@ -63,6 +67,8 @@ export function EditorSidebar({
   onUploadClick,
   isCalculatingScore,
   onCalculateScore,
+  isGuest = false,
+  onAuthGate,
 }: EditorSidebarProps) {
   const t = useTranslations("builder");
 
@@ -89,7 +95,7 @@ export function EditorSidebar({
           <Button
             variant="outline"
             size="sm"
-            onClick={onUploadClick}
+            onClick={isGuest && onAuthGate ? onAuthGate : onUploadClick}
             disabled={isUploading}
             className="gap-2"
             title={t("actions.upload")}
@@ -166,7 +172,11 @@ export function EditorSidebar({
             </TabsContent>
 
             <TabsContent value="export" className="mt-0">
-              <ExportPanel data={resumeData} />
+              <ExportPanel
+                data={resumeData}
+                isGuest={isGuest}
+                onAuthGate={onAuthGate}
+              />
             </TabsContent>
           </div>
         </div>
