@@ -88,6 +88,7 @@ import { ResumeService, ResumeSummary } from "@/services/resume.service";
 import { JobApplicationService } from "@/services/job-application.service";
 import { Save, Bookmark } from "lucide-react";
 import { getAccessToken } from "@/utils/cookies";
+import { AuthGateDialog } from "@/features/resume-builder/components/AuthGateDialog";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -129,24 +130,28 @@ export default function UploadPage() {
   const [showResumeSelector, setShowResumeSelector] = useState(false);
   const [storedResumes, setStoredResumes] = useState<ResumeSummary[]>([]);
   const [isLoadingResumes, setIsLoadingResumes] = useState(false);
+  const [showAuthGate, setShowAuthGate] = useState(false);
 
   // API Hooks
   const { mutate: uploadCv, isPending: isUploading } = useUploadCv();
   const { mutate: tailorCv, isPending: isTailoring } = useTailorCv();
 
   // Handlers
+  const handleUploadClick = useCallback(() => {
+    const token = getAccessToken();
+    if (!token) {
+      setShowAuthGate(true);
+      return;
+    }
+    fileInputRef.current?.click();
+  }, []);
+
   const handleFileSelect = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
       if (!file) return;
 
-      // Auth check
-      const token = getAccessToken();
-      if (!token) {
-        toast.error(t("authRequired"));
-        router.push("/login?redirect=/app/upload");
-        return;
-      }
+      // Removed duplicate auth check here since it's now in handleUploadClick
 
       const validTypes = [
         "application/pdf",
@@ -216,8 +221,7 @@ export default function UploadPage() {
       // Auth check
       const token = getAccessToken();
       if (!token) {
-        toast.error(t("authRequired"));
-        router.push("/login?redirect=/app/upload");
+        setShowAuthGate(true);
         return;
       }
 
@@ -258,6 +262,13 @@ export default function UploadPage() {
   );
 
   const handleManualEntry = useCallback(() => {
+    // Auth check
+    const token = getAccessToken();
+    if (!token) {
+      setShowAuthGate(true);
+      return;
+    }
+
     setResumeData(emptyResumeData);
     setCurrentStep(2);
   }, []);
@@ -267,8 +278,7 @@ export default function UploadPage() {
     // Auth check
     const token = getAccessToken();
     if (!token) {
-      toast.error(t("authRequired"));
-      router.push("/login?redirect=/app/upload");
+      setShowAuthGate(true);
       return;
     }
 
@@ -450,7 +460,9 @@ export default function UploadPage() {
       }
     } catch (error) {
       console.error("Scrape failed:", error);
-      toast.error(t("errors.scrapeFailed") || "Failed to import job description");
+      toast.error(
+        t("errors.scrapeFailed") || "Failed to import job description",
+      );
     } finally {
       setIsScraping(false);
     }
@@ -697,7 +709,7 @@ export default function UploadPage() {
               />
               <Button
                 size="lg"
-                onClick={() => fileInputRef.current?.click()}
+                onClick={handleUploadClick}
                 disabled={isUploading}
               >
                 {isUploading ? (
@@ -1419,8 +1431,8 @@ export default function UploadPage() {
                   />
                 </div>
               </div>
-              
-               <div className="space-y-2">
+
+              <div className="space-y-2">
                 <Label>{t("upload.importUrl") || "Import from URL"}</Label>
                 <div className="flex gap-2">
                   <Input
@@ -1443,7 +1455,8 @@ export default function UploadPage() {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {t("upload.importUrlDesc") || "Paste a LinkedIn or Indeed job URL to automatically extract the description."}
+                  {t("upload.importUrlDesc") ||
+                    "Paste a LinkedIn or Indeed job URL to automatically extract the description."}
                 </p>
               </div>
 
@@ -2301,6 +2314,12 @@ export default function UploadPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AuthGateDialog
+        open={showAuthGate}
+        onOpenChange={setShowAuthGate}
+        returnTo="/app/upload"
+      />
     </div>
   );
 }

@@ -4,11 +4,13 @@ import {
   TokenPurchaseResult,
 } from "@/services/token-package.service";
 import { toast } from "sonner";
+import { getAccessToken } from "@/utils/cookies";
 
 export const useTokenPackages = () => {
   return useQuery({
     queryKey: ["token-packages"],
     queryFn: () => tokenPackageService.getPackages(),
+    enabled: !!getAccessToken(),
   });
 };
 
@@ -16,6 +18,7 @@ export const useTokenBalance = () => {
   return useQuery({
     queryKey: ["token-balance"],
     queryFn: () => tokenPackageService.getBalance(),
+    enabled: !!getAccessToken(),
   });
 };
 
@@ -23,7 +26,7 @@ export const usePurchasePreview = (packageId: number, promoCode: string) => {
   return useQuery({
     queryKey: ["purchase-preview", packageId, promoCode],
     queryFn: () => tokenPackageService.previewPurchase(packageId, promoCode),
-    enabled: !!packageId && !!promoCode,
+    enabled: !!packageId && !!promoCode && !!getAccessToken(),
     retry: false,
   });
 };

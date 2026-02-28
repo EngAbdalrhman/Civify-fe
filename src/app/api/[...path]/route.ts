@@ -163,7 +163,13 @@ async function handleRequest(
       finalContentType = "application/json";
     }
 
-    const proxyResponse = new NextResponse(finalBody, {
+    // 204, 205, and 304 responses cannot have a body
+    const isBodyAllowed =
+      response.status !== 204 &&
+      response.status !== 205 &&
+      response.status !== 304;
+
+    const proxyResponse = new NextResponse(isBodyAllowed ? finalBody : null, {
       status: response.status,
       statusText: response.statusText,
     });

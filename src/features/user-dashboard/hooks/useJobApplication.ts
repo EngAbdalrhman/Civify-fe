@@ -4,11 +4,13 @@ import {
   JobApplicationRequest,
 } from "@/services/job-application.service";
 import { toast } from "sonner";
+import { getAccessToken } from "@/utils/cookies";
 
 export const useJobApplications = () => {
   return useQuery({
     queryKey: ["job-applications"],
     queryFn: () => JobApplicationService.getAll(),
+    enabled: !!getAccessToken(),
   });
 };
 

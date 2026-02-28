@@ -1,11 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiKeyService } from "@/services/api-key.service";
 import { toast } from "sonner";
+import { getAccessToken } from "@/utils/cookies";
 
 export const useApiKeys = () => {
   return useQuery({
     queryKey: ["api-keys"],
     queryFn: () => apiKeyService.getUserApiKeys(),
+    enabled: !!getAccessToken(),
   });
 };
 

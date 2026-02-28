@@ -95,7 +95,7 @@ export function EditorSidebar({
           <Button
             variant="outline"
             size="sm"
-            onClick={onUploadClick}
+            onClick={isGuest && onAuthGate ? onAuthGate : onUploadClick}
             disabled={isUploading}
             className="gap-2"
             title={t("actions.upload")}

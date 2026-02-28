@@ -17,30 +17,32 @@ const OAUTH_RETURN_TO_KEY = "civify_oauth_returnTo";
 interface AuthGateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  returnTo?: string; // Add optional returnTo prop
 }
 
-export function AuthGateDialog({ open, onOpenChange }: AuthGateDialogProps) {
+export function AuthGateDialog({
+  open,
+  onOpenChange,
+  returnTo = "/app/resume-builder?tab=export",
+}: AuthGateDialogProps) {
   const t = useTranslations("builder.authGate");
   const router = useRouter();
 
   const handleLogin = () => {
     onOpenChange(false);
-    router.push("/login?returnTo=/app/resume-builder?tab=export");
+    router.push(`/login?returnTo=${returnTo}`);
   };
 
   const handleSignup = () => {
     onOpenChange(false);
-    router.push("/signup?returnTo=/app/resume-builder?tab=export");
+    router.push(`/signup?returnTo=${returnTo}`);
   };
 
   const handleGoogleLogin = () => {
     onOpenChange(false);
     // Store return path for OAuth callback
     try {
-      localStorage.setItem(
-        OAUTH_RETURN_TO_KEY,
-        "/app/resume-builder?tab=export",
-      );
+      localStorage.setItem(OAUTH_RETURN_TO_KEY, returnTo);
     } catch {}
     const backendUrl =
       process.env.NEXT_PUBLIC_API_URL || "http://localhost:8077/apis";
@@ -50,10 +52,7 @@ export function AuthGateDialog({ open, onOpenChange }: AuthGateDialogProps) {
   const handleLinkedInLogin = () => {
     onOpenChange(false);
     try {
-      localStorage.setItem(
-        OAUTH_RETURN_TO_KEY,
-        "/app/resume-builder?tab=export",
-      );
+      localStorage.setItem(OAUTH_RETURN_TO_KEY, returnTo);
     } catch {}
     const backendUrl =
       process.env.NEXT_PUBLIC_API_URL || "http://localhost:8077/apis";

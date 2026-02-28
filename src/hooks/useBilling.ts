@@ -1,11 +1,13 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { billingService } from "@/services/billing.service";
 import { toast } from "sonner";
+import { getAccessToken } from "@/utils/cookies";
 
 export const useInvoices = () => {
   return useQuery({
     queryKey: ["billing", "invoices"],
     queryFn: () => billingService.getInvoices(),
+    enabled: !!getAccessToken(),
   });
 };
 
@@ -13,7 +15,7 @@ export const useInvoice = (uuid: string) => {
   return useQuery({
     queryKey: ["billing", "invoices", uuid],
     queryFn: () => billingService.getInvoiceByUuid(uuid),
-    enabled: !!uuid,
+    enabled: !!uuid && !!getAccessToken(),
   });
 };
 

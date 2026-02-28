@@ -1,48 +1,42 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import { Plus } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
-import { ResumeService, ResumeSummary } from "@/services/resume.service";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
+import {
+  useResumes,
+  useDeleteResume,
+} from "@/features/upload-cv/hooks/useResume";
 import { ResumeCard } from "./ResumeCard";
 
 export function ResumeCarousel() {
   const t = useTranslations("dashboard.resumes");
   const router = useRouter();
-  const [resumes, setResumes] = useState<ResumeSummary[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchResumes = async () => {
-      try {
-        const data = await ResumeService.getAll();
-        setResumes(data);
-      } catch (e) {
-        console.error("Failed to fetch resumes", e);
-        toast.error(t("loadError"));
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
-    fetchResumes();
-  }, [t]);
+  const { data: resumes = [], isLoading } = useResumes();
+  const deleteMutation = useDeleteResume();
 
-  const handleDelete = async (id: string, e: React.MouseEvent) => {
+  const handleDelete = (id: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    try {
-      await ResumeService.delete(id);
-      setResumes((prev) => prev.filter((r) => r.id !== id));
-      toast.success(t("deleted"));
-    } catch (error) {
-      toast.error(t("deleteError"));
-    }
+    deleteMutation.mutate(id);
   };
 
   const handleDownload = (id: string, e: React.MouseEvent) => {
@@ -51,28 +45,64 @@ export function ResumeCarousel() {
     router.push(`/app/resume-builder?id=${id}&tab=export`);
   };
 
+  // ─── Filter & Search ────────────────────────────────────────────────────────
+  const filteredResumes = useMemo(() => {
+    if (!searchQuery.trim()) return resumes;
+    const lowerQuery = searchQuery.toLowerCase();
+    return resumes.filter((resume) => {
+      const matchTitle = resume.title.toLowerCase().includes(lowerQuery);
+      const matchJob = resume.data?.personalInfo?.jobTitle
+        ?.toLowerCase()
+        .includes(lowerQuery);
+      return matchTitle || matchJob;
+    });
+  }, [resumes, searchQuery]);
+
+  // Reset page to 1 when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  // ─── Pagination ─────────────────────────────────────────────────────────────
+  const ITEMS_PER_PAGE = 8;
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredResumes.length / ITEMS_PER_PAGE),
+  );
+  const displayedResumes = filteredResumes.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE,
+  );
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      {/* Header section with title, search, and action button */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h2 className="text-xl font-bold tracking-tight">{t("myResumes")}</h2>
+
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          <div className="relative w-full sm:w-[250px]">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search CV or Job Title..."
+              className="pl-8"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <Button asChild className="w-full sm:w-auto">
+            <Link href="/app/resume-builder">
+              <Plus className="h-4 w-4 mr-2" />
+              {t("createNew")}
+            </Link>
+          </Button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {/* Create New Card */}
-        <Link href="/app/resume-builder" className="group">
-          <Card className="h-full flex flex-col items-center justify-center border-dashed border-2 hover:border-primary hover:bg-muted/50 transition-all cursor-pointer">
-            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Plus className="h-6 w-6 text-primary" />
-            </div>
-            <span className="mt-4 font-semibold text-primary">
-              {t("createNew")}
-            </span>
-          </Card>
-        </Link>
-
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {/* Loading State */}
         {isLoading &&
-          Array(2)
+          Array(4)
             .fill(0)
             .map((_, i) => (
               <div
@@ -81,19 +111,103 @@ export function ResumeCarousel() {
               />
             ))}
 
+        {/* Empty State */}
+        {!isLoading && displayedResumes.length === 0 && (
+          <div className="col-span-full py-12 text-center text-muted-foreground border-2 border-dashed rounded-lg bg-card/50">
+            <p className="mb-4">
+              {searchQuery
+                ? "No resumes found for your search."
+                : "You haven't created any resumes yet."}
+            </p>
+            {!searchQuery && (
+              <Button asChild variant="outline">
+                <Link href="/app/resume-builder">
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t("createNew")}
+                </Link>
+              </Button>
+            )}
+          </div>
+        )}
+
         {/* Resume Cards */}
         {!isLoading &&
-          resumes
-            .slice(0, 3)
-            .map((resume) => (
-              <ResumeCard
-                key={resume.id}
-                resume={resume}
-                onDelete={handleDelete}
-                onDownload={handleDownload}
-              />
-            ))}
+          displayedResumes.map((resume) => (
+            <ResumeCard
+              key={resume.id}
+              resume={resume}
+              onDelete={handleDelete}
+              onDownload={handleDownload}
+            />
+          ))}
       </div>
+
+      {/* Pagination Controls */}
+      {!isLoading && totalPages > 1 && (
+        <Pagination className="mt-6">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (currentPage > 1) setCurrentPage((p) => p - 1);
+                }}
+                className={
+                  currentPage === 1 ? "pointer-events-none opacity-50" : ""
+                }
+              />
+            </PaginationItem>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+              if (
+                page === 1 ||
+                page === totalPages ||
+                (page >= currentPage - 1 && page <= currentPage + 1)
+              ) {
+                return (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      href="#"
+                      isActive={currentPage === page}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setCurrentPage(page);
+                      }}
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              }
+
+              if (page === 2 && currentPage > 3) {
+                return <PaginationEllipsis key="ellipsis-start" />;
+              }
+              if (page === totalPages - 1 && currentPage < totalPages - 2) {
+                return <PaginationEllipsis key="ellipsis-end" />;
+              }
+
+              return null;
+            })}
+
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (currentPage < totalPages) setCurrentPage((p) => p + 1);
+                }}
+                className={
+                  currentPage === totalPages
+                    ? "pointer-events-none opacity-50"
+                    : ""
+                }
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   );
 }
