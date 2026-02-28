@@ -146,6 +146,11 @@ const attemptTokenRefresh = async (): Promise<string> => {
     // Set the new access token using centralized utility
     setAccessToken(accessToken);
 
+    // Notify React components that auth state has changed
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("auth-state-changed"));
+    }
+
     // Reset retry count on success
     refreshRetryCount = 0;
 

@@ -40,6 +40,17 @@ export default function UserDashboardLayout({
     setIsAuthChecking(false);
   }, [pathname]);
 
+  // Re-sync auth state when the token is refreshed by the API client
+  useEffect(() => {
+    const handleAuthChange = () => {
+      const token = getAccessToken();
+      setIsAuthenticated(!!token);
+    };
+    window.addEventListener("auth-state-changed", handleAuthChange);
+    return () =>
+      window.removeEventListener("auth-state-changed", handleAuthChange);
+  }, []);
+
   // Ensure permissions are fetched if navigating from auth
   useEffect(() => {
     const token = getAccessToken();
