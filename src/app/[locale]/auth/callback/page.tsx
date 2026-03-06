@@ -22,9 +22,6 @@ function AuthCallbackContent() {
       // Store token in cookie using centralized utility
       setAccessToken(accessToken);
 
-      // Show success message
-      toast.success("Login successful! Redirecting...");
-
       // Check for returnTo in localStorage (from guest builder flow)
       let redirectPath = "/app";
       try {
@@ -33,7 +30,7 @@ function AuthCallbackContent() {
           redirectPath = storedReturnTo;
           localStorage.removeItem(OAUTH_RETURN_TO_KEY);
         }
-      } catch {}
+      } catch { }
 
       // Redirect to destination
       setTimeout(() => {
