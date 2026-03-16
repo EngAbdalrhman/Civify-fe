@@ -2116,7 +2116,7 @@ export default function UploadPage() {
                         Cover Letter
                       </TabsTrigger>
                     )}
-                    {tailorResponse.interviewPrep?.questions?.length && (
+                    {tailorResponse.interviewPrep?.questions?.length > 0 && (
                       <TabsTrigger
                         value="interview"
                         className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
@@ -2125,7 +2125,7 @@ export default function UploadPage() {
                         Interview Prep
                       </TabsTrigger>
                     )}
-                    {tailorResponse.roadmap?.steps?.length && (
+                    {tailorResponse.roadmap?.steps?.length > 0 && (
                       <TabsTrigger
                         value="roadmap"
                         className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
@@ -2170,7 +2170,7 @@ export default function UploadPage() {
                   )}
 
                   {/* Interview Tab */}
-                  {tailorResponse.interviewPrep?.questions?.length && (
+                  {tailorResponse.interviewPrep?.questions?.length > 0 && (
                     <TabsContent value="interview" className="p-6">
                       <div className="mb-4">
                         <h3 className="font-semibold">
@@ -2208,7 +2208,7 @@ export default function UploadPage() {
                   )}
 
                   {/* Roadmap Tab */}
-                  {tailorResponse.roadmap?.steps?.length && (
+                  {tailorResponse.roadmap?.steps?.length > 0 && (
                     <TabsContent value="roadmap" className="p-6">
                       <div className="mb-4">
                         <h3 className="font-semibold">
