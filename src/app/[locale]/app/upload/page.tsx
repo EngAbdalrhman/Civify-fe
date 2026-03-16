@@ -2097,13 +2097,13 @@ export default function UploadPage() {
           {hasAdditionalFeatures && (
             <Card>
               <CardContent className="p-0">
-                <Tabs
+                  <Tabs
                   defaultValue={
                     tailorResponse.coverLetter
                       ? "cover-letter"
-                      : tailorResponse.interviewPrep
+                      : tailorResponse.interviewPrep?.questions?.length
                         ? "interview"
-                        : "roadmap"
+                        : tailorResponse.roadmap?.steps?.length ? "roadmap" : "cover-letter"
                   }
                 >
                   <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0">
