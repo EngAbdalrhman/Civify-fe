@@ -2116,7 +2116,7 @@ export default function UploadPage() {
                         Cover Letter
                       </TabsTrigger>
                     )}
-                    {tailorResponse.interviewPrep?.questions?.length > 0 && (
+                    {(tailorResponse.interviewPrep?.questions?.length ?? 0) > 0 && (
                       <TabsTrigger
                         value="interview"
                         className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
@@ -2125,7 +2125,7 @@ export default function UploadPage() {
                         Interview Prep
                       </TabsTrigger>
                     )}
-                    {tailorResponse.roadmap?.steps?.length > 0 && (
+                    {(tailorResponse.roadmap?.steps?.length ?? 0) > 0 && (
                       <TabsTrigger
                         value="roadmap"
                         className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
@@ -2170,7 +2170,7 @@ export default function UploadPage() {
                   )}
 
                   {/* Interview Tab */}
-                  {tailorResponse.interviewPrep?.questions?.length > 0 && (
+                  {(tailorResponse.interviewPrep?.questions?.length ?? 0) > 0 && (
                     <TabsContent value="interview" className="p-6">
                       <div className="mb-4">
                         <h3 className="font-semibold">
@@ -2181,7 +2181,7 @@ export default function UploadPage() {
                         </p>
                       </div>
                       <div className="space-y-3">
-                        {tailorResponse.interviewPrep.questions.map((q, i) => (
+                        {tailorResponse.interviewPrep?.questions?.map((q, i) => (
                           <div key={i} className="p-4 bg-muted rounded-lg">
                             <div className="flex items-start justify-between gap-4">
                               <p className="font-medium">
@@ -2208,7 +2208,7 @@ export default function UploadPage() {
                   )}
 
                   {/* Roadmap Tab */}
-                  {tailorResponse.roadmap?.steps?.length > 0 && (
+                  {(tailorResponse.roadmap?.steps?.length ?? 0) > 0 && (
                     <TabsContent value="roadmap" className="p-6">
                       <div className="mb-4">
                         <h3 className="font-semibold">
@@ -2219,14 +2219,13 @@ export default function UploadPage() {
                         </p>
                       </div>
 
-                      {tailorResponse.roadmap.skillGaps &&
-                        tailorResponse.roadmap.skillGaps.length > 0 && (
+                      {(tailorResponse.roadmap?.skillGaps?.length ?? 0) > 0 && (
                           <div className="mb-6">
                             <h4 className="text-sm font-medium mb-2">
                               Skills to Develop
                             </h4>
                             <div className="flex flex-wrap gap-2">
-                              {tailorResponse.roadmap.skillGaps.map(
+                              {tailorResponse.roadmap?.skillGaps?.map(
                                 (skill, i) => (
                                   <span
                                     key={i}
@@ -2241,7 +2240,7 @@ export default function UploadPage() {
                         )}
 
                       <div className="space-y-3">
-                        {tailorResponse.roadmap.steps.map((step, i) => (
+                        {tailorResponse.roadmap?.steps?.map((step, i) => (
                           <div
                             key={i}
                             className="flex items-start gap-3 p-3 bg-muted rounded-lg"
