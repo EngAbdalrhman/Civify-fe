@@ -123,6 +123,7 @@ export default function AdminDashboardLayout({
                       width={75}
                       height={35}
                       className="object-contain"
+                      style={{ width: "auto", height: "auto" }}
                     />
                   </div>
                 </Link>

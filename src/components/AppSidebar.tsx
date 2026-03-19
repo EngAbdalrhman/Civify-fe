@@ -126,6 +126,7 @@ export function AppSidebar({
                     width={shouldShowCollapsed ? 32 : 75}
                     height={shouldShowCollapsed ? 32 : 35}
                     className="object-contain"
+                    style={{ width: "auto", height: "auto" }}
                   />
                 </div>
               </Link>

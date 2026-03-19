@@ -261,6 +261,7 @@ export function Footer() {
               width={32}
               height={32}
               className="object-contain"
+              style={{ width: "auto", height: "auto" }}
             />
           </Link>
           <span className="text-sm text-gray-600">{t("poweredBy")}</span>
