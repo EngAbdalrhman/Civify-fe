@@ -45,6 +45,9 @@ export default function UserDashboardLayout({
     const handleAuthChange = () => {
       const token = getAccessToken();
       setIsAuthenticated(!!token);
+      if (token) {
+        refetch();
+      }
     };
     window.addEventListener("auth-state-changed", handleAuthChange);
     return () =>
