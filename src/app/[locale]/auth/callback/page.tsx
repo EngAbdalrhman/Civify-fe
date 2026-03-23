@@ -4,6 +4,7 @@ import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { setAccessToken } from "@/utils/cookies";
+import apiClient from "@/api/client";
 
 const OAUTH_RETURN_TO_KEY = "civify_oauth_returnTo";
 
@@ -21,6 +22,15 @@ function AuthCallbackContent() {
     if (accessToken) {
       // Store token in cookie using centralized utility
       setAccessToken(accessToken);
+
+      // Check and apply pending referral code from OAuth signup
+      const pendingReferral = localStorage.getItem("civify_pending_referral");
+      if (pendingReferral) {
+        apiClient.post("/v1/referrals/apply", { referralCode: pendingReferral })
+          .then(() => toast.success("Referral code applied successfully!"))
+          .catch(err => console.error("Failed to apply referral code:", err))
+          .finally(() => localStorage.removeItem("civify_pending_referral"));
+      }
 
       // Check for returnTo in localStorage (from guest builder flow)
       let redirectPath = "/app";
