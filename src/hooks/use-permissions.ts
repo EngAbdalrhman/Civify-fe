@@ -4,6 +4,7 @@ import { useCallback, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/providers/query-provider";
 import apiClient from "@/api/client";
+import { getAccessToken } from "@/utils/cookies";
 interface PermissionsResponse {
   permissions: string[];
   encryptedPermissions: string;
@@ -40,6 +41,7 @@ export const usePermissions = (): PermissionContextType => {
         await apiClient.get<PermissionsResponse>("/auth/permissions");
       return response.data;
     },
+    enabled: !!getAccessToken(),
     retry: false, // Don't retry on auth failures — let the refresh flow handle it
     select: (data) => ({
       permissions: data?.permissions || [],
