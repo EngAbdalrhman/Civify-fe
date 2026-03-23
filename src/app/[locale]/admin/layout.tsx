@@ -25,7 +25,7 @@ export default function AdminDashboardLayout({
   const t = useTranslations("nav");
   const pathname = usePathname();
   const router = useRouter();
-  const { isLoading, hasPermission } = usePermissions();
+  const { isLoading, hasPermission, error } = usePermissions();
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -39,9 +39,14 @@ export default function AdminDashboardLayout({
     setIsMobileOpen(false);
   }, [pathname]);
 
+  // Treat auth errors as a "loading" state — the refresh flow may restore the session
+  const isAuthRecovering = !!error;
+
   // Check if user has access to admin dashboard at all
   const hasAdminAccess =
-    isLoading || hasPermission(ADMIN_ACTION_PERMISSIONS.ADMIN_DASHBOARD_VIEW);
+    isLoading ||
+    isAuthRecovering ||
+    hasPermission(ADMIN_ACTION_PERMISSIONS.ADMIN_DASHBOARD_VIEW);
 
   // Helper to check if a link is active
   const isActive = (path: string) => {
@@ -123,6 +128,7 @@ export default function AdminDashboardLayout({
                       width={75}
                       height={35}
                       className="object-contain"
+                      style={{ width: "auto", height: "auto" }}
                     />
                   </div>
                 </Link>

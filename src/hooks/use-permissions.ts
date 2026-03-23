@@ -1,10 +1,9 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/providers/query-provider";
 import apiClient from "@/api/client";
-import { getAccessToken } from "@/utils/cookies";
 interface PermissionsResponse {
   permissions: string[];
   encryptedPermissions: string;
@@ -24,16 +23,24 @@ interface PermissionContextType {
 }
 
 export const usePermissions = (): PermissionContextType => {
+  // Re-fetch permissions when token is refreshed
+  useEffect(() => {
+    const handleAuthChange = () => {
+      queryClient.invalidateQueries({ queryKey: ["permissions"] });
+    };
+    window.addEventListener("auth-state-changed", handleAuthChange);
+    return () =>
+      window.removeEventListener("auth-state-changed", handleAuthChange);
+  }, []);
+
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["permissions"],
     queryFn: async () => {
-      const token = getAccessToken();
-      if (!token) return null;
-
       const response =
         await apiClient.get<PermissionsResponse>("/auth/permissions");
       return response.data;
     },
+    retry: false, // Don't retry on auth failures — let the refresh flow handle it
     select: (data) => ({
       permissions: data?.permissions || [],
       groupName: data?.groupName || null,

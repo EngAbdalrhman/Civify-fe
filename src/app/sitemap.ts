@@ -1,5 +1,21 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
 import { getPathname, routing } from "@/i18n/routing";
+
+type SitemapRoute = {
+  href:
+    | "/"
+    | "/plans"
+    | "/api-docs"
+    | "/contact"
+    | "/terms"
+    | "/policy"
+    | "/policy/cancellation"
+    | "/extension";
+  changeFrequency: NonNullable<
+    MetadataRoute.Sitemap[number]["changeFrequency"]
+  >;
+  priority: number;
+};
 
 // Ensure the host doesn't have a trailing slash to prevent double slashes (e.g., //en)
 const host = (process.env.NEXT_PUBLIC_BASE_URL || "https://civify.cv").replace(
@@ -9,7 +25,7 @@ const host = (process.env.NEXT_PUBLIC_BASE_URL || "https://civify.cv").replace(
 
 export default function sitemap(): MetadataRoute.Sitemap {
   // 1. Define your routes in a single array to avoid repetition
-  const routes = [
+  const routes: SitemapRoute[] = [
     { href: "/", changeFrequency: "weekly", priority: 1 },
     { href: "/plans", changeFrequency: "weekly", priority: 0.9 },
     { href: "/api-docs", changeFrequency: "weekly", priority: 0.8 },
@@ -23,23 +39,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // 2. Use flatMap to generate entries for every locale for every route
   return routes.flatMap((route) => {
     return routing.locales.map((locale) => {
-      // Resolve the URL for the current locale
-      // Cast href to 'any' to avoid TS errors if your routing config is strictly typed
-      const href = route.href as any;
-
       return {
-        url: `${host}${getPathname({ locale, href })}`,
+        url: `${host}${getPathname({ locale, href: route.href })}`,
         lastModified: new Date(),
-        changeFrequency: route.changeFrequency as
-          | "weekly"
-          | "monthly"
-          | "yearly",
+        changeFrequency: route.changeFrequency,
         priority: route.priority,
         alternates: {
           languages: Object.fromEntries(
             routing.locales.map((l) => [
               l,
-              `${host}${getPathname({ locale: l, href })}`,
+              `${host}${getPathname({ locale: l, href: route.href })}`,
             ]),
           ),
         },
