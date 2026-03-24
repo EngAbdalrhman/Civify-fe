@@ -98,7 +98,7 @@ export function Navbar() {
                 width={150}
                 height={32}
                 className="object-contain"
-                style={{ width: "150px", height: "32px" }}
+                // style={{ width: "auto", height: "auto" }}
               />
             </div>
           </Link>
