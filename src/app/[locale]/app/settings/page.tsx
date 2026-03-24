@@ -933,11 +933,6 @@ export default function SettingsPage() {
                       )}
                     </button>
                   </div>
-                  <Switch
-                    checked={is2FAEnabled}
-                    onCheckedChange={handleToggle2FA}
-                    disabled={isToggling2FA || !user}
-                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Confirm New Password</Label>
@@ -984,29 +979,29 @@ export default function SettingsPage() {
               </CardFooter>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Two-Factor Authentication</CardTitle>
-                <CardDescription>
-                  Add an extra layer of security to your account.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <div className="font-medium">Enable 2FA</div>
-                    <div className="text-sm text-muted-foreground">
-                      Receive a verification code via email when logging in.
-                    </div>
-                  </div>
-                  <Switch
-                    checked={is2FAEnabled}
-                    onCheckedChange={handleToggle2FA}
-                    disabled={isToggling2FA || !user}
-                  />
-                </div>
-              </CardContent>
-            </Card>
+            {/*<Card>*/}
+            {/*  <CardHeader>*/}
+            {/*    <CardTitle>Two-Factor Authentication</CardTitle>*/}
+            {/*    <CardDescription>*/}
+            {/*      Add an extra layer of security to your account.*/}
+            {/*    </CardDescription>*/}
+            {/*  </CardHeader>*/}
+            {/*  <CardContent>*/}
+            {/*    <div className="flex items-center justify-between">*/}
+            {/*      <div className="space-y-0.5">*/}
+            {/*        <div className="font-medium">Enable 2FA</div>*/}
+            {/*        <div className="text-sm text-muted-foreground">*/}
+            {/*          Receive a verification code via email when logging in.*/}
+            {/*        </div>*/}
+            {/*      </div>*/}
+            {/*      <Switch*/}
+            {/*        checked={is2FAEnabled}*/}
+            {/*        onCheckedChange={handleToggle2FA}*/}
+            {/*        disabled={isToggling2FA || !user}*/}
+            {/*      />*/}
+            {/*    </div>*/}
+            {/*  </CardContent>*/}
+            {/*</Card>*/}
 
             {/* Delete Account Danger Zone */}
             <Card className="border-destructive/50">
