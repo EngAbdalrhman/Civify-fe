@@ -1,6 +1,7 @@
 import SignupContent from "@/features/auth/components/SignupContent";
 import { getTranslations } from "next-intl/server";
 import { Metadata } from "next";
+import { Suspense } from "react";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -34,5 +35,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default function SignupPage() {
-  return <SignupContent />;
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div></div>}>
+      <SignupContent />
+    </Suspense>
+  );
 }
