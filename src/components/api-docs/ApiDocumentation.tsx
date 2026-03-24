@@ -137,6 +137,112 @@ with open("masked_cv.pdf", "wb") as f:
 HTTP Headers:
 Content-Type: application/pdf
 Content-Disposition: attachment; filename="masked_cv.pdf"`
+    },
+    {
+      id: 'tailor',
+      method: 'POST',
+      path: '/v1/external/cvs/tailor',
+      title: 'Tailor CV',
+      description: 'Upload a CV and job description to get a tailored CV with ATS analysis',
+      parameters: [
+        { name: 'file', type: 'multipart/form-data', required: true, description: 'The CV file (PDF, DOC, DOCX)' },
+        { name: 'jobDescription', type: 'string', required: true, description: 'The job description to tailor the CV against' },
+        { name: 'jobTitle', type: 'string', required: false, description: 'Target job title' },
+        { name: 'companyName', type: 'string', required: false, description: 'Target company name' },
+        { name: 'language', type: 'string', required: false, description: 'Target language (e.g., "en", "ar")' },
+        { name: 'generateCoverLetter', type: 'boolean', required: false, description: 'Whether to generate a cover letter (default: false)' },
+        { name: 'includeInterviewQuestions', type: 'boolean', required: false, description: 'Whether to include interview questions (default: false)' },
+        { name: 'includeRoadmap', type: 'boolean', required: false, description: 'Whether to include a learning roadmap (default: false)' }
+      ],
+      curlExample: `curl -X POST \\
+  \${baseUrl}/v1/external/cvs/tailor \\
+  -H "X-API-KEY: your_api_key_here" \\
+  -F "file=@/path/to/cv.pdf" \\
+  -F "jobDescription=We are looking for a Senior Software Engineer..." \\
+  -F "jobTitle=Senior Software Engineer" \\
+  -F "companyName=Tech Corp" \\
+  -F "generateCoverLetter=true"`,
+      jsExample: `const formData = new FormData();
+formData.append('file', fileInput.files[0]);
+formData.append('jobDescription', 'We are looking for a Senior Software Engineer...');
+formData.append('jobTitle', 'Senior Software Engineer');
+formData.append('companyName', 'Tech Corp');
+formData.append('generateCoverLetter', 'true');
+
+const response = await fetch('\${baseUrl}/v1/external/cvs/tailor', {
+  method: 'POST',
+  headers: {
+    'X-API-KEY': 'your_api_key_here'
+  },
+  body: formData
+});
+
+const data = await response.json();
+console.log(data);`,
+      pythonExample: `import requests
+
+url = "\${baseUrl}/v1/external/cvs/tailor"
+headers = {"X-API-KEY": "your_api_key_here"}
+files = {"file": open("/path/to/cv.pdf", "rb")}
+data = {
+    "jobDescription": "We are looking for a Senior Software Engineer...",
+    "jobTitle": "Senior Software Engineer",
+    "companyName": "Tech Corp",
+    "generateCoverLetter": "true"
+}
+
+response = requests.post(url, headers=headers, files=files, data=data)
+result = response.json()
+print(result)`,
+      response: `{
+  "success": true,
+  "message": "CV tailored successfully",
+  "tailoredCv": {
+    "summary": "Experienced software engineer...",
+    "score": 85,
+    "improvements": [...]
+  },
+  "coverLetter": "Dear Hiring Manager...",
+  "interviewQuestions": [...],
+  "roadmap": [...]
+}`
+    },
+    {
+      id: 'profile',
+      method: 'GET',
+      path: '/v1/external/user/profile',
+      title: 'Get User Profile',
+      description: 'Get basic user profile and subscription plan details',
+      parameters: [],
+      curlExample: `curl -X GET \\
+  \${baseUrl}/v1/external/user/profile \\
+  -H "X-API-KEY: your_api_key_here"`,
+      jsExample: `const response = await fetch('\${baseUrl}/v1/external/user/profile', {
+  method: 'GET',
+  headers: {
+    'X-API-KEY': 'your_api_key_here'
+  }
+});
+
+const data = await response.json();
+console.log(data);`,
+      pythonExample: `import requests
+
+url = "\${baseUrl}/v1/external/user/profile"
+headers = {"X-API-KEY": "your_api_key_here"}
+
+response = requests.get(url, headers=headers)
+result = response.json()
+print(result)`,
+      response: `{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "email": "user@example.com",
+  "name": "Jane Smith",
+  "plan": "premium",
+  "apiCallsQuota": 1000,
+  "apiCallsUsed": 150,
+  "createdAt": "2024-01-01T00:00:00Z"
+}`
     }
   ];
 
