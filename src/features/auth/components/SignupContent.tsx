@@ -7,12 +7,15 @@ import { SubmitHandler } from "react-hook-form";
 import { useSignup, SignupSchemaType } from "@/features/auth/hooks";
 import { usePermissions } from "@/hooks/use-permissions";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 export default function SignupContent() {
   const t = useTranslations("auth");
   const router = useRouter();
   const { refetch } = usePermissions();
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const searchParams = useSearchParams();
+  const refCode = searchParams.get("ref");
 
   const { form, signup, isSignupPending, isSignupSuccess } = useSignup();
 
@@ -27,6 +30,12 @@ export default function SignupContent() {
   };
 
   useEffect(() => {
+    if (refCode) {
+      form.setValue("referralCode", refCode);
+    }
+  }, [refCode, form]);
+
+  useEffect(() => {
     const handleSignupSuccess = async () => {
       if (isSignupSuccess && !isRedirecting) {
         setIsRedirecting(true);
@@ -39,7 +48,15 @@ export default function SignupContent() {
     handleSignupSuccess();
   }, [isSignupSuccess, isRedirecting, refetch, router]);
 
+  const saveReferralForOAuth = () => {
+    const code = form.getValues("referralCode");
+    if (code) {
+      localStorage.setItem("civify_pending_referral", code);
+    }
+  };
+
   const handleGoogleSignup = () => {
+    saveReferralForOAuth();
     // Redirect to backend Google OAuth endpoint
     const backendUrl =
       process.env.NEXT_PUBLIC_API_URL || "http://localhost:8077/apis";
@@ -47,6 +64,7 @@ export default function SignupContent() {
   };
 
   const handleLinkedInSignup = () => {
+    saveReferralForOAuth();
     // Redirect to backend LinkedIn OAuth endpoint
     const backendUrl =
       process.env.NEXT_PUBLIC_API_URL || "http://localhost:8077/apis";
@@ -138,6 +156,16 @@ export default function SignupContent() {
                 {errors.confirmPassword.message}
               </p>
             )}
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t("referralCode") || "Referral Code (Optional)"}</label>
+            <input
+              type="text"
+              {...register("referralCode")}
+              className="w-full rounded-md border px-3 py-2 uppercase"
+              placeholder={t("referralCodePlaceholder") || "e.g. A1B2C3D4"}
+            />
           </div>
 
           <label className="flex items-center gap-2 text-sm cursor-pointer">

@@ -25,6 +25,7 @@ export const useSignup = () => {
         .min(8, t("passwordMin"))
         .regex(PASSWORD_REGEX, t("passwordComplexity")),
       confirmPassword: z.string().min(8, t("confirmPasswordMin")),
+      referralCode: z.string().optional(),
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: t("passwordsMatch"),
@@ -74,4 +75,5 @@ export type SignupSchemaType = {
   email: string;
   password: string;
   confirmPassword: string;
+  referralCode?: string;
 };
