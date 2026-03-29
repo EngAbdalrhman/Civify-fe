@@ -98,7 +98,7 @@ export default function ContactContent() {
                     {t("info.phone")}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    +20 01101008225
+                    +20 01108992027
                   </p>
                 </div>
               </div>
