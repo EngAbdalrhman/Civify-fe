@@ -30,11 +30,16 @@ export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const eventSourceRef = useRef<EventSource | null>(null);
+  // Guard against React 18 StrictMode double-mount creating 2 SSE connections
+  const connectionActiveRef = useRef(false);
 
   // Connect to SSE stream
   useEffect(() => {
     const token = getAccessToken();
     if (!token) return;
+    // If a connection is already active (StrictMode double-invoke), skip
+    if (connectionActiveRef.current) return;
+    connectionActiveRef.current = true;
 
     const baseUrl =
       process.env.NEXT_PUBLIC_API_URL || "http://localhost:8077/apis";
@@ -86,6 +91,7 @@ export function NotificationBell() {
     return () => {
       eventSource.close();
       setIsConnected(false);
+      connectionActiveRef.current = false;
     };
   }, [queryClient]);
 
