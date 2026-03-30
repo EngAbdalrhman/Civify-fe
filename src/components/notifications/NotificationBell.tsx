@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Bell, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +19,10 @@ import {
   Notification,
 } from "@/hooks/useNotifications";
 
+// Module-level singleton: survives React 18 StrictMode unmount/remount cycle.
+// A ref would be reset during cleanup, allowing a second connection on remount.
+let activeEventSource: EventSource | null = null;
+
 export function NotificationBell() {
   const queryClient = useQueryClient();
   const { data: unreadCount = 0 } = useUnreadNotificationsCount();
@@ -29,25 +33,26 @@ export function NotificationBell() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
-  const eventSourceRef = useRef<EventSource | null>(null);
-  // Guard against React 18 StrictMode double-mount creating 2 SSE connections
-  const connectionActiveRef = useRef(false);
 
-  // Connect to SSE stream
+  // Connect to SSE stream — single connection guaranteed by module-level guard
   useEffect(() => {
     const token = getAccessToken();
     if (!token) return;
-    // If a connection is already active (StrictMode double-invoke), skip
-    if (connectionActiveRef.current) return;
-    connectionActiveRef.current = true;
+
+    // If there's already an active connection (StrictMode remount), skip entirely
+    if (activeEventSource && activeEventSource.readyState !== EventSource.CLOSED) {
+      setIsConnected(true);
+      return;
+    }
 
     const baseUrl =
       process.env.NEXT_PUBLIC_API_URL || "http://localhost:8077/apis";
 
-    // Connect to stream using cookie for auth (access token is already in cookie)
     const eventSource = new EventSource(`${baseUrl}/v1/notifications/stream`, {
       withCredentials: true,
     });
+
+    activeEventSource = eventSource;
 
     eventSource.onopen = () => {
       setIsConnected(true);
@@ -86,12 +91,10 @@ export function NotificationBell() {
       setIsConnected(false);
     };
 
-    eventSourceRef.current = eventSource;
-
     return () => {
       eventSource.close();
+      activeEventSource = null;
       setIsConnected(false);
-      connectionActiveRef.current = false;
     };
   }, [queryClient]);
 
