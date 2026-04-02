@@ -105,7 +105,7 @@ export default async function ExtensionPage({
       <ExtensionHowItWorksSection />
       <LanguageSection />
       <PrivacySecuritySection />
-      <ExtensionTestimonialsSection />
+      {/*<ExtensionTestimonialsSection />*/}
       <ComparisonTableSection />
       <ExtensionFAQSection />
       <ExtensionCTASection />
