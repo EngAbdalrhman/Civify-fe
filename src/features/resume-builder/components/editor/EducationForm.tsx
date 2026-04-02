@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Trash2, Plus } from 'lucide-react';
+import { Trash2, Plus, Eye, EyeOff } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 
 interface EducationFormProps {
@@ -58,8 +58,11 @@ export function EducationForm({ items = [], onChange }: EducationFormProps) {
   return (
     <div className="space-y-6">
       {items.map((item) => (
-        <div key={item.id} className="p-4 border rounded-lg bg-card/50 space-y-4 relative group">
-          <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div key={item.id} className={`p-4 border rounded-lg bg-card/50 space-y-4 relative group transition-opacity ${item.visible === false ? 'opacity-50' : ''}`}>
+          <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity flex">
+            <Button variant="ghost" size="icon" onClick={() => updateItem(item.id, { visible: item.visible === false ? true : false })} className="text-muted-foreground hover:text-foreground">
+              {item.visible === false ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </Button>
             <Button variant="ghost" size="icon" onClick={() => removeItem(item.id)} className="text-destructive hover:text-destructive/90">
               <Trash2 className="h-4 w-4" />
             </Button>

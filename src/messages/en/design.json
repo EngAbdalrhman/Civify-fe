@@ -35,5 +35,8 @@
     "matchLocale": "Match Language",
     "ltr": "Left to Right",
     "rtl": "Right to Left"
+  },
+  "sectionColumns": {
+    "title": "Section Columns"
   }
 }

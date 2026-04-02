@@ -64,6 +64,7 @@ export interface ResumeMetadata {
   margins?: { top?: number; bottom?: number; left?: number; right?: number; };
   headingFontFamily?: string;
   bodyFontFamily?: string;
+  sectionColumns?: Record<string, number>;
 }
 
 export interface ResumeData {

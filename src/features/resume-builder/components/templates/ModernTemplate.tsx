@@ -108,10 +108,10 @@ export function ModernTemplate({ data, color }: TemplateProps) {
     );
   };
 
-  // Simple bullet list for courses/certifications
+  // Simple bullet list for courses/certifications/interests/hobbies
   const renderSimpleCourses = (section: any) => {
     const items = section.items.filter((item: any) => item.visible !== false);
-    const columnCount = 3;
+    const columnCount = metadata?.sectionColumns?.[section.id] ?? 3;
     const itemsPerColumn = Math.ceil(items.length / columnCount);
     const columns: any[][] = [];
     for (let i = 0; i < columnCount; i++) {
@@ -119,7 +119,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
     }
     
     return (
-      <div className="grid grid-cols-3 gap-4 text-sm">
+      <div className={`grid gap-4 text-sm`} style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}>
         {columns.map((column, colIdx) => (
           <ul key={colIdx} className="list-disc list-inside space-y-1">
             {column.map((item: any) => (

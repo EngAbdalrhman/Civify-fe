@@ -261,7 +261,7 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
 
   const renderSimpleCourses = (section: (typeof sections)[0]) => {
     const items = section.items.filter((item) => item.visible !== false);
-    const columnCount = 3;
+    const columnCount = metadata?.sectionColumns?.[section.id] ?? 3;
     const itemsPerColumn = Math.ceil(items.length / columnCount);
     const columns: (typeof items)[] = [];
     for (let i = 0; i < columnCount; i++) {
@@ -269,7 +269,7 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
     }
 
     return `
-      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; font-size: 14px;">
+      <div style="display: grid; grid-template-columns: repeat(${columnCount}, minmax(0, 1fr)); gap: 16px; font-size: 14px;">
         ${columns
           .map(
             (column) => `
@@ -503,7 +503,7 @@ function renderModernTemplate(data: ResumeData, color: string): string {
 
   const renderSimpleCourses = (section: (typeof sections)[0]) => {
     const items = section.items.filter((item) => item.visible !== false);
-    const columnCount = 3;
+    const columnCount = metadata?.sectionColumns?.[section.id] ?? 3;
     const itemsPerColumn = Math.ceil(items.length / columnCount);
     const columns: (typeof items)[] = [];
     for (let i = 0; i < columnCount; i++) {
@@ -511,7 +511,7 @@ function renderModernTemplate(data: ResumeData, color: string): string {
     }
 
     return `
-      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; font-size: 14px;">
+      <div style="display: grid; grid-template-columns: repeat(${columnCount}, minmax(0, 1fr)); gap: 16px; font-size: 14px;">
         ${columns
           .map(
             (column) => `
@@ -760,7 +760,7 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
 
   const renderSimpleCourses = (section: (typeof sections)[0]) => {
     const items = section.items.filter((item) => item.visible !== false);
-    const columnCount = 3;
+    const columnCount = metadata?.sectionColumns?.[section.id] ?? 3;
     const itemsPerColumn = Math.ceil(items.length / columnCount);
     const columns: (typeof items)[] = [];
     for (let i = 0; i < columnCount; i++) {
@@ -768,7 +768,7 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
     }
 
     return `
-      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; font-size: 14px;">
+      <div style="display: grid; grid-template-columns: repeat(${columnCount}, minmax(0, 1fr)); gap: 16px; font-size: 14px;">
         ${columns
           .map(
             (column) => `

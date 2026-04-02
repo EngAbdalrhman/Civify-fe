@@ -79,6 +79,34 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
     });
   };
 
+  const isCertOrCourseStr = (type: string, title: string) => {
+    const lowerTitle = title.toLowerCase();
+    return type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
+  };
+
+  const isSimpleSectionStr = (type: string, title: string) => {
+    const lowerTitle = title.toLowerCase();
+    return type === 'interests' || lowerTitle.includes('interest') || lowerTitle.includes('hobby') || lowerTitle.includes('hobbies');
+  };
+
+  const columnEligibleSections = data.sections.filter(section => {
+    if (section.visible === false) return false;
+    return isCertOrCourseStr(section.type, section.title) || isSimpleSectionStr(section.type, section.title) || section.type === 'custom';
+  });
+
+  const updateSectionColumns = (sectionId: string, columns: number) => {
+    onChange({
+      ...data,
+      metadata: {
+        ...metadata,
+        sectionColumns: {
+          ...(metadata.sectionColumns || {}),
+          [sectionId]: columns,
+        },
+      },
+    });
+  };
+
   return (
     <div className="space-y-8">
       {/* Templates */}
@@ -414,6 +442,42 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
           </button>
         </div>
       </div>
+
+      {/* Section Columns */}
+      {columnEligibleSections.length > 0 && (
+        <div className="space-y-4">
+          <h3 className="font-semibold flex items-center gap-2">
+            <LayoutTemplate className="h-4 w-4" />
+            {t('sectionColumns.title') || 'Section Columns'}
+          </h3>
+          <div className="space-y-3">
+            {columnEligibleSections.map(section => {
+              const currentCols = metadata.sectionColumns?.[section.id] || (isCertOrCourseStr(section.type, section.title) ? 3 : 1);
+              return (
+                <div key={section.id} className="flex items-center justify-between">
+                  <Label className="text-sm border-0 font-medium truncate pr-4">{section.title}</Label>
+                  <div className="flex gap-1 shrink-0">
+                    {[1, 2, 3, 4].map(n => (
+                      <button
+                        key={n}
+                        className={`
+                          w-8 h-8 flex items-center justify-center text-xs rounded-md border transition-all
+                          ${currentCols === n
+                            ? 'bg-primary text-primary-foreground border-primary font-bold'
+                            : 'bg-background hover:bg-muted border-border font-medium hover:border-primary/50'}
+                        `}
+                        onClick={() => updateSectionColumns(section.id, n)}
+                      >
+                        {n}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

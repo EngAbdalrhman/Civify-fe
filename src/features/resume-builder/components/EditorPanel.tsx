@@ -50,6 +50,8 @@ import {
   GripVertical,
   Pencil,
   Trash2,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { useTranslations } from "next-intl";
@@ -104,11 +106,13 @@ function SortableSection({
   children,
   onRename,
   onDelete,
+  onToggleVisibility,
 }: {
   section: ResumeSection;
   children: React.ReactNode;
   onRename: (id: string, newTitle: string) => void;
   onDelete: (id: string) => void;
+  onToggleVisibility: (id: string) => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(section.title);
@@ -175,6 +179,24 @@ function SortableSection({
             <span className="text-xs text-muted-foreground ml-auto mr-2">
               ({section.items.length})
             </span>
+
+            <div
+              role="button"
+              tabIndex={0}
+              className="h-6 w-6 inline-flex items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleVisibility(section.id);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.stopPropagation();
+                  onToggleVisibility(section.id);
+                }
+              }}
+            >
+              {section.visible === false ? <EyeOff className="h-3 w-3 text-muted-foreground" /> : <Eye className="h-3 w-3" />}
+            </div>
 
             <div
               role="button"
@@ -256,6 +278,16 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
     const newSections = data.sections.map((section) => {
       if (section.id === sectionId) {
         return { ...section, title: newTitle };
+      }
+      return section;
+    });
+    onChange({ ...data, sections: newSections });
+  };
+
+  const toggleSectionVisibility = (sectionId: string) => {
+    const newSections = data.sections.map((section) => {
+      if (section.id === sectionId) {
+        return { ...section, visible: section.visible === false ? true : false };
       }
       return section;
     });
@@ -395,6 +427,7 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
                 section={section}
                 onRename={renameSection}
                 onDelete={deleteSection}
+                onToggleVisibility={toggleSectionVisibility}
               >
                 {renderSectionContent(section)}
               </SortableSection>
