@@ -173,7 +173,7 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
   };
 
   const visibleSections = sections.filter(
-    (s) => s.visible !== false && s.items && s.items.length > 0,
+    (s) => s.visible !== false && s.items && s.items.some((i: any) => i.visible !== false),
   );
 
   const compactClass = metadata?.compactMode ? "1.2" : "1.6";
@@ -291,6 +291,26 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
       lowerTitle.includes("certif")
     );
   };
+
+  const isSimpleListSection = (type: string, title: string) => {
+    const lowerTitle = title.toLowerCase();
+    return (
+      type === "interests" ||
+      lowerTitle.includes("interest") ||
+      lowerTitle.includes("hobby") ||
+      lowerTitle.includes("hobbies")
+    );
+  };
+
+  const shouldUseSimpleColumns = (section: any) => {
+    if (section.type === "skills" || section.type === "languages") return false;
+    if (isCertOrCourse(section.type, section.title) && coursesStyle === "simple") return true;
+    if (isSimpleListSection(section.type, section.title)) return true;
+    if (metadata?.sectionColumns?.[section.id]) return true;
+    return false;
+  };
+
+
 
   const content = `
     <div style="padding: ${margins.top}px ${margins.right}px ${margins.bottom}px ${margins.left}px; min-height: 100%; background-color: white; color: #111827; line-height: ${compactClass};">
@@ -791,6 +811,24 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
     );
   };
 
+  const isSimpleListSection = (type: string, title: string) => {
+    const lowerTitle = title.toLowerCase();
+    return (
+      type === "interests" ||
+      lowerTitle.includes("interest") ||
+      lowerTitle.includes("hobby") ||
+      lowerTitle.includes("hobbies")
+    );
+  };
+
+  const shouldUseSimpleColumns = (section: any) => {
+    if (section.type === "skills" || section.type === "languages") return false;
+    if (isCertOrCourse(section.type, section.title) && coursesStyle === "simple") return true;
+    if (isSimpleListSection(section.type, section.title)) return true;
+    if (metadata?.sectionColumns?.[section.id]) return true;
+    return false;
+  };
+
   const content = `
     <div style="display: flex; min-height: 100%; background-color: white; line-height: ${compactClass};">
       <!-- Left Sidebar -->
@@ -859,8 +897,7 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
             </h2>
             
             ${
-              isCertOrCourse(section.type, section.title) &&
-              coursesStyle === "simple"
+              shouldUseSimpleColumns(section)
                 ? renderSimpleCourses(section)
                 : `
               <div style="display: flex; flex-direction: column; gap: ${itemGap}px;">

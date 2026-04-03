@@ -1,5 +1,7 @@
 "use client";
 
+import React from 'react';
+
 import { ResumeData, SkillLevel, SkillsDisplayStyle, LanguagesDisplayStyle, CoursesDisplayStyle } from '@/features/upload-cv/types';
 import { LevelVisualizer } from './LevelVisualizer';
 
@@ -118,9 +120,22 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
     return type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
   };
 
-  const skillsSections = sections.filter(s => s.type === 'skills' && s.items && s.items.length > 0);
-  const languagesSections = sections.filter(s => s.type === 'languages' && s.items && s.items.length > 0);
-  const otherSections = sections.filter(s => s.type !== 'skills' && s.type !== 'languages' && s.visible !== false && s.items && s.items.length > 0);
+  const isSimpleListSection = (type: string, title: string) => {
+    const lowerTitle = title.toLowerCase();
+    return type === 'interests' || lowerTitle.includes('interest') || lowerTitle.includes('hobby') || lowerTitle.includes('hobbies');
+  };
+
+  const shouldUseSimpleColumns = (section: any) => {
+    if (section.type === 'skills' || section.type === 'languages') return false;
+    if (isCertOrCourse(section.type, section.title) && coursesStyle === 'simple') return true;
+    if (isSimpleListSection(section.type, section.title)) return true;
+    if (metadata?.sectionColumns?.[section.id]) return true;
+    return false;
+  };
+
+  const skillsSections = sections.filter(s => s.visible !== false && s.type === 'skills' && s.items && s.items.some((i: any) => i.visible !== false));
+  const languagesSections = sections.filter(s => s.visible !== false && s.type === 'languages' && s.items && s.items.some((i: any) => i.visible !== false));
+  const otherSections = sections.filter(s => s.type !== 'skills' && s.type !== 'languages' && s.visible !== false && s.items && s.items.some((i: any) => i.visible !== false));
 
   const labels = {
     profile: metadata?.language === 'ar' ? "الملف الشخصي" : "Profile",
@@ -203,7 +218,7 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
                {section.title}
              </h2>
              
-             {isCertOrCourse(section.type, section.title) && coursesStyle === 'simple' ? (
+             {shouldUseSimpleColumns(section) ? (
                renderSimpleCourses(section)
              ) : (
                <div className="flex flex-col" style={{ gap: `${itemGap}px` }}>
