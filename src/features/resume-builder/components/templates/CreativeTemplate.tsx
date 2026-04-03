@@ -24,7 +24,7 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
   const { personalInfo, sections, metadata } = data;
   const skillsStyle: SkillsDisplayStyle = metadata?.skillsDisplayStyle || 'tags';
   const languagesStyle: LanguagesDisplayStyle = metadata?.languagesDisplayStyle || 'level';
-  const coursesStyle: CoursesDisplayStyle = metadata?.coursesDisplayStyle || 'detailed';
+  const coursesStyle: CoursesDisplayStyle = metadata?.coursesDisplayStyle || 'simple';
 
   // Determine direction
   const direction = metadata?.layoutDirection === 'ltr' ? 'ltr' : 
@@ -144,7 +144,7 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
   const itemGap = spacingLevel * 4; // e.g. 16px
 
   return (
-    <div className="flex h-full bg-white text-gray-900" dir={direction}>
+    <div className="flex min-h-full bg-white text-gray-900" dir={direction}>
       {/* Left Sidebar */}
       <aside className="w-[30%] text-white p-6" style={{ backgroundColor: color, display: 'flex', flexDirection: 'column', gap: `${sidebarSectionMargin}px` }}>
         <div className="text-center">

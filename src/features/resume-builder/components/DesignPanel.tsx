@@ -88,7 +88,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
     if (section.visible === false) return false;
     // Only eligible if it's a course/certification AND using simple display style
     const isCourse = isCertOrCourseStr(section.type, section.title);
-    const usesSimpleStyle = metadata.coursesDisplayStyle === 'simple';
+    const usesSimpleStyle = (metadata.coursesDisplayStyle || 'simple') === 'simple';
     return isCourse && usesSimpleStyle;
   });
 
@@ -382,7 +382,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
               key={style.id}
               className={`
                 px-3 py-2 text-sm rounded-lg border transition-all text-left
-                ${(metadata.coursesDisplayStyle || 'detailed') === style.id
+                ${(metadata.coursesDisplayStyle || 'simple') === style.id
                   ? 'border-primary bg-primary/10 text-primary font-medium'
                   : 'border-border hover:border-primary/50'}
               `}

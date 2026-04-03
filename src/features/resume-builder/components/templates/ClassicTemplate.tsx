@@ -24,7 +24,7 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
   const { personalInfo, sections, metadata } = data;
   const skillsStyle: SkillsDisplayStyle = metadata?.skillsDisplayStyle || 'tags';
   const languagesStyle: LanguagesDisplayStyle = metadata?.languagesDisplayStyle || 'level';
-  const coursesStyle: CoursesDisplayStyle = metadata?.coursesDisplayStyle || 'detailed';
+  const coursesStyle: CoursesDisplayStyle = metadata?.coursesDisplayStyle || 'simple';
 
   // Determine direction
   const direction = metadata?.layoutDirection === 'ltr' ? 'ltr' : 
@@ -142,7 +142,16 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
   const itemGap = spacingLevel * 4; // e.g. 12px for level 3
 
   return (
-    <div className="p-10 h-full bg-white text-gray-900 leading-relaxed" dir={direction}>
+    <div 
+      className={`min-h-full bg-white text-gray-900 ${compactClass}`} 
+      dir={direction}
+      style={{
+        paddingTop: `${margins.top}px`,
+        paddingBottom: `${margins.bottom}px`,
+        paddingLeft: `${margins.left}px`,
+        paddingRight: `${margins.right}px`,
+      }}
+    >
        <header className="text-center mb-8 border-b-2 border-double border-gray-300 pb-6">
          <h1 className="text-3xl font-bold uppercase mb-2 tracking-wide text-gray-900">
            {personalInfo.fullName}

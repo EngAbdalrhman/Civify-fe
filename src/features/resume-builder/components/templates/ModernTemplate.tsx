@@ -25,7 +25,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
   const { personalInfo, sections, metadata } = data;
   const skillsStyle: SkillsDisplayStyle = metadata?.skillsDisplayStyle || 'tags';
   const languagesStyle: LanguagesDisplayStyle = metadata?.languagesDisplayStyle || 'level';
-  const coursesStyle: CoursesDisplayStyle = metadata?.coursesDisplayStyle || 'detailed';
+  const coursesStyle: CoursesDisplayStyle = metadata?.coursesDisplayStyle || 'simple';
 
   // Determine direction
   const direction = metadata?.layoutDirection === 'ltr' ? 'ltr' : 
@@ -161,7 +161,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
 
   return (
     <div 
-      className={`h-full bg-white text-gray-900 ${compactClass}`} 
+      className={`min-h-full bg-white text-gray-900 ${compactClass}`} 
       dir={direction}
       style={{
         paddingTop: `${margins.top}px`,

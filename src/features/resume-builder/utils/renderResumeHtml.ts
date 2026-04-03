@@ -155,7 +155,7 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
   const languagesStyle: LanguagesDisplayStyle =
     metadata?.languagesDisplayStyle || "level";
   const coursesStyle: CoursesDisplayStyle =
-    metadata?.coursesDisplayStyle || "detailed";
+    metadata?.coursesDisplayStyle || "simple";
 
   const direction =
     metadata?.layoutDirection === "ltr"
@@ -414,7 +414,7 @@ function renderModernTemplate(data: ResumeData, color: string): string {
   const languagesStyle: LanguagesDisplayStyle =
     metadata?.languagesDisplayStyle || "level";
   const coursesStyle: CoursesDisplayStyle =
-    metadata?.coursesDisplayStyle || "detailed";
+    metadata?.coursesDisplayStyle || "simple";
 
   const direction =
     metadata?.layoutDirection === "ltr"
@@ -663,7 +663,7 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
   const languagesStyle: LanguagesDisplayStyle =
     metadata?.languagesDisplayStyle || "level";
   const coursesStyle: CoursesDisplayStyle =
-    metadata?.coursesDisplayStyle || "detailed";
+    metadata?.coursesDisplayStyle || "simple";
 
   const direction =
     metadata?.layoutDirection === "ltr"
