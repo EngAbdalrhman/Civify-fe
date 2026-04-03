@@ -58,6 +58,11 @@
     },
     "learnMore": "Learn more"
   },
+  "tutorial": {
+    "badge": "Tutorial",
+    "title": "See It in Action",
+    "subtitle": "Watch how the Civify Chrome Extension lets you tailor resumes directly from LinkedIn in seconds."
+  },
   "howItWorks": {
     "badge": "Getting Started",
     "title": "Up and Running in 4 Simple Steps",

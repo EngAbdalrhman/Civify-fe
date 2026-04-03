@@ -1,0 +1,91 @@
+{
+  "metadata": {
+    "title": "Zoho Recruit Integration — Civify",
+    "description": "Seamlessly integrate Civify with Zoho Recruit to automatically parse CVs, generate summaries, and assess candidates directly inside your ATS.",
+    "ogTitle": "Civify for Zoho Recruit",
+    "ogDescription": "Automate resume screening and assessment right inside your Zoho Recruit dashboard."
+  },
+  "hero": {
+    "badge": "Zoho Recruit Extension",
+    "title": "Supercharge Your ATS",
+    "titleAccent": "With AI.",
+    "subtitle": "Bring the power of Civify directly into Zoho Recruit. Parse resumes, assess candidates, and generate executive summaries without ever leaving your ATS.",
+    "ctaPrimary": "Get It on Zoho Marketplace",
+    "ctaSecondary": "Generate API Key",
+    "trustLine": "Official Zoho Recruit Integration",
+    "statUsers": "1-Click",
+    "statUsersLabel": "Installation",
+    "statTime": "< 5s",
+    "statTimeLabel": "Per Parsing",
+    "statLanguages": "EN / AR",
+    "statLanguagesLabel": "Multi-language"
+  },
+  "features": {
+    "badge": "Integration Features",
+    "title": "Recruitment Made Brilliant",
+    "subtitle": "Discover how the Civify extension enhances your Zoho Recruit workflow.",
+    "parse": {
+      "title": "Instant CV Parsing",
+      "description": "Automatically extract skills, experience, and contact details from any uploaded resume right into Zoho candidate fields."
+    },
+    "summarize": {
+      "title": "AI Summaries",
+      "description": "Generate concise, executive-level summaries for each candidate's background and core competencies."
+    },
+    "assess": {
+      "title": "Candidate Assessment",
+      "description": "Get an immediate AI evaluation of a candidate's fit for the job listing, highlighting matches and skill gaps."
+    }
+  },
+  "howItWorks": {
+    "badge": "Installation",
+    "title": "Set Up in Minutes",
+    "subtitle": "Integrating Civify with Zoho Recruit is simple and fast.",
+    "step1": {
+      "title": "Install on Zoho",
+      "description": "Visit the Zoho Marketplace and install the Civify app into your Zoho Recruit account."
+    },
+    "step2": {
+      "title": "Get API Key",
+      "description": "Log into your Civify account, navigate to API Keys, and generate a new key."
+    },
+    "step3": {
+      "title": "Connect",
+      "description": "Paste your Civify API key into the Zoho Recruit extension settings page to authenticate."
+    },
+    "step4": {
+      "title": "Start Parsing",
+      "description": "Open any candidate record in Zoho Recruit and click the Civify button to parse and assess immediately."
+    }
+  },
+  "tutorial": {
+    "badge": "Tutorial",
+    "title": "Experience It Live",
+    "subtitle": "Watch how to install and use the Civify extension within Zoho Recruit to streamline your hiring."
+  },
+  "faq": {
+    "badge": "FAQ",
+    "title": "Frequently Asked Questions",
+    "subtitle": "Learn more about the Civify integration for Zoho Recruit.",
+    "items": {
+      "q1": {
+        "question": "Does it work with existing candidates in Zoho Recruit?",
+        "answer": "Yes! You can use the Civify extension to parse and evaluate both newly added candidates and the ones already existing in your database."
+      },
+      "q2": {
+        "question": "Do I need a paid Civify account?",
+        "answer": "The Zoho extension requires an active Civify API key. Free accounts are provided with a quota, but heavy usage requires a premium plan."
+      },
+      "q3": {
+        "question": "Is candidate data kept secure?",
+        "answer": "Absolutely. Data is processed securely according to our Privacy Policy and is used only for the purpose of generating the parsing and assessment results you request."
+      }
+    }
+  },
+  "cta": {
+    "title": "Ready to Modernize Your Hiring?",
+    "subtitle": "Install the Civify extension on Zoho Recruit today and never manually parse a resume again.",
+    "ctaPrimary": "Visit Zoho Marketplace",
+    "ctaSecondary": "Generate API Key"
+  }
+}

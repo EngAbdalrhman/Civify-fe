@@ -150,7 +150,7 @@ export function NotificationBell() {
               {unreadCount > 9 ? "9+" : unreadCount}
             </Badge>
           )}
-          {isConnected && (
+          {unreadCount > 0 && (
             <span className="absolute bottom-0 right-0 w-2 h-2 bg-green-500 rounded-full" />
           )}
         </Button>

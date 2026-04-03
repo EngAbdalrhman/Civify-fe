@@ -3,6 +3,7 @@ import {
   ProblemSolutionSection,
   FeatureHighlightsSection,
   ExtensionHowItWorksSection,
+  ExtensionTutorialVideoSection,
   LanguageSection,
   PrivacySecuritySection,
   ExtensionTestimonialsSection,
@@ -103,6 +104,7 @@ export default async function ExtensionPage({
       <ProblemSolutionSection />
       <FeatureHighlightsSection />
       <ExtensionHowItWorksSection />
+      <ExtensionTutorialVideoSection />
       <LanguageSection />
       <PrivacySecuritySection />
       {/*<ExtensionTestimonialsSection />*/}
