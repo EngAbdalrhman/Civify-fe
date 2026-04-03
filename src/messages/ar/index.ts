@@ -27,6 +27,7 @@ import tooltips from "./tooltips.json";
 import upload from "./upload.json";
 import zohoExtension from "./zoho-extension.json";
 import extensionsHub from "./extensions-hub.json";
+import tour from "./tour.json";
 
 export default {
   admin,
@@ -58,4 +59,5 @@ export default {
   upload,
   "zoho-extension": zohoExtension,
   "extensions-hub": extensionsHub,
+  tour,
 };
