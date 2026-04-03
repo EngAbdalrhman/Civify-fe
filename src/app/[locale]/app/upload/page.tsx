@@ -1528,7 +1528,7 @@ export default function UploadPage() {
             </CardContent>
           </Card>
 
-          <AdBanner />
+          {/*<AdBanner />*/}
 
           <div className="flex justify-between gap-3">
             <Button variant="outline" onClick={() => setCurrentStep(2)}>
@@ -1766,7 +1766,7 @@ export default function UploadPage() {
                 </CardContent>
               </Card>
 
-              <AdBanner />
+              {/*<AdBanner />*/}
             </div>
 
             {/* Main Preview */}

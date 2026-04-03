@@ -40,9 +40,9 @@ export function DashboardPricingPromotion({
     subscription?.status === "ACTIVE" &&
     subscription?.planName?.toLowerCase() !== "free";
 
-  //   if (isPaidPlan) {
-  //     return null;
-  //   }
+  if (isPaidPlan) {
+    return null;
+  }
 
   // Find the Pro or Premium plan to promote
   const promotedPlan =
