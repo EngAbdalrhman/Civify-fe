@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
 };
 
 export default withSentryConfig(withNextIntl(nextConfig), {
-  org: "civify-2g",
+  org: "civify",
   project: "javascript-nextjs",
   silent: !process.env.CI,
   widenClientFileUpload: true,
