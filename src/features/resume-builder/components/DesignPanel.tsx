@@ -84,14 +84,12 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
     return type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
   };
 
-  const isSimpleSectionStr = (type: string, title: string) => {
-    const lowerTitle = title.toLowerCase();
-    return type === 'interests' || lowerTitle.includes('interest') || lowerTitle.includes('hobby') || lowerTitle.includes('hobbies');
-  };
-
   const columnEligibleSections = data.sections.filter(section => {
     if (section.visible === false) return false;
-    return isCertOrCourseStr(section.type, section.title) || isSimpleSectionStr(section.type, section.title) || section.type === 'custom';
+    // Only eligible if it's a course/certification AND using simple display style
+    const isCourse = isCertOrCourseStr(section.type, section.title);
+    const usesSimpleStyle = metadata.coursesDisplayStyle === 'simple';
+    return isCourse && usesSimpleStyle;
   });
 
   const updateSectionColumns = (sectionId: string, columns: number) => {

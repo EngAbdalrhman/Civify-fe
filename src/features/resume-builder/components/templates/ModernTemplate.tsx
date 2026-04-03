@@ -138,16 +138,9 @@ export function ModernTemplate({ data, color }: TemplateProps) {
     return type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
   };
 
-  const isSimpleListSection = (type: string, title: string) => {
-    const lowerTitle = title.toLowerCase();
-    return type === 'interests' || lowerTitle.includes('interest') || lowerTitle.includes('hobby') || lowerTitle.includes('hobbies');
-  };
-
   const shouldUseSimpleColumns = (section: any) => {
     if (section.type === 'skills' || section.type === 'languages') return false;
     if (isCertOrCourse(section.type, section.title) && coursesStyle === 'simple') return true;
-    if (isSimpleListSection(section.type, section.title)) return true;
-    if (metadata?.sectionColumns?.[section.id]) return true;
     return false;
   };
 
