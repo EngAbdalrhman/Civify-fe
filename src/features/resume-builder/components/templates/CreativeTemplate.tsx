@@ -115,15 +115,12 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
     );
   };
 
-  const isCertOrCourse = (type: string, title: string) => {
-    const lowerTitle = title.toLowerCase();
-    return type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
-  };
-
   const shouldUseSimpleColumns = (section: any) => {
     if (section.type === 'skills' || section.type === 'languages') return false;
-    if (isCertOrCourse(section.type, section.title) && coursesStyle === 'simple') return true;
-    return false;
+    const lowerTitle = section.title.toLowerCase();
+    const isCourse = section.type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
+    const isSimpleList = lowerTitle.includes('interest') || lowerTitle.includes('hobb');
+    return isSimpleList || (isCourse && coursesStyle === 'simple');
   };
 
   const skillsSections = sections.filter(s => s.visible !== false && s.type === 'skills' && s.items && s.items.some((i: any) => i.visible !== false));
@@ -144,7 +141,7 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
   const itemGap = spacingLevel * 4; // e.g. 16px
 
   return (
-    <div className="flex min-h-full bg-white text-gray-900" dir={direction}>
+    <div className="flex flex-1 w-full bg-white text-gray-900" dir={direction}>
       {/* Left Sidebar */}
       <aside className="w-[30%] text-white p-6" style={{ backgroundColor: color, display: 'flex', flexDirection: 'column', gap: `${sidebarSectionMargin}px` }}>
         <div className="text-center">

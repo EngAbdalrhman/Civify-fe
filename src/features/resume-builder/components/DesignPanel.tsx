@@ -79,17 +79,15 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
     });
   };
 
-  const isCertOrCourseStr = (type: string, title: string) => {
-    const lowerTitle = title.toLowerCase();
-    return type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
-  };
-
   const columnEligibleSections = data.sections.filter(section => {
     if (section.visible === false) return false;
-    // Only eligible if it's a course/certification AND using simple display style
-    const isCourse = isCertOrCourseStr(section.type, section.title);
+    const lowerTitle = section.title.toLowerCase();
+    const isCourse = section.type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
+    const isSimpleList = lowerTitle.includes('interest') || lowerTitle.includes('hobb');
+    
+    // Eligible if it's natively a simple list type, OR if it's a course using simple display style
     const usesSimpleStyle = (metadata.coursesDisplayStyle || 'simple') === 'simple';
-    return isCourse && usesSimpleStyle;
+    return isSimpleList || (isCourse && usesSimpleStyle);
   });
 
   const updateSectionColumns = (sectionId: string, columns: number) => {
@@ -450,7 +448,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
           </h3>
           <div className="space-y-3">
             {columnEligibleSections.map(section => {
-              const currentCols = metadata.sectionColumns?.[section.id] || (isCertOrCourseStr(section.type, section.title) ? 3 : 1);
+              const currentCols = metadata.sectionColumns?.[section.id] || 3;
               return (
                 <div key={section.id} className="flex items-center justify-between">
                   <Label className="text-sm border-0 font-medium truncate pr-4">{section.title}</Label>

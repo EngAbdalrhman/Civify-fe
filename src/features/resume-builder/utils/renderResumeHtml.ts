@@ -358,8 +358,7 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
               ? renderSkills(section)
               : section.type === "languages"
                 ? renderLanguages(section)
-                : isCertOrCourse(section.type, section.title) &&
-                    coursesStyle === "simple"
+                : shouldUseSimpleColumns(section)
                   ? renderSimpleCourses(section)
                   : `
               <div style="display: flex; flex-direction: column; gap: 16px;">
@@ -608,8 +607,7 @@ function renderModernTemplate(data: ResumeData, color: string): string {
               ? renderSkills(section)
               : section.type === "languages"
                 ? renderLanguages(section)
-                : isCertOrCourse(section.type, section.title) &&
-                    coursesStyle === "simple"
+                : shouldUseSimpleColumns(section)
                   ? renderSimpleCourses(section)
                   : `
               <div style="display: flex; flex-direction: column; gap: ${itemGap}px;">
@@ -879,8 +877,7 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
             </h2>
             
             ${
-              isCertOrCourse(section.type, section.title) &&
-              coursesStyle === "simple"
+              shouldUseSimpleColumns(section)
                 ? renderSimpleCourses(section)
                 : `
               <div style="display: flex; flex-direction: column; gap: ${itemGap}px;">

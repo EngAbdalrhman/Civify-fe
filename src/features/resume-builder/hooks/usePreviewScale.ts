@@ -41,8 +41,9 @@ export function usePreviewScale({
         );
         setScale(newScale);
 
-        // Calculate the scaled height for the container (A4 aspect ratio: 210mm x 297mm)
-        const resumeHeight = 1123; // 297mm in pixels
+        // Calculate the scaled height dynamically to support content exceeding standard A4
+        const resumeElement = document.getElementById("resume-preview-content");
+        const resumeHeight = resumeElement ? resumeElement.offsetHeight : 1123; // 297mm base
         setScaledHeight(resumeHeight * newScale);
       }
     };

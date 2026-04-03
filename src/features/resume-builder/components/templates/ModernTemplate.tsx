@@ -133,15 +133,12 @@ export function ModernTemplate({ data, color }: TemplateProps) {
     );
   };
 
-  const isCertOrCourse = (type: string, title: string) => {
-    const lowerTitle = title.toLowerCase();
-    return type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
-  };
-
   const shouldUseSimpleColumns = (section: any) => {
     if (section.type === 'skills' || section.type === 'languages') return false;
-    if (isCertOrCourse(section.type, section.title) && coursesStyle === 'simple') return true;
-    return false;
+    const lowerTitle = section.title.toLowerCase();
+    const isCourse = section.type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
+    const isSimpleList = lowerTitle.includes('interest') || lowerTitle.includes('hobb');
+    return isSimpleList || (isCourse && coursesStyle === 'simple');
   };
 
   const visibleSections = sections.filter(s => s.visible !== false && s.items && s.items.some((i: any) => i.visible !== false));
