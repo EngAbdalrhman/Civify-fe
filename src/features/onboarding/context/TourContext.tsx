@@ -34,6 +34,14 @@ export function TourProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     setIsClient(true);
+    try {
+      const stored = localStorage.getItem(TOUR_COMPLETED_KEY);
+      if (stored) {
+        setCompletedTours(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.error("Failed to parse local tour storage:", e);
+    }
   }, []);
 
   // Sync with backend / local storage
