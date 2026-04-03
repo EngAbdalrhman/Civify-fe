@@ -59,8 +59,8 @@ function BuilderDashboard() {
 
   return (
     <div className="space-y-6">
-      <DashboardPricingPromotion />
-      <AdBanner />
+      {/* <DashboardPricingPromotion /> */}
+      {/*<AdBanner />*/}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold">{t("title")}</h1>
@@ -113,7 +113,7 @@ function TailorDashboard() {
 
   return (
     <div className="space-y-6">
-      <AdBanner />
+      {/*<AdBanner />*/}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold">{t("title")}</h1>
@@ -168,7 +168,7 @@ function ApiDashboard() {
 
   return (
     <div className="space-y-6">
-      <AdBanner />
+      {/*<AdBanner />*/}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start justify-between w-full sm:w-auto">
           <div>
@@ -232,8 +232,8 @@ function ApiDashboard() {
 function DefaultDashboard() {
   return (
     <div className="space-y-6">
-      <DashboardPricingPromotion />
-      <AdBanner />
+      {/* <DashboardPricingPromotion /> */}
+      {/*<AdBanner />*/}
       <div>
         <h1 className="text-2xl font-semibold">Dashboard</h1>
         <p className="text-sm text-muted-foreground">
