@@ -2,7 +2,6 @@ const CACHE_NAME = "civify-cache-v1";
 const STATIC_ASSETS = [
   "/civify-logo-simple.png",
   "/favicon.ico",
-  "/manifest.json",
 ];
 
 self.addEventListener("install", (event) => {
