@@ -21,6 +21,8 @@
     "a2": "Yes, you can cancel your subscription at any time. Your access will continue until the end of the current billing period.",
     "q3": "What is the difference between CV building and parsing?",
     "a3": "Building creates a new CV from scratch or template. Parsing extracts data from an existing CV to populate your profile.",
+    "q4": "Will I see ads on a paid plan?",
+    "a4": "No, as our policy, paid users enjoy an completely ad-free experience. All advertisements are automatically removed as soon as you subscribe to any premium plan.",
     "stillQuestions": "Still have questions?",
     "contactSupportTeam": "Contact Support Team"
   },
