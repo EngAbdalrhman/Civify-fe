@@ -9,37 +9,14 @@ export function AdBanner() {
   const [isPwa, setIsPwa] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
     // Detect PWA standalone mode — hide ads in installed app context
-    const isStandalone =
-      window.matchMedia("(display-mode: standalone)").matches ||
-      (window.navigator as any).standalone === true;
-    setIsPwa(isStandalone);
-
-    // Wait until subscription is loaded before making ad decisions
-    if (isLoading) return;
-
-    // Check if user is on a paid plan
-    const isPaid =
-      subscription?.status === "ACTIVE" &&
-      subscription?.planName?.toLowerCase() !== "free";
-
-    if (isStandalone || isPaid) return;
-
-    // Inject Monetag script (vignette format as provided by user)
-    // using the exact provided snippet logic if it doesn't already exist.
-    if (!document.querySelector('script[data-zone="10826560"]')) {
-      const s = document.createElement("script");
-      s.dataset.zone = "10826560";
-      s.src = "https://n6wxm.com/vignette.min.js";
-      
-      const target = [document.documentElement, document.body].filter(Boolean).pop();
-      if (target) {
-        target.appendChild(s);
-      }
+    if (typeof window !== "undefined") {
+      const isStandalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        (window.navigator as any).standalone === true;
+      setIsPwa(isStandalone);
     }
-  }, [isLoading, subscription]);
+  }, []);
 
   // Don't show while loading
   if (isLoading) return null;
