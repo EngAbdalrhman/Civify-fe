@@ -1,20 +1,19 @@
 import {
-  ExtensionHeroSection,
-  ProblemSolutionSection,
-  FeatureHighlightsSection,
-  ExtensionHowItWorksSection,
-  ExtensionTutorialVideoSection,
-  LanguageSection,
-  PrivacySecuritySection,
-  ExtensionTestimonialsSection,
-  ComparisonTableSection,
-  ExtensionFAQSection,
-  ExtensionCTASection,
+    ComparisonTableSection,
+    ExtensionCTASection,
+    ExtensionFAQSection,
+    ExtensionHeroSection,
+    ExtensionHowItWorksSection,
+    ExtensionTutorialVideoSection,
+    FeatureHighlightsSection,
+    LanguageSection,
+    PrivacySecuritySection,
+    ProblemSolutionSection,
 } from "@/features/extension-page/components";
-import { getTranslations, setRequestLocale } from "next-intl/server";
-import { routing } from "@/i18n/routing";
-import { notFound } from "next/navigation";
-import { Metadata } from "next";
+import {getTranslations, setRequestLocale} from "next-intl/server";
+import {routing} from "@/i18n/routing";
+import {notFound} from "next/navigation";
+import {Metadata} from "next";
 
 type Props = {
   params: { locale: string };
