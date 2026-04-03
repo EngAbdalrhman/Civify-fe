@@ -1,16 +1,4 @@
-import {
-  ExtensionHeroSection,
-  ProblemSolutionSection,
-  FeatureHighlightsSection,
-  ExtensionHowItWorksSection,
-  ExtensionTutorialVideoSection,
-  LanguageSection,
-  PrivacySecuritySection,
-  ExtensionTestimonialsSection,
-  ComparisonTableSection,
-  ExtensionFAQSection,
-  ExtensionCTASection,
-} from "@/features/extension-page/components";
+import { ExtensionsHubList } from "@/features/extensions-hub/components";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { notFound } from "next/navigation";
@@ -27,7 +15,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     notFound();
   }
 
-  const t = await getTranslations({ locale, namespace: "extension.metadata" });
+  const t = await getTranslations({ locale, namespace: "extensions-hub.metadata" });
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://civify.cv";
 
   return {
@@ -46,7 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           url: "/og-image.png",
           width: 1200,
           height: 630,
-          alt: "Civify CV Browser Extension",
+          alt: "Civify Extensions and Integrations",
         },
       ],
     },
@@ -70,7 +58,7 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-export default async function ExtensionPage({
+export default async function ExtensionsHubPage({
   params,
 }: {
   params: Promise<{ locale: string }>;
@@ -78,39 +66,5 @@ export default async function ExtensionPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const t = await getTranslations({ locale, namespace: "extension.faq" });
-  const faqKeys = ["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8"];
-
-  const faqJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqKeys.map((key) => ({
-      "@type": "Question",
-      name: t(`items.${key}.question`),
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: t(`items.${key}.answer`),
-      },
-    })),
-  };
-
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-      />
-      <ExtensionHeroSection />
-      <ProblemSolutionSection />
-      <FeatureHighlightsSection />
-      <ExtensionHowItWorksSection />
-      <ExtensionTutorialVideoSection />
-      <LanguageSection />
-      <PrivacySecuritySection />
-      {/*<ExtensionTestimonialsSection />*/}
-      <ComparisonTableSection />
-      <ExtensionFAQSection />
-      <ExtensionCTASection />
-    </>
-  );
+  return <ExtensionsHubList />;
 }

@@ -26,6 +26,7 @@ import tokens from "./tokens.json";
 import tooltips from "./tooltips.json";
 import upload from "./upload.json";
 import zohoExtension from "./zoho-extension.json";
+import extensionsHub from "./extensions-hub.json";
 
 export default {
   admin,
@@ -56,4 +57,5 @@ export default {
   tooltips,
   upload,
   "zoho-extension": zohoExtension,
+  "extensions-hub": extensionsHub,
 };
