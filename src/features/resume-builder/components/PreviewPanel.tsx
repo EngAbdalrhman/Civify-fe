@@ -31,6 +31,7 @@ export function PreviewPanel({
   return (
     <div
       ref={previewContainerRef}
+      data-tour="rb-preview"
       className={`flex-1 flex flex-col bg-slate-100 dark:bg-slate-900 overflow-hidden relative ${mobileView === "preview" ? "flex" : "hidden"} lg:flex`}
     >
       <div className="absolute top-4 right-4 z-20 flex gap-2">

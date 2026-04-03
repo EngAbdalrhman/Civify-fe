@@ -5,7 +5,7 @@ import { usePathname } from "@/i18n/routing";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { getAccessToken } from "@/utils/cookies";
-import { OnboardingProvider } from "@/features/onboarding";
+import { OnboardingProvider, TourProvider } from "@/features/onboarding";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
@@ -74,7 +74,8 @@ export default function UserDashboardLayout({
 
   return (
     <OnboardingProvider>
-      <div className="flex min-h-screen bg-background">
+      <TourProvider>
+        <div className="flex min-h-screen bg-background">
         <AppSidebar
           isMobileOpen={isMobileOpen}
           setIsMobileOpen={setIsMobileOpen}
@@ -138,6 +139,7 @@ export default function UserDashboardLayout({
           </div>
         </div>
       </div>
+      </TourProvider>
     </OnboardingProvider>
   );
 }

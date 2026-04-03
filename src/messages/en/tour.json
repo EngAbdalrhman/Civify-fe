@@ -1,0 +1,72 @@
+{
+  "common": {
+    "skipTour": "Skip tour",
+    "nextStep": "Next",
+    "prevStep": "Back",
+    "doneButton": "Done"
+  },
+  "upload": {
+    "step1": {
+      "title": "Welcome to Tailoring",
+      "description": "Upload an existing resume to get started. We'll extract your details and fit them perfectly to your target job."
+    },
+    "step2": {
+      "title": "Upload Area",
+      "description": "Drag & drop your PDF or DOCX file here."
+    },
+    "step3": {
+      "title": "Add Manually or Select",
+      "description": "Alternatively, type your details manually or select a previously saved resume."
+    },
+    "step4": {
+      "title": "Track Progress",
+      "description": "Follow the steps here from uploading to reviewing data and generating your final resume."
+    }
+  },
+  "resumeBuilder": {
+    "step1": {
+      "title": "The Resume Builder",
+      "description": "This is where the magic happens. Your extracted information is mapped directly into our templates."
+    },
+    "step2": {
+      "title": "Save & Upload",
+      "description": "Don't forget to save your progress, or upload a new source document if needed."
+    },
+    "step3": {
+      "title": "Content Editor",
+      "description": "Edit your experience, education, and skills. Every change reflects instantly."
+    },
+    "step4": {
+      "title": "Design Settings",
+      "description": "Customize your template, colors, spacing, and fonts to match your personal brand."
+    },
+    "step5": {
+      "title": "Export Options",
+      "description": "Download your finished resume as a high-quality PDF or DOCX, ready for applications."
+    },
+    "step6": {
+      "title": "Live Preview",
+      "description": "See how your resume looks in real-time as you type or change designs."
+    }
+  },
+  "apiKeys": {
+    "step1": {
+      "title": "Developer Hub",
+      "description": "Manage your API keys to integrate our resume engine into your own applications."
+    },
+    "step2": {
+      "title": "Generate a Key",
+      "description": "Create a new API key here. Keep it secret!"
+    },
+    "step3": {
+      "title": "Your Active Keys",
+      "description": "View, copy, or revoke your existing keys here."
+    }
+  },
+  "dashboard": {
+    "step1": {
+      "title": "Quick Navigation",
+      "description": "Access the core tools: resumes, upload, and analytics directly from the sidebar."
+    }
+  }
+}
