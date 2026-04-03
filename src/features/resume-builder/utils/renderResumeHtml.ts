@@ -544,13 +544,12 @@ function renderModernTemplate(data: ResumeData, color: string): string {
     `;
   };
 
-  const isCertOrCourse = (type: string, title: string) => {
-    const lowerTitle = title.toLowerCase();
-    return (
-      type === "certifications" ||
-      lowerTitle.includes("course") ||
-      lowerTitle.includes("certif")
-    );
+  const shouldUseSimpleColumns = (section: any) => {
+    if (section.type === 'skills' || section.type === 'languages') return false;
+    const lowerTitle = section.title.toLowerCase();
+    const isCourse = section.type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
+    const isSimpleList = lowerTitle.includes('interest') || lowerTitle.includes('hobb');
+    return isSimpleList || (isCourse && coursesStyle === 'simple');
   };
 
   // SVG icons for Modern template
@@ -679,10 +678,10 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
   };
 
   const skillsSections = sections.filter(
-    (s) => s.type === "skills" && s.items && s.items.length > 0,
+    (s) => s.visible !== false && s.type === "skills" && s.items && s.items.some((i) => i.visible !== false),
   );
   const languagesSections = sections.filter(
-    (s) => s.type === "languages" && s.items && s.items.length > 0,
+    (s) => s.visible !== false && s.type === "languages" && s.items && s.items.some((i) => i.visible !== false),
   );
   const otherSections = sections.filter(
     (s) =>
@@ -800,13 +799,12 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
     `;
   };
 
-  const isCertOrCourse = (type: string, title: string) => {
-    const lowerTitle = title.toLowerCase();
-    return (
-      type === "certifications" ||
-      lowerTitle.includes("course") ||
-      lowerTitle.includes("certif")
-    );
+  const shouldUseSimpleColumns = (section: any) => {
+    if (section.type === 'skills' || section.type === 'languages') return false;
+    const lowerTitle = section.title.toLowerCase();
+    const isCourse = section.type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
+    const isSimpleList = lowerTitle.includes('interest') || lowerTitle.includes('hobb');
+    return isSimpleList || (isCourse && coursesStyle === 'simple');
   };
 
   const content = `
@@ -814,9 +812,10 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
       <!-- Left Sidebar -->
       <aside style="width: 30%; background-color: ${color}; color: white; padding: ${margins.top}px 24px ${margins.bottom}px ${margins.left}px; display: flex; flex-direction: column; gap: ${sectionMargin}px;">
         <div style="text-align: center;">
-          <div style="width: 128px; height: 128px; background-color: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700;">
-            ${personalInfo.fullName.charAt(0)}
-          </div>
+          ${personalInfo.picture 
+            ? `<img src="${personalInfo.picture}" alt="${escapeHtml(personalInfo.fullName)}" style="width: 128px; height: 128px; border-radius: 50%; margin: 0 auto 16px; object-fit: cover; border: 4px solid rgba(255,255,255,0.3); display: block;" />`
+            : `<div style="width: 128px; height: 128px; background-color: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700;">${personalInfo.fullName.charAt(0)}</div>`
+          }
           <h1 style="font-size: 24px; font-weight: 700; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">
             ${escapeHtml(personalInfo.fullName)}
           </h1>

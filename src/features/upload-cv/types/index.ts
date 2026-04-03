@@ -9,6 +9,7 @@ export interface PersonalInfo {
   country?: string;
   summary?: string;
   jobTitle?: string;
+  picture?: string;
   linkedin?: string;
   website?: string;
   github?: string;

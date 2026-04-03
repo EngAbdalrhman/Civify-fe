@@ -145,9 +145,13 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
       {/* Left Sidebar */}
       <aside className="w-[30%] text-white p-6" style={{ backgroundColor: color, display: 'flex', flexDirection: 'column', gap: `${sidebarSectionMargin}px` }}>
         <div className="text-center">
-           <div className="w-32 h-32 bg-white/20 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl font-bold">
-              {personalInfo.fullName.charAt(0)}
-           </div>
+           {personalInfo.picture ? (
+             <img src={personalInfo.picture} alt={personalInfo.fullName} className="w-32 h-32 rounded-full mx-auto mb-4 object-cover border-4 border-white/30" />
+           ) : (
+             <div className="w-32 h-32 bg-white/20 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl font-bold">
+               {personalInfo.fullName.charAt(0)}
+             </div>
+           )}
            <h1 className="text-2xl font-bold uppercase leading-tight mb-2">
              {personalInfo.fullName}
            </h1>

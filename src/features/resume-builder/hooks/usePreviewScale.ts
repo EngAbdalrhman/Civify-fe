@@ -59,9 +59,23 @@ export function usePreviewScale({
       resizeObserver.observe(containerRef.current);
     }
 
+    // Observe content mutations (section toggles, data changes) to recalculate height
+    const resumeEl = document.getElementById("resume-preview-content");
+    let mutationObserver: MutationObserver | null = null;
+    if (resumeEl) {
+      mutationObserver = new MutationObserver(calculateScale);
+      mutationObserver.observe(resumeEl, { childList: true, subtree: true, attributes: true });
+      resizeObserver.observe(resumeEl);
+    }
+
+    // Fallback: periodically recalculate to catch any missed changes
+    const interval = setInterval(calculateScale, 500);
+
     return () => {
       window.removeEventListener("resize", calculateScale);
       resizeObserver.disconnect();
+      mutationObserver?.disconnect();
+      clearInterval(interval);
     };
   }, [containerRef, padding, enabled]);
 
