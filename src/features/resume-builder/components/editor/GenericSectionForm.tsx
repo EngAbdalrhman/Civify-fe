@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Trash2, GripVertical } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Eye, EyeOff } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
@@ -120,17 +120,27 @@ function SortableGenericItem({
               <GripVertical className="h-4 w-4" />
               <span>{t('item')} {index + 1}</span>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => removeItem(item.id)}
-              className="h-8 w-8 text-destructive hover:text-destructive"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <div className="flex gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => updateItem(item.id, { visible: item.visible === false ? true : false })}
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              >
+                {item.visible === false ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => removeItem(item.id)}
+                className="h-8 w-8 text-destructive hover:text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
 
-          <div className="grid gap-3">
+          <div className={`grid gap-3 transition-opacity ${item.visible === false ? 'opacity-50' : ''}`}>
             <div>
               <Label className="text-xs">{t('title')}</Label>
               <Input

@@ -79,6 +79,30 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
     });
   };
 
+  const columnEligibleSections = data.sections.filter(section => {
+    if (section.visible === false) return false;
+    const lowerTitle = section.title.toLowerCase();
+    const isCourse = section.type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
+    const isSimpleList = lowerTitle.includes('interest') || lowerTitle.includes('hobb');
+    
+    // Eligible if it's natively a simple list type, OR if it's a course using simple display style
+    const usesSimpleStyle = (metadata.coursesDisplayStyle || 'simple') === 'simple';
+    return isSimpleList || (isCourse && usesSimpleStyle);
+  });
+
+  const updateSectionColumns = (sectionId: string, columns: number) => {
+    onChange({
+      ...data,
+      metadata: {
+        ...metadata,
+        sectionColumns: {
+          ...(metadata.sectionColumns || {}),
+          [sectionId]: columns,
+        },
+      },
+    });
+  };
+
   return (
     <div className="space-y-8">
       {/* Templates */}
@@ -344,31 +368,6 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
         </div>
       </div>
 
-      {/* Courses Display Style */}
-      <div className="space-y-4">
-        <h3 className="font-semibold flex items-center gap-2">
-          <BookOpen className="h-4 w-4" />
-          {t('sectionStyles.courses')}
-        </h3>
-        <div className="grid grid-cols-2 gap-2">
-          {COURSES_DISPLAY_STYLES.map((style) => (
-            <button
-              key={style.id}
-              className={`
-                px-3 py-2 text-sm rounded-lg border transition-all text-left
-                ${(metadata.coursesDisplayStyle || 'detailed') === style.id
-                  ? 'border-primary bg-primary/10 text-primary font-medium'
-                  : 'border-border hover:border-primary/50'}
-              `}
-              onClick={() => updateMetadata('coursesDisplayStyle', style.id)}
-            >
-              <div className="font-medium">{t(`sectionStyles.${style.id}.name` as any)}</div>
-              <div className="text-xs text-muted-foreground">{t(`sectionStyles.${style.id}.description` as any)}</div>
-            </button>
-          ))}
-        </div>
-      </div>
-
        {/* Layout Direction */}
        <div className="space-y-4">
         <h3 className="font-semibold flex items-center gap-2">
@@ -414,6 +413,42 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
           </button>
         </div>
       </div>
+
+      {/* Section Columns */}
+      {columnEligibleSections.length > 0 && (
+        <div className="space-y-4">
+          <h3 className="font-semibold flex items-center gap-2">
+            <LayoutTemplate className="h-4 w-4" />
+            {t('sectionColumns.title') || 'Section Columns'}
+          </h3>
+          <div className="space-y-3">
+            {columnEligibleSections.map(section => {
+              const currentCols = metadata.sectionColumns?.[section.id] || 3;
+              return (
+                <div key={section.id} className="flex items-center justify-between">
+                  <Label className="text-sm border-0 font-medium truncate pr-4">{section.title}</Label>
+                  <div className="flex gap-1 shrink-0">
+                    {[1, 2, 3, 4].map(n => (
+                      <button
+                        key={n}
+                        className={`
+                          w-8 h-8 flex items-center justify-center text-xs rounded-md border transition-all
+                          ${currentCols === n
+                            ? 'bg-primary text-primary-foreground border-primary font-bold'
+                            : 'bg-background hover:bg-muted border-border font-medium hover:border-primary/50'}
+                        `}
+                        onClick={() => updateSectionColumns(section.id, n)}
+                      >
+                        {n}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

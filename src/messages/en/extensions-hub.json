@@ -1,0 +1,26 @@
+{
+  "metadata": {
+    "title": "Browser Extensions & Integrations — Civify",
+    "description": "Discover Civify's powerful browser extensions and platform integrations to seamlessly enhance your recruitment and job search workflow.",
+    "ogTitle": "Civify Extensions Hub",
+    "ogDescription": "Explore our suites of browser extensions and ATS integrations."
+  },
+  "hero": {
+    "badge": "Integrations",
+    "title": "Supercharge Your Workflow",
+    "titleAccent": "Anywhere.",
+    "subtitle": "Discover our suite of powerful browser extensions and integrations designed to seamlessly bring Civify's AI capabilities into your existing platforms."
+  },
+  "chromeExt": {
+    "title": "Civify for Chrome",
+    "description": "Optimize your resume directly from your browser. Extract job descriptions and auto-tailor your CV in seconds.",
+    "badge": "Browser Extension",
+    "action": "View Extension"
+  },
+  "zohoExt": {
+    "title": "Civify for Zoho Recruit",
+    "description": "Bring AI parsing and candidate assessment directly into your ATS dashboard. Never manually review resumes again.",
+    "badge": "ATS Integration",
+    "action": "View Integration"
+  }
+}

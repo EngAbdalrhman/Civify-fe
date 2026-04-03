@@ -8,3 +8,4 @@ export { ExtensionTestimonialsSection } from "./ExtensionTestimonialsSection";
 export { ComparisonTableSection } from "./ComparisonTableSection";
 export { ExtensionFAQSection } from "./ExtensionFAQSection";
 export { ExtensionCTASection } from "./ExtensionCTASection";
+export { ExtensionTutorialVideoSection } from "./ExtensionTutorialVideoSection";

@@ -1,5 +1,7 @@
 "use client";
 
+import React from 'react';
+
 import { ResumeData, SkillLevel, SkillsDisplayStyle, LanguagesDisplayStyle, CoursesDisplayStyle } from '@/features/upload-cv/types';
 import { LevelVisualizer } from './LevelVisualizer';
 
@@ -22,7 +24,7 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
   const { personalInfo, sections, metadata } = data;
   const skillsStyle: SkillsDisplayStyle = metadata?.skillsDisplayStyle || 'tags';
   const languagesStyle: LanguagesDisplayStyle = metadata?.languagesDisplayStyle || 'level';
-  const coursesStyle: CoursesDisplayStyle = metadata?.coursesDisplayStyle || 'detailed';
+  const coursesStyle: CoursesDisplayStyle = metadata?.coursesDisplayStyle || 'simple';
 
   // Determine direction
   const direction = metadata?.layoutDirection === 'ltr' ? 'ltr' : 
@@ -90,10 +92,10 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
     );
   };
 
-  // Simple bullet list for courses/certifications
+  // Simple bullet list for courses/certifications/interests/hobbies
   const renderSimpleCourses = (section: any) => {
     const items = section.items.filter((item: any) => item.visible !== false);
-    const columnCount = 3;
+    const columnCount = metadata?.sectionColumns?.[section.id] ?? 3;
     const itemsPerColumn = Math.ceil(items.length / columnCount);
     const columns: any[][] = [];
     for (let i = 0; i < columnCount; i++) {
@@ -101,7 +103,7 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
     }
     
     return (
-      <div className="grid grid-cols-3 gap-4 text-sm">
+      <div className={`grid gap-4 text-sm`} style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}>
         {columns.map((column, colIdx) => (
           <ul key={colIdx} className="list-disc list-inside space-y-1">
             {column.map((item: any) => (
@@ -113,14 +115,17 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
     );
   };
 
-  const isCertOrCourse = (type: string, title: string) => {
-    const lowerTitle = title.toLowerCase();
-    return type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
+  const shouldUseSimpleColumns = (section: any) => {
+    if (section.type === 'skills' || section.type === 'languages') return false;
+    const lowerTitle = section.title.toLowerCase();
+    const isCourse = section.type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
+    const isSimpleList = lowerTitle.includes('interest') || lowerTitle.includes('hobb');
+    return isSimpleList || (isCourse && coursesStyle === 'simple');
   };
 
-  const skillsSections = sections.filter(s => s.type === 'skills' && s.items && s.items.length > 0);
-  const languagesSections = sections.filter(s => s.type === 'languages' && s.items && s.items.length > 0);
-  const otherSections = sections.filter(s => s.type !== 'skills' && s.type !== 'languages' && s.visible !== false && s.items && s.items.length > 0);
+  const skillsSections = sections.filter(s => s.visible !== false && s.type === 'skills' && s.items && s.items.some((i: any) => i.visible !== false));
+  const languagesSections = sections.filter(s => s.visible !== false && s.type === 'languages' && s.items && s.items.some((i: any) => i.visible !== false));
+  const otherSections = sections.filter(s => s.type !== 'skills' && s.type !== 'languages' && s.visible !== false && s.items && s.items.some((i: any) => i.visible !== false));
 
   const labels = {
     profile: metadata?.language === 'ar' ? "الملف الشخصي" : "Profile",
@@ -136,13 +141,17 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
   const itemGap = spacingLevel * 4; // e.g. 16px
 
   return (
-    <div className="flex h-full bg-white text-gray-900" dir={direction}>
+    <div className="flex flex-1 w-full bg-white text-gray-900" dir={direction}>
       {/* Left Sidebar */}
       <aside className="w-[30%] text-white p-6" style={{ backgroundColor: color, display: 'flex', flexDirection: 'column', gap: `${sidebarSectionMargin}px` }}>
         <div className="text-center">
-           <div className="w-32 h-32 bg-white/20 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl font-bold">
-              {personalInfo.fullName.charAt(0)}
-           </div>
+           {personalInfo.picture ? (
+             <img src={personalInfo.picture} alt={personalInfo.fullName} className="w-32 h-32 rounded-full mx-auto mb-4 object-cover border-4 border-white/30" />
+           ) : (
+             <div className="w-32 h-32 bg-white/20 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl font-bold">
+               {personalInfo.fullName.charAt(0)}
+             </div>
+           )}
            <h1 className="text-2xl font-bold uppercase leading-tight mb-2">
              {personalInfo.fullName}
            </h1>
@@ -203,7 +212,7 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
                {section.title}
              </h2>
              
-             {isCertOrCourse(section.type, section.title) && coursesStyle === 'simple' ? (
+             {shouldUseSimpleColumns(section) ? (
                renderSimpleCourses(section)
              ) : (
                <div className="flex flex-col" style={{ gap: `${itemGap}px` }}>

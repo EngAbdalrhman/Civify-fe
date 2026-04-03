@@ -21,6 +21,22 @@ export function PersonalInfoForm({ data, onChange }: PersonalInfoFormProps) {
     onChange({ ...data, [field]: value });
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        handleChange('picture', base64String);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removePicture = () => {
+    onChange({ ...data, picture: undefined });
+  };
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
@@ -33,12 +49,39 @@ export function PersonalInfoForm({ data, onChange }: PersonalInfoFormProps) {
           />
         </div>
         <div className="space-y-2">
-          <Label>{t("jobTitle")}</Label>
+          <Label>{t("jobTitle") || "Job Title"}</Label>
           <Input
             value={data.jobTitle || ""}
             onChange={(e) => handleChange("jobTitle", e.target.value)}
-            placeholder={t("jobTitlePlaceholder")}
+            placeholder={t("jobTitlePlaceholder") || "e.g. Software Engineer"}
           />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Profile Picture</Label>
+        <div className="flex items-center gap-4">
+          {data.picture && (
+            <div className="relative w-16 h-16 rounded-full overflow-hidden border border-gray-200">
+              <img src={data.picture} alt="Profile" className="w-full h-full object-cover" />
+            </div>
+          )}
+          <div className="flex-1">
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="cursor-pointer"
+            />
+          </div>
+          {data.picture && (
+            <button
+              onClick={removePicture}
+              className="px-3 py-2 text-sm text-red-600 border border-red-200 rounded-md hover:bg-red-50"
+            >
+              Remove
+            </button>
+          )}
         </div>
       </div>
 

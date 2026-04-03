@@ -13,8 +13,8 @@
     "ctaPrimary": "Generate API Key",
     "ctaSecondary": "Get the Extension",
     "trustLine": "Supports English & Arabic",
-    "statUsers": "10,000+",
-    "statUsersLabel": "Active Users",
+    "statUsers": "60+",
+    "statUsersLabel": "Users",
     "statTime": "< 30s",
     "statTimeLabel": "Per Action",
     "statLanguages": "EN / AR",
@@ -57,6 +57,11 @@
       "example": "Dear Hiring Manager, As a data engineer with 4+ years..."
     },
     "learnMore": "Learn more"
+  },
+  "tutorial": {
+    "badge": "Tutorial",
+    "title": "See It in Action",
+    "subtitle": "Watch how the Civify Chrome Extension lets you tailor resumes directly from LinkedIn in seconds."
   },
   "howItWorks": {
     "badge": "Getting Started",

@@ -33,7 +33,7 @@ export function ResumePreview({ data }: ResumePreviewProps) {
 
   return (
     <div 
-      className="bg-white shadow-2xl p-0 w-[210mm] min-h-[297mm] mx-auto origin-top transition-all"
+      className="bg-white shadow-2xl p-0 w-[210mm] min-h-[297mm] mx-auto origin-top transition-all flex flex-col"
       style={{ 
         fontFamily: bodyFont,
         '--heading-font': `"${headingFont}", sans-serif`,

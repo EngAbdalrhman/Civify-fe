@@ -1,5 +1,7 @@
 "use client";
 
+import React from 'react';
+
 import { ResumeData, SkillLevel, SkillsDisplayStyle, LanguagesDisplayStyle, CoursesDisplayStyle } from '@/features/upload-cv/types';
 import { Mail, Phone, MapPin, Linkedin, Github, Globe } from 'lucide-react';
 import { LevelVisualizer } from './LevelVisualizer';
@@ -23,7 +25,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
   const { personalInfo, sections, metadata } = data;
   const skillsStyle: SkillsDisplayStyle = metadata?.skillsDisplayStyle || 'tags';
   const languagesStyle: LanguagesDisplayStyle = metadata?.languagesDisplayStyle || 'level';
-  const coursesStyle: CoursesDisplayStyle = metadata?.coursesDisplayStyle || 'detailed';
+  const coursesStyle: CoursesDisplayStyle = metadata?.coursesDisplayStyle || 'simple';
 
   // Determine direction
   const direction = metadata?.layoutDirection === 'ltr' ? 'ltr' : 
@@ -108,10 +110,10 @@ export function ModernTemplate({ data, color }: TemplateProps) {
     );
   };
 
-  // Simple bullet list for courses/certifications
+  // Simple bullet list for courses/certifications/interests/hobbies
   const renderSimpleCourses = (section: any) => {
     const items = section.items.filter((item: any) => item.visible !== false);
-    const columnCount = 3;
+    const columnCount = metadata?.sectionColumns?.[section.id] ?? 3;
     const itemsPerColumn = Math.ceil(items.length / columnCount);
     const columns: any[][] = [];
     for (let i = 0; i < columnCount; i++) {
@@ -119,7 +121,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
     }
     
     return (
-      <div className="grid grid-cols-3 gap-4 text-sm">
+      <div className={`grid gap-4 text-sm`} style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}>
         {columns.map((column, colIdx) => (
           <ul key={colIdx} className="list-disc list-inside space-y-1">
             {column.map((item: any) => (
@@ -131,12 +133,15 @@ export function ModernTemplate({ data, color }: TemplateProps) {
     );
   };
 
-  const isCertOrCourse = (type: string, title: string) => {
-    const lowerTitle = title.toLowerCase();
-    return type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
+  const shouldUseSimpleColumns = (section: any) => {
+    if (section.type === 'skills' || section.type === 'languages') return false;
+    const lowerTitle = section.title.toLowerCase();
+    const isCourse = section.type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
+    const isSimpleList = lowerTitle.includes('interest') || lowerTitle.includes('hobb');
+    return isSimpleList || (isCourse && coursesStyle === 'simple');
   };
 
-  const visibleSections = sections.filter(s => s.visible !== false && s.items && s.items.length > 0);
+  const visibleSections = sections.filter(s => s.visible !== false && s.items && s.items.some((i: any) => i.visible !== false));
 
 
   const labels = {
@@ -153,7 +158,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
 
   return (
     <div 
-      className={`h-full bg-white text-gray-900 ${compactClass}`} 
+      className={`min-h-full bg-white text-gray-900 ${compactClass}`} 
       dir={direction}
       style={{
         paddingTop: `${margins.top}px`,
@@ -214,7 +219,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
             renderSkills(section)
           ) : section.type === 'languages' ? (
             renderLanguages(section)
-          ) : isCertOrCourse(section.type, section.title) && coursesStyle === 'simple' ? (
+          ) : shouldUseSimpleColumns(section) ? (
             renderSimpleCourses(section)
           ) : (
             <div className="flex flex-col" style={{ gap: `${itemGap}px` }}>

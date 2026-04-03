@@ -155,7 +155,7 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
   const languagesStyle: LanguagesDisplayStyle =
     metadata?.languagesDisplayStyle || "level";
   const coursesStyle: CoursesDisplayStyle =
-    metadata?.coursesDisplayStyle || "detailed";
+    metadata?.coursesDisplayStyle || "simple";
 
   const direction =
     metadata?.layoutDirection === "ltr"
@@ -173,7 +173,7 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
   };
 
   const visibleSections = sections.filter(
-    (s) => s.visible !== false && s.items && s.items.length > 0,
+    (s) => s.visible !== false && s.items && s.items.some((i: any) => i.visible !== false),
   );
 
   const compactClass = metadata?.compactMode ? "1.2" : "1.6";
@@ -261,7 +261,7 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
 
   const renderSimpleCourses = (section: (typeof sections)[0]) => {
     const items = section.items.filter((item) => item.visible !== false);
-    const columnCount = 3;
+    const columnCount = metadata?.sectionColumns?.[section.id] ?? 3;
     const itemsPerColumn = Math.ceil(items.length / columnCount);
     const columns: (typeof items)[] = [];
     for (let i = 0; i < columnCount; i++) {
@@ -269,7 +269,7 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
     }
 
     return `
-      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; font-size: 14px;">
+      <div style="display: grid; grid-template-columns: repeat(${columnCount}, minmax(0, 1fr)); gap: 16px; font-size: 14px;">
         ${columns
           .map(
             (column) => `
@@ -291,6 +291,26 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
       lowerTitle.includes("certif")
     );
   };
+
+  const isSimpleListSection = (type: string, title: string) => {
+    const lowerTitle = title.toLowerCase();
+    return (
+      type === "interests" ||
+      lowerTitle.includes("interest") ||
+      lowerTitle.includes("hobby") ||
+      lowerTitle.includes("hobbies")
+    );
+  };
+
+  const shouldUseSimpleColumns = (section: any) => {
+    if (section.type === "skills" || section.type === "languages") return false;
+    if (isCertOrCourse(section.type, section.title) && coursesStyle === "simple") return true;
+    if (isSimpleListSection(section.type, section.title)) return true;
+    if (metadata?.sectionColumns?.[section.id]) return true;
+    return false;
+  };
+
+
 
   const content = `
     <div style="padding: ${margins.top}px ${margins.right}px ${margins.bottom}px ${margins.left}px; min-height: 100%; background-color: white; color: #111827; line-height: ${compactClass};">
@@ -338,8 +358,7 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
               ? renderSkills(section)
               : section.type === "languages"
                 ? renderLanguages(section)
-                : isCertOrCourse(section.type, section.title) &&
-                    coursesStyle === "simple"
+                : shouldUseSimpleColumns(section)
                   ? renderSimpleCourses(section)
                   : `
               <div style="display: flex; flex-direction: column; gap: 16px;">
@@ -394,7 +413,7 @@ function renderModernTemplate(data: ResumeData, color: string): string {
   const languagesStyle: LanguagesDisplayStyle =
     metadata?.languagesDisplayStyle || "level";
   const coursesStyle: CoursesDisplayStyle =
-    metadata?.coursesDisplayStyle || "detailed";
+    metadata?.coursesDisplayStyle || "simple";
 
   const direction =
     metadata?.layoutDirection === "ltr"
@@ -503,7 +522,7 @@ function renderModernTemplate(data: ResumeData, color: string): string {
 
   const renderSimpleCourses = (section: (typeof sections)[0]) => {
     const items = section.items.filter((item) => item.visible !== false);
-    const columnCount = 3;
+    const columnCount = metadata?.sectionColumns?.[section.id] ?? 3;
     const itemsPerColumn = Math.ceil(items.length / columnCount);
     const columns: (typeof items)[] = [];
     for (let i = 0; i < columnCount; i++) {
@@ -511,7 +530,7 @@ function renderModernTemplate(data: ResumeData, color: string): string {
     }
 
     return `
-      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; font-size: 14px;">
+      <div style="display: grid; grid-template-columns: repeat(${columnCount}, minmax(0, 1fr)); gap: 16px; font-size: 14px;">
         ${columns
           .map(
             (column) => `
@@ -525,13 +544,12 @@ function renderModernTemplate(data: ResumeData, color: string): string {
     `;
   };
 
-  const isCertOrCourse = (type: string, title: string) => {
-    const lowerTitle = title.toLowerCase();
-    return (
-      type === "certifications" ||
-      lowerTitle.includes("course") ||
-      lowerTitle.includes("certif")
-    );
+  const shouldUseSimpleColumns = (section: any) => {
+    if (section.type === 'skills' || section.type === 'languages') return false;
+    const lowerTitle = section.title.toLowerCase();
+    const isCourse = section.type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
+    const isSimpleList = lowerTitle.includes('interest') || lowerTitle.includes('hobb');
+    return isSimpleList || (isCourse && coursesStyle === 'simple');
   };
 
   // SVG icons for Modern template
@@ -588,8 +606,7 @@ function renderModernTemplate(data: ResumeData, color: string): string {
               ? renderSkills(section)
               : section.type === "languages"
                 ? renderLanguages(section)
-                : isCertOrCourse(section.type, section.title) &&
-                    coursesStyle === "simple"
+                : shouldUseSimpleColumns(section)
                   ? renderSimpleCourses(section)
                   : `
               <div style="display: flex; flex-direction: column; gap: ${itemGap}px;">
@@ -643,7 +660,7 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
   const languagesStyle: LanguagesDisplayStyle =
     metadata?.languagesDisplayStyle || "level";
   const coursesStyle: CoursesDisplayStyle =
-    metadata?.coursesDisplayStyle || "detailed";
+    metadata?.coursesDisplayStyle || "simple";
 
   const direction =
     metadata?.layoutDirection === "ltr"
@@ -661,10 +678,10 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
   };
 
   const skillsSections = sections.filter(
-    (s) => s.type === "skills" && s.items && s.items.length > 0,
+    (s) => s.visible !== false && s.type === "skills" && s.items && s.items.some((i) => i.visible !== false),
   );
   const languagesSections = sections.filter(
-    (s) => s.type === "languages" && s.items && s.items.length > 0,
+    (s) => s.visible !== false && s.type === "languages" && s.items && s.items.some((i) => i.visible !== false),
   );
   const otherSections = sections.filter(
     (s) =>
@@ -760,7 +777,7 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
 
   const renderSimpleCourses = (section: (typeof sections)[0]) => {
     const items = section.items.filter((item) => item.visible !== false);
-    const columnCount = 3;
+    const columnCount = metadata?.sectionColumns?.[section.id] ?? 3;
     const itemsPerColumn = Math.ceil(items.length / columnCount);
     const columns: (typeof items)[] = [];
     for (let i = 0; i < columnCount; i++) {
@@ -768,7 +785,7 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
     }
 
     return `
-      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; font-size: 14px;">
+      <div style="display: grid; grid-template-columns: repeat(${columnCount}, minmax(0, 1fr)); gap: 16px; font-size: 14px;">
         ${columns
           .map(
             (column) => `
@@ -782,13 +799,12 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
     `;
   };
 
-  const isCertOrCourse = (type: string, title: string) => {
-    const lowerTitle = title.toLowerCase();
-    return (
-      type === "certifications" ||
-      lowerTitle.includes("course") ||
-      lowerTitle.includes("certif")
-    );
+  const shouldUseSimpleColumns = (section: any) => {
+    if (section.type === 'skills' || section.type === 'languages') return false;
+    const lowerTitle = section.title.toLowerCase();
+    const isCourse = section.type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
+    const isSimpleList = lowerTitle.includes('interest') || lowerTitle.includes('hobb');
+    return isSimpleList || (isCourse && coursesStyle === 'simple');
   };
 
   const content = `
@@ -796,9 +812,10 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
       <!-- Left Sidebar -->
       <aside style="width: 30%; background-color: ${color}; color: white; padding: ${margins.top}px 24px ${margins.bottom}px ${margins.left}px; display: flex; flex-direction: column; gap: ${sectionMargin}px;">
         <div style="text-align: center;">
-          <div style="width: 128px; height: 128px; background-color: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700;">
-            ${personalInfo.fullName.charAt(0)}
-          </div>
+          ${personalInfo.picture 
+            ? `<img src="${personalInfo.picture}" alt="${escapeHtml(personalInfo.fullName)}" style="width: 128px; height: 128px; border-radius: 50%; margin: 0 auto 16px; object-fit: cover; border: 4px solid rgba(255,255,255,0.3); display: block;" />`
+            : `<div style="width: 128px; height: 128px; background-color: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700;">${personalInfo.fullName.charAt(0)}</div>`
+          }
           <h1 style="font-size: 24px; font-weight: 700; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">
             ${escapeHtml(personalInfo.fullName)}
           </h1>
@@ -859,8 +876,7 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
             </h2>
             
             ${
-              isCertOrCourse(section.type, section.title) &&
-              coursesStyle === "simple"
+              shouldUseSimpleColumns(section)
                 ? renderSimpleCourses(section)
                 : `
               <div style="display: flex; flex-direction: column; gap: ${itemGap}px;">

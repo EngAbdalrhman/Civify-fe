@@ -23,10 +23,6 @@ export function HeroSection() {
 
       <div className="container relative mx-auto px-4 py-20 md:py-32">
         <div className="mx-auto max-w-4xl text-center">
-          {/* Beta Badge */}
-          <div className="mb-6">
-            <BetaBadge />
-          </div>
 
           {/* Language Support Badges */}
           <div className="flex items-center justify-center gap-3 mb-6">

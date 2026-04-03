@@ -9,6 +9,7 @@ export interface PersonalInfo {
   country?: string;
   summary?: string;
   jobTitle?: string;
+  picture?: string;
   linkedin?: string;
   website?: string;
   github?: string;
@@ -64,6 +65,7 @@ export interface ResumeMetadata {
   margins?: { top?: number; bottom?: number; left?: number; right?: number; };
   headingFontFamily?: string;
   bodyFontFamily?: string;
+  sectionColumns?: Record<string, number>;
 }
 
 export interface ResumeData {

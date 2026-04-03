@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Eye, EyeOff } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 
 interface LanguagesFormProps {
@@ -53,6 +53,12 @@ export function LanguagesForm({ items = [], onChange }: LanguagesFormProps) {
     ));
   };
 
+  const updateItem = (id: string, updates: Partial<SectionItem>) => {
+    onChange(items.map(item => 
+      item.id === id ? { ...item, ...updates } : item
+    ));
+  };
+
   const removeLanguage = (id: string) => {
     onChange(items.filter(item => item.id !== id));
   };
@@ -88,7 +94,7 @@ export function LanguagesForm({ items = [], onChange }: LanguagesFormProps) {
       {/* Languages list */}
       <div className="space-y-2">
         {items.map((item) => (
-          <Card key={item.id} className="p-3">
+          <Card key={item.id} className={`p-3 transition-opacity ${item.visible === false ? 'opacity-50' : ''}`}>
             <div className="flex items-center gap-3">
               <span className="font-medium flex-1">{item.title}</span>
               <Select 
@@ -106,6 +112,14 @@ export function LanguagesForm({ items = [], onChange }: LanguagesFormProps) {
                   ))}
                 </SelectContent>
               </Select>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => updateItem(item.id, { visible: item.visible === false ? true : false })}
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              >
+                {item.visible === false ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
               <Button
                 variant="ghost"
                 size="icon"
