@@ -13,9 +13,8 @@
 }
 
 /* Light mode adjustments */
-:root:not(.dark) .civify-tour,
 html:not(.dark) .civify-tour,
-body:not(.dark) .civify-tour {
+:root:not(.dark) .civify-tour {
   --driver-popover-bg: rgba(255, 255, 255, 0.75);
   --driver-popover-text-color: #4a4a4a;
   --driver-popover-title-color: #1a1a1a;
@@ -29,12 +28,12 @@ body:not(.dark) .civify-tour {
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
   border: 1px solid var(--driver-border-color) !important;
-  /* 1px primary top-border to ground the modal */
+  /* 2px primary top-border to ground the modal */
   border-top: 2px solid #4d8eff !important; 
-  border-radius: 0.75rem !important; /* md */
+  border-radius: 1rem !important; /* lg */
   box-shadow: var(--driver-popover-shadow) !important;
   font-family: 'Inter', sans-serif !important;
-  padding: 1.5rem !important;
+  padding: 1.75rem !important;
   color: var(--driver-popover-text-color) !important;
   
   /* Spring animation */
@@ -61,19 +60,19 @@ body:not(.dark) .civify-tour {
 
 /* Typography refinements */
 .civify-tour .driver-popover-title {
-  font-size: 1.25rem !important;
+  font-size: 1.35rem !important;
   font-weight: 700 !important;
-  margin-bottom: 0.75rem !important;
+  margin-bottom: 0.875rem !important;
   color: var(--driver-popover-title-color) !important;
   letter-spacing: -0.02em !important;
   line-height: 1.4 !important;
 }
 
 .civify-tour .driver-popover-description {
-  font-size: 0.875rem !important;
-  line-height: 1.6 !important;
+  font-size: 0.95rem !important;
+  line-height: 1.65 !important;
   color: var(--driver-popover-text-color) !important;
-  margin-bottom: 1.5rem !important;
+  margin-bottom: 2rem !important;
 }
 
 .civify-tour .driver-popover-footer {
@@ -121,15 +120,13 @@ body:not(.dark) .civify-tour {
 }
 
 /* Light mode button contrast adjustments */
-:root:not(.dark) .civify-tour .driver-popover-prev-btn,
 html:not(.dark) .civify-tour .driver-popover-prev-btn,
-body:not(.dark) .civify-tour .driver-popover-prev-btn {
+:root:not(.dark) .civify-tour .driver-popover-prev-btn {
   background: rgba(0, 0, 0, 0.03) !important;
 }
 
-:root:not(.dark) .civify-tour .driver-popover-prev-btn:hover,
 html:not(.dark) .civify-tour .driver-popover-prev-btn:hover,
-body:not(.dark) .civify-tour .driver-popover-prev-btn:hover {
+:root:not(.dark) .civify-tour .driver-popover-prev-btn:hover {
   background: rgba(0, 0, 0, 0.07) !important;
 }
 
