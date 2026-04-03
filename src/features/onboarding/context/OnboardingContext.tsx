@@ -19,6 +19,7 @@ import {
 import { trackOnboardingEvent } from "../utils/trackOnboardingEvent";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import apiClient from "@/api/client";
+import { getAccessToken } from "@/utils/cookies";
 
 interface OnboardingContextValue extends OnboardingState {
   setPrimaryIntent: (intent: PrimaryIntent) => void;
@@ -139,7 +140,9 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem(ONBOARDING_STORAGE_KEY);
     }
 
-    apiClient.put("/v1/users/me/onboarding-status", { onboardingCompleted: true }).catch(() => null);
+    if (getAccessToken()) {
+      apiClient.put("/v1/users/me/onboarding-status", { onboardingCompleted: true }).catch(() => null);
+    }
 
     trackOnboardingEvent("onboarding_completed", {
       primaryIntent: state.primaryIntent || undefined,
@@ -160,8 +163,9 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(ONBOARDING_COMPLETED_KEY, "true");
       localStorage.removeItem(ONBOARDING_STORAGE_KEY);
     }
-    
-    apiClient.put("/v1/users/me/onboarding-status", { onboardingCompleted: true }).catch(() => null);
+    if (getAccessToken()) {
+      apiClient.put("/v1/users/me/onboarding-status", { onboardingCompleted: true }).catch(() => null);
+    }
 
     setState((prev: OnboardingState) => ({
       ...initialState,

@@ -8,6 +8,7 @@ import "../styles/tour-theme.css";
 import { useTranslations } from "next-intl";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import apiClient from "@/api/client";
+import { getAccessToken } from "@/utils/cookies";
 
 const TOUR_COMPLETED_KEY = "civify_tour_completed";
 
@@ -59,12 +60,14 @@ export function TourProvider({ children }: { children: ReactNode }) {
     if (typeof window !== "undefined") {
       localStorage.setItem(TOUR_COMPLETED_KEY, JSON.stringify(newTours));
     }
-    try {
-      await apiClient.put("/v1/users/me/onboarding-status", {
-        completedTours: JSON.stringify(newTours),
-      });
-    } catch (e) {
-      console.error("Failed to sync tour status to backend", e);
+    if (getAccessToken()) {
+      try {
+        await apiClient.put("/v1/users/me/onboarding-status", {
+          completedTours: JSON.stringify(newTours),
+        });
+      } catch (e) {
+        console.error("Failed to sync tour status to backend", e);
+      }
     }
   }, []);
 
