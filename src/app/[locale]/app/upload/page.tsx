@@ -89,6 +89,7 @@ import { JobApplicationService } from "@/services/job-application.service";
 import { Save, Bookmark } from "lucide-react";
 import { getAccessToken } from "@/utils/cookies";
 import { AuthGateDialog } from "@/features/resume-builder/components/AuthGateDialog";
+import { AdBanner } from "@/components/ads/AdBanner";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -1527,6 +1528,8 @@ export default function UploadPage() {
             </CardContent>
           </Card>
 
+          <AdBanner />
+
           <div className="flex justify-between gap-3">
             <Button variant="outline" onClick={() => setCurrentStep(2)}>
               <ArrowLeft className="mr-2 h-4 w-4" /> {t("actions.back")}
@@ -1762,6 +1765,8 @@ export default function UploadPage() {
                     )}
                 </CardContent>
               </Card>
+
+              <AdBanner />
             </div>
 
             {/* Main Preview */}
