@@ -87,7 +87,7 @@ export function TourProvider({ children }: { children: ReactNode }) {
     const tourDriver = driver({
       showProgress: true,
       allowClose: true,
-      theme: "civify-tour",
+      popoverClass: "civify-tour",
       steps: steps.map(step => ({
           ...step,
           popover: {
