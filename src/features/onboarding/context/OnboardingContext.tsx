@@ -17,6 +17,8 @@ import {
   ONBOARDING_PROFILE_KEY,
 } from "../types";
 import { trackOnboardingEvent } from "../utils/trackOnboardingEvent";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import apiClient from "@/api/client";
 
 interface OnboardingContextValue extends OnboardingState {
   setPrimaryIntent: (intent: PrimaryIntent) => void;
@@ -40,7 +42,27 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<OnboardingState>(initialState);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
 
-  // Load state from localStorage on mount
+  const { data: userProfile } = useUserProfile();
+
+  // Handle Backend Sync / Migration
+  useEffect(() => {
+    if (!userProfile) return;
+
+    if (userProfile.onboardingCompleted) {
+      setHasCompletedOnboarding(true);
+      setState((prev) => ({ ...prev, onboardingCompleted: true }));
+    } else {
+      // Migrate from local storage to backend if local true
+      const localCompleted = window.localStorage.getItem(ONBOARDING_COMPLETED_KEY);
+      if (localCompleted === "true") {
+        setHasCompletedOnboarding(true);
+        setState((prev) => ({ ...prev, onboardingCompleted: true }));
+        apiClient.put("/v1/users/me/onboarding-status", { onboardingCompleted: true }).catch(() => null);
+      }
+    }
+  }, [userProfile]);
+
+  // Load state from localStorage on mount (fallback)
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -117,6 +139,8 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem(ONBOARDING_STORAGE_KEY);
     }
 
+    apiClient.put("/v1/users/me/onboarding-status", { onboardingCompleted: true }).catch(() => null);
+
     trackOnboardingEvent("onboarding_completed", {
       primaryIntent: state.primaryIntent || undefined,
       industry: state.profile.industry,
@@ -136,6 +160,9 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(ONBOARDING_COMPLETED_KEY, "true");
       localStorage.removeItem(ONBOARDING_STORAGE_KEY);
     }
+    
+    apiClient.put("/v1/users/me/onboarding-status", { onboardingCompleted: true }).catch(() => null);
+
     setState((prev) => ({
       ...initialState,
       onboardingCompleted: true,
