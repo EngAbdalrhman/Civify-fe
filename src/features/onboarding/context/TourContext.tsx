@@ -19,6 +19,7 @@ interface TourContextValue {
   resetTour: (pageId: string) => void;
   resetAllTours: () => void;
   isTourCompleted: (pageId: string) => boolean;
+  isReady: boolean;
 }
 
 const TourContext = createContext<TourContextValue | null>(null);
@@ -26,6 +27,7 @@ const TourContext = createContext<TourContextValue | null>(null);
 export function TourProvider({ children }: { children: ReactNode }) {
   const [completedTours, setCompletedTours] = useState<Record<string, boolean>>({});
   const [isClient, setIsClient] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   
   // We can use the common translations for next/prev/done buttons
   const t = useTranslations("tour.common");
@@ -46,7 +48,13 @@ export function TourProvider({ children }: { children: ReactNode }) {
 
   // Sync with backend / local storage
   useEffect(() => {
-    if (!userProfile) return;
+    if (!userProfile) {
+      // If no access token, mark ready immediately (guest user)
+      if (typeof window !== "undefined" && !getAccessToken()) {
+        setIsReady(true);
+      }
+      return;
+    }
     try {
       if (userProfile.completedTours) {
         setCompletedTours(JSON.parse(userProfile.completedTours));
@@ -65,6 +73,7 @@ export function TourProvider({ children }: { children: ReactNode }) {
     } catch (e) {
       console.error("Failed to parse tour storage:", e);
     }
+    setIsReady(true);
   }, [userProfile]);
 
   const saveTours = useCallback(async (newTours: Record<string, boolean>) => {
@@ -188,6 +197,7 @@ export function TourProvider({ children }: { children: ReactNode }) {
         resetTour,
         resetAllTours,
         isTourCompleted,
+        isReady,
       }}
     >
       {children}
