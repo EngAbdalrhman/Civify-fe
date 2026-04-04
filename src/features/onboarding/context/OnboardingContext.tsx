@@ -17,6 +17,9 @@ import {
   ONBOARDING_PROFILE_KEY,
 } from "../types";
 import { trackOnboardingEvent } from "../utils/trackOnboardingEvent";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import apiClient from "@/api/client";
+import { getAccessToken } from "@/utils/cookies";
 
 interface OnboardingContextValue extends OnboardingState {
   setPrimaryIntent: (intent: PrimaryIntent) => void;
@@ -40,7 +43,39 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<OnboardingState>(initialState);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
 
-  // Load state from localStorage on mount
+  const { data: userProfile } = useUserProfile();
+
+  // Handle Backend Sync / Migration
+  useEffect(() => {
+    if (!userProfile) return;
+
+    if (userProfile.onboardingCompleted) {
+      setHasCompletedOnboarding(true);
+      setState((prev: OnboardingState) => ({
+        ...prev,
+        onboardingCompleted: true,
+        primaryIntent: (userProfile.primaryIntent as PrimaryIntent) || prev.primaryIntent,
+      }));
+    } else {
+      // Migrate from local storage to backend if local true
+      const localCompleted = window.localStorage.getItem(ONBOARDING_COMPLETED_KEY);
+      if (localCompleted === "true") {
+        setHasCompletedOnboarding(true);
+        setState((prev: OnboardingState) => ({ ...prev, onboardingCompleted: true }));
+        const profileData = window.localStorage.getItem(ONBOARDING_PROFILE_KEY);
+        let intent: string | undefined;
+        if (profileData) {
+          try { intent = JSON.parse(profileData).primaryIntent; } catch { /* ignore */ }
+        }
+        apiClient.put("/v1/users/me/onboarding-status", {
+          onboardingCompleted: true,
+          primaryIntent: intent || undefined,
+        }).catch(() => null);
+      }
+    }
+  }, [userProfile]);
+
+  // Load state from localStorage on mount (fallback)
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -55,7 +90,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
           // ignore
         }
       }
-      setState((prev) => ({
+      setState((prev: OnboardingState) => ({
         ...prev,
         onboardingCompleted: true,
         primaryIntent: profile.primaryIntent || null,
@@ -85,7 +120,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   }, [state]);
 
   const setPrimaryIntent = useCallback((intent: PrimaryIntent) => {
-    setState((prev) => {
+    setState((prev: OnboardingState) => {
       const newProfile = { ...prev.profile, primaryIntent: intent };
       if (typeof window !== "undefined") {
         localStorage.setItem(
@@ -99,7 +134,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const setProfile = useCallback((updates: Partial<UserOnboardingProfile>) => {
-    setState((prev) => {
+    setState((prev: OnboardingState) => {
       const newProfile = { ...prev.profile, ...updates };
       if (typeof window !== "undefined") {
         localStorage.setItem(
@@ -117,12 +152,19 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem(ONBOARDING_STORAGE_KEY);
     }
 
+    if (getAccessToken()) {
+      apiClient.put("/v1/users/me/onboarding-status", {
+        onboardingCompleted: true,
+        primaryIntent: state.primaryIntent || undefined,
+      }).catch(() => null);
+    }
+
     trackOnboardingEvent("onboarding_completed", {
       primaryIntent: state.primaryIntent || undefined,
       industry: state.profile.industry,
     });
 
-    setState((prev) => ({
+    setState((prev: OnboardingState) => ({
       ...initialState,
       onboardingCompleted: true,
       primaryIntent: prev.primaryIntent,
@@ -136,7 +178,11 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(ONBOARDING_COMPLETED_KEY, "true");
       localStorage.removeItem(ONBOARDING_STORAGE_KEY);
     }
-    setState((prev) => ({
+    if (getAccessToken()) {
+      apiClient.put("/v1/users/me/onboarding-status", { onboardingCompleted: true }).catch(() => null);
+    }
+
+    setState((prev: OnboardingState) => ({
       ...initialState,
       onboardingCompleted: true,
       primaryIntent: prev.primaryIntent,

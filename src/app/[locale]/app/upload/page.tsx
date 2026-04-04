@@ -90,11 +90,13 @@ import { Save, Bookmark } from "lucide-react";
 import { getAccessToken } from "@/utils/cookies";
 import { AuthGateDialog } from "@/features/resume-builder/components/AuthGateDialog";
 import { AdBanner } from "@/components/ads/AdBanner";
+import { useTourAutoStart, getUploadTourSteps } from "@/features/onboarding";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 export default function UploadPage() {
   const t = useTranslations("upload");
+  const tTour = useTranslations("tour");
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cvPreviewRef = useRef<HTMLDivElement>(null);
@@ -136,6 +138,9 @@ export default function UploadPage() {
   // API Hooks
   const { mutate: uploadCv, isPending: isUploading } = useUploadCv();
   const { mutate: tailorCv, isPending: isTailoring } = useTailorCv();
+
+  // Tour
+  useTourAutoStart("upload", getUploadTourSteps(tTour), { enabled: currentStep === 1 });
 
   // Handlers
   const handleUploadClick = useCallback(() => {
@@ -647,13 +652,13 @@ export default function UploadPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-12">
       {/* Header */}
-      <div>
+      <div data-tour="upload-header">
         <h1 className="text-3xl font-bold tracking-tight">{t("pageTitle")}</h1>
         <p className="text-muted-foreground mt-2">{t("pageSubtitle")}</p>
       </div>
 
       {/* Stepper */}
-      <div className="flex items-center justify-center mb-8 overflow-x-auto pb-2">
+      <div data-tour="upload-stepper" className="flex items-center justify-center mb-8 overflow-x-auto pb-2">
         <div className="flex items-center gap-2 sm:gap-4">
           {steps.map((step, index) => (
             <div key={step.id} className="flex items-center">
@@ -686,6 +691,7 @@ export default function UploadPage() {
       {currentStep === 1 && (
         <div className="max-w-2xl mx-auto space-y-4">
           <Card
+            data-tour="upload-dropzone"
             className={`border-dashed border-2 transition-colors ${isDragging ? "border-primary bg-primary/5" : ""}`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -737,7 +743,7 @@ export default function UploadPage() {
           </div>
 
           {/* Side by side buttons */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div data-tour="upload-alternatives" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Button
               variant="outline"
               className="w-full"

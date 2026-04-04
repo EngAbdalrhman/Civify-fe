@@ -1,34 +1,71 @@
 {
   "title": "Help Center",
   "subtitle": "Find answers to common questions and learn how to get the most out of Civify",
+  "searchPlaceholder": "Search help articles...",
+  "noResults": "No articles found matching your search",
+  "noResultsHint": "Try different keywords or browse the categories below",
   "gettingStarted": {
     "title": "Getting Started",
     "desc": "Learn the basics of uploading and tailoring your CV",
     "createFirstCv": "Create your first CV",
+    "createFirstCvBody": "Navigate to the Resume Builder from the sidebar. You'll see a live editor on the left and a real-time preview on the right. Fill in your personal information, work experience, education, skills, and other sections. Use the Design tab to pick a template, adjust colors, fonts, and layout. When you're happy, click Save to store it, or go to the Export tab to download as PDF or DOCX.",
+    "createFirstCvKeywords": "resume builder create new CV template",
     "tailorFirstCv": "Tailor your first CV",
+    "tailorFirstCvBody": "Go to Tailor Resume from the sidebar. Upload your existing resume (PDF or DOCX, up to 5MB), or select one from your saved resumes. We'll extract your data automatically. Review and edit the extracted information, then paste the job description you're applying for. Click Generate Tailored Resume and our AI will optimize your CV to match the job requirements. You can also generate a cover letter, interview prep questions, and a learning roadmap.",
+    "tailorFirstCvKeywords": "tailor upload optimize job description AI",
     "howTailoringWorks": "How tailoring works",
-    "understandingAts": "Understanding ATS scores"
+    "howTailoringWorksBody": "Our AI analyzes the job description and compares it against your resume. It identifies key skills, experiences, and qualifications the employer is looking for, then restructures and rewrites your CV sections to highlight the most relevant information. The system uses advanced NLP to match keywords, rephrase achievements, and ensure your resume passes Applicant Tracking Systems (ATS). Your original data is never lost — you can always reset to the original version.",
+    "howTailoringWorksKeywords": "AI NLP matching keywords ATS optimize",
+    "understandingAts": "Understanding ATS scores",
+    "understandingAtsBody": "ATS (Applicant Tracking System) scores indicate how well your resume matches a job description. Our system evaluates keyword matching, formatting compatibility, section completeness, and content relevance. A higher score means your resume is more likely to pass automated screening. After tailoring, you'll see a before/after comparison showing how much your match score improved. Aim for 80%+ for best results."
   },
   "features": {
     "title": "Features",
     "desc": "Explore all the tools available to optimize your CV",
     "aiOptimization": "AI Optimization",
+    "aiOptimizationBody": "Civify uses AI to rewrite and optimize your resume content for each specific job application. When you provide a job description, the AI identifies required skills, experience levels, and qualifications, then adapts your resume language to match. It rephrases your achievements using action verbs, quantifies impact where possible, and ensures the right keywords appear throughout your document. You can regenerate different variants to find the perfect version.",
+    "aiOptimizationKeywords": "AI rewrite optimize keywords action verbs",
     "infoMasking": "Personal Info Masking",
-    "exportOptions": "Export Options (PDF/DOCX)"
+    "infoMaskingBody": "The masking feature lets you hide personal details like your name, email, phone number, and address when sharing your CV. This is useful for blind recruitment processes or when posting your resume publicly. Masked fields are replaced with placeholder text while keeping the rest of your resume intact. You can toggle masking on or off at any time from the Design tab in the Resume Builder.",
+    "infoMaskingKeywords": "mask hide personal information blind recruitment privacy",
+    "exportOptions": "Export Options (PDF/DOCX)",
+    "exportOptionsBody": "You can export your resume in two formats: PDF preserves your exact layout and formatting — ideal for sharing and printing. DOCX creates an editable Word document you can further modify in Microsoft Word or Google Docs. Both formats are available from the Export tab in the Resume Builder, or from the result page after tailoring. All exports maintain your chosen template design, colors, and fonts.",
+    "exportOptionsKeywords": "download PDF DOCX Word export print format",
+    "resumeBuilder": "Resume Builder & Templates",
+    "resumeBuilderBody": "The Resume Builder provides a full WYSIWYG editor with multiple professional templates. Use the Content tab to edit all your information. The Design tab lets you choose between templates (Professional, Creative, etc.), customize colors, fonts, spacing, and toggle section visibility. Changes appear instantly in the live preview. You can upload an existing resume to auto-fill the editor, or start from scratch.",
+    "resumeBuilderKeywords": "builder editor template design preview WYSIWYG",
+    "chromeExtension": "Chrome Extension",
+    "chromeExtensionBody": "Install the Civify Chrome Extension to tailor your resume directly from job listing pages like LinkedIn, Indeed, and Glassdoor. The extension detects job descriptions on the page and lets you generate a tailored resume with one click. You can log in with your Civify account, Google, or LinkedIn to sync your saved resumes. Find it on the Chrome Web Store or from the Extensions page in the sidebar.",
+    "chromeExtensionKeywords": "chrome extension browser LinkedIn Indeed job listing"
   },
   "account": {
     "title": "Account & Security",
     "desc": "Manage your account settings and security",
     "changePassword": "Change Password",
-    "twoFactor": "Two-Factor Auth",
-    "apiKeyManagement": "API Key Management"
+    "changePasswordBody": "Go to Settings from the sidebar and find the Password section. Enter your current password, then type your new password and confirm it. Your password must be at least 8 characters long. After saving, you'll need to use the new password for your next login.",
+    "changePasswordKeywords": "password change update security",
+    "twoFactor": "Two-Factor Authentication",
+    "twoFactorBody": "Enable two-factor authentication (2FA) from your Settings page for an extra layer of security. After enabling 2FA, you'll need to enter a 6-digit code from your authenticator app (Google Authenticator, Authy, etc.) each time you log in. This prevents unauthorized access even if your password is compromised. You can disable 2FA from the same settings page if needed.",
+    "twoFactorKeywords": "2FA two factor authentication security OTP code",
+    "apiKeyManagement": "API Key Management",
+    "apiKeyManagementBody": "If you want to integrate Civify into your own applications, you can generate API keys from the API Keys page. Each key can be used to access our REST API for programmatic resume tailoring. You can create multiple keys, view their usage, and revoke them at any time. Keep your API keys private — treat them like passwords. See the API Documentation page for endpoints, authentication, and rate limits.",
+    "apiKeyManagementKeywords": "API key generate revoke integration developer",
+    "subscription": "Subscription & Billing",
+    "subscriptionBody": "View and manage your subscription from the Billing page. Civify offers free and paid plans. Paid plans include more monthly tokens for AI tailoring, priority processing, and an ad-free experience. You can upgrade, downgrade, or cancel your subscription at any time. Token add-on packs are also available if you run out before your monthly reset.",
+    "subscriptionKeywords": "plan billing subscription upgrade tokens payment"
   },
   "apiDocs": {
     "title": "API Documentation",
     "desc": "For developers integrating with our API",
     "apiReference": "API Reference",
+    "apiReferenceBody": "Our comprehensive API reference documents all available endpoints including resume parsing, tailoring, and export. Each endpoint includes request/response schemas, example payloads, and error codes. Access the full documentation from the API Documentation page in the sidebar.",
+    "apiReferenceKeywords": "API endpoint REST reference documentation",
     "authGuide": "Authentication Guide",
-    "rateLimits": "Rate Limits"
+    "authGuideBody": "Authenticate your API requests using your API key in the Authorization header as a Bearer token. All requests must use HTTPS. Unauthenticated requests will receive a 401 error. Generate your API key from the API Keys page.",
+    "authGuideKeywords": "API authentication bearer token header HTTPS",
+    "rateLimits": "Rate Limits",
+    "rateLimitsBody": "API requests are rate-limited based on your subscription plan. Free plan users are limited to a lower number of requests per minute. Paid plans have higher limits. If you exceed the rate limit, you'll receive a 429 Too Many Requests response. Check the X-RateLimit headers in the response to monitor your remaining quota.",
+    "rateLimitsKeywords": "rate limit quota 429 throttle requests per minute"
   },
   "contact": {
     "title": "Need more help?",

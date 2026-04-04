@@ -149,7 +149,7 @@ export function AppSidebar({
             )}
           </div>
 
-          <nav className="space-y-1">
+          <nav data-tour="sidebar-nav" className="space-y-1">
             {/* Dashboard - authenticated only */}
             {isAuthenticated && (
               <Link

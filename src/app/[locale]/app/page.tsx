@@ -8,7 +8,9 @@ import { PersonalizedDashboard } from "@/features/user-dashboard/components/Pers
 export default function PersonalPage() {
   const { hasCompletedOnboarding } = useOnboarding();
 
-  if (FLAGS.ENABLE_INLINE_ONBOARDING && !hasCompletedOnboarding) {
+  const showOnboarding = FLAGS.ENABLE_INLINE_ONBOARDING && !hasCompletedOnboarding;
+
+  if (showOnboarding) {
     return <OnboardingHub />;
   }
 

@@ -74,10 +74,11 @@ export function EditorSidebar({
 
   return (
     <div
+      data-tour="rb-main"
       className={`w-full lg:w-[450px] shrink-0 border-r bg-card flex flex-col h-full z-10 shadow-xl ${mobileView === "editor" ? "flex" : "hidden"} lg:flex`}
     >
       {/* Header */}
-      <div className="p-4 border-b flex items-center justify-between bg-card">
+      <div data-tour="rb-header" className="p-4 border-b flex items-center justify-between bg-card">
         <h1 className="font-bold text-xl flex items-center gap-2">
           <span className="text-primary">Civify</span>{" "}
           {t("title").replace("Civify ", "")}
@@ -146,15 +147,15 @@ export function EditorSidebar({
       >
         <div className="px-4 pt-4">
           <TabsList className="w-full grid grid-cols-3">
-            <TabsTrigger value="content" className="flex gap-2">
+            <TabsTrigger data-tour="rb-tab-content" value="content" className="flex gap-2">
               <FileText className="h-4 w-4" />
               <span className="hidden sm:inline">{t("tabs.content")}</span>
             </TabsTrigger>
-            <TabsTrigger value="design" className="flex gap-2">
+            <TabsTrigger data-tour="rb-tab-design" value="design" className="flex gap-2">
               <Palette className="h-4 w-4" />
               <span className="hidden sm:inline">{t("tabs.design")}</span>
             </TabsTrigger>
-            <TabsTrigger value="export" className="flex gap-2">
+            <TabsTrigger data-tour="rb-tab-export" value="export" className="flex gap-2">
               <Download className="h-4 w-4" />
               <span className="hidden sm:inline">{t("tabs.export")}</span>
             </TabsTrigger>

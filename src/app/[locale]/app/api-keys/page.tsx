@@ -6,8 +6,11 @@ import { ApiKeysHeader } from "@/features/api-keys/components/ApiKeysHeader";
 import { ApiKeysToolbar } from "@/features/api-keys/components/ApiKeysToolbar";
 import { CreateKeyDialog } from "@/features/api-keys/components/CreateKeyDialog";
 import { ApiKeysListCard } from "@/features/api-keys/components/ApiKeysListCard";
+import { useTourAutoStart, getApiKeysTourSteps } from "@/features/onboarding";
+import { useTranslations } from "next-intl";
 
 export default function ApiKeysPage() {
+  const tTour = useTranslations("tour");
   const {
     keys,
     isLoading,
@@ -24,12 +27,14 @@ export default function ApiKeysPage() {
     openDialog,
   } = useApiKeys();
 
+  useTourAutoStart("api-keys", getApiKeysTourSteps(tTour));
+
   return (
     <PermissionGuard permissions={["API.ACCESS", "API.KEY.CREATE"]}>
       <div className="space-y-6 md:space-y-8">
-        <ApiKeysHeader />
+        <div data-tour="api-header"><ApiKeysHeader /></div>
 
-        <ApiKeysToolbar onGenerateClick={openDialog} />
+        <div data-tour="api-generate"><ApiKeysToolbar onGenerateClick={openDialog} /></div>
 
         <CreateKeyDialog
           isOpen={isDialogOpen}
@@ -43,11 +48,13 @@ export default function ApiKeysPage() {
           onClose={handleDialogClose}
         />
 
-        <ApiKeysListCard
-          keys={keys}
-          isLoading={isLoading}
-          onRevoke={handleRevoke}
-        />
+        <div data-tour="api-keys-list">
+          <ApiKeysListCard
+            keys={keys}
+            isLoading={isLoading}
+            onRevoke={handleRevoke}
+          />
+        </div>
       </div>
     </PermissionGuard>
   );

@@ -16,6 +16,9 @@ export interface UserProfile {
   extraTokens?: number;
   createdAt?: string;
   emailVerified?: boolean;
+  onboardingCompleted?: boolean;
+  completedTours?: string;
+  primaryIntent?: string;
 }
 
 export function useUserProfile() {

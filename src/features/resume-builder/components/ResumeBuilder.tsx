@@ -12,6 +12,7 @@ import { useFileUpload } from "../hooks/useFileUpload";
 import { MobileViewToggle } from "./MobileViewToggle";
 import { EditorSidebar } from "./EditorSidebar";
 import { PreviewPanel } from "./PreviewPanel";
+import { useTourAutoStart, getResumeBuilderTourSteps } from "@/features/onboarding";
 import { SaveDialog } from "./SaveDialog";
 import { AuthGateDialog } from "./AuthGateDialog";
 
@@ -42,6 +43,7 @@ export function ResumeBuilder({
 }: ResumeBuilderProps) {
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const t = useTranslations("builder");
+  const tTour = useTranslations("tour");
 
   const builder = useResumeBuilder({
     initialData,
@@ -52,6 +54,8 @@ export function ResumeBuilder({
   const upload = useFileUpload({
     onSuccess: builder.handleResumeDataUpdate,
   });
+
+  useTourAutoStart("resume-builder", getResumeBuilderTourSteps(tTour));
 
   const handleFullScreenToggle = async () => {
     try {

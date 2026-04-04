@@ -18,20 +18,6 @@ import { DashboardPricingPromotion } from "@/components/dashboard/DashboardPrici
 import { AdBanner } from "@/components/ads/AdBanner";
 
 export function PersonalizedDashboard() {
-  const { primaryIntent } = useOnboarding();
-
-  if (primaryIntent === "build") {
-    return <BuilderDashboard />;
-  }
-
-  if (primaryIntent === "tailor") {
-    return <TailorDashboard />;
-  }
-
-  if (primaryIntent === "api") {
-    return <ApiDashboard />;
-  }
-
   return <DefaultDashboard />;
 }
 
