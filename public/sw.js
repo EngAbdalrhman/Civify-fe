@@ -32,6 +32,11 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Skip non-GET requests (like POST to /monitoring or API routes)
+  if (event.request.method !== "GET") {
+    return;
+  }
+
   // Handle next.js data requests
   if (event.request.url.includes("/_next/data/")) {
     event.respondWith(
