@@ -51,14 +51,26 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
 
     if (userProfile.onboardingCompleted) {
       setHasCompletedOnboarding(true);
-      setState((prev: OnboardingState) => ({ ...prev, onboardingCompleted: true }));
+      setState((prev: OnboardingState) => ({
+        ...prev,
+        onboardingCompleted: true,
+        primaryIntent: (userProfile.primaryIntent as PrimaryIntent) || prev.primaryIntent,
+      }));
     } else {
       // Migrate from local storage to backend if local true
       const localCompleted = window.localStorage.getItem(ONBOARDING_COMPLETED_KEY);
       if (localCompleted === "true") {
         setHasCompletedOnboarding(true);
         setState((prev: OnboardingState) => ({ ...prev, onboardingCompleted: true }));
-        apiClient.put("/v1/users/me/onboarding-status", { onboardingCompleted: true }).catch(() => null);
+        const profileData = window.localStorage.getItem(ONBOARDING_PROFILE_KEY);
+        let intent: string | undefined;
+        if (profileData) {
+          try { intent = JSON.parse(profileData).primaryIntent; } catch { /* ignore */ }
+        }
+        apiClient.put("/v1/users/me/onboarding-status", {
+          onboardingCompleted: true,
+          primaryIntent: intent || undefined,
+        }).catch(() => null);
       }
     }
   }, [userProfile]);
@@ -141,7 +153,10 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     }
 
     if (getAccessToken()) {
-      apiClient.put("/v1/users/me/onboarding-status", { onboardingCompleted: true }).catch(() => null);
+      apiClient.put("/v1/users/me/onboarding-status", {
+        onboardingCompleted: true,
+        primaryIntent: state.primaryIntent || undefined,
+      }).catch(() => null);
     }
 
     trackOnboardingEvent("onboarding_completed", {

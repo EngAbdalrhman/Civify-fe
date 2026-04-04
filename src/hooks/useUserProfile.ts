@@ -18,6 +18,7 @@ export interface UserProfile {
   emailVerified?: boolean;
   onboardingCompleted?: boolean;
   completedTours?: string;
+  primaryIntent?: string;
 }
 
 export function useUserProfile() {
