@@ -74,6 +74,7 @@ export function EditorSidebar({
 
   return (
     <div
+      data-tour="rb-main"
       className={`w-full lg:w-[450px] shrink-0 border-r bg-card flex flex-col h-full z-10 shadow-xl ${mobileView === "editor" ? "flex" : "hidden"} lg:flex`}
     >
       {/* Header */}

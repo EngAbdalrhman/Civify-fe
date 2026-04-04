@@ -99,35 +99,58 @@ export function TourProvider({ children }: { children: ReactNode }) {
     const prevText = t("prevStep") || "Back";
     const doneText = t("doneButton") || "Done";
 
+    const originalScrollIntoView = window.HTMLElement.prototype.scrollIntoView;
+    window.HTMLElement.prototype.scrollIntoView = function() {};
+
     const tourDriver = driver({
       showProgress: true,
       allowClose: true,
+      smoothScroll: false,
       popoverClass: "civify-tour",
       steps: steps.map(step => ({
           ...step,
           popover: {
               ...step.popover,
               showButtons: ['next', 'previous', 'close'],
-              onDeselected: (element?: Element) => {
-                if (element) {
-                  (element as HTMLElement).style.removeProperty('position');
-                  (element as HTMLElement).style.removeProperty('z-index');
-                }
-              },
           }
       })),
       nextBtnText: nextText,
       prevBtnText: prevText,
       doneBtnText: doneText,
       progressText: '{{current}} / {{total}}',
+      onHighlighted: (element?: Element) => {
+        if (element) {
+          (element as HTMLElement).style.removeProperty('position');
+          (element as HTMLElement).style.removeProperty('z-index');
+        }
+        
+        // Failsafe: force scroll top back to 0 on main layout containers
+        document.querySelectorAll('.overflow-hidden').forEach(el => {
+          el.scrollTop = 0;
+        });
+      },
+      onDeselected: (element?: Element) => {
+        if (element) {
+          (element as HTMLElement).style.removeProperty('position');
+          (element as HTMLElement).style.removeProperty('z-index');
+        }
+      },
       onDestroyed: () => {
         completeTour(pageId);
-        // Clean up any inline styles driver.js leaves on highlighted elements
+        
+        // Restore scrollIntoView
+        window.HTMLElement.prototype.scrollIntoView = originalScrollIntoView;
+        
         document.querySelectorAll('[data-tour]').forEach(el => {
           (el as HTMLElement).style.removeProperty('position');
           (el as HTMLElement).style.removeProperty('z-index');
           (el as HTMLElement).classList.remove('driver-active-element');
         });
+        
+        document.querySelectorAll('.overflow-hidden').forEach(el => {
+          el.scrollTop = 0;
+        });
+        window.scrollTo(0, 0);
       },
     });
 
