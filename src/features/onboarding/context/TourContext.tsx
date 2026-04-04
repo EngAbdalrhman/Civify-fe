@@ -50,12 +50,16 @@ export function TourProvider({ children }: { children: ReactNode }) {
     try {
       if (userProfile.completedTours) {
         setCompletedTours(JSON.parse(userProfile.completedTours));
+        // Backend is source-of-truth; clear local storage
+        localStorage.removeItem(TOUR_COMPLETED_KEY);
       } else {
         const stored = localStorage.getItem(TOUR_COMPLETED_KEY);
         if (stored) {
           setCompletedTours(JSON.parse(stored));
           // Migrate to backend
-          apiClient.put("/v1/users/me/onboarding-status", { completedTours: stored }).catch(() => null);
+          apiClient.put("/v1/users/me/onboarding-status", { completedTours: stored })
+            .then(() => localStorage.removeItem(TOUR_COMPLETED_KEY))
+            .catch(() => null);
         }
       }
     } catch (e) {
@@ -65,9 +69,6 @@ export function TourProvider({ children }: { children: ReactNode }) {
 
   const saveTours = useCallback(async (newTours: Record<string, boolean>) => {
     setCompletedTours(newTours);
-    if (typeof window !== "undefined") {
-      localStorage.setItem(TOUR_COMPLETED_KEY, JSON.stringify(newTours));
-    }
     if (getAccessToken()) {
       try {
         await apiClient.put("/v1/users/me/onboarding-status", {
@@ -76,6 +77,9 @@ export function TourProvider({ children }: { children: ReactNode }) {
       } catch (e) {
         console.error("Failed to sync tour status to backend", e);
       }
+    } else if (typeof window !== "undefined") {
+      // Only use localStorage for guests (not authenticated)
+      localStorage.setItem(TOUR_COMPLETED_KEY, JSON.stringify(newTours));
     }
   }, []);
 
@@ -104,6 +108,12 @@ export function TourProvider({ children }: { children: ReactNode }) {
           popover: {
               ...step.popover,
               showButtons: ['next', 'previous', 'close'],
+              onDeselected: (element?: Element) => {
+                if (element) {
+                  (element as HTMLElement).style.removeProperty('position');
+                  (element as HTMLElement).style.removeProperty('z-index');
+                }
+              },
           }
       })),
       nextBtnText: nextText,
@@ -112,6 +122,12 @@ export function TourProvider({ children }: { children: ReactNode }) {
       progressText: '{{current}} / {{total}}',
       onDestroyed: () => {
         completeTour(pageId);
+        // Clean up any inline styles driver.js leaves on highlighted elements
+        document.querySelectorAll('[data-tour]').forEach(el => {
+          (el as HTMLElement).style.removeProperty('position');
+          (el as HTMLElement).style.removeProperty('z-index');
+          (el as HTMLElement).classList.remove('driver-active-element');
+        });
       },
     });
 

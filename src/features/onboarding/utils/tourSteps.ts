@@ -46,11 +46,12 @@ export function getUploadTourSteps(t: TranslationFunction): DriveStep[] {
 export function getResumeBuilderTourSteps(t: TranslationFunction): DriveStep[] {
   return [
     {
+      element: '[data-tour="rb-main"]',
       popover: {
         title: t("resumeBuilder.step1.title"),
         description: t("resumeBuilder.step1.description"),
-        side: "bottom",
-        align: "center"
+        side: "left",
+        align: "start"
       }
     },
     {
