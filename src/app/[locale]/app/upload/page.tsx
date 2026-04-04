@@ -309,11 +309,20 @@ export default function UploadPage() {
 
   // Handler for selecting a stored resume
   const handleSelectStoredResume = useCallback(
-    (resume: ResumeSummary) => {
-      setResumeData(resume.data);
+    async (resume: ResumeSummary) => {
       setShowResumeSelector(false);
-      setCurrentStep(2);
-      // toast.success(t('selectResume.selected'));
+      try {
+        const fullResume = await ResumeService.getById(resume.id);
+        if (fullResume.data) {
+          setResumeData(fullResume.data);
+          setCurrentStep(2);
+        } else {
+          toast.error(t("selectResume.loadError") || "Resume data not found");
+        }
+      } catch (error) {
+        console.error("Failed to load resume:", error);
+        toast.error(t("selectResume.loadError") || "Failed to load resume");
+      }
     },
     [t],
   );
