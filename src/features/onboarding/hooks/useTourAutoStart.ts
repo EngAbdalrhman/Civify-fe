@@ -14,12 +14,13 @@ export function useTourAutoStart(
   options: TourAutoStartOptions = {}
 ) {
   const { enabled = true, delay = 500 } = options;
-  const { startTour, isTourCompleted } = useTour();
+  const { startTour, isTourCompleted, isReady } = useTour();
   const [hasTriggered, setHasTriggered] = useState(false);
 
   useEffect(() => {
     if (!FLAGS.ENABLE_GUIDED_TOURS) return;
     if (!enabled) return;
+    if (!isReady) return;
     if (hasTriggered) return;
     if (isTourCompleted(pageId)) return;
 
@@ -29,5 +30,5 @@ export function useTourAutoStart(
     }, delay);
 
     return () => clearTimeout(timer);
-  }, [pageId, steps, enabled, delay, startTour, isTourCompleted, hasTriggered]);
+  }, [pageId, steps, enabled, delay, startTour, isTourCompleted, hasTriggered, isReady]);
 }

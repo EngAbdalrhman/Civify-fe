@@ -41,6 +41,12 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -303,11 +309,20 @@ export default function UploadPage() {
 
   // Handler for selecting a stored resume
   const handleSelectStoredResume = useCallback(
-    (resume: ResumeSummary) => {
-      setResumeData(resume.data);
+    async (resume: ResumeSummary) => {
       setShowResumeSelector(false);
-      setCurrentStep(2);
-      // toast.success(t('selectResume.selected'));
+      try {
+        const fullResume = await ResumeService.getById(resume.id);
+        if (fullResume.data) {
+          setResumeData(fullResume.data);
+          setCurrentStep(2);
+        } else {
+          toast.error(t("selectResume.loadError") || "Resume data not found");
+        }
+      } catch (error) {
+        console.error("Failed to load resume:", error);
+        toast.error(t("selectResume.loadError") || "Failed to load resume");
+      }
     },
     [t],
   );
@@ -929,6 +944,7 @@ export default function UploadPage() {
           </Card>
 
           {/* Dynamic Sections */}
+          <Accordion type="single" collapsible defaultValue={resumeData.sections[0]?.id} className="space-y-3">
           {resumeData.sections.map((section) => {
             const sectionType = getSectionType(section);
 
@@ -940,13 +956,12 @@ export default function UploadPage() {
                 .filter(Boolean);
 
               return (
-                <Card key={section.id}>
-                  <CardHeader>
-                    <CardTitle className="capitalize">
-                      {section.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+                <AccordionItem key={section.id} value={section.id} className="border rounded-lg">
+                  <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                    <span className="capitalize font-semibold">{section.title}</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-4">
+                  <div className="space-y-4">
                     <div className="space-y-2">
                       <Label>{t("sections.skillsInput")}</Label>
                       <Textarea
@@ -1037,25 +1052,32 @@ export default function UploadPage() {
                         )}
                       </div>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                  </AccordionContent>
+                </AccordionItem>
               );
             }
 
             // Other sections: Normal item-by-item rendering
             return (
-              <Card key={section.id}>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="capitalize">{section.title}</CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => addSectionItem(section.id)}
-                  >
-                    <Plus className="h-4 w-4 mr-1" /> Add
-                  </Button>
-                </CardHeader>
-                <CardContent className="space-y-4">
+              <AccordionItem key={section.id} value={section.id} className="border rounded-lg">
+                <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                  <div className="flex items-center justify-between w-full pr-2">
+                    <span className="capitalize font-semibold">{section.title}</span>
+                    <span className="text-xs text-muted-foreground font-normal">{section.items.length} {section.items.length === 1 ? 'item' : 'items'}</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4">
+                <div className="space-y-4">
+                  <div className="flex justify-end">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => { e.stopPropagation(); addSectionItem(section.id); }}
+                    >
+                      <Plus className="h-4 w-4 mr-1" /> Add
+                    </Button>
+                  </div>
                   {section.items.length === 0 && (
                     <p className="text-sm text-muted-foreground text-center py-4">
                       No items yet. Click "Add" to add your {section.type}.
@@ -1311,10 +1333,12 @@ export default function UploadPage() {
                       )}
                     </div>
                   ))}
-                </CardContent>
-              </Card>
+                </div>
+                </AccordionContent>
+              </AccordionItem>
             );
           })}
+          </Accordion>
 
           {/* Add New Section Dropdown + Navigation */}
           <div className="flex justify-between items-center gap-3">
