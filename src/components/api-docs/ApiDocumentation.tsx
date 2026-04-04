@@ -32,21 +32,15 @@ export function ApiDocumentation() {
       parameters: [
         { name: 'file', type: 'multipart/form-data', required: true, description: 'The CV file (PDF, DOC, DOCX)' },
         { name: 'language', type: 'string', required: false, description: 'Language hint for parsing (e.g., "en", "ar")' },
-        { name: 'userTemplate', type: 'string (JSON/YAML)', required: false, description: 'Optional template string to define output structure' },
       ],
       curlExample: `curl -X POST \\
   ${baseUrl}/v1/external/cvs/parse \\
   -H "X-API-KEY: your_api_key_here" \\
   -F "file=@/path/to/cv.pdf" \\
-  -F "language=en" \\
-  -F 'userTemplate={"sections": ["experience", "education"]}'`,
+  -F "language=en"`,
       jsExample: `const formData = new FormData();
 formData.append('file', fileInput.files[0]);
 formData.append('language', 'en');
-// Optional: Add template as string
-formData.append('userTemplate', JSON.stringify({
-  sections: ['experience', 'education', 'skills']
-}));
 
 const response = await fetch('${baseUrl}/v1/external/cvs/parse', {
   method: 'POST',
@@ -65,8 +59,7 @@ url = "${baseUrl}/v1/external/cvs/parse"
 headers = {"X-API-KEY": "your_api_key_here"}
 files = {"file": open("/path/to/cv.pdf", "rb")}
 data = {
-    "language": "en",
-    "userTemplate": json.dumps({"sections": ["experience", "education"]})  # Optional
+    "language": "en"
 }
 
 response = requests.post(url, headers=headers, files=files, data=data)
