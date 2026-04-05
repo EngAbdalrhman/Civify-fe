@@ -32,6 +32,5 @@ export default withSentryConfig(withNextIntl(nextConfig), {
   sentryUrl: "https://de.sentry.io/",
   silent: !process.env.CI,
   widenClientFileUpload: true,
-  // App Route `src/app/monitoring/route.ts` proxies envelopes; next.config rewrites often 500 on POST in standalone.
   tunnelRoute: false,
 });

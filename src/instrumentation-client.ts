@@ -3,13 +3,12 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from "@sentry/nextjs";
-import { sentryBrowserTunnelPath } from "@/lib/sentry-tunnel";
 
 const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
 Sentry.init({
   dsn,
-  tunnel: sentryBrowserTunnelPath(dsn),
+  // Direct ingest (DSN host). No /monitoring tunnel — avoids server-side proxy issues; some ad blockers may block Sentry domains.
 
   // Add optional integrations for additional features
   integrations: [Sentry.replayIntegration()],

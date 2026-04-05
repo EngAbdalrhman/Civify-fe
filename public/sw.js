@@ -32,7 +32,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Skip non-GET requests (like POST to /monitoring or API routes)
+  // Skip non-GET requests (API routes, etc.)
   if (event.request.method !== "GET") {
     return;
   }
