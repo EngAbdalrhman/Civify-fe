@@ -27,9 +27,10 @@ const nextConfig: NextConfig = {
 };
 
 export default withSentryConfig(withNextIntl(nextConfig), {
-  org: "civify",
-  project: "javascript-nextjs",
+  org: "civify-2g",
+  project: "civify",
+  sentryUrl: "https://de.sentry.io/",
   silent: !process.env.CI,
   widenClientFileUpload: true,
-  tunnelRoute: "/monitoring",
+  tunnelRoute: false,
 });

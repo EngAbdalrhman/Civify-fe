@@ -10,6 +10,11 @@ import type {
   LanguagesDisplayStyle,
   CoursesDisplayStyle,
 } from "@/features/upload-cv/types";
+import {
+  normalizeGitHubUrl,
+  normalizeLinkedInUrl,
+  normalizeWebsiteUrl,
+} from "@/features/resume-builder/utils/socialLinks";
 
 // ============================================================================
 // Shared Utilities
@@ -325,9 +330,9 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
           ${personalInfo.city ? `<span>• ${escapeHtml([personalInfo.city, personalInfo.country].filter(Boolean).join(", "))}</span>` : ""}
         </div>
         <div style="font-size: 14px; color: #4b5563; display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-top: 4px;">
-          ${personalInfo.linkedin ? `<a href="${personalInfo.linkedin.startsWith("http") ? personalInfo.linkedin : `https://${personalInfo.linkedin}`}" target="_blank">${labels.linkedin}</a>` : ""}
-          ${personalInfo.github ? `<a href="${personalInfo.github.startsWith("http") ? personalInfo.github : `https://github.com/${personalInfo.github}`}" target="_blank">${labels.github}</a>` : ""}
-          ${personalInfo.website ? `<a href="${personalInfo.website.startsWith("http") ? personalInfo.website : `https://${personalInfo.website}`}" target="_blank">${escapeHtml(personalInfo.website)}</a>` : ""}
+          ${personalInfo.linkedin ? `<a href="${escapeHtml(normalizeLinkedInUrl(personalInfo.linkedin))}" target="_blank">${labels.linkedin}</a>` : ""}
+          ${personalInfo.github ? `<a href="${escapeHtml(normalizeGitHubUrl(personalInfo.github))}" target="_blank">${labels.github}</a>` : ""}
+          ${personalInfo.website ? `<a href="${escapeHtml(normalizeWebsiteUrl(personalInfo.website))}" target="_blank">${escapeHtml(personalInfo.website)}</a>` : ""}
         </div>
       </header>
 
@@ -572,9 +577,9 @@ function renderModernTemplate(data: ResumeData, color: string): string {
           ${personalInfo.email ? `<div style="display: flex; align-items: center; gap: 4px;">${mailIcon} ${escapeHtml(personalInfo.email)}</div>` : ""}
           ${personalInfo.phone ? `<div style="display: flex; align-items: center; gap: 4px;">${phoneIcon} ${escapeHtml(personalInfo.phone)}</div>` : ""}
           ${personalInfo.city ? `<div style="display: flex; align-items: center; gap: 4px;">${mapPinIcon} ${escapeHtml([personalInfo.city, personalInfo.country].filter(Boolean).join(", "))}</div>` : ""}
-          ${personalInfo.linkedin ? `<a href="${personalInfo.linkedin.startsWith("http") ? personalInfo.linkedin : `https://${personalInfo.linkedin}`}" target="_blank" style="display: flex; align-items: center; gap: 4px; color: #2563eb;">${linkedinIcon} ${labels.linkedin}</a>` : ""}
-          ${personalInfo.github ? `<a href="${personalInfo.github.startsWith("http") ? personalInfo.github : `https://github.com/${personalInfo.github}`}" target="_blank" style="display: flex; align-items: center; gap: 4px; color: #2563eb;">${githubIcon} ${labels.github}</a>` : ""}
-          ${personalInfo.website ? `<a href="${personalInfo.website.startsWith("http") ? personalInfo.website : `https://${personalInfo.website}`}" target="_blank" style="display: flex; align-items: center; gap: 4px; color: #2563eb;">${globeIcon} ${escapeHtml(personalInfo.website)}</a>` : ""}
+          ${personalInfo.linkedin ? `<a href="${escapeHtml(normalizeLinkedInUrl(personalInfo.linkedin))}" target="_blank" style="display: flex; align-items: center; gap: 4px; color: #2563eb;">${linkedinIcon} ${labels.linkedin}</a>` : ""}
+          ${personalInfo.github ? `<a href="${escapeHtml(normalizeGitHubUrl(personalInfo.github))}" target="_blank" style="display: flex; align-items: center; gap: 4px; color: #2563eb;">${githubIcon} ${labels.github}</a>` : ""}
+          ${personalInfo.website ? `<a href="${escapeHtml(normalizeWebsiteUrl(personalInfo.website))}" target="_blank" style="display: flex; align-items: center; gap: 4px; color: #2563eb;">${globeIcon} ${escapeHtml(personalInfo.website)}</a>` : ""}
         </div>
       </header>
 
@@ -826,9 +831,9 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
           ${personalInfo.email ? `<div style="word-break: break-word;">${escapeHtml(personalInfo.email)}</div>` : ""}
           ${personalInfo.phone ? `<div>${escapeHtml(personalInfo.phone)}</div>` : ""}
           ${personalInfo.address ? `<div>${escapeHtml(personalInfo.address)}</div>` : ""}
-          ${personalInfo.linkedin ? `<a href="${personalInfo.linkedin.startsWith("http") ? personalInfo.linkedin : `https://${personalInfo.linkedin}`}" target="_blank" style="display: block; color: rgba(255,255,255,0.9); text-decoration: underline;">${labels.linkedin}</a>` : ""}
-          ${personalInfo.github ? `<a href="${personalInfo.github.startsWith("http") ? personalInfo.github : `https://github.com/${personalInfo.github}`}" target="_blank" style="display: block; color: rgba(255,255,255,0.9); text-decoration: underline;">${labels.github}</a>` : ""}
-          ${personalInfo.website ? `<a href="${personalInfo.website.startsWith("http") ? personalInfo.website : `https://${personalInfo.website}`}" target="_blank" style="display: block; color: rgba(255,255,255,0.9); text-decoration: underline; word-break: break-word;">${escapeHtml(personalInfo.website)}</a>` : ""}
+          ${personalInfo.linkedin ? `<a href="${escapeHtml(normalizeLinkedInUrl(personalInfo.linkedin))}" target="_blank" style="display: block; color: rgba(255,255,255,0.9); text-decoration: underline;">${labels.linkedin}</a>` : ""}
+          ${personalInfo.github ? `<a href="${escapeHtml(normalizeGitHubUrl(personalInfo.github))}" target="_blank" style="display: block; color: rgba(255,255,255,0.9); text-decoration: underline;">${labels.github}</a>` : ""}
+          ${personalInfo.website ? `<a href="${escapeHtml(normalizeWebsiteUrl(personalInfo.website))}" target="_blank" style="display: block; color: rgba(255,255,255,0.9); text-decoration: underline; word-break: break-word;">${escapeHtml(personalInfo.website)}</a>` : ""}
         </div>
 
         ${skillsSections

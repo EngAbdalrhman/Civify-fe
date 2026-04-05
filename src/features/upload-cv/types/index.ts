@@ -69,6 +69,8 @@ export interface ResumeMetadata {
 }
 
 export interface ResumeData {
+  /** Client-only: resume record id after load/create (not always present on API payloads). */
+  id?: string;
   personalInfo: PersonalInfo;
   sections: ResumeSection[];
   metadata?: ResumeMetadata;

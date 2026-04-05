@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { ResumeData, AtsScore } from "@/features/upload-cv/types";
 import { ResumeService } from "@/services/resume.service";
 import { useGuestResumeStorage } from "./useGuestResumeStorage";
+import { ensureUniqueSectionItemIds } from "@/features/resume-builder/utils/normalizeResumeIds";
 
 interface UseResumeBuilderParams {
   initialData: ResumeData;
@@ -121,12 +122,16 @@ export function useResumeBuilder({
     setShowSaveDialog(false);
 
     try {
+      const dataToSave = ensureUniqueSectionItemIds(resumeData) as ResumeData;
       if (currentResumeId) {
-        await ResumeService.update(currentResumeId, resumeTitle, resumeData);
+        await ResumeService.update(currentResumeId, resumeTitle, dataToSave);
       } else {
-        const created = await ResumeService.create(resumeTitle, resumeData);
+        const created = await ResumeService.create(resumeTitle, dataToSave);
         setCurrentResumeId(created.id);
       }
+      // Update local state with the normalized data to avoid sync issues
+      setResumeData(dataToSave);
+      originalDataRef.current = dataToSave;
       toast.success(t("toasts.saveSuccess"));
     } catch (error) {
       console.error(error);

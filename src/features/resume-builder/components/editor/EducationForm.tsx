@@ -72,16 +72,16 @@ export function EducationForm({ items = [], onChange }: EducationFormProps) {
              <div className="space-y-2">
               <Label>{t('school')}</Label>
               <Input 
-                value={item.title || ''} 
-                onChange={e => updateItem(item.id, { title: e.target.value })} 
+                value={item.subtitle || ''} 
+                onChange={e => updateItem(item.id, { subtitle: e.target.value })} 
                 placeholder={t('schoolPlaceholder')}
               />
             </div>
             <div className="space-y-2">
               <Label>{t('degree')}</Label>
               <Input 
-                value={item.subtitle || ''} 
-                onChange={e => updateItem(item.id, { subtitle: e.target.value })} 
+                value={item.title || ''} 
+                onChange={e => updateItem(item.id, { title: e.target.value })} 
                 placeholder={t('degreePlaceholder')}
               />
             </div>
