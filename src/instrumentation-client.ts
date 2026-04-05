@@ -3,9 +3,13 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from "@sentry/nextjs";
+import { sentryBrowserTunnelPath } from "@/lib/sentry-tunnel";
+
+const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
 Sentry.init({
-  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  dsn,
+  tunnel: sentryBrowserTunnelPath(dsn),
 
   // Add optional integrations for additional features
   integrations: [Sentry.replayIntegration()],
