@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { ResumeData, SkillLevel, SkillsDisplayStyle, LanguagesDisplayStyle, CoursesDisplayStyle } from '@/features/upload-cv/types';
+import { normalizeGitHubUrl, normalizeLinkedInUrl, normalizeWebsiteUrl } from '@/features/resume-builder/utils/socialLinks';
 import { LevelVisualizer } from './LevelVisualizer';
 
 interface TemplateProps {
@@ -161,19 +162,19 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
          </div>
           <div className="text-sm text-gray-600 flex flex-wrap justify-center gap-x-4 mt-1">
            {personalInfo.linkedin && (
-             <a href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} 
+             <a href={normalizeLinkedInUrl(personalInfo.linkedin)} 
                 target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                {labels.linkedin}
              </a>
            )}
            {personalInfo.github && (
-             <a href={personalInfo.github.startsWith('http') ? personalInfo.github : `https://github.com/${personalInfo.github}`} 
+             <a href={normalizeGitHubUrl(personalInfo.github)} 
                 target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                {labels.github}
              </a>
            )}
            {personalInfo.website && (
-             <a href={personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`} 
+             <a href={normalizeWebsiteUrl(personalInfo.website)} 
                 target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                {personalInfo.website}
              </a>

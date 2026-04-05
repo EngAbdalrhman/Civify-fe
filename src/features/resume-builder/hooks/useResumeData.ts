@@ -4,6 +4,7 @@ import { ResumeData, emptyResumeData } from "@/features/upload-cv/types";
 import { ResumeService } from "@/services/resume.service";
 import { toast } from "sonner";
 import { isAuthenticated } from "@/utils/cookies";
+import { ensureUniqueSectionItemIds } from "@/features/resume-builder/utils/normalizeResumeIds";
 
 interface UseResumeDataReturn {
   initialData: ResumeData | null;
@@ -29,7 +30,7 @@ export function useResumeData(): UseResumeDataReturn {
         if (resumeIdParam && !isGuest) {
           try {
             const resume = await ResumeService.getById(resumeIdParam);
-            const dataWithId = { ...resume.data, id: resume.id };
+            const dataWithId = ensureUniqueSectionItemIds({ ...resume.data, id: resume.id }) as ResumeData;
             setInitialData(dataWithId);
             setResumeId(resume.id);
             setIsLoading(false);

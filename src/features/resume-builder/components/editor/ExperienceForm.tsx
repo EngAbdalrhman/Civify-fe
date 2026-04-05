@@ -147,17 +147,17 @@ function SortableExperienceItem({
           <div className="space-y-2">
             <Label>{t("company")}</Label>
             <Input
-              value={item.title || ""}
-              onChange={(e) => updateItem(item.id, { title: e.target.value })}
+              value={item.subtitle || ""}
+              onChange={(e) => updateItem(item.id, { subtitle: e.target.value })}
               placeholder={t("companyPlaceholder")}
             />
           </div>
           <div className="space-y-2">
             <Label>{t("position")}</Label>
             <Input
-              value={item.subtitle || ""}
+              value={item.title || ""}
               onChange={(e) =>
-                updateItem(item.id, { subtitle: e.target.value })
+                updateItem(item.id, { title: e.target.value })
               }
               placeholder={t("positionPlaceholder")}
             />

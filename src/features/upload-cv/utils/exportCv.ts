@@ -1,5 +1,10 @@
 import { saveAs } from "file-saver";
-import type { ResumeData } from "../types";
+import type { ResumeData, ResumeSection, SectionItem } from "../types";
+import {
+  normalizeGitHubUrl,
+  normalizeLinkedInUrl,
+  normalizeWebsiteUrl,
+} from "@/features/resume-builder/utils/socialLinks";
 
 export type TemplateType = "modern" | "classic" | "creative";
 
@@ -514,9 +519,30 @@ export async function exportToDocx(
     TableCell,
     BorderStyle,
     WidthType,
+    ExternalHyperlink,
   } = await import("docx");
 
   const { personalInfo, sections } = resumeData;
+  const metadata = resumeData.metadata;
+
+  const filterVisibleItems = (items: SectionItem[] | undefined): SectionItem[] =>
+    (items || []).filter((i) => i.visible !== false);
+
+  const shouldUseSimpleColumnsDocx = (section: ResumeSection): boolean => {
+    if (section.type === "skills" || section.type === "languages") return false;
+    const lowerTitle = (section.title || "").toLowerCase();
+    const isCourse =
+      section.type === "certifications" ||
+      lowerTitle.includes("course") ||
+      lowerTitle.includes("certif");
+    const isSimpleList =
+      lowerTitle.includes("interest") || lowerTitle.includes("hobb");
+    const coursesStyle = metadata?.coursesDisplayStyle ?? "simple";
+    return isSimpleList || (isCourse && coursesStyle === "simple");
+  };
+
+  const simpleColumnsColCount = (section: ResumeSection): number =>
+    metadata?.sectionColumns?.[section.id] ?? 3;
 
   // Helper to get localized header
   const getHeader = (key: string, defaultText: string) => {
@@ -535,6 +561,22 @@ export async function exportToDocx(
 
   // Build document content
   const children: any[] = [];
+
+  const cellBorders = {
+    top: { style: BorderStyle.NONE, size: 0, color: "auto" },
+    bottom: { style: BorderStyle.NONE, size: 0, color: "auto" },
+    left: { style: BorderStyle.NONE, size: 0, color: "auto" },
+    right: { style: BorderStyle.NONE, size: 0, color: "auto" },
+  };
+
+  const tableOuterBorders = {
+    top: { style: BorderStyle.NONE, size: 0, color: "auto" },
+    bottom: { style: BorderStyle.NONE, size: 0, color: "auto" },
+    left: { style: BorderStyle.NONE, size: 0, color: "auto" },
+    right: { style: BorderStyle.NONE, size: 0, color: "auto" },
+    insideHorizontal: { style: BorderStyle.NONE, size: 0, color: "auto" },
+    insideVertical: { style: BorderStyle.NONE, size: 0, color: "auto" },
+  };
 
   // Header with name
   children.push(
@@ -566,17 +608,59 @@ export async function exportToDocx(
     );
   }
 
-  // Links line
-  const linkParts: string[] = [];
-  if (personalInfo.linkedin)
-    linkParts.push(`LinkedIn: ${personalInfo.linkedin}`);
-  if (personalInfo.github) linkParts.push(`GitHub: ${personalInfo.github}`);
-  if (personalInfo.website) linkParts.push(`Website: ${personalInfo.website}`);
-
-  if (linkParts.length > 0) {
+  // Links — clickable hyperlinks (aligned with PDF / preview URLs)
+  const linkRuns: any[] = [];
+  const pushLinkSep = () => {
+    if (linkRuns.length > 0) {
+      linkRuns.push(new TextRun({ text: " | " }));
+    }
+  };
+  if (personalInfo.linkedin) {
+    pushLinkSep();
+    linkRuns.push(
+      new ExternalHyperlink({
+        children: [
+          new TextRun({
+            text: "LinkedIn",
+            style: "Hyperlink",
+          }),
+        ],
+        link: normalizeLinkedInUrl(personalInfo.linkedin),
+      }),
+    );
+  }
+  if (personalInfo.github) {
+    pushLinkSep();
+    linkRuns.push(
+      new ExternalHyperlink({
+        children: [
+          new TextRun({
+            text: "GitHub",
+            style: "Hyperlink",
+          }),
+        ],
+        link: normalizeGitHubUrl(personalInfo.github),
+      }),
+    );
+  }
+  if (personalInfo.website) {
+    pushLinkSep();
+    linkRuns.push(
+      new ExternalHyperlink({
+        children: [
+          new TextRun({
+            text: "Website",
+            style: "Hyperlink",
+          }),
+        ],
+        link: normalizeWebsiteUrl(personalInfo.website),
+      }),
+    );
+  }
+  if (linkRuns.length > 0) {
     children.push(
       new Paragraph({
-        text: linkParts.join(" | "),
+        children: linkRuns,
         alignment: AlignmentType.CENTER,
         spacing: { after: 400 },
       }),
@@ -601,17 +685,18 @@ export async function exportToDocx(
     );
   }
 
-  // Sections - filter out empty and hidden sections
   const visibleSections = sections.filter(
     (s) =>
       s.visible !== false &&
       s.isVisible !== false &&
       s.items &&
-      s.items.length > 0,
+      s.items.length > 0 &&
+      s.items.some((i) => i.visible !== false),
   );
 
   for (const section of visibleSections) {
-    // Already filtered above, no need for additional check
+    const items = filterVisibleItems(section.items);
+    if (items.length === 0) continue;
 
     children.push(
       new Paragraph({
@@ -621,12 +706,12 @@ export async function exportToDocx(
         spacing: { before: 300, after: 200 },
       }),
     );
-    // Skills section - render with safe text visual bars
+
     if (section.type === "skills") {
       const skillsStyle = resumeData?.metadata?.skillsDisplayStyle || "tags";
 
       if (skillsStyle === "tags") {
-        const skills = section.items.map((item) => item.title).filter(Boolean);
+        const skills = items.map((item) => item.title).filter(Boolean);
         if (skills.length > 0) {
           children.push(
             new Paragraph({
@@ -636,22 +721,9 @@ export async function exportToDocx(
           );
         }
       } else {
-        // Use safer unicode characters or text
-        const levelBars: Record<string, string> = {
-          expert: "[|||||]",
-          advanced: "[||||_]",
-          intermediate: "[|||__]",
-          beginner: "[||___]",
-        };
-
-        for (const item of section.items) {
+        for (const item of items) {
           const level = item.level || "intermediate";
-          /* 
-             DOCX rendering of block characters can be font dependent.
-             Sticking to text representation for safety as per user feedback about garbled blocks.
-             Or standard text description.
-          */
-          const visual = `(${level})`; // Safest fallback
+          const visual = `(${level})`;
 
           children.push(
             new Paragraph({
@@ -664,10 +736,8 @@ export async function exportToDocx(
           );
         }
       }
-    }
-    // Languages section
-    else if (section.type === "languages") {
-      for (const item of section.items) {
+    } else if (section.type === "languages") {
+      for (const item of items) {
         children.push(
           new Paragraph({
             children: [
@@ -678,15 +748,8 @@ export async function exportToDocx(
           }),
         );
       }
-    }
-    // Courses/Certifications - simple bullet list - MULTI COLUMN TABLE
-    else if (
-      (section.type === "certifications" ||
-        section.title?.toLowerCase().includes("course")) &&
-      resumeData?.metadata?.coursesDisplayStyle === "simple"
-    ) {
-      const items = section.items;
-      const colCount = 3;
+    } else if (shouldUseSimpleColumnsDocx(section)) {
+      const colCount = simpleColumnsColCount(section);
       const rows = [];
 
       for (let i = 0; i < items.length; i += colCount) {
@@ -694,26 +757,19 @@ export async function exportToDocx(
         const cells = rowItems.map(
           (item) =>
             new TableCell({
-              children: [new Paragraph(`• ${item.title}`)],
-              borders: {
-                top: { style: BorderStyle.NONE, size: 0, color: "auto" },
-                bottom: { style: BorderStyle.NONE, size: 0, color: "auto" },
-                left: { style: BorderStyle.NONE, size: 0, color: "auto" },
-                right: { style: BorderStyle.NONE, size: 0, color: "auto" },
-              },
+              children: [
+                new Paragraph({
+                  children: [new TextRun(`• ${item.title}`)],
+                }),
+              ],
+              borders: cellBorders,
             }),
         );
-        // Fill remaining cells if row is incomplete
         while (cells.length < colCount) {
           cells.push(
             new TableCell({
               children: [],
-              borders: {
-                top: { style: BorderStyle.NONE, size: 0, color: "auto" },
-                bottom: { style: BorderStyle.NONE, size: 0, color: "auto" },
-                left: { style: BorderStyle.NONE, size: 0, color: "auto" },
-                right: { style: BorderStyle.NONE, size: 0, color: "auto" },
-              },
+              borders: cellBorders,
             }),
           );
         }
@@ -723,27 +779,13 @@ export async function exportToDocx(
 
       children.push(
         new Table({
-          rows: rows,
+          rows,
           width: { size: 100, type: WidthType.PERCENTAGE },
-          borders: {
-            top: { style: BorderStyle.NONE, size: 0, color: "auto" },
-            bottom: { style: BorderStyle.NONE, size: 0, color: "auto" },
-            left: { style: BorderStyle.NONE, size: 0, color: "auto" },
-            right: { style: BorderStyle.NONE, size: 0, color: "auto" },
-            insideHorizontal: {
-              style: BorderStyle.NONE,
-              size: 0,
-              color: "auto",
-            },
-            insideVertical: { style: BorderStyle.NONE, size: 0, color: "auto" },
-          },
+          borders: tableOuterBorders,
         }),
       );
-    }
-    // Other sections (experience, education, projects, etc.)
-    else {
-      for (const item of section.items) {
-        // Title and subtitle
+    } else {
+      for (const item of items) {
         children.push(
           new Paragraph({
             children: [
@@ -754,7 +796,6 @@ export async function exportToDocx(
           }),
         );
 
-        // Date and location
         if (item.date || item.location) {
           children.push(
             new Paragraph({
@@ -769,9 +810,7 @@ export async function exportToDocx(
           );
         }
 
-        // Description
         if (item.description) {
-          // Split description by newlines for bullet points
           const descLines = item.description
             .split("\n")
             .filter((line) => line.trim());
@@ -789,13 +828,11 @@ export async function exportToDocx(
           }
         }
 
-        // Add spacing after each item
         children.push(new Paragraph({ spacing: { after: 200 } }));
       }
     }
   }
 
-  // Create document
   const doc = new Document({
     sections: [
       {
@@ -805,7 +842,6 @@ export async function exportToDocx(
     ],
   });
 
-  // Generate and save
   const blob = await Packer.toBlob(doc);
   downloadBlob(blob, `${filename}.docx`);
 }

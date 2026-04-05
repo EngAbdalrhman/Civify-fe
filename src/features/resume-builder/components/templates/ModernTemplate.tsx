@@ -4,6 +4,7 @@ import React from 'react';
 
 import { ResumeData, SkillLevel, SkillsDisplayStyle, LanguagesDisplayStyle, CoursesDisplayStyle } from '@/features/upload-cv/types';
 import { Mail, Phone, MapPin, Linkedin, Github, Globe } from 'lucide-react';
+import { normalizeGitHubUrl, normalizeLinkedInUrl, normalizeWebsiteUrl } from '@/features/resume-builder/utils/socialLinks';
 import { LevelVisualizer } from './LevelVisualizer';
 
 interface TemplateProps {
@@ -178,19 +179,19 @@ export function ModernTemplate({ data, color }: TemplateProps) {
           {personalInfo.phone && <div className="flex items-center gap-1"><Phone className="w-3 h-3" /> {personalInfo.phone}</div>}
           {personalInfo.city && <div className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {[personalInfo.city, personalInfo.country].filter(Boolean).join(', ')}</div>}
           {personalInfo.linkedin && (
-            <a href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} 
+            <a href={normalizeLinkedInUrl(personalInfo.linkedin)} 
                target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-blue-600 hover:underline">
               <Linkedin className="w-3 h-3" /> {labels.linkedin}
             </a>
           )}
           {personalInfo.github && (
-            <a href={personalInfo.github.startsWith('http') ? personalInfo.github : `https://github.com/${personalInfo.github}`} 
+            <a href={normalizeGitHubUrl(personalInfo.github)} 
                target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-blue-600 hover:underline">
               <Github className="w-3 h-3" /> {labels.github}
             </a>
           )}
           {personalInfo.website && (
-            <a href={personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`} 
+            <a href={normalizeWebsiteUrl(personalInfo.website)} 
                target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-blue-600 hover:underline">
               <Globe className="w-3 h-3" /> {personalInfo.website}
             </a>
