@@ -49,10 +49,13 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+# Prefer IPv4 for outbound HTTPS (avoids broken IPv6 in many Docker / host networks; fixes Sentry tunnel fetch).
+ENV NODE_OPTIONS="--dns-result-order=ipv4first"
 
 # Install Chromium and required dependencies for Puppeteer
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
+       ca-certificates \
        chromium \
        fonts-ipafont-gothic \
        fonts-wqy-zenhei \
