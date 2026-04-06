@@ -96,7 +96,13 @@ import { Save, Bookmark } from "lucide-react";
 import { getAccessToken } from "@/utils/cookies";
 import { AuthGateDialog } from "@/features/resume-builder/components/AuthGateDialog";
 import { AdBanner } from "@/components/ads/AdBanner";
-import { useTourAutoStart, getUploadTourSteps } from "@/features/onboarding";
+import {
+  useTourAutoStart,
+  getUploadTourSteps,
+  getUploadStep2TourSteps,
+  getUploadStep3TourSteps,
+  getUploadStep4TourSteps,
+} from "@/features/onboarding";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -147,6 +153,21 @@ export default function UploadPage() {
 
   // Tour
   useTourAutoStart("upload", getUploadTourSteps(tTour), { enabled: currentStep === 1 });
+  useTourAutoStart("upload-step2", getUploadStep2TourSteps(tTour), {
+    enabled: currentStep === 2 && !!resumeData,
+  });
+  useTourAutoStart("upload-step3", getUploadStep3TourSteps(tTour), {
+    enabled: currentStep === 3,
+  });
+  useTourAutoStart(
+    "upload-step4",
+    getUploadStep4TourSteps(tTour, {
+      hasCoverLetter: !!tailorResponse?.coverLetter,
+      hasInterviewPrep: !!tailorResponse?.interviewPrep?.questions?.length,
+      hasRoadmap: !!tailorResponse?.roadmap?.steps?.length,
+    }),
+    { enabled: currentStep === 4 && !!tailorResponse },
+  );
 
   // Handlers
   const handleUploadClick = useCallback(() => {
@@ -848,7 +869,7 @@ export default function UploadPage() {
       {currentStep === 2 && resumeData && (
         <div className="space-y-6 max-w-3xl mx-auto">
           {/* Personal Info */}
-          <Card>
+          <Card data-tour="upload-step2-personal-info">
             <CardHeader>
               <CardTitle>{t("personalInfo.title")}</CardTitle>
               <CardDescription>{t("personalInfo.subtitle")}</CardDescription>
@@ -944,7 +965,13 @@ export default function UploadPage() {
           </Card>
 
           {/* Dynamic Sections */}
-          <Accordion type="single" collapsible defaultValue={resumeData.sections[0]?.id} className="space-y-3">
+          <Accordion
+            data-tour="upload-step2-sections"
+            type="single"
+            collapsible
+            defaultValue={resumeData.sections[0]?.id}
+            className="space-y-3"
+          >
           {resumeData.sections.map((section) => {
             const sectionType = getSectionType(section);
 
@@ -1341,7 +1368,10 @@ export default function UploadPage() {
           </Accordion>
 
           {/* Add New Section Dropdown + Navigation */}
-          <div className="flex justify-between items-center gap-3">
+          <div
+            data-tour="upload-step2-actions"
+            className="flex justify-between items-center gap-3"
+          >
             <Button variant="outline" onClick={() => setCurrentStep(1)}>
               <ArrowLeft className="mr-2 h-4 w-4" /> {t("actions.back")}
             </Button>
@@ -1438,7 +1468,7 @@ export default function UploadPage() {
       {/* Step 3: Job Description */}
       {currentStep === 3 && (
         <div className="max-w-3xl mx-auto space-y-6">
-          <Card>
+          <Card data-tour="upload-step3-job-details">
             <CardHeader>
               <CardTitle>{t("upload.targetJobDescription")}</CardTitle>
               <CardDescription>{t("upload.pasteJobDesc")}</CardDescription>
@@ -1463,7 +1493,7 @@ export default function UploadPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2" data-tour="upload-step3-import-url">
                 <Label>{t("upload.importUrl") || "Import from URL"}</Label>
                 <div className="flex gap-2">
                   <Input
@@ -1512,7 +1542,7 @@ export default function UploadPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card data-tour="upload-step3-options">
             <CardHeader>
               <CardTitle>{t("upload.additionalOptions")}</CardTitle>
             </CardHeader>
@@ -1560,7 +1590,7 @@ export default function UploadPage() {
 
           {/*<AdBanner />*/}
 
-          <div className="flex justify-between gap-3">
+          <div data-tour="upload-step3-generate" className="flex justify-between gap-3">
             <Button variant="outline" onClick={() => setCurrentStep(2)}>
               <ArrowLeft className="mr-2 h-4 w-4" /> {t("actions.back")}
             </Button>
@@ -1592,7 +1622,7 @@ export default function UploadPage() {
             {/* Left Sidebar */}
             <div className="lg:col-span-1 space-y-4">
               {/* Status Card */}
-              <Card>
+              <Card data-tour="upload-step4-downloads">
                 <CardContent className="pt-6 space-y-4">
                   <div className="flex items-center gap-2 text-green-600">
                     <CheckCircle2 className="h-5 w-5" />
@@ -1662,7 +1692,7 @@ export default function UploadPage() {
               </Card>
 
               {/* Refine Options */}
-              <Card>
+              <Card data-tour="upload-step4-refine">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base">
                     {t("upload.refineResult")}
@@ -1691,7 +1721,7 @@ export default function UploadPage() {
               </Card>
 
               {/* ATS Score */}
-              <Card>
+              <Card data-tour="upload-step4-ats">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base">
                     {t("upload.atsMatchScore")}
@@ -1801,7 +1831,7 @@ export default function UploadPage() {
 
             {/* Main Preview */}
             <div className="lg:col-span-3">
-              <Card>
+              <Card data-tour="upload-step4-preview">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-base">Preview</CardTitle>
                   <div className="flex items-center gap-2">
@@ -2130,7 +2160,7 @@ export default function UploadPage() {
 
           {/* Additional Features Tabs - Below the main content */}
           {hasAdditionalFeatures && (
-            <Card>
+            <Card data-tour="upload-step4-additional-tabs">
               <CardContent className="p-0">
                   <Tabs
                   defaultValue={

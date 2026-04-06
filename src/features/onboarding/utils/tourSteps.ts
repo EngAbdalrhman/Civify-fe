@@ -1,6 +1,11 @@
 import type { DriveStep } from "driver.js";
 
 type TranslationFunction = (key: string) => string;
+type UploadStep4TourOptions = {
+  hasCoverLetter?: boolean;
+  hasInterviewPrep?: boolean;
+  hasRoadmap?: boolean;
+};
 
 export function getUploadTourSteps(t: TranslationFunction): DriveStep[] {
   return [
@@ -41,6 +46,141 @@ export function getUploadTourSteps(t: TranslationFunction): DriveStep[] {
       }
     }
   ];
+}
+
+export function getUploadStep2TourSteps(t: TranslationFunction): DriveStep[] {
+  return [
+    {
+      element: '[data-tour="upload-step2-personal-info"]',
+      popover: {
+        title: t("uploadStep2.step1.title"),
+        description: t("uploadStep2.step1.description"),
+        side: "bottom",
+        align: "start",
+      },
+    },
+    {
+      element: '[data-tour="upload-step2-sections"]',
+      popover: {
+        title: t("uploadStep2.step2.title"),
+        description: t("uploadStep2.step2.description"),
+        side: "top",
+        align: "center",
+      },
+    },
+    {
+      element: '[data-tour="upload-step2-actions"]',
+      popover: {
+        title: t("uploadStep2.step3.title"),
+        description: t("uploadStep2.step3.description"),
+        side: "top",
+        align: "end",
+      },
+    },
+  ];
+}
+
+export function getUploadStep3TourSteps(t: TranslationFunction): DriveStep[] {
+  return [
+    {
+      element: '[data-tour="upload-step3-job-details"]',
+      popover: {
+        title: t("uploadStep3.step1.title"),
+        description: t("uploadStep3.step1.description"),
+        side: "bottom",
+        align: "start",
+      },
+    },
+    {
+      element: '[data-tour="upload-step3-import-url"]',
+      popover: {
+        title: t("uploadStep3.step2.title"),
+        description: t("uploadStep3.step2.description"),
+        side: "top",
+        align: "center",
+      },
+    },
+    {
+      element: '[data-tour="upload-step3-options"]',
+      popover: {
+        title: t("uploadStep3.step3.title"),
+        description: t("uploadStep3.step3.description"),
+        side: "top",
+        align: "center",
+      },
+    },
+    {
+      element: '[data-tour="upload-step3-generate"]',
+      popover: {
+        title: t("uploadStep3.step4.title"),
+        description: t("uploadStep3.step4.description"),
+        side: "top",
+        align: "end",
+      },
+    },
+  ];
+}
+
+export function getUploadStep4TourSteps(
+  t: TranslationFunction,
+  options: UploadStep4TourOptions = {},
+): DriveStep[] {
+  const { hasCoverLetter = false, hasInterviewPrep = false, hasRoadmap = false } =
+    options;
+  const hasExtras = hasCoverLetter || hasInterviewPrep || hasRoadmap;
+
+  const steps: DriveStep[] = [
+    {
+      element: '[data-tour="upload-step4-downloads"]',
+      popover: {
+        title: t("uploadStep4.step1.title"),
+        description: t("uploadStep4.step1.description"),
+        side: "right",
+        align: "start",
+      },
+    },
+    {
+      element: '[data-tour="upload-step4-refine"]',
+      popover: {
+        title: t("uploadStep4.step2.title"),
+        description: t("uploadStep4.step2.description"),
+        side: "right",
+        align: "center",
+      },
+    },
+    {
+      element: '[data-tour="upload-step4-ats"]',
+      popover: {
+        title: t("uploadStep4.step3.title"),
+        description: t("uploadStep4.step3.description"),
+        side: "right",
+        align: "center",
+      },
+    },
+    {
+      element: '[data-tour="upload-step4-preview"]',
+      popover: {
+        title: t("uploadStep4.step4.title"),
+        description: t("uploadStep4.step4.description"),
+        side: "left",
+        align: "start",
+      },
+    },
+  ];
+
+  if (hasExtras) {
+    steps.push({
+      element: '[data-tour="upload-step4-additional-tabs"]',
+      popover: {
+        title: t("uploadStep4.step5.title"),
+        description: t("uploadStep4.step5.description"),
+        side: "top",
+        align: "start",
+      },
+    });
+  }
+
+  return steps;
 }
 
 export function getResumeBuilderTourSteps(t: TranslationFunction): DriveStep[] {
