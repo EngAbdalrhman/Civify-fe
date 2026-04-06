@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { MonthPicker } from "@/features/resume-builder/components/editor/MonthPicker";
 import { Trash2, Plus, GripVertical, Eye, EyeOff } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -167,25 +168,21 @@ function SortableExperienceItem({
         <div className="grid grid-cols-2 gap-4 mt-4">
           <div className="space-y-2">
             <Label>{t("startDate")}</Label>
-            <Input
-              type="month"
+            <MonthPicker
               value={displayStartDate !== "Present" ? displayStartDate : ""}
-              onChange={(e) =>
-                updateDates(item.id, e.target.value, displayEndDate)
-              }
+              onChange={(value) => updateDates(item.id, value, displayEndDate)}
+              placeholder={t("startDate")}
             />
           </div>
           <div className="space-y-2">
             <Label>{t("endDate")}</Label>
-            <Input
-              type="month"
+            <MonthPicker
               value={isPresent ? "" : displayEndDate}
-              onChange={(e) =>
-                updateDates(item.id, displayStartDate, e.target.value)
-              }
+              onChange={(value) => updateDates(item.id, displayStartDate, value)}
               disabled={isPresent}
+              placeholder={t("endDate")}
             />
-            <div className="flex items-center gap-2 mt-1">
+            <div className="mt-2 flex h-5 items-center gap-2">
               <Checkbox
                 id={`present-${item.id}`}
                 checked={isPresent}
@@ -199,7 +196,7 @@ function SortableExperienceItem({
               />
               <Label
                 htmlFor={`present-${item.id}`}
-                className="text-xs text-muted-foreground cursor-pointer"
+                className="cursor-pointer text-xs leading-none text-muted-foreground"
               >
                 {t("present")}
               </Label>

@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
+import { MonthPicker } from '@/features/resume-builder/components/editor/MonthPicker';
 import { Plus, Trash2, GripVertical, Eye, EyeOff } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
@@ -167,23 +168,23 @@ function SortableGenericItem({
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <Label className="text-xs">{t('startDate')}</Label>
-                  <Input
-                    type="month"
+                  <MonthPicker
                     value={displayStartDate !== 'Present' ? displayStartDate : ''}
-                    onChange={(e) => updateDates(e.target.value, displayEndDate)}
+                    onChange={(value) => updateDates(value, displayEndDate)}
                     className="h-9"
+                    placeholder={t('startDate')}
                   />
                 </div>
                 <div>
                   <Label className="text-xs">{t('endDate')}</Label>
-                  <Input
-                    type="month"
+                  <MonthPicker
                     value={isPresent ? '' : displayEndDate}
-                    onChange={(e) => updateDates(displayStartDate, e.target.value)}
+                    onChange={(value) => updateDates(displayStartDate, value)}
                     className="h-9"
                     disabled={isPresent}
+                    placeholder={t('endDate')}
                   />
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="mt-2 flex h-5 items-center gap-2">
                     <Checkbox 
                       id={`present-${item.id}`}
                       checked={isPresent}
@@ -191,7 +192,7 @@ function SortableGenericItem({
                         updateDates(displayStartDate, checked ? 'Present' : '');
                       }}
                     />
-                    <Label htmlFor={`present-${item.id}`} className="text-xs text-muted-foreground">
+                    <Label htmlFor={`present-${item.id}`} className="cursor-pointer text-xs leading-none text-muted-foreground">
                       {t('present')}
                     </Label>
                   </div>
