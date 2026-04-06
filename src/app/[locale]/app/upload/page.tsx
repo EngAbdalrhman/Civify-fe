@@ -103,6 +103,7 @@ import {
   getUploadStep3TourSteps,
   getUploadStep4TourSteps,
 } from "@/features/onboarding";
+import { ensureUniqueSectionItemIds } from "@/features/resume-builder/utils/normalizeResumeIds";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -435,6 +436,32 @@ export default function UploadPage() {
       setIsTrackingApplication(false);
     }
   }, [tailorResponse, jobTitle, companyName, jobDescription]);
+
+  const handleEditInResumeBuilder = useCallback(async () => {
+    if (!tailorResponse?.tailoredCv) return;
+
+    try {
+      let targetResumeId = savedResumeId;
+
+      if (!targetResumeId) {
+        setIsSavingResume(true);
+        const title = `${tailorResponse.tailoredCv.personalInfo.fullName || "My CV"} - ${jobTitle || "Tailored"}`;
+        const normalized = ensureUniqueSectionItemIds(
+          tailorResponse.tailoredCv,
+        ) as ResumeData;
+        const saved = await ResumeService.create(title, normalized);
+        targetResumeId = saved.id;
+        setSavedResumeId(saved.id);
+      }
+
+      router.push(`/app/resume-builder?id=${targetResumeId}`);
+    } catch (error) {
+      console.error("Failed to open in resume builder:", error);
+      toast.error(t("errors.saveFailed"));
+    } finally {
+      setIsSavingResume(false);
+    }
+  }, [tailorResponse, savedResumeId, jobTitle, router, t]);
 
   const handleGenerate = useCallback(() => {
     if (!resumeData) return;
@@ -1703,10 +1730,11 @@ export default function UploadPage() {
                     variant="ghost"
                     className="w-full justify-start"
                     size="sm"
-                    onClick={() => setCurrentStep(2)}
+                    onClick={handleEditInResumeBuilder}
+                    disabled={isSavingResume}
                   >
                     <Edit2 className="mr-2 h-4 w-4" />{" "}
-                    {t("upload.editSections")}
+                    {isSavingResume ? t("upload.saving") : t("upload.editSections")}
                   </Button>
                   <Button
                     variant="ghost"
@@ -2021,12 +2049,14 @@ export default function UploadPage() {
                       )}
 
                       {/* Dynamic Sections */}
-                      {tailorResponse.tailoredCv.sections.map((section) => {
+                      {tailorResponse.tailoredCv.sections.map(
+                        (section, sectionIndex) => {
                         if (!section.items?.length) return null;
                         const sectionType = section.type.toLowerCase();
+                        const sectionKey = `${section.id || "section"}-${sectionIndex}`;
 
                         return (
-                          <section key={section.id} className="mt-6">
+                          <section key={sectionKey} className="mt-6">
                             <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-4 border-b border-gray-200 pb-2 flex items-center gap-2">
                               <span className="w-1 h-3.5 bg-gray-900 rounded-sm inline-block"></span>
                               {section.title}
@@ -2034,11 +2064,11 @@ export default function UploadPage() {
 
                             {sectionType === "skills" ? (
                               <div className="flex flex-wrap gap-2">
-                                {section.items.flatMap((item) =>
+                                {section.items.flatMap((item, itemIndex) =>
                                   item.tags && item.tags.length > 0
                                     ? item.tags.map((tag, idx) => (
                                         <span
-                                          key={`${item.id}-${idx}`}
+                                          key={`${sectionKey}-${item.id || "item"}-${itemIndex}-${idx}`}
                                           className="px-3 py-1 bg-gray-100 border border-gray-200 text-gray-800 text-sm font-medium rounded-[4px] hover:bg-gray-200 transition-colors"
                                         >
                                           {tag}
@@ -2047,7 +2077,7 @@ export default function UploadPage() {
                                     : item.title
                                       ? [
                                           <span
-                                            key={item.id}
+                                            key={`${sectionKey}-${item.id || "item"}-${itemIndex}`}
                                             className="px-3 py-1 bg-gray-100 border border-gray-200 text-gray-800 text-sm font-medium rounded-[4px]"
                                           >
                                             {item.title}
@@ -2058,9 +2088,9 @@ export default function UploadPage() {
                               </div>
                             ) : sectionType === "languages" ? (
                               <div className="grid grid-cols-2 gap-4">
-                                {section.items.map((item) => (
+                                {section.items.map((item, itemIndex) => (
                                   <div
-                                    key={item.id}
+                                    key={`${sectionKey}-${item.id || "item"}-${itemIndex}`}
                                     className="flex items-center justify-between p-2 bg-gray-50 rounded-md border border-gray-100"
                                   >
                                     <span className="font-semibold text-gray-900 text-sm">
@@ -2076,8 +2106,11 @@ export default function UploadPage() {
                               </div>
                             ) : (
                               <div className="space-y-6">
-                                {section.items.map((item) => (
-                                  <div key={item.id} className="group">
+                                {section.items.map((item, itemIndex) => (
+                                  <div
+                                    key={`${sectionKey}-${item.id || "item"}-${itemIndex}`}
+                                    className="group"
+                                  >
                                     <div className="flex justify-between items-baseline mb-1">
                                       <h3 className="font-bold text-gray-900 text-[1.05rem]">
                                         {item.title}
@@ -2150,7 +2183,8 @@ export default function UploadPage() {
                             )}
                           </section>
                         );
-                      })}
+                        },
+                      )}
                     </div>
                   </div>
                 </CardContent>
