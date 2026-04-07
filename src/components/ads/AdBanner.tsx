@@ -7,7 +7,11 @@ import { useMyActiveSubscription } from "@/features/plans/hooks/useSubscription"
 const ADS_ENABLED = process.env.NEXT_PUBLIC_ADS_ENABLED !== "false";
 
 export function AdBanner() {
-    const { data: subscription, isLoading } = useMyActiveSubscription();
+    const {
+        data: subscription,
+        isLoading,
+        isError: isSubscriptionError,
+    } = useMyActiveSubscription();
     const [isPwa, setIsPwa] = useState(false);
 
     const AD_WIDTH = 970;
@@ -27,13 +31,19 @@ export function AdBanner() {
     // 2. Loading state
     if (isLoading) return null;
 
+    // Fail-safe: do not show ads when subscription lookup fails
+    if (isSubscriptionError) return null;
+
     // 3. PWA check
     if (isPwa) return null;
 
     // 4. Subscription check
+    const subscriptionStatus = subscription?.status?.toString().toUpperCase();
+    const planName = subscription?.planName?.toString().trim().toLowerCase();
     const isPaidPlan =
-        subscription?.status === "ACTIVE" &&
-        subscription?.planName?.toLowerCase() !== "free";
+        subscriptionStatus === "ACTIVE" &&
+        !!planName &&
+        planName !== "free";
 
     if (isPaidPlan) return null;
 
