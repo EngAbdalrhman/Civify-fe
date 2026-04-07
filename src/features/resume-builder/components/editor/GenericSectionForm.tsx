@@ -184,7 +184,7 @@ function SortableGenericItem({
                     disabled={isPresent}
                     placeholder={t('endDate')}
                   />
-                  <div className="mt-2 flex h-5 items-center gap-2">
+                  <div className="mt-2 flex items-start gap-2 pl-0.5">
                     <Checkbox 
                       id={`present-${item.id}`}
                       checked={isPresent}
@@ -192,7 +192,7 @@ function SortableGenericItem({
                         updateDates(displayStartDate, checked ? 'Present' : '');
                       }}
                     />
-                    <Label htmlFor={`present-${item.id}`} className="cursor-pointer text-xs leading-none text-muted-foreground">
+                    <Label htmlFor={`present-${item.id}`} className="cursor-pointer pt-0.5 text-xs leading-none text-muted-foreground">
                       {t('present')}
                     </Label>
                   </div>
