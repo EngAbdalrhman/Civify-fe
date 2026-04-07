@@ -4,6 +4,7 @@ import {
   SubscriptionService,
 } from "@/services/subscription.service";
 import { toast } from "sonner";
+import { getAccessToken } from "@/utils/cookies";
 
 export const usePlans = () => {
   return useQuery({
@@ -21,9 +22,14 @@ export const usePlan = (id: number) => {
 };
 
 export const useMyActiveSubscription = () => {
+  const hasAccessToken = !!getAccessToken();
+
   return useQuery({
-    queryKey: ["subscription", "active"],
+    queryKey: ["subscription", "active", hasAccessToken ? "auth" : "guest"],
     queryFn: () => subscriptionService.getMyActiveSubscription(),
+    enabled: hasAccessToken,
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 };
 
