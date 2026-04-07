@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { MonthPicker } from '@/features/resume-builder/components/editor/MonthPicker';
 import { Trash2, Plus, Eye, EyeOff } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -88,23 +89,23 @@ export function EducationForm({ items = [], onChange }: EducationFormProps) {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-             <div className="space-y-2">
+            <div className="space-y-2">
               <Label>{t('startDate')}</Label>
-              <Input 
-                type="month"
+              <MonthPicker 
                 value={item.startDate || ''} 
-                onChange={e => updateDates(item.id, e.target.value, item.endDate || '')} 
+                onChange={value => updateDates(item.id, value, item.endDate || '')} 
+                placeholder={t('startDate')}
               />
             </div>
             <div className="space-y-2">
               <Label>{t('endDate')}</Label>
-              <Input 
-                type="month"
+              <MonthPicker 
                 value={item.endDate === 'Present' ? '' : (item.endDate || '')} 
-                onChange={e => updateDates(item.id, item.startDate || '', e.target.value)} 
+                onChange={value => updateDates(item.id, item.startDate || '', value)} 
                 disabled={item.endDate === 'Present'}
+                placeholder={t('endDate')}
               />
-              <div className="flex items-center gap-2 mt-1">
+              <div className="mt-2 flex items-start gap-2 pl-0.5">
                 <Checkbox 
                   id={`present-edu-${item.id}`}
                   checked={item.endDate === 'Present'}
@@ -112,7 +113,7 @@ export function EducationForm({ items = [], onChange }: EducationFormProps) {
                     updateDates(item.id, item.startDate || '', checked ? 'Present' : '');
                   }}
                 />
-                <Label htmlFor={`present-edu-${item.id}`} className="text-xs text-muted-foreground cursor-pointer">
+                <Label htmlFor={`present-edu-${item.id}`} className="cursor-pointer pt-0.5 text-xs leading-none text-muted-foreground">
                   {t('present')}
                 </Label>
               </div>

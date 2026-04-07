@@ -34,6 +34,7 @@ function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("checkout");
+  const tSubscription = useTranslations("subscription");
   const tPolicy = useTranslations("subscription.policy");
 
   const planId = searchParams.get("planId");
@@ -158,6 +159,13 @@ function CheckoutContent() {
   };
 
   const handleCheckout = async () => {
+    const getPaymentErrorMessage = (errorMessage?: string) => {
+      if (errorMessage === "subscription.active.exists") {
+        return tSubscription("active.exists");
+      }
+      return "Failed to initiate payment. Please try again.";
+    };
+
     try {
       setIsProcessing(true);
 
@@ -192,11 +200,18 @@ function CheckoutContent() {
       if (response.paymentUrl) {
         window.location.href = response.paymentUrl;
       } else {
-        toast.error("Failed to get payment URL");
+        toast.error(getPaymentErrorMessage(response.message));
       }
     } catch (error) {
       console.error("Payment initiation error:", error);
-      toast.error("Failed to initiate payment. Please try again.");
+      const errorMessage =
+        typeof error === "object" &&
+        error !== null &&
+        "message" in error &&
+        typeof (error as { message?: string }).message === "string"
+          ? (error as { message: string }).message
+          : undefined;
+      toast.error(getPaymentErrorMessage(errorMessage));
     } finally {
       setIsProcessing(false);
     }

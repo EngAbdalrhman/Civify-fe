@@ -123,6 +123,11 @@ export default function SettingsPage() {
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const router = useRouter();
+  const isOAuthUser = Boolean(user?.oauthProvider);
+  const oauthProviderLabel = user?.oauthProvider
+    ? user.oauthProvider.charAt(0).toUpperCase() +
+      user.oauthProvider.slice(1).toLowerCase()
+    : null;
 
   // Subscription state
   const { data: subscription, isLoading: isSubscriptionLoading } =
@@ -329,16 +334,21 @@ export default function SettingsPage() {
 
   // Delete account handler
   const handleDeleteAccount = async () => {
-    if (!deleteAccountPassword) {
+    if (!isOAuthUser && !deleteAccountPassword) {
       toast.error("Please enter your password");
       return;
     }
 
     setIsDeletingAccount(true);
     try {
-      await apiClient.delete("/v1/users/me", {
-        data: { password: deleteAccountPassword },
-      });
+      await apiClient.delete(
+        "/v1/users/me",
+        isOAuthUser
+          ? undefined
+          : {
+              data: { password: deleteAccountPassword },
+            },
+      );
       toast.success("Account deleted successfully");
       setShowDeleteDialog(false);
       // Clear local storage and redirect
@@ -1045,20 +1055,28 @@ export default function SettingsPage() {
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <div className="py-4">
-                        <Label htmlFor="delete-password">
-                          Enter your password to confirm
-                        </Label>
-                        <div className="relative mt-2">
-                          <Input
-                            id="delete-password"
-                            type="password"
-                            value={deleteAccountPassword}
-                            onChange={(e) =>
-                              setDeleteAccountPassword(e.target.value)
-                            }
-                            placeholder="Your password"
-                          />
-                        </div>
+                        {isOAuthUser ? (
+                          <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-3 text-sm text-muted-foreground">
+                            {`You're signed in with ${oauthProviderLabel || "OAuth"}. No password is required to delete this account.`}
+                          </div>
+                        ) : (
+                          <>
+                            <Label htmlFor="delete-password">
+                              Enter your password to confirm
+                            </Label>
+                            <div className="relative mt-2">
+                              <Input
+                                id="delete-password"
+                                type="password"
+                                value={deleteAccountPassword}
+                                onChange={(e) =>
+                                  setDeleteAccountPassword(e.target.value)
+                                }
+                                placeholder="Your password"
+                              />
+                            </div>
+                          </>
+                        )}
                       </div>
                       <AlertDialogFooter>
                         <AlertDialogCancel
@@ -1069,7 +1087,10 @@ export default function SettingsPage() {
                         <Button
                           variant="destructive"
                           onClick={handleDeleteAccount}
-                          disabled={isDeletingAccount || !deleteAccountPassword}
+                          disabled={
+                            isDeletingAccount ||
+                            (!isOAuthUser && !deleteAccountPassword)
+                          }
                         >
                           {isDeletingAccount && (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

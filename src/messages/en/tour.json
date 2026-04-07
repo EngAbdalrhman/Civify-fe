@@ -23,6 +23,60 @@
       "description": "Follow the steps here from uploading to reviewing data and generating your final resume."
     }
   },
+  "uploadStep2": {
+    "step1": {
+      "title": "Confirm Core Details",
+      "description": "Start here and make sure your name and email are accurate. Correct core details improve matching quality downstream."
+    },
+    "step2": {
+      "title": "Polish Sections",
+      "description": "Review experience, projects, and skills for clarity and impact. Add missing items before generating."
+    },
+    "step3": {
+      "title": "Continue to Tailoring",
+      "description": "Use Add Section if something important is missing, then continue when required fields are complete."
+    }
+  },
+  "uploadStep3": {
+    "step1": {
+      "title": "Target Job Context",
+      "description": "Paste the target job description with enough detail. Better input here gives better tailoring results."
+    },
+    "step2": {
+      "title": "Import from Job URL",
+      "description": "You can paste a job post URL to auto-fill the description, then quickly refine the imported text."
+    },
+    "step3": {
+      "title": "Optional Enhancements",
+      "description": "Enable only the extras you need now, like Cover Letter, Interview Prep, or Career Roadmap."
+    },
+    "step4": {
+      "title": "Generate Tailored Output",
+      "description": "When your job description is ready, run tailoring to produce your optimized resume and add-ons."
+    }
+  },
+  "uploadStep4": {
+    "step1": {
+      "title": "Download Your Resume",
+      "description": "Export your tailored resume in PDF or DOCX. Save both if you need different application formats."
+    },
+    "step2": {
+      "title": "Refine and Regenerate",
+      "description": "Use Edit Sections for content fixes or Regenerate Variant to try a different optimization pass."
+    },
+    "step3": {
+      "title": "Check ATS Improvement",
+      "description": "Review before/after score and missing keywords to decide where to strengthen alignment."
+    },
+    "step4": {
+      "title": "Preview Before Sending",
+      "description": "Scan the full resume preview for formatting, content quality, and personal details before sharing."
+    },
+    "step5": {
+      "title": "Use Extra Outputs",
+      "description": "If enabled, open Cover Letter, Interview Prep, and Career Roadmap tabs to prepare beyond the CV."
+    }
+  },
   "resumeBuilder": {
     "step1": {
       "title": "The Resume Builder",

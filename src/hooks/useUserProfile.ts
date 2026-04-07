@@ -19,6 +19,8 @@ export interface UserProfile {
   onboardingCompleted?: boolean;
   completedTours?: string;
   primaryIntent?: string;
+  oauthProvider?: string | null;
+  oauthSubject?: string | null;
 }
 
 export function useUserProfile() {

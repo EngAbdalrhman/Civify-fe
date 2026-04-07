@@ -47,7 +47,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     verification: {
       other: {
         "msvalidate.01": "143872F0A850B77A1ACBD2E4D2CBA1B0",
-        monetag: "49c8dd85c99e0ddae54c41f1aa13e695",
       },
     },
     title: {
