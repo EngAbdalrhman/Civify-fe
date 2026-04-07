@@ -9,6 +9,9 @@ export function AdBanner() {
   const [isPwa, setIsPwa] = useState(false);
   const AD_WIDTH = 300;
   const AD_HEIGHT = 250;
+  const adsEnabled =
+    process.env.NEXT_PUBLIC_ADS_ENABLED === undefined ||
+    process.env.NEXT_PUBLIC_ADS_ENABLED.toLowerCase() === "true";
 
   useEffect(() => {
     // Detect PWA standalone mode — hide ads in installed app context
@@ -22,6 +25,9 @@ export function AdBanner() {
 
   // Don't show while loading
   if (isLoading) return null;
+
+  // Global feature flag to disable ads per environment
+  if (!adsEnabled) return null;
 
   // Hide in PWA standalone mode
   if (isPwa) return null;
@@ -45,6 +51,9 @@ export function AdBanner() {
           data-aa="2433336"
           src="//ad.a-ads.com/2433336/?size=300x250"
           title="Advertisement"
+          loading="lazy"
+          sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
+          referrerPolicy="strict-origin-when-cross-origin"
           style={{
             border: 0,
             padding: 0,
