@@ -7,6 +7,8 @@ import { useMyActiveSubscription } from "@/features/plans/hooks/useSubscription"
 export function AdBanner() {
   const { data: subscription, isLoading } = useMyActiveSubscription();
   const [isPwa, setIsPwa] = useState(false);
+  const AD_WIDTH = 300;
+  const AD_HEIGHT = 250;
 
   useEffect(() => {
     // Detect PWA standalone mode — hide ads in installed app context
@@ -33,18 +35,26 @@ export function AdBanner() {
 
   return (
     <div className="my-3 sm:my-4 p-3 sm:p-4 border border-dashed border-border rounded-lg flex flex-col items-center justify-center relative overflow-visible bg-muted/30">
-      <span className="text-[10px] text-muted-foreground mb-2 font-medium uppercase tracking-wider">
-        Advertisement
-      </span>
-
-      {/* Monetag banner placeholder — responsive height */}
+      {/* A-ADS banner unit 2433336 (300x250) */}
       <div
-        id="monetag-banner-placeholder"
-        className="w-full min-h-[60px] sm:min-h-[90px] flex items-center justify-center bg-background rounded border border-border/50"
+        id="frame"
+        className="z-[99998] mx-auto overflow-hidden"
+        style={{ width: `${AD_WIDTH}px`, height: "auto" }}
       >
-        <span className="text-muted-foreground text-xs sm:text-sm">
-          Ad Banner Space
-        </span>
+        <iframe
+          data-aa="2433336"
+          src="//ad.a-ads.com/2433336/?size=300x250"
+          title="Advertisement"
+          style={{
+            border: 0,
+            padding: 0,
+            width: `${AD_WIDTH}px`,
+            height: `${AD_HEIGHT}px`,
+            overflow: "hidden",
+            display: "block",
+            margin: "auto",
+          }}
+        />
       </div>
 
       {/* Remove Ads badge — 44px minimum touch target for mobile */}
