@@ -928,12 +928,7 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
 // Main Export Function
 // ============================================================================
 
-export type TemplateType =
-  | "modern"
-  | "classic"
-  | "creative"
-  | "executive"
-  | "minimal";
+export type TemplateType = "modern" | "classic" | "creative";
 
 export function renderResumeHtml(
   data: ResumeData,
@@ -941,10 +936,6 @@ export function renderResumeHtml(
   color: string = "#000000",
 ): string {
   switch (template) {
-    case "executive":
-      return renderClassicTemplate(data, color);
-    case "minimal":
-      return renderModernTemplate(data, color);
     case "classic":
       return renderClassicTemplate(data, color);
     case "creative":

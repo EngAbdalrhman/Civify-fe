@@ -3,7 +3,7 @@
 import { ResumeData, SkillsDisplayStyle, LanguagesDisplayStyle, CoursesDisplayStyle } from '@/features/upload-cv/types';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { LayoutTemplate, Type, Palette, Code, Languages, AlignLeft, AlignRight, Maximize } from 'lucide-react';
+import { LayoutTemplate, Type, Palette, Code, Languages, BookOpen, AlignLeft, AlignRight, Maximize, FileText } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 
 interface DesignPanelProps {
@@ -12,45 +12,15 @@ interface DesignPanelProps {
 }
 
 const TEMPLATES = [
-  {
-    id: 'modern',
-    category: 'balanced',
-    accent: '#2563eb',
-    preview: ['wide', 'bars', 'grid'],
-  },
-  {
-    id: 'classic',
-    category: 'traditional',
-    accent: '#111827',
-    preview: ['rule', 'stack', 'text'],
-  },
-  {
-    id: 'creative',
-    category: 'bold',
-    accent: '#db2777',
-    preview: ['sidebar', 'cards', 'contrast'],
-  },
-  {
-    id: 'executive',
-    category: 'premium',
-    accent: '#0f766e',
-    preview: ['header', 'columns', 'tight'],
-  },
-  {
-    id: 'minimal',
-    category: 'clean',
-    accent: '#475569',
-    preview: ['thin', 'airy', 'mono'],
-  },
+  { id: 'modern', name: 'Modern', description: 'Clean and professional' },
+  { id: 'classic', name: 'Classic', description: 'Timeless and traditional' },
+  { id: 'creative', name: 'Creative', description: 'Bold and standout' },
 ];
 
 const FONTS = [
   { id: 'Inter', name: 'Inter (Sans)' },
   { id: 'Georgia', name: 'Georgia (Serif)' },
   { id: 'Roboto', name: 'Roboto (Sans)' },
-  { id: 'Arial', name: 'Arial (Sans)' },
-  { id: 'Times New Roman', name: 'Times (Serif)' },
-  { id: 'Trebuchet MS', name: 'Trebuchet (Humanist)' },
 ];
 
 const COLORS = [
@@ -60,10 +30,6 @@ const COLORS = [
   '#16a34a', // Green
   '#9333ea', // Purple
   '#f59e0b', // Amber
-  '#0f766e', // Teal
-  '#1d4ed8', // Royal Blue
-  '#be185d', // Rose
-  '#475569', // Slate
 ];
 
 const SKILLS_DISPLAY_STYLES: { id: SkillsDisplayStyle; name: string }[] = [
@@ -89,8 +55,6 @@ import { useTranslations } from 'next-intl';
 export function DesignPanel({ data, onChange }: DesignPanelProps) {
   const metadata = data.metadata || {};
   const t = useTranslations('design');
-  const tr = (key: string, fallback: string) =>
-    t.has(key as never) ? t(key as never) : fallback;
 
   const updateMetadata = (key: string, value: any) => {
     onChange({
@@ -152,67 +116,15 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
             <div
               key={template.id}
               className={`
-                relative overflow-hidden rounded-2xl border-2 cursor-pointer transition-all
+                relative p-4 rounded-lg border-2 cursor-pointer transition-all
                 ${metadata.templateId === template.id 
-                  ? 'border-primary bg-primary/5 shadow-sm' 
+                  ? 'border-primary bg-primary/5' 
                   : 'border-border hover:border-primary/50'}
               `}
               onClick={() => updateMetadata('templateId', template.id)}
             >
-              <div className="grid gap-4 md:grid-cols-[1.1fr_0.9fr]">
-                <div className="space-y-2 p-4">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="h-3 w-3 rounded-full"
-                      style={{ backgroundColor: template.accent }}
-                    />
-                    <div className="font-medium">
-                      {tr(
-                        `template.${template.id}.name`,
-                        template.id.charAt(0).toUpperCase() + template.id.slice(1),
-                      )}
-                    </div>
-                    <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                      {tr(`template.categories.${template.category}`, template.category)}
-                    </span>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {tr(`template.${template.id}.description`, "Template preview")}
-                  </div>
-                </div>
-                <div className="bg-muted/40 p-4">
-                  <div className="mx-auto flex h-28 max-w-[170px] flex-col gap-2 rounded-xl border bg-background p-3 shadow-sm">
-                    <div
-                      className="h-2.5 rounded-full"
-                      style={{ backgroundColor: template.accent, width: template.preview[0] === 'thin' ? '40%' : '70%' }}
-                    />
-                    <div className={`grid flex-1 gap-2 ${template.preview.includes('sidebar') ? 'grid-cols-[0.42fr_0.58fr]' : 'grid-cols-1'}`}>
-                      {template.preview.includes('sidebar') ? (
-                        <>
-                          <div className="rounded-lg bg-muted/80" />
-                          <div className="space-y-2">
-                            <div className="h-2 rounded-full bg-muted/80" />
-                            <div className="h-2 rounded-full bg-muted/60" />
-                            <div className="grid grid-cols-2 gap-2">
-                              <div className="h-10 rounded-lg bg-muted/60" />
-                              <div className="h-10 rounded-lg bg-muted/50" />
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div className="h-10 rounded-lg bg-muted/70" />
-                          <div className="grid grid-cols-2 gap-2">
-                            <div className="rounded-lg bg-muted/60" />
-                            <div className="rounded-lg bg-muted/50" />
-                          </div>
-                          <div className="h-8 rounded-lg bg-muted/55" />
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <div className="font-medium">{t(`template.${template.id}.name` as any)}</div>
+              <div className="text-sm text-muted-foreground">{t(`template.${template.id}.description` as any)}</div>
             </div>
           ))}
         </div>
@@ -254,7 +166,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
             <RadioGroup 
               value={metadata.headingFontFamily || metadata.fontFamily || 'Inter'} 
               onValueChange={(val) => updateMetadata('headingFontFamily', val)}
-              className="grid grid-cols-2 gap-2 xl:grid-cols-3"
+              className="grid grid-cols-3 gap-2"
             >
               {FONTS.map((font) => (
                 <div key={`heading-${font.id}`} className="flex items-center space-x-2 border rounded-md p-2 hover:bg-muted/50 transition-colors">
@@ -271,7 +183,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
             <RadioGroup 
               value={metadata.bodyFontFamily || metadata.fontFamily || 'Inter'} 
               onValueChange={(val) => updateMetadata('bodyFontFamily', val)}
-              className="grid grid-cols-2 gap-2 xl:grid-cols-3"
+              className="grid grid-cols-3 gap-2"
             >
               {FONTS.map((font) => (
                 <div key={`body-${font.id}`} className="flex items-center space-x-2 border rounded-md p-2 hover:bg-muted/50 transition-colors">
@@ -288,7 +200,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
       <div className="space-y-6 border-t pt-6">
         <h3 className="font-semibold flex items-center gap-2">
           <Maximize className="h-4 w-4" />
-          {tr('layoutAndSpacing', 'Layout & Spacing')}
+          Layout & Spacing
         </h3>
         
         {/* Compact Mode */}
@@ -298,7 +210,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
               {t('compactMode')}
             </Label>
             <p className="text-xs text-muted-foreground">
-              {tr('compactModeDescription', 'Reduce line heights to fit more content.')}
+              Reduce line heights to fit more content.
             </p>
           </div>
           <Switch
@@ -329,8 +241,8 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
             className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
           />
           <div className="flex justify-between text-[10px] text-muted-foreground uppercase tracking-wider">
-            <span>{tr('spacingTight', 'Tight')}</span>
-            <span>{tr('spacingRelaxed', 'Relaxed')}</span>
+            <span>Tight</span>
+            <span>Relaxed</span>
           </div>
         </div>
 
@@ -426,7 +338,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
               `}
               onClick={() => updateMetadata('skillsDisplayStyle', style.id)}
             >
-            {tr(`sectionStyles.${style.id}`, style.name)}
+              {t(`sectionStyles.${style.id}` as any)}
             </button>
           ))}
         </div>
@@ -450,7 +362,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
               `}
               onClick={() => updateMetadata('languagesDisplayStyle', style.id)}
             >
-            {tr(`sectionStyles.${style.id}`, style.name)}
+              {t(`sectionStyles.${style.id}` as any)}
             </button>
           ))}
         </div>

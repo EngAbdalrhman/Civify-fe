@@ -3,16 +3,7 @@
     "title": "Template",
     "modern": { "name": "Modern", "description": "Clean and professional" },
     "classic": { "name": "Classic", "description": "Timeless and traditional" },
-    "creative": { "name": "Creative", "description": "Bold and standout" },
-    "executive": { "name": "Executive", "description": "Structured and polished for senior roles" },
-    "minimal": { "name": "Minimal", "description": "Lightweight and distraction-free" },
-    "categories": {
-      "balanced": "Balanced",
-      "traditional": "Traditional",
-      "bold": "Bold",
-      "premium": "Executive",
-      "clean": "Minimal"
-    }
+    "creative": { "name": "Creative", "description": "Bold and standout" }
   },
   "colors": "Primary Color",
   "typography": "Typography",

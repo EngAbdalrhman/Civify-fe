@@ -20,10 +20,6 @@ export function ResumePreview({ data }: ResumePreviewProps) {
   // Map template ID to component
   const renderTemplate = () => {
     switch (templateId) {
-      case 'executive':
-        return <ClassicTemplate data={data} color={primaryColor} />;
-      case 'minimal':
-        return <ModernTemplate data={data} color={primaryColor} />;
       case 'modern':
         return <ModernTemplate data={data} color={primaryColor} />;
       case 'classic':

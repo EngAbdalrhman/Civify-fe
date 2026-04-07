@@ -182,7 +182,7 @@ function SortableExperienceItem({
               disabled={isPresent}
               placeholder={t("endDate")}
             />
-            <div className="mt-2 flex items-start gap-2 pl-0.5">
+            <div className="mt-2 flex h-5 items-center gap-2">
               <Checkbox
                 id={`present-${item.id}`}
                 checked={isPresent}
@@ -196,7 +196,7 @@ function SortableExperienceItem({
               />
               <Label
                 htmlFor={`present-${item.id}`}
-                className="cursor-pointer pt-0.5 text-xs leading-none text-muted-foreground"
+                className="cursor-pointer text-xs leading-none text-muted-foreground"
               >
                 {t("present")}
               </Label>
