@@ -2,17 +2,31 @@
   "title": "Resume Builder",
   "tabs": {
     "content": "Content",
+    "target": "Target Job",
     "design": "Design",
     "export": "Export"
   },
   "actions": {
     "upload": "Upload Resume",
+    "linkedinImport": "Import LinkedIn",
     "parsing": "Parsing...",
     "save": "Save",
     "saving": "Saving...",
     "reset": "Reset to Original",
+    "atsScore": "ATS Score",
     "fullscreen": "Fullscreen",
     "exitFullscreen": "Exit Fullscreen"
+  },
+  "saveStatus": {
+    "saved": "Saved",
+    "saving": "Saving",
+    "unsaved": "Unsaved changes",
+    "error": "Save failed",
+    "lastSaved": "Last saved {time}"
+  },
+  "importWorkspace": {
+    "title": "Bring in your source material",
+    "subtitle": "Start from an existing resume or paste LinkedIn profile text for a guided merge."
   },
   "saveDialog": {
     "title": "Save Resume",
@@ -46,7 +60,6 @@
     "parseSuccess": "Resume parsed successfully!",
     "parseError": "Failed to parse resume. Please try again.",
     "fullscreenError": "Fullscreen not supported",
-
     "loginAction": "Login"
   },
   "tokenLimit": {
@@ -76,5 +89,130 @@
     "description": "You have an unsaved resume from a previous session. Would you like to continue editing it or start fresh?",
     "continue": "Continue Editing",
     "startFresh": "Start Fresh"
+  },
+  "targetJob": {
+    "title": "Target a Specific Job",
+    "jobTitle": "Target Job Title",
+    "jobTitlePlaceholder": "e.g. Senior Frontend Engineer",
+    "company": "Company",
+    "companyPlaceholder": "e.g. Stripe",
+    "jobUrl": "Job URL",
+    "jobUrlPlaceholder": "Paste a LinkedIn or Indeed job URL",
+    "importUrl": "Import URL",
+    "jobDescription": "Job Description",
+    "jobDescriptionPlaceholder": "Paste the full job description here...",
+    "jobDescriptionHint": "Add at least 50 characters so Civify can tailor accurately.",
+    "lastTailored": "Tailored moments ago",
+    "defaultTailoredTitle": "Tailored Resume",
+    "options": {
+      "coverLetter": "Generate cover letter",
+      "coverLetterDesc": "Create a tailored cover letter from the same job context.",
+      "interviewPrep": "Interview prep",
+      "interviewPrepDesc": "Generate likely interview questions from the role and your resume.",
+      "roadmap": "Learning roadmap",
+      "roadmapDesc": "Highlight skill gaps and the next best steps to improve fit."
+    },
+    "actions": {
+      "generate": "Tailor Resume",
+      "generating": "Tailoring...",
+      "openAts": "Analyze ATS",
+      "apply": "Apply To Current Resume",
+      "saveDuplicate": "Save As Duplicate"
+    },
+    "results": {
+      "title": "Tailored Results",
+      "before": "Before",
+      "after": "After",
+      "matchRate": "optimized score",
+      "keywordMatch": "Keywords",
+      "skillsMatch": "Skills"
+    },
+    "tabs": {
+      "ats": "ATS",
+      "coverLetter": "Cover Letter",
+      "interview": "Interview",
+      "roadmap": "Roadmap"
+    },
+    "ats": {
+      "missingKeywords": "Missing Keywords",
+      "suggestions": "Suggestions"
+    },
+    "coverLetter": {
+      "title": "Generated Cover Letter",
+      "subtitle": "Edit, copy, or download this version for your application.",
+      "copy": "Copy",
+      "download": "Download"
+    },
+    "roadmap": {
+      "skillGaps": "Skill Gaps"
+    },
+    "empty": {
+      "title": "No tailored results yet",
+      "description": "Paste a job description, then tailor this resume to see ATS improvements, cover letters, and interview prep."
+    },
+    "errors": {
+      "descriptionRequired": "Job description is required",
+      "descriptionMinLength": "Job description must be at least 50 characters",
+      "invalidUrl": "Please enter a valid job URL",
+      "scrapeEmpty": "We couldn't extract a description from that URL",
+      "scrapeFailed": "Failed to import the job description"
+    },
+    "toasts": {
+      "jdImported": "Job description imported",
+      "tailorSuccess": "Tailored resume generated",
+      "applySuccess": "Tailored content applied to the builder",
+      "saveDuplicateSuccess": "Tailored resume saved as a duplicate",
+      "saveDuplicateError": "Failed to save the tailored duplicate",
+      "coverLetterCopied": "Cover letter copied to clipboard"
+    }
+  },
+  "linkedinImport": {
+    "title": "Import From LinkedIn",
+    "description": "Paste LinkedIn profile text, review the parsed content, and choose exactly what to merge into the builder.",
+    "howItWorksTitle": "How it works",
+    "howItWorksBody": "Paste your profile text from LinkedIn. Civify will build a draft resume and let you review each section before merging it.",
+    "profileUrl": "LinkedIn Profile URL",
+    "profileUrlPlaceholder": "https://linkedin.com/in/username",
+    "profileText": "LinkedIn Profile Text",
+    "profileTextPlaceholder": "Paste your LinkedIn profile text here...",
+    "hint": "Tip: copy your profile page content including About, Experience, Education, and Skills.",
+    "reviewTitle": "Review Parsed Content",
+    "foundSections": "Imported Sections",
+    "mergeModeTitle": "How should we merge it?",
+    "mergeMode": {
+      "append": "Append",
+      "replace": "Replace"
+    },
+    "fields": {
+      "personalInfo": "Personal info",
+      "summary": "Summary",
+      "experience": "Experience",
+      "education": "Education",
+      "skills": "Skills",
+      "certifications": "Certifications",
+      "projects": "Projects"
+    },
+    "preview": {
+      "fullName": "Full name",
+      "jobTitle": "Headline",
+      "email": "Email",
+      "linkedin": "LinkedIn",
+      "summary": "Summary"
+    },
+    "badges": {
+      "experience": "{count} experience",
+      "education": "{count} education",
+      "skills": "{count} skills",
+      "certifications": "{count} certifications",
+      "projects": "{count} projects"
+    },
+    "errors": {
+      "empty": "Paste LinkedIn profile text before continuing"
+    },
+    "cancel": "Cancel",
+    "back": "Back",
+    "parse": "Parse Profile",
+    "apply": "Apply Import",
+    "success": "LinkedIn content merged into the builder"
   }
 }

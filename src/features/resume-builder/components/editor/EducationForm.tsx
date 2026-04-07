@@ -105,7 +105,7 @@ export function EducationForm({ items = [], onChange }: EducationFormProps) {
                 disabled={item.endDate === 'Present'}
                 placeholder={t('endDate')}
               />
-              <div className="mt-2 flex h-5 items-center gap-2">
+              <div className="mt-2 flex items-start gap-2 pl-0.5">
                 <Checkbox 
                   id={`present-edu-${item.id}`}
                   checked={item.endDate === 'Present'}
@@ -113,7 +113,7 @@ export function EducationForm({ items = [], onChange }: EducationFormProps) {
                     updateDates(item.id, item.startDate || '', checked ? 'Present' : '');
                   }}
                 />
-                <Label htmlFor={`present-edu-${item.id}`} className="cursor-pointer text-xs leading-none text-muted-foreground">
+                <Label htmlFor={`present-edu-${item.id}`} className="cursor-pointer pt-0.5 text-xs leading-none text-muted-foreground">
                   {t('present')}
                 </Label>
               </div>

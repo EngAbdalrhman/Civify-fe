@@ -6,7 +6,12 @@ import {
   normalizeWebsiteUrl,
 } from "@/features/resume-builder/utils/socialLinks";
 
-export type TemplateType = "modern" | "classic" | "creative";
+export type TemplateType =
+  | "modern"
+  | "classic"
+  | "creative"
+  | "executive"
+  | "minimal";
 
 /**
  * Export the CV to PDF using Puppeteer (server-side rendering)
