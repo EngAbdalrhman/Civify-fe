@@ -10,7 +10,7 @@ export function AdBanner() {
     const { data: subscription, isLoading } = useMyActiveSubscription();
     const [isPwa, setIsPwa] = useState(false);
 
-    const AD_WIDTH = 300;
+    const AD_WIDTH = 970;
     const AD_HEIGHT = 250;
 
     useEffect(() => {
@@ -47,7 +47,7 @@ export function AdBanner() {
             >
                 <iframe
                     data-aa="2433336"
-                    src="//ad.a-ads.com/2433336/?size=300x250"
+                    src="//ad.a-ads.com/2433336/?size=970x250"
                     title="Advertisement"
                     loading="lazy"
                     sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
