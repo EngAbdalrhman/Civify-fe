@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Link } from "@/i18n/routing";
 import { useMyActiveSubscription } from "@/features/plans/hooks/useSubscription";
 
@@ -49,30 +50,25 @@ export function AdBanner() {
 
     return (
         <div className="my-3 sm:my-4 p-3 sm:p-4 border border-dashed border-border rounded-lg flex flex-col items-center justify-center relative overflow-visible bg-muted/30">
-            {/* A-ADS banner unit 2433336 (300x250) */}
-            <div
-                id="frame"
-                className="z-[99998] mx-auto overflow-hidden"
+            <a
+                href="mailto:ceo@civify.cv"
+                className="z-[99998] mx-auto block overflow-hidden"
                 style={{ width: `${AD_WIDTH}px`, height: "auto" }}
+                aria-label="Contact Civify for ad space"
             >
-                <iframe
-                    data-aa="2433336"
-                    src="//ad.a-ads.com/2433336/?size=970x250"
-                    title="Advertisement"
+                <Image
+                    src="/ad%20with%20us.png"
+                    alt="Advertise with Civify"
+                    width={AD_WIDTH}
+                    height={AD_HEIGHT}
                     loading="lazy"
-                    sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
-                    referrerPolicy="strict-origin-when-cross-origin"
                     style={{
-                        border: 0,
-                        padding: 0,
-                        width: `${AD_WIDTH}px`,
-                        height: `${AD_HEIGHT}px`,
-                        overflow: "hidden",
+                        width: "100%",
+                        height: "auto",
                         display: "block",
-                        margin: "auto",
                     }}
                 />
-            </div>
+            </a>
 
             {/* Remove Ads badge */}
             <Link
