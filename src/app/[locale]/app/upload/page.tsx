@@ -1,109 +1,82 @@
 "use client";
 
-import { useState, useRef, useCallback, useMemo } from "react";
-import { useTranslations } from "next-intl";
+import {useCallback, useMemo, useRef, useState} from "react";
+import {useTranslations} from "next-intl";
 import {
-  UploadCloud,
-  FileText,
-  CheckCircle2,
-  Loader2,
-  ArrowRight,
-  ArrowLeft,
-  Edit2,
-  Plus,
-  Trash2,
-  Download,
-  Eye,
-  EyeOff,
-  Sparkles,
-  MessageSquare,
-  Map,
-  FileEdit,
-  Mail,
-  Phone,
-  Linkedin,
-  Github,
-  Globe,
-  MapPin,
-  RefreshCw,
-  Settings,
-  X,
+    ArrowLeft,
+    ArrowRight,
+    CheckCircle2,
+    CreditCard,
+    Download,
+    Edit2,
+    Eye,
+    EyeOff,
+    FileEdit,
+    FileText,
+    FolderOpen,
+    Github,
+    Globe,
+    Linkedin,
+    Loader2,
+    Mail,
+    Map,
+    MapPin,
+    MessageSquare,
+    Phone,
+    Plus,
+    RefreshCw,
+    Save,
+    Sparkles,
+    Trash2,
+    UploadCloud,
+    X,
+    Zap,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Textarea} from "@/components/ui/textarea";
+import {Label} from "@/components/ui/label";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
+import {Separator} from "@/components/ui/separator";
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger,} from "@/components/ui/accordion";
+import {Switch} from "@/components/ui/switch";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,} from "@/components/ui/dropdown-menu";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+    AlertDialog,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { toast } from "sonner";
+import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,} from "@/components/ui/dialog";
+import {toast} from "sonner";
 import Link from "next/link";
-import { Zap, CreditCard, FolderOpen } from "lucide-react";
-import { useUploadCv, useTailorCv } from "@/features/upload-cv/hooks";
+import {useTailorCv, useUploadCv} from "@/features/upload-cv/hooks";
 import {
-  type ResumeData,
-  type ResumeSection,
-  type SectionItem,
-  type CvTailorResponse,
-  emptyResumeData,
-  PII_FIELDS,
+    type CvTailorResponse,
+    emptyResumeData,
+    PII_FIELDS,
+    type ResumeData,
+    type ResumeSection,
 } from "@/features/upload-cv/types";
+import {exportToDocx, exportToPdfPuppeteer, type TemplateType,} from "@/features/upload-cv/utils/exportCv";
+import {useRouter} from "next/navigation";
+import {ResumeService, ResumeSummary} from "@/services/resume.service";
+import {JobApplicationService} from "@/services/job-application.service";
+import {getAccessToken} from "@/utils/cookies";
+import {AuthGateDialog} from "@/features/resume-builder/components/AuthGateDialog";
+// import { AdBanner } from "@/components/ads/AdBanner";
 import {
-  exportToPdfPuppeteer,
-  exportToDocx,
-  type TemplateType,
-} from "@/features/upload-cv/utils/exportCv";
-import { useRouter } from "next/navigation";
-import { ResumeService, ResumeSummary } from "@/services/resume.service";
-import { JobApplicationService } from "@/services/job-application.service";
-import { Save, Bookmark } from "lucide-react";
-import { getAccessToken } from "@/utils/cookies";
-import { AuthGateDialog } from "@/features/resume-builder/components/AuthGateDialog";
-import { AdBanner } from "@/components/ads/AdBanner";
-import {
-  useTourAutoStart,
-  getUploadTourSteps,
-  getUploadStep2TourSteps,
-  getUploadStep3TourSteps,
-  getUploadStep4TourSteps,
+    getUploadStep2TourSteps,
+    getUploadStep3TourSteps,
+    getUploadStep4TourSteps,
+    getUploadTourSteps,
+    useTourAutoStart,
 } from "@/features/onboarding";
-import { ensureUniqueSectionItemIds } from "@/features/resume-builder/utils/normalizeResumeIds";
+import {ensureUniqueSectionItemIds} from "@/features/resume-builder/utils/normalizeResumeIds";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -1615,7 +1588,7 @@ export default function UploadPage() {
             </CardContent>
           </Card>
 
-          <AdBanner />
+          {/*<AdBanner />*/}
 
           <div data-tour="upload-step3-generate" className="flex justify-between gap-3">
             <Button variant="outline" onClick={() => setCurrentStep(2)}>
@@ -1854,7 +1827,7 @@ export default function UploadPage() {
                 </CardContent>
               </Card>
 
-              <AdBanner />
+              {/*<AdBanner />*/}
             </div>
 
             {/* Main Preview */}
