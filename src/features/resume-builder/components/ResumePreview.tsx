@@ -4,6 +4,8 @@ import { ResumeData } from "@/features/upload-cv/types";
 import { ModernTemplate } from "./templates/ModernTemplate";
 import { ClassicTemplate } from "./templates/ClassicTemplate";
 import { CreativeTemplate } from "./templates/CreativeTemplate";
+import { ExecutiveTemplate } from "./templates/ExecutiveTemplate";
+import { MinimalTemplate } from "./templates/MinimalTemplate";
 
 interface ResumePreviewProps {
   data: ResumeData;
@@ -21,13 +23,15 @@ export function ResumePreview({ data }: ResumePreviewProps) {
   const renderTemplate = () => {
     switch (templateId) {
       case "modern":
-      case "minimal": // alias → modern (unique template coming in Phase 7)
         return <ModernTemplate data={data} color={primaryColor} />;
       case "classic":
-      case "executive": // alias → classic (unique template coming in Phase 7)
         return <ClassicTemplate data={data} color={primaryColor} />;
       case "creative":
         return <CreativeTemplate data={data} color={primaryColor} />;
+      case "executive":
+        return <ExecutiveTemplate data={data} color={primaryColor} />;
+      case "minimal":
+        return <MinimalTemplate data={data} color={primaryColor} />;
       default:
         return <ModernTemplate data={data} color={primaryColor} />;
     }

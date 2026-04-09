@@ -3,7 +3,12 @@
     "title": "Template",
     "modern": { "name": "Modern", "description": "Clean and professional" },
     "classic": { "name": "Classic", "description": "Timeless and traditional" },
-    "creative": { "name": "Creative", "description": "Bold and standout" }
+    "creative": { "name": "Creative", "description": "Bold and standout" },
+    "executive": {
+      "name": "Executive",
+      "description": "Polished and corporate"
+    },
+    "minimal": { "name": "Minimal", "description": "Simple and elegant" }
   },
   "colors": "Primary Color",
   "typography": "Typography",

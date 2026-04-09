@@ -1,10 +1,26 @@
 "use client";
 
-import { ResumeData, SkillsDisplayStyle, LanguagesDisplayStyle, CoursesDisplayStyle } from '@/features/upload-cv/types';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { LayoutTemplate, Type, Palette, Code, Languages, BookOpen, AlignLeft, AlignRight, Maximize, FileText } from 'lucide-react';
-import { Switch } from '@/components/ui/switch';
+import {
+  ResumeData,
+  SkillsDisplayStyle,
+  LanguagesDisplayStyle,
+  CoursesDisplayStyle,
+} from "@/features/upload-cv/types";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  LayoutTemplate,
+  Type,
+  Palette,
+  Code,
+  Languages,
+  BookOpen,
+  AlignLeft,
+  AlignRight,
+  Maximize,
+  FileText,
+} from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 interface DesignPanelProps {
   data: ResumeData;
@@ -12,49 +28,66 @@ interface DesignPanelProps {
 }
 
 const TEMPLATES = [
-  { id: 'modern', name: 'Modern', description: 'Clean and professional' },
-  { id: 'classic', name: 'Classic', description: 'Timeless and traditional' },
-  { id: 'creative', name: 'Creative', description: 'Bold and standout' },
+  { id: "modern", name: "Modern", description: "Clean and professional" },
+  { id: "classic", name: "Classic", description: "Timeless and traditional" },
+  { id: "creative", name: "Creative", description: "Bold and standout" },
+  { id: "executive", name: "Executive", description: "Polished and corporate" },
+  { id: "minimal", name: "Minimal", description: "Simple and elegant" },
 ];
 
 const FONTS = [
-  { id: 'Inter', name: 'Inter (Sans)' },
-  { id: 'Georgia', name: 'Georgia (Serif)' },
-  { id: 'Roboto', name: 'Roboto (Sans)' },
+  { id: "Inter", name: "Inter (Sans)" },
+  { id: "Georgia", name: "Georgia (Serif)" },
+  { id: "Roboto", name: "Roboto (Sans)" },
+  { id: "Merriweather", name: "Merriweather (Serif)" },
+  { id: "Fira Code", name: "Fira Code (Mono)" },
+  { id: "Lato", name: "Lato (Sans)" },
 ];
 
 const COLORS = [
-  '#000000', // Black
-  '#2563eb', // Blue
-  '#dc2626', // Red
-  '#16a34a', // Green
-  '#9333ea', // Purple
-  '#f59e0b', // Amber
+  "#000000", // Black
+  "#2563eb", // Blue
+  "#dc2626", // Red
+  "#16a34a", // Green
+  "#9333ea", // Purple
+  "#f59e0b", // Amber
+  "#0d9488", // Teal
+  "#4f46e5", // Indigo
+  "#9e1634", // Rose
+  // "#475569", // Slate
+  // "#25bc71",
+  // "#e23fe8",
+  // "#91a1b8",
 ];
 
 const SKILLS_DISPLAY_STYLES: { id: SkillsDisplayStyle; name: string }[] = [
-  { id: 'tags', name: 'Tags' },
-  { id: 'level', name: 'Level' },
-  { id: 'dots', name: 'Dots' },
-  { id: 'bar', name: 'Bar' },
+  { id: "tags", name: "Tags" },
+  { id: "level", name: "Level" },
+  { id: "dots", name: "Dots" },
+  { id: "bar", name: "Bar" },
 ];
 
-const LANGUAGES_DISPLAY_STYLES: { id: LanguagesDisplayStyle; name: string }[] = [
-  { id: 'level', name: 'Level' },
-  { id: 'dots', name: 'Dots' },
-  { id: 'bar', name: 'Bar' },
+const LANGUAGES_DISPLAY_STYLES: { id: LanguagesDisplayStyle; name: string }[] =
+  [
+    { id: "level", name: "Level" },
+    { id: "dots", name: "Dots" },
+    { id: "bar", name: "Bar" },
+  ];
+
+const COURSES_DISPLAY_STYLES: {
+  id: CoursesDisplayStyle;
+  name: string;
+  desc: string;
+}[] = [
+  { id: "detailed", name: "Detailed", desc: "Full cards" },
+  { id: "simple", name: "Simple", desc: "Bullet list" },
 ];
 
-const COURSES_DISPLAY_STYLES: { id: CoursesDisplayStyle; name: string; desc: string }[] = [
-  { id: 'detailed', name: 'Detailed', desc: 'Full cards' },
-  { id: 'simple', name: 'Simple', desc: 'Bullet list' },
-];
-
-import { useTranslations } from 'next-intl';
+import { useTranslations } from "next-intl";
 
 export function DesignPanel({ data, onChange }: DesignPanelProps) {
   const metadata = data.metadata || {};
-  const t = useTranslations('design');
+  const t = useTranslations("design");
 
   const updateMetadata = (key: string, value: any) => {
     onChange({
@@ -66,7 +99,10 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
     });
   };
 
-  const updateMargins = (key: 'top' | 'bottom' | 'left' | 'right', value: number) => {
+  const updateMargins = (
+    key: "top" | "bottom" | "left" | "right",
+    value: number,
+  ) => {
     onChange({
       ...data,
       metadata: {
@@ -79,14 +115,19 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
     });
   };
 
-  const columnEligibleSections = data.sections.filter(section => {
+  const columnEligibleSections = data.sections.filter((section) => {
     if (section.visible === false) return false;
     const lowerTitle = section.title.toLowerCase();
-    const isCourse = section.type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
-    const isSimpleList = lowerTitle.includes('interest') || lowerTitle.includes('hobb');
-    
+    const isCourse =
+      section.type === "certifications" ||
+      lowerTitle.includes("course") ||
+      lowerTitle.includes("certif");
+    const isSimpleList =
+      lowerTitle.includes("interest") || lowerTitle.includes("hobb");
+
     // Eligible if it's natively a simple list type, OR if it's a course using simple display style
-    const usesSimpleStyle = (metadata.coursesDisplayStyle || 'simple') === 'simple';
+    const usesSimpleStyle =
+      (metadata.coursesDisplayStyle || "simple") === "simple";
     return isSimpleList || (isCourse && usesSimpleStyle);
   });
 
@@ -109,7 +150,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
       <div className="space-y-4">
         <h3 className="font-semibold flex items-center gap-2">
           <LayoutTemplate className="h-4 w-4" />
-          {t('template.title')}
+          {t("template.title")}
         </h3>
         <div className="grid grid-cols-1 gap-4">
           {TEMPLATES.map((template) => (
@@ -117,24 +158,30 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
               key={template.id}
               className={`
                 relative p-4 rounded-lg border-2 cursor-pointer transition-all
-                ${metadata.templateId === template.id 
-                  ? 'border-primary bg-primary/5' 
-                  : 'border-border hover:border-primary/50'}
+                ${
+                  metadata.templateId === template.id
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/50"
+                }
               `}
-              onClick={() => updateMetadata('templateId', template.id)}
+              onClick={() => updateMetadata("templateId", template.id)}
             >
-              <div className="font-medium">{t(`template.${template.id}.name` as any)}</div>
-              <div className="text-sm text-muted-foreground">{t(`template.${template.id}.description` as any)}</div>
+              <div className="font-medium">
+                {t(`template.${template.id}.name` as any)}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {t(`template.${template.id}.description` as any)}
+              </div>
             </div>
           ))}
         </div>
       </div>
 
-       {/* Colors */}
-       <div className="space-y-4">
+      {/* Colors */}
+      <div className="space-y-4">
         <h3 className="font-semibold flex items-center gap-2">
           <Palette className="h-4 w-4" />
-          {t('colors')}
+          {t("colors")}
         </h3>
         <div className="flex flex-wrap gap-3">
           {COLORS.map((color) => (
@@ -142,10 +189,10 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
               key={color}
               className={`
                 w-8 h-8 rounded-full border-2 transition-all ring-offset-background
-                ${metadata.primaryColor === color ? 'ring-2 ring-primary ring-offset-2' : ''}
+                ${metadata.primaryColor === color ? "ring-2 ring-primary ring-offset-2" : ""}
               `}
               style={{ backgroundColor: color, borderColor: color }}
-              onClick={() => updateMetadata('primaryColor', color)}
+              onClick={() => updateMetadata("primaryColor", color)}
               title={color}
             />
           ))}
@@ -155,23 +202,38 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
       {/* Fonts */}
       <div className="space-y-4">
         <h3 className="font-semibold flex items-center gap-2">
-           <Type className="h-4 w-4" />
-           {t('typography')}
+          <Type className="h-4 w-4" />
+          {t("typography")}
         </h3>
-        
+
         <div className="space-y-6">
           {/* Heading Font */}
           <div className="space-y-2">
-            <h4 className="text-sm font-medium text-muted-foreground">{t('headingFont')}</h4>
-            <RadioGroup 
-              value={metadata.headingFontFamily || metadata.fontFamily || 'Inter'} 
-              onValueChange={(val) => updateMetadata('headingFontFamily', val)}
-              className="grid grid-cols-3 gap-2"
+            <h4 className="text-sm font-medium text-muted-foreground">
+              {t("headingFont")}
+            </h4>
+            <RadioGroup
+              value={
+                metadata.headingFontFamily || metadata.fontFamily || "Inter"
+              }
+              onValueChange={(val) => updateMetadata("headingFontFamily", val)}
+              className="grid grid-cols-2 gap-2"
             >
               {FONTS.map((font) => (
-                <div key={`heading-${font.id}`} className="flex items-center space-x-2 border rounded-md p-2 hover:bg-muted/50 transition-colors">
-                  <RadioGroupItem value={font.id} id={`heading-font-${font.id}`} />
-                  <Label htmlFor={`heading-font-${font.id}`} className="flex-1 cursor-pointer text-xs">{font.name}</Label>
+                <div
+                  key={`heading-${font.id}`}
+                  className="flex items-center space-x-2 border rounded-md p-2 hover:bg-muted/50 transition-colors"
+                >
+                  <RadioGroupItem
+                    value={font.id}
+                    id={`heading-font-${font.id}`}
+                  />
+                  <Label
+                    htmlFor={`heading-font-${font.id}`}
+                    className="flex-1 cursor-pointer text-xs"
+                  >
+                    {font.name}
+                  </Label>
                 </div>
               ))}
             </RadioGroup>
@@ -179,16 +241,26 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
 
           {/* Body Font */}
           <div className="space-y-2">
-            <h4 className="text-sm font-medium text-muted-foreground">{t('bodyFont')}</h4>
-            <RadioGroup 
-              value={metadata.bodyFontFamily || metadata.fontFamily || 'Inter'} 
-              onValueChange={(val) => updateMetadata('bodyFontFamily', val)}
-              className="grid grid-cols-3 gap-2"
+            <h4 className="text-sm font-medium text-muted-foreground">
+              {t("bodyFont")}
+            </h4>
+            <RadioGroup
+              value={metadata.bodyFontFamily || metadata.fontFamily || "Inter"}
+              onValueChange={(val) => updateMetadata("bodyFontFamily", val)}
+              className="grid grid-cols-2 gap-2"
             >
               {FONTS.map((font) => (
-                <div key={`body-${font.id}`} className="flex items-center space-x-2 border rounded-md p-2 hover:bg-muted/50 transition-colors">
+                <div
+                  key={`body-${font.id}`}
+                  className="flex items-center space-x-2 border rounded-md p-2 hover:bg-muted/50 transition-colors"
+                >
                   <RadioGroupItem value={font.id} id={`body-font-${font.id}`} />
-                  <Label htmlFor={`body-font-${font.id}`} className="flex-1 cursor-pointer text-xs">{font.name}</Label>
+                  <Label
+                    htmlFor={`body-font-${font.id}`}
+                    className="flex-1 cursor-pointer text-xs"
+                  >
+                    {font.name}
+                  </Label>
                 </div>
               ))}
             </RadioGroup>
@@ -202,12 +274,12 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
           <Maximize className="h-4 w-4" />
           Layout & Spacing
         </h3>
-        
+
         {/* Compact Mode */}
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <Label htmlFor="compact-mode" className="text-sm">
-              {t('compactMode')}
+              {t("compactMode")}
             </Label>
             <p className="text-xs text-muted-foreground">
               Reduce line heights to fit more content.
@@ -216,7 +288,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
           <Switch
             id="compact-mode"
             checked={metadata.compactMode || false}
-            onCheckedChange={(val) => updateMetadata('compactMode', val)}
+            onCheckedChange={(val) => updateMetadata("compactMode", val)}
           />
         </div>
 
@@ -224,7 +296,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
         <div className="space-y-3">
           <div className="flex justify-between items-center">
             <Label htmlFor="spacing-slider" className="text-sm">
-              {t('spacing')}
+              {t("spacing")}
             </Label>
             <span className="text-xs font-mono text-muted-foreground">
               {metadata.spacingLevel || 3}
@@ -237,7 +309,9 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
             max="5"
             step="1"
             value={metadata.spacingLevel || 3}
-            onChange={(e) => updateMetadata('spacingLevel', parseInt(e.target.value))}
+            onChange={(e) =>
+              updateMetadata("spacingLevel", parseInt(e.target.value))
+            }
             className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
           />
           <div className="flex justify-between text-[10px] text-muted-foreground uppercase tracking-wider">
@@ -249,14 +323,18 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
         {/* Page Margins */}
         <div className="space-y-4">
           <Label className="text-sm block">
-            {t('margins.title') || 'Page Margins'}
+            {t("margins.title") || "Page Margins"}
           </Label>
           <div className="grid grid-cols-2 gap-4">
             {/* Top Margin */}
             <div className="space-y-2">
               <div className="flex justify-between items-center text-xs">
-                <span className="text-muted-foreground">{t('margins.top') || 'Top'}</span>
-                <span className="font-mono">{metadata.margins?.top ?? 40}px</span>
+                <span className="text-muted-foreground">
+                  {t("margins.top") || "Top"}
+                </span>
+                <span className="font-mono">
+                  {metadata.margins?.top ?? 40}px
+                </span>
               </div>
               <input
                 type="range"
@@ -264,15 +342,19 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
                 max="60"
                 step="1"
                 value={metadata.margins?.top ?? 40}
-                onChange={(e) => updateMargins('top', parseInt(e.target.value))}
+                onChange={(e) => updateMargins("top", parseInt(e.target.value))}
                 className="w-full h-1.5 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
               />
             </div>
             {/* Bottom Margin */}
             <div className="space-y-2">
               <div className="flex justify-between items-center text-xs">
-                <span className="text-muted-foreground">{t('margins.bottom') || 'Bottom'}</span>
-                <span className="font-mono">{metadata.margins?.bottom ?? 40}px</span>
+                <span className="text-muted-foreground">
+                  {t("margins.bottom") || "Bottom"}
+                </span>
+                <span className="font-mono">
+                  {metadata.margins?.bottom ?? 40}px
+                </span>
               </div>
               <input
                 type="range"
@@ -280,15 +362,21 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
                 max="60"
                 step="1"
                 value={metadata.margins?.bottom ?? 40}
-                onChange={(e) => updateMargins('bottom', parseInt(e.target.value))}
+                onChange={(e) =>
+                  updateMargins("bottom", parseInt(e.target.value))
+                }
                 className="w-full h-1.5 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
               />
             </div>
             {/* Left Margin */}
             <div className="space-y-2">
               <div className="flex justify-between items-center text-xs">
-                <span className="text-muted-foreground">{t('margins.left') || 'Left'}</span>
-                <span className="font-mono">{metadata.margins?.left ?? 40}px</span>
+                <span className="text-muted-foreground">
+                  {t("margins.left") || "Left"}
+                </span>
+                <span className="font-mono">
+                  {metadata.margins?.left ?? 40}px
+                </span>
               </div>
               <input
                 type="range"
@@ -296,15 +384,21 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
                 max="60"
                 step="1"
                 value={metadata.margins?.left ?? 40}
-                onChange={(e) => updateMargins('left', parseInt(e.target.value))}
+                onChange={(e) =>
+                  updateMargins("left", parseInt(e.target.value))
+                }
                 className="w-full h-1.5 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
               />
             </div>
             {/* Right Margin */}
             <div className="space-y-2">
               <div className="flex justify-between items-center text-xs">
-                <span className="text-muted-foreground">{t('margins.right') || 'Right'}</span>
-                <span className="font-mono">{metadata.margins?.right ?? 40}px</span>
+                <span className="text-muted-foreground">
+                  {t("margins.right") || "Right"}
+                </span>
+                <span className="font-mono">
+                  {metadata.margins?.right ?? 40}px
+                </span>
               </div>
               <input
                 type="range"
@@ -312,7 +406,9 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
                 max="60"
                 step="1"
                 value={metadata.margins?.right ?? 40}
-                onChange={(e) => updateMargins('right', parseInt(e.target.value))}
+                onChange={(e) =>
+                  updateMargins("right", parseInt(e.target.value))
+                }
                 className="w-full h-1.5 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
               />
             </div>
@@ -324,7 +420,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
       <div className="space-y-4">
         <h3 className="font-semibold flex items-center gap-2">
           <Code className="h-4 w-4" />
-          {t('sectionStyles.skills')}
+          {t("sectionStyles.skills")}
         </h3>
         <div className="grid grid-cols-4 gap-2">
           {SKILLS_DISPLAY_STYLES.map((style) => (
@@ -332,11 +428,13 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
               key={style.id}
               className={`
                 px-3 py-2 text-sm rounded-lg border transition-all
-                ${(metadata.skillsDisplayStyle || 'tags') === style.id
-                  ? 'border-primary bg-primary/10 text-primary font-medium'
-                  : 'border-border hover:border-primary/50'}
+                ${
+                  (metadata.skillsDisplayStyle || "tags") === style.id
+                    ? "border-primary bg-primary/10 text-primary font-medium"
+                    : "border-border hover:border-primary/50"
+                }
               `}
-              onClick={() => updateMetadata('skillsDisplayStyle', style.id)}
+              onClick={() => updateMetadata("skillsDisplayStyle", style.id)}
             >
               {t(`sectionStyles.${style.id}` as any)}
             </button>
@@ -348,7 +446,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
       <div className="space-y-4">
         <h3 className="font-semibold flex items-center gap-2">
           <Languages className="h-4 w-4" />
-          {t('sectionStyles.languages')}
+          {t("sectionStyles.languages")}
         </h3>
         <div className="grid grid-cols-4 gap-2">
           {LANGUAGES_DISPLAY_STYLES.map((style) => (
@@ -356,11 +454,13 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
               key={style.id}
               className={`
                 px-3 py-2 text-sm rounded-lg border transition-all
-                ${(metadata.languagesDisplayStyle || 'level') === style.id
-                  ? 'border-primary bg-primary/10 text-primary font-medium'
-                  : 'border-border hover:border-primary/50'}
+                ${
+                  (metadata.languagesDisplayStyle || "level") === style.id
+                    ? "border-primary bg-primary/10 text-primary font-medium"
+                    : "border-border hover:border-primary/50"
+                }
               `}
-              onClick={() => updateMetadata('languagesDisplayStyle', style.id)}
+              onClick={() => updateMetadata("languagesDisplayStyle", style.id)}
             >
               {t(`sectionStyles.${style.id}` as any)}
             </button>
@@ -368,48 +468,56 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
         </div>
       </div>
 
-       {/* Layout Direction */}
-       <div className="space-y-4">
+      {/* Layout Direction */}
+      <div className="space-y-4">
         <h3 className="font-semibold flex items-center gap-2">
           <AlignLeft className="h-4 w-4" />
-          {t('layoutDirection.title')}
+          {t("layoutDirection.title")}
         </h3>
         <div className="grid grid-cols-3 gap-2">
           <button
             className={`
               px-3 py-2 text-sm rounded-lg border transition-all flex flex-col items-center justify-center gap-1
-              ${(!metadata.layoutDirection || metadata.layoutDirection === 'auto')
-                ? 'border-primary bg-primary/10 text-primary font-medium'
-                : 'border-border hover:border-primary/50'}
+              ${
+                !metadata.layoutDirection || metadata.layoutDirection === "auto"
+                  ? "border-primary bg-primary/10 text-primary font-medium"
+                  : "border-border hover:border-primary/50"
+              }
             `}
-            onClick={() => updateMetadata('layoutDirection', 'auto')}
+            onClick={() => updateMetadata("layoutDirection", "auto")}
           >
-            <span className="font-medium">{t('layoutDirection.auto')}</span>
-            <span className="text-[10px] text-muted-foreground">{t('layoutDirection.matchLocale')}</span>
+            <span className="font-medium">{t("layoutDirection.auto")}</span>
+            <span className="text-[10px] text-muted-foreground">
+              {t("layoutDirection.matchLocale")}
+            </span>
           </button>
-           <button
+          <button
             className={`
               px-3 py-2 text-sm rounded-lg border transition-all flex flex-col items-center justify-center gap-1
-              ${metadata.layoutDirection === 'ltr'
-                ? 'border-primary bg-primary/10 text-primary font-medium'
-                : 'border-border hover:border-primary/50'}
+              ${
+                metadata.layoutDirection === "ltr"
+                  ? "border-primary bg-primary/10 text-primary font-medium"
+                  : "border-border hover:border-primary/50"
+              }
             `}
-            onClick={() => updateMetadata('layoutDirection', 'ltr')}
+            onClick={() => updateMetadata("layoutDirection", "ltr")}
           >
             <AlignLeft className="h-3 w-3" />
-            <span className="font-medium">{t('layoutDirection.ltr')}</span>
+            <span className="font-medium">{t("layoutDirection.ltr")}</span>
           </button>
-           <button
+          <button
             className={`
               px-3 py-2 text-sm rounded-lg border transition-all flex flex-col items-center justify-center gap-1
-              ${metadata.layoutDirection === 'rtl'
-                ? 'border-primary bg-primary/10 text-primary font-medium'
-                : 'border-border hover:border-primary/50'}
+              ${
+                metadata.layoutDirection === "rtl"
+                  ? "border-primary bg-primary/10 text-primary font-medium"
+                  : "border-border hover:border-primary/50"
+              }
             `}
-            onClick={() => updateMetadata('layoutDirection', 'rtl')}
+            onClick={() => updateMetadata("layoutDirection", "rtl")}
           >
             <AlignRight className="h-3 w-3" />
-            <span className="font-medium">{t('layoutDirection.rtl')}</span>
+            <span className="font-medium">{t("layoutDirection.rtl")}</span>
           </button>
         </div>
       </div>
@@ -419,23 +527,30 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
         <div className="space-y-4">
           <h3 className="font-semibold flex items-center gap-2">
             <LayoutTemplate className="h-4 w-4" />
-            {t('sectionColumns.title') || 'Section Columns'}
+            {t("sectionColumns.title") || "Section Columns"}
           </h3>
           <div className="space-y-3">
-            {columnEligibleSections.map(section => {
+            {columnEligibleSections.map((section) => {
               const currentCols = metadata.sectionColumns?.[section.id] || 3;
               return (
-                <div key={section.id} className="flex items-center justify-between">
-                  <Label className="text-sm border-0 font-medium truncate pr-4">{section.title}</Label>
+                <div
+                  key={section.id}
+                  className="flex items-center justify-between"
+                >
+                  <Label className="text-sm border-0 font-medium truncate pr-4">
+                    {section.title}
+                  </Label>
                   <div className="flex gap-1 shrink-0">
-                    {[1, 2, 3, 4].map(n => (
+                    {[1, 2, 3, 4].map((n) => (
                       <button
                         key={n}
                         className={`
                           w-8 h-8 flex items-center justify-center text-xs rounded-md border transition-all
-                          ${currentCols === n
-                            ? 'bg-primary text-primary-foreground border-primary font-bold'
-                            : 'bg-background hover:bg-muted border-border font-medium hover:border-primary/50'}
+                          ${
+                            currentCols === n
+                              ? "bg-primary text-primary-foreground border-primary font-bold"
+                              : "bg-background hover:bg-muted border-border font-medium hover:border-primary/50"
+                          }
                         `}
                         onClick={() => updateSectionColumns(section.id, n)}
                       >
