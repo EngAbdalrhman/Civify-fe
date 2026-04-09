@@ -14,11 +14,9 @@ import {
   Palette,
   Code,
   Languages,
-  BookOpen,
   AlignLeft,
   AlignRight,
   Maximize,
-  FileText,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 
@@ -28,11 +26,36 @@ interface DesignPanelProps {
 }
 
 const TEMPLATES = [
-  { id: "modern", name: "Modern", description: "Clean and professional" },
-  { id: "classic", name: "Classic", description: "Timeless and traditional" },
-  { id: "creative", name: "Creative", description: "Bold and standout" },
-  { id: "executive", name: "Executive", description: "Polished and corporate" },
-  { id: "minimal", name: "Minimal", description: "Simple and elegant" },
+  {
+    id: "modern",
+    category: "balanced",
+    accent: "#2563eb",
+    preview: ["wide", "bars", "grid"],
+  },
+  {
+    id: "classic",
+    category: "traditional",
+    accent: "#111827",
+    preview: ["rule", "stack", "text"],
+  },
+  {
+    id: "creative",
+    category: "bold",
+    accent: "#db2777",
+    preview: ["sidebar", "cards", "contrast"],
+  },
+  {
+    id: "executive",
+    category: "premium",
+    accent: "#0f766e",
+    preview: ["header", "columns", "tight"],
+  },
+  {
+    id: "minimal",
+    category: "clean",
+    accent: "#475569",
+    preview: ["thin", "airy", "mono"],
+  },
 ];
 
 const FONTS = [
@@ -88,6 +111,8 @@ import { useTranslations } from "next-intl";
 export function DesignPanel({ data, onChange }: DesignPanelProps) {
   const metadata = data.metadata || {};
   const t = useTranslations("design");
+  const tr = (key: string, fallback: string) =>
+    t.has(key as never) ? t(key as never) : fallback;
 
   const updateMetadata = (key: string, value: any) => {
     onChange({
@@ -157,20 +182,85 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
             <div
               key={template.id}
               className={`
-                relative p-4 rounded-lg border-2 cursor-pointer transition-all
+                relative overflow-hidden rounded-2xl border-2 cursor-pointer transition-all
                 ${
                   metadata.templateId === template.id
-                    ? "border-primary bg-primary/5"
+                    ? "border-primary bg-primary/5 shadow-sm"
                     : "border-border hover:border-primary/50"
                 }
               `}
               onClick={() => updateMetadata("templateId", template.id)}
             >
-              <div className="font-medium">
-                {t(`template.${template.id}.name` as any)}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {t(`template.${template.id}.description` as any)}
+              <div className="grid gap-4 md:grid-cols-[1.1fr_0.9fr]">
+                <div className="space-y-2 p-4">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="h-3 w-3 rounded-full"
+                      style={{ backgroundColor: template.accent }}
+                    />
+                    <div className="font-medium">
+                      {tr(
+                        `template.${template.id}.name`,
+                        template.id.charAt(0).toUpperCase() +
+                          template.id.slice(1),
+                      )}
+                    </div>
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      {tr(
+                        `template.categories.${template.category}`,
+                        template.category,
+                      )}
+                    </span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {tr(
+                      `template.${template.id}.description`,
+                      "Template preview",
+                    )}
+                  </div>
+                </div>
+                {/* Mini preview thumbnail */}
+                <div className="bg-muted/40 p-4">
+                  <div className="mx-auto flex h-28 max-w-[170px] flex-col gap-2 rounded-xl border bg-background p-3 shadow-sm">
+                    <div
+                      className="h-2.5 rounded-full"
+                      style={{
+                        backgroundColor: template.accent,
+                        width: template.preview[0] === "thin" ? "40%" : "70%",
+                      }}
+                    />
+                    <div
+                      className={`grid flex-1 gap-2 ${
+                        template.preview.includes("sidebar")
+                          ? "grid-cols-[0.42fr_0.58fr]"
+                          : "grid-cols-1"
+                      }`}
+                    >
+                      {template.preview.includes("sidebar") ? (
+                        <>
+                          <div className="rounded-lg bg-muted/80" />
+                          <div className="space-y-2">
+                            <div className="h-2 rounded-full bg-muted/80" />
+                            <div className="h-2 rounded-full bg-muted/60" />
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="h-10 rounded-lg bg-muted/60" />
+                              <div className="h-10 rounded-lg bg-muted/50" />
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="h-10 rounded-lg bg-muted/70" />
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="rounded-lg bg-muted/60" />
+                            <div className="rounded-lg bg-muted/50" />
+                          </div>
+                          <div className="h-8 rounded-lg bg-muted/55" />
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           ))}
@@ -217,7 +307,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
                 metadata.headingFontFamily || metadata.fontFamily || "Inter"
               }
               onValueChange={(val) => updateMetadata("headingFontFamily", val)}
-              className="grid grid-cols-2 gap-2"
+              className="grid grid-cols-2 gap-2 xl:grid-cols-3"
             >
               {FONTS.map((font) => (
                 <div
@@ -247,7 +337,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
             <RadioGroup
               value={metadata.bodyFontFamily || metadata.fontFamily || "Inter"}
               onValueChange={(val) => updateMetadata("bodyFontFamily", val)}
-              className="grid grid-cols-2 gap-2"
+              className="grid grid-cols-2 gap-2 xl:grid-cols-3"
             >
               {FONTS.map((font) => (
                 <div
@@ -272,7 +362,7 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
       <div className="space-y-6 border-t pt-6">
         <h3 className="font-semibold flex items-center gap-2">
           <Maximize className="h-4 w-4" />
-          Layout & Spacing
+          {tr("layoutAndSpacing", "Layout & Spacing")}
         </h3>
 
         {/* Compact Mode */}
