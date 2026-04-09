@@ -71,6 +71,14 @@
     "successTitle": "Resume saved!",
     "successDescription": "Your resume has been saved to your account."
   },
+  "saveStatus": {
+    "saving": "Saving…",
+    "saved": "Saved",
+    "error": "Save failed",
+    "justNow": "just now",
+    "secondsAgo": "{count}s ago",
+    "minutesAgo": "{count}m ago"
+  },
   "cachePrompt": {
     "title": "Resume in Progress Found",
     "description": "You have an unsaved resume from a previous session. Would you like to continue editing it or start fresh?",

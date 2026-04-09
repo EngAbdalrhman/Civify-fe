@@ -8,6 +8,7 @@ import { ResumeData, AtsScore } from "@/features/upload-cv/types";
 import { ResumeService } from "@/services/resume.service";
 import { useGuestResumeStorage } from "./useGuestResumeStorage";
 import { ensureUniqueSectionItemIds } from "@/features/resume-builder/utils/normalizeResumeIds";
+import type { BuilderSaveStatus } from "@/features/resume-builder/types";
 
 interface UseResumeBuilderParams {
   initialData: ResumeData;
@@ -30,6 +31,10 @@ interface UseResumeBuilderReturn {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   isGuest: boolean;
+
+  // Save status (autosave)
+  saveStatus: BuilderSaveStatus;
+  lastSavedAt: string | null;
 
   // Auth gate
   showAuthGate: boolean;
@@ -75,6 +80,10 @@ export function useResumeBuilder({
   );
   const [mobileView, setMobileView] = useState<"editor" | "preview">("editor");
 
+  // Save status (autosave)
+  const [saveStatus, setSaveStatus] = useState<BuilderSaveStatus>("idle");
+  const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
+
   // ATS Score state
   const [showScoreDialog, setShowScoreDialog] = useState(false);
   const [atsScore, setAtsScore] = useState<AtsScore | null>(null);
@@ -82,16 +91,31 @@ export function useResumeBuilder({
 
   const router = useRouter();
   const originalDataRef = useRef<ResumeData>(initialData);
+  const titleSetByUserRef = useRef(false);
+  const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const t = useTranslations("builder");
 
   // Guest storage
   const { saveGuestResume } = useGuestResumeStorage();
 
-  // Update ref when initialData changes
+  // Update ref when initialData changes — preserve user-set title
   useEffect(() => {
     originalDataRef.current = initialData;
     setResumeData(initialData);
+    // Only derive title if user hasn't manually set one
+    if (!titleSetByUserRef.current) {
+      const derived = initialData.personalInfo?.fullName
+        ? `${initialData.personalInfo.fullName}'s Resume`
+        : "Untitled Resume";
+      setResumeTitle(derived);
+    }
   }, [initialData]);
+
+  // Wrap setResumeTitle to track when user explicitly sets a title
+  const handleSetResumeTitle = useCallback((title: string) => {
+    titleSetByUserRef.current = true;
+    setResumeTitle(title);
+  }, []);
 
   // Auto-save to localStorage for guests when data changes
   useEffect(() => {
@@ -99,6 +123,47 @@ export function useResumeBuilder({
       saveGuestResume(resumeData, resumeTitle);
     }
   }, [resumeData, resumeTitle, isGuest, saveGuestResume]);
+
+  // ── Autosave (debounced 2s) for authenticated users ──
+  const persistResume = useCallback(async () => {
+    if (isGuest || !currentResumeId) return;
+
+    // Only save if data has actually changed
+    const currentJson = JSON.stringify(resumeData);
+    const originalJson = JSON.stringify(originalDataRef.current);
+    if (currentJson === originalJson) return;
+
+    setSaveStatus("saving");
+    try {
+      const dataToSave = ensureUniqueSectionItemIds(resumeData) as ResumeData;
+      await ResumeService.update(currentResumeId, resumeTitle, dataToSave);
+      originalDataRef.current = dataToSave;
+      setResumeData(dataToSave);
+      setLastSavedAt(new Date().toISOString());
+      setSaveStatus("saved");
+    } catch {
+      setSaveStatus("error");
+    }
+  }, [isGuest, currentResumeId, resumeData, resumeTitle]);
+
+  useEffect(() => {
+    if (isGuest || !currentResumeId) return;
+
+    // Clear any pending timer
+    if (autosaveTimerRef.current) {
+      clearTimeout(autosaveTimerRef.current);
+    }
+
+    autosaveTimerRef.current = setTimeout(() => {
+      persistResume();
+    }, 2000);
+
+    return () => {
+      if (autosaveTimerRef.current) {
+        clearTimeout(autosaveTimerRef.current);
+      }
+    };
+  }, [resumeData, persistResume, isGuest, currentResumeId]);
 
   const handleAuthGatedAction = useCallback(() => {
     setShowAuthGate(true);
@@ -121,6 +186,7 @@ export function useResumeBuilder({
     setIsSaving(true);
     setShowSaveDialog(false);
 
+    setSaveStatus("saving");
     try {
       const dataToSave = ensureUniqueSectionItemIds(resumeData) as ResumeData;
       if (currentResumeId) {
@@ -132,9 +198,12 @@ export function useResumeBuilder({
       // Update local state with the normalized data to avoid sync issues
       setResumeData(dataToSave);
       originalDataRef.current = dataToSave;
+      setLastSavedAt(new Date().toISOString());
+      setSaveStatus("saved");
       toast.success(t("toasts.saveSuccess"));
     } catch (error) {
       console.error(error);
+      setSaveStatus("error");
       toast.error(t("toasts.saveError"));
     } finally {
       setIsSaving(false);
@@ -173,7 +242,7 @@ export function useResumeBuilder({
     resumeData,
     setResumeData,
     resumeTitle,
-    setResumeTitle,
+    setResumeTitle: handleSetResumeTitle,
     isSaving,
     currentResumeId,
     showSaveDialog,
@@ -183,6 +252,10 @@ export function useResumeBuilder({
     activeTab,
     setActiveTab,
     isGuest,
+
+    // Save status (autosave)
+    saveStatus,
+    lastSavedAt,
 
     // Auth gate
     showAuthGate,
