@@ -14,9 +14,15 @@ import {
     FileEdit,
     FileText,
     FolderOpen,
+    Github,
+    Globe,
+    Linkedin,
     Loader2,
+    Mail,
     Map,
+    MapPin,
     MessageSquare,
+    Phone,
     Plus,
     RefreshCw,
     Save,
@@ -49,14 +55,19 @@ import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,} fr
 import {toast} from "sonner";
 import Link from "next/link";
 import {useTailorCv, useUploadCv} from "@/features/upload-cv/hooks";
-import {type CvTailorResponse, emptyResumeData, type ResumeData, type ResumeSection,} from "@/features/upload-cv/types";
+import {
+    type CvTailorResponse,
+    emptyResumeData,
+    PII_FIELDS,
+    type ResumeData,
+    type ResumeSection,
+} from "@/features/upload-cv/types";
 import {exportToDocx, exportToPdfPuppeteer, type TemplateType,} from "@/features/upload-cv/utils/exportCv";
 import {useRouter} from "next/navigation";
 import {ResumeService, ResumeSummary} from "@/services/resume.service";
 import {JobApplicationService} from "@/services/job-application.service";
 import {getAccessToken} from "@/utils/cookies";
 import {AuthGateDialog} from "@/features/resume-builder/components/AuthGateDialog";
-import {ResumePreview} from "@/features/resume-builder/components/ResumePreview";
 // import { AdBanner } from "@/components/ads/AdBanner";
 import {
     getUploadStep2TourSteps,
@@ -66,8 +77,6 @@ import {
     useTourAutoStart,
 } from "@/features/onboarding";
 import {ensureUniqueSectionItemIds} from "@/features/resume-builder/utils/normalizeResumeIds";
-import enTranslations from "@/messages/en";
-import arTranslations from "@/messages/ar";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -76,6 +85,7 @@ export default function UploadPage() {
   const tTour = useTranslations("tour");
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cvPreviewRef = useRef<HTMLDivElement>(null);
 
   // State
   const [currentStep, setCurrentStep] = useState(1);
@@ -345,13 +355,7 @@ export default function UploadPage() {
     setIsExportingDocx(true);
     try {
       const filename = `${tailorResponse.tailoredCv.personalInfo.fullName || "cv"}_tailored`;
-      await exportToDocx(
-        tailorResponse.tailoredCv,
-        filename,
-        tailorResponse.tailoredCv.metadata?.language === "ar"
-          ? arTranslations
-          : enTranslations,
-      );
+      await exportToDocx(tailorResponse.tailoredCv, filename);
       // toast.success('DOCX downloaded successfully!');
     } catch (error) {
       console.error("DOCX export failed:", error);
@@ -359,7 +363,7 @@ export default function UploadPage() {
     } finally {
       setIsExportingDocx(false);
     }
-  }, [tailorResponse, t]);
+  }, [tailorResponse]);
 
   // Save tailored CV to My Resumes
   const handleSaveToResumes = useCallback(async () => {
@@ -623,28 +627,16 @@ export default function UploadPage() {
     [maskPII],
   );
 
-  const previewResumeData = useMemo(() => {
-    if (!tailorResponse?.tailoredCv) return null;
-    if (!maskPII) return tailorResponse.tailoredCv;
-
-    const source = tailorResponse.tailoredCv;
-    return {
-      ...source,
-      personalInfo: {
-        ...source.personalInfo,
-        fullName: maskValue(source.personalInfo.fullName),
-        email: maskValue(source.personalInfo.email),
-        phone: maskValue(source.personalInfo.phone),
-        address: maskValue(source.personalInfo.address),
-        city: maskValue(source.personalInfo.city),
-        country: maskValue(source.personalInfo.country),
-        linkedin: "",
-        github: "",
-        website: "",
-        picture: "",
-      },
-    };
-  }, [tailorResponse, maskPII, maskValue]);
+  // Get display value
+  const getDisplayValue = useCallback(
+    (fieldPath: string, value: string | undefined) => {
+      if (maskPII && PII_FIELDS.includes(fieldPath as any)) {
+        return maskValue(value);
+      }
+      return value || "";
+    },
+    [maskPII, maskValue],
+  );
 
   // Check if required fields are filled
   const isResumeValid = useCallback(() => {
@@ -1863,11 +1855,311 @@ export default function UploadPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {previewResumeData && (
-                    <div className="mx-auto w-full max-w-[850px] overflow-x-auto rounded-[1px] border bg-muted/20 p-4">
-                      <ResumePreview data={previewResumeData} />
+                  {/* CV Preview Document */}
+                  <div
+                    ref={cvPreviewRef}
+                    className="bg-white rounded-[1px] border shadow-sm mx-auto w-full max-w-[850px] min-h-[1100px] p-[40px] text-gray-900 font-sans leading-relaxed selection:bg-blue-100"
+                  >
+                    <div className="space-y-6">
+                      {/* Header */}
+                      <header className="border-b-2 border-gray-800 pb-5">
+                        <h1 className="text-4xl font-bold uppercase tracking-tight text-gray-900 mb-3">
+                          {getDisplayValue(
+                            "personalInfo.fullName",
+                            tailorResponse.tailoredCv.personalInfo.fullName,
+                          )}
+                        </h1>
+
+                        <div className="flex flex-wrap items-center gap-y-2 text-sm text-gray-700 font-medium">
+                          {tailorResponse.tailoredCv.personalInfo.email && (
+                            <span className="flex items-center hover:text-primary transition-colors">
+                              <Mail className="w-3.5 h-3.5 mr-1.5" />
+                              {getDisplayValue(
+                                "personalInfo.email",
+                                tailorResponse.tailoredCv.personalInfo.email,
+                              )}
+                            </span>
+                          )}
+                          {tailorResponse.tailoredCv.personalInfo.phone && (
+                            <>
+                              <span className="mx-3 text-gray-300">|</span>
+                              <span className="flex items-center hover:text-primary transition-colors">
+                                <Phone className="w-3.5 h-3.5 mr-1.5" />
+                                {getDisplayValue(
+                                  "personalInfo.phone",
+                                  tailorResponse.tailoredCv.personalInfo.phone,
+                                )}
+                              </span>
+                            </>
+                          )}
+                          {(tailorResponse.tailoredCv.personalInfo.city ||
+                            tailorResponse.tailoredCv.personalInfo.country) && (
+                            <>
+                              <span className="mx-3 text-gray-300">|</span>
+                              <span className="flex items-center hover:text-primary transition-colors">
+                                <MapPin className="w-3.5 h-3.5 mr-1.5" />
+                                {[
+                                  tailorResponse.tailoredCv.personalInfo.city,
+                                  tailorResponse.tailoredCv.personalInfo
+                                    .country,
+                                ]
+                                  .filter(Boolean)
+                                  .join(", ")}
+                              </span>
+                            </>
+                          )}
+                        </div>
+
+                        {/* Social Links */}
+                        {(tailorResponse.tailoredCv.personalInfo.linkedin ||
+                          tailorResponse.tailoredCv.personalInfo.github ||
+                          tailorResponse.tailoredCv.personalInfo.website) && (
+                          <div className="flex flex-wrap items-center gap-y-2 mt-2 text-sm text-gray-700 font-medium">
+                            {tailorResponse.tailoredCv.personalInfo.linkedin &&
+                              (maskPII ? (
+                                <span className="mr-4 text-gray-400">
+                                  ••••••••••••
+                                </span>
+                              ) : (
+                                <a
+                                  href={
+                                    tailorResponse.tailoredCv.personalInfo.linkedin.startsWith(
+                                      "http",
+                                    )
+                                      ? tailorResponse.tailoredCv.personalInfo
+                                          .linkedin
+                                      : tailorResponse.tailoredCv.personalInfo.linkedin.includes(
+                                            "linkedin.com",
+                                          )
+                                        ? `https://${tailorResponse.tailoredCv.personalInfo.linkedin}`
+                                        : `https://linkedin.com/in/${tailorResponse.tailoredCv.personalInfo.linkedin}`
+                                  }
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center mr-4 text-blue-700 hover:text-blue-900 transition-colors hover:underline"
+                                >
+                                  <Linkedin className="w-3.5 h-3.5 mr-1.5" />
+                                  {tailorResponse.tailoredCv.personalInfo.linkedin
+                                    .replace(
+                                      /^https?:\/\/(www\.)?linkedin\.com\/in\//,
+                                      "",
+                                    )
+                                    .replace(/\/$/, "")}
+                                </a>
+                              ))}
+                            {tailorResponse.tailoredCv.personalInfo.github &&
+                              (maskPII ? (
+                                <span className="mr-4 text-gray-400">
+                                  ••••••••••••
+                                </span>
+                              ) : (
+                                <a
+                                  href={
+                                    tailorResponse.tailoredCv.personalInfo.github.startsWith(
+                                      "http",
+                                    )
+                                      ? tailorResponse.tailoredCv.personalInfo
+                                          .github
+                                      : tailorResponse.tailoredCv.personalInfo.github.includes(
+                                            "github.com",
+                                          )
+                                        ? `https://${tailorResponse.tailoredCv.personalInfo.github}`
+                                        : `https://github.com/${tailorResponse.tailoredCv.personalInfo.github}`
+                                  }
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center mr-4 text-gray-800 hover:text-black transition-colors hover:underline"
+                                >
+                                  <Github className="w-3.5 h-3.5 mr-1.5" />
+                                  {tailorResponse.tailoredCv.personalInfo.github
+                                    .replace(
+                                      /^https?:\/\/(www\.)?github\.com\//,
+                                      "",
+                                    )
+                                    .replace(/\/$/, "")}
+                                </a>
+                              ))}
+                            {tailorResponse.tailoredCv.personalInfo.website &&
+                              (maskPII ? (
+                                <span className="mr-4 text-gray-400">
+                                  ••••••••••••
+                                </span>
+                              ) : (
+                                <a
+                                  href={
+                                    tailorResponse.tailoredCv.personalInfo.website.startsWith(
+                                      "http",
+                                    )
+                                      ? tailorResponse.tailoredCv.personalInfo
+                                          .website
+                                      : `https://${tailorResponse.tailoredCv.personalInfo.website}`
+                                  }
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center mr-4 text-emerald-700 hover:text-emerald-900 transition-colors hover:underline"
+                                >
+                                  <Globe className="w-3.5 h-3.5 mr-1.5" />
+                                  {tailorResponse.tailoredCv.personalInfo.website
+                                    .replace(/^https?:\/\/(www\.)?/, "")
+                                    .replace(/\/$/, "")}
+                                </a>
+                              ))}
+                          </div>
+                        )}
+                      </header>
+
+                      {/* Summary */}
+                      {tailorResponse.tailoredCv.personalInfo.summary && (
+                        <section>
+                          <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-3 flex items-center gap-2">
+                            <span className="w-1 h-3.5 bg-gray-900 rounded-sm inline-block"></span>
+                            Professional Summary
+                          </h2>
+                          <div className="text-[0.925rem] text-gray-800 leading-relaxed text-justify">
+                            {tailorResponse.tailoredCv.personalInfo.summary}
+                          </div>
+                        </section>
+                      )}
+
+                      {/* Dynamic Sections */}
+                      {tailorResponse.tailoredCv.sections.map(
+                        (section, sectionIndex) => {
+                        if (!section.items?.length) return null;
+                        const sectionType = section.type.toLowerCase();
+                        const sectionKey = `${section.id || "section"}-${sectionIndex}`;
+
+                        return (
+                          <section key={sectionKey} className="mt-6">
+                            <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-4 border-b border-gray-200 pb-2 flex items-center gap-2">
+                              <span className="w-1 h-3.5 bg-gray-900 rounded-sm inline-block"></span>
+                              {section.title}
+                            </h2>
+
+                            {sectionType === "skills" ? (
+                              <div className="flex flex-wrap gap-2">
+                                {section.items.flatMap((item, itemIndex) =>
+                                  item.tags && item.tags.length > 0
+                                    ? item.tags.map((tag, idx) => (
+                                        <span
+                                          key={`${sectionKey}-${item.id || "item"}-${itemIndex}-${idx}`}
+                                          className="px-3 py-1 bg-gray-100 border border-gray-200 text-gray-800 text-sm font-medium rounded-[4px] hover:bg-gray-200 transition-colors"
+                                        >
+                                          {tag}
+                                        </span>
+                                      ))
+                                    : item.title
+                                      ? [
+                                          <span
+                                            key={`${sectionKey}-${item.id || "item"}-${itemIndex}`}
+                                            className="px-3 py-1 bg-gray-100 border border-gray-200 text-gray-800 text-sm font-medium rounded-[4px]"
+                                          >
+                                            {item.title}
+                                          </span>,
+                                        ]
+                                      : [],
+                                )}
+                              </div>
+                            ) : sectionType === "languages" ? (
+                              <div className="grid grid-cols-2 gap-4">
+                                {section.items.map((item, itemIndex) => (
+                                  <div
+                                    key={`${sectionKey}-${item.id || "item"}-${itemIndex}`}
+                                    className="flex items-center justify-between p-2 bg-gray-50 rounded-md border border-gray-100"
+                                  >
+                                    <span className="font-semibold text-gray-900 text-sm">
+                                      {item.title}
+                                    </span>
+                                    {item.subtitle && (
+                                      <span className="text-gray-600 text-xs uppercase tracking-wide bg-white px-2 py-0.5 rounded shadow-sm border">
+                                        {item.subtitle}
+                                      </span>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="space-y-6">
+                                {section.items.map((item, itemIndex) => (
+                                  <div
+                                    key={`${sectionKey}-${item.id || "item"}-${itemIndex}`}
+                                    className="group"
+                                  >
+                                    <div className="flex justify-between items-baseline mb-1">
+                                      <h3 className="font-bold text-gray-900 text-[1.05rem]">
+                                        {item.title}
+                                        {item.subtitle && (
+                                          <span className="font-normal text-gray-700 mx-2">
+                                            |
+                                          </span>
+                                        )}
+                                        {item.subtitle && (
+                                          <span className="text-gray-700 font-semibold">
+                                            {item.subtitle}
+                                          </span>
+                                        )}
+                                      </h3>
+                                      <div className="text-right shrink-0 ml-4">
+                                        <span className="font-medium text-gray-600 text-sm block">
+                                          {item.date}
+                                        </span>
+                                        {item.location && (
+                                          <span className="text-gray-500 text-xs block mt-0.5">
+                                            {item.location}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    {item.description && (
+                                      <div className="text-[0.925rem] text-gray-800 leading-relaxed mt-1.5 text-justify group-hover:text-gray-950 transition-colors">
+                                        {item.description.includes("•") ||
+                                        item.description.includes("- ") ? (
+                                          <ul className="list-disc leading-relaxed pl-5 space-y-1">
+                                            {item.description
+                                              .split(/(?=[•-])/)
+                                              .map((line, idx) => {
+                                                const cleanLine = line
+                                                  .replace(/^[•-]\s*/, "")
+                                                  .trim();
+                                                if (!cleanLine) return null;
+                                                return (
+                                                  <li
+                                                    key={idx}
+                                                    className="pl-1"
+                                                  >
+                                                    {cleanLine}
+                                                  </li>
+                                                );
+                                              })}
+                                          </ul>
+                                        ) : (
+                                          item.description
+                                        )}
+                                      </div>
+                                    )}
+
+                                    {item.tags && item.tags.length > 0 && (
+                                      <div className="flex flex-wrap gap-x-1.5 gap-y-1 mt-2.5">
+                                        {item.tags.map((tag, idx) => (
+                                          <span
+                                            key={idx}
+                                            className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-gray-100 text-gray-600"
+                                          >
+                                            {tag}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </section>
+                        );
+                        },
+                      )}
                     </div>
-                  )}
+                  </div>
                 </CardContent>
               </Card>
             </div>

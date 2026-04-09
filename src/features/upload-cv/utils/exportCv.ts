@@ -5,7 +5,6 @@ import {
   normalizeLinkedInUrl,
   normalizeWebsiteUrl,
 } from "@/features/resume-builder/utils/socialLinks";
-import { exportResumeToDocx } from "./docxExport";
 
 export type TemplateType = "modern" | "classic" | "creative";
 
@@ -508,8 +507,6 @@ export async function exportToDocx(
   filename: string = "cv",
   translations?: any,
 ): Promise<void> {
-  return exportResumeToDocx(resumeData, filename, translations);
-/*
   const {
     Document,
     Packer,
@@ -847,5 +844,4 @@ export async function exportToDocx(
 
   const blob = await Packer.toBlob(doc);
   downloadBlob(blob, `${filename}.docx`);
-*/
 }
