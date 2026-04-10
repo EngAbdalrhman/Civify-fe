@@ -52,7 +52,7 @@ export function AdBanner() {
         <div className="my-3 sm:my-4 p-3 sm:p-4 border border-dashed border-border rounded-lg flex flex-col items-center justify-center relative overflow-visible bg-muted/30">
             <a
                 href="mailto:ceo@civify.cv"
-                className="z-[99998] mx-auto block overflow-hidden"
+                className="relative z-0 mx-auto block overflow-hidden"
                 style={{ width: `${AD_WIDTH}px`, height: "auto" }}
                 aria-label="Contact Civify for ad space"
             >
