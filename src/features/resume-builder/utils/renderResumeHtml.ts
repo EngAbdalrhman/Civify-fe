@@ -84,29 +84,39 @@ function wrapInHtmlDocument(
   bodyFontFamily: string = "Inter",
   headingFontFamily: string = "Inter",
 ): string {
-  let fontLinks = [];
-  const fontsToLoad = new Set([bodyFontFamily, headingFontFamily]);
-
-  if (fontsToLoad.has("Inter")) {
-    fontLinks.push(
+  // ── Google Fonts registry ──
+  const googleFontsMap: Record<string, string> = {
+    Inter:
       '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">',
-    );
-  }
-  if (fontsToLoad.has("Roboto")) {
-    fontLinks.push(
+    Roboto:
       '<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">',
-    );
+    Merriweather:
+      '<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">',
+    "Fira Code":
+      '<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">',
+    Lato: '<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">',
+  };
+
+  // ── CSS fallback stacks ──
+  const cssFallbacks: Record<string, string> = {
+    Georgia: "Georgia, 'Times New Roman', serif",
+    Merriweather: "'Merriweather', Georgia, serif",
+    "Fira Code": "'Fira Code', 'Courier New', monospace",
+  };
+  const defaultStack =
+    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+
+  const fontLinks: string[] = [];
+  const fontsToLoad = new Set([bodyFontFamily, headingFontFamily]);
+  for (const font of fontsToLoad) {
+    if (googleFontsMap[font]) fontLinks.push(googleFontsMap[font]);
   }
 
-  let bodyFontFamilyCss = `'${bodyFontFamily}', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
-  if (bodyFontFamily === "Georgia") {
-    bodyFontFamilyCss = "Georgia, 'Times New Roman', serif";
-  }
+  const toCss = (font: string) =>
+    cssFallbacks[font] || `'${font}', ${defaultStack}`;
 
-  let headingFontFamilyCss = `'${headingFontFamily}', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
-  if (headingFontFamily === "Georgia") {
-    headingFontFamilyCss = "Georgia, 'Times New Roman', serif";
-  }
+  const bodyFontFamilyCss = toCss(bodyFontFamily);
+  const headingFontFamilyCss = toCss(headingFontFamily);
 
   return `
 <!DOCTYPE html>
@@ -178,7 +188,10 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
   };
 
   const visibleSections = sections.filter(
-    (s) => s.visible !== false && s.items && s.items.some((i: any) => i.visible !== false),
+    (s) =>
+      s.visible !== false &&
+      s.items &&
+      s.items.some((i: any) => i.visible !== false),
   );
 
   const compactClass = metadata?.compactMode ? "1.2" : "1.6";
@@ -309,13 +322,15 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
 
   const shouldUseSimpleColumns = (section: any) => {
     if (section.type === "skills" || section.type === "languages") return false;
-    if (isCertOrCourse(section.type, section.title) && coursesStyle === "simple") return true;
+    if (
+      isCertOrCourse(section.type, section.title) &&
+      coursesStyle === "simple"
+    )
+      return true;
     if (isSimpleListSection(section.type, section.title)) return true;
     if (metadata?.sectionColumns?.[section.id]) return true;
     return false;
   };
-
-
 
   const content = `
     <div style="padding: ${margins.top}px ${margins.right}px ${margins.bottom}px ${margins.left}px; min-height: 100%; background-color: white; color: #111827; line-height: ${compactClass};">
@@ -550,11 +565,15 @@ function renderModernTemplate(data: ResumeData, color: string): string {
   };
 
   const shouldUseSimpleColumns = (section: any) => {
-    if (section.type === 'skills' || section.type === 'languages') return false;
+    if (section.type === "skills" || section.type === "languages") return false;
     const lowerTitle = section.title.toLowerCase();
-    const isCourse = section.type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
-    const isSimpleList = lowerTitle.includes('interest') || lowerTitle.includes('hobb');
-    return isSimpleList || (isCourse && coursesStyle === 'simple');
+    const isCourse =
+      section.type === "certifications" ||
+      lowerTitle.includes("course") ||
+      lowerTitle.includes("certif");
+    const isSimpleList =
+      lowerTitle.includes("interest") || lowerTitle.includes("hobb");
+    return isSimpleList || (isCourse && coursesStyle === "simple");
   };
 
   // SVG icons for Modern template
@@ -683,10 +702,18 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
   };
 
   const skillsSections = sections.filter(
-    (s) => s.visible !== false && s.type === "skills" && s.items && s.items.some((i) => i.visible !== false),
+    (s) =>
+      s.visible !== false &&
+      s.type === "skills" &&
+      s.items &&
+      s.items.some((i) => i.visible !== false),
   );
   const languagesSections = sections.filter(
-    (s) => s.visible !== false && s.type === "languages" && s.items && s.items.some((i) => i.visible !== false),
+    (s) =>
+      s.visible !== false &&
+      s.type === "languages" &&
+      s.items &&
+      s.items.some((i) => i.visible !== false),
   );
   const otherSections = sections.filter(
     (s) =>
@@ -805,11 +832,15 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
   };
 
   const shouldUseSimpleColumns = (section: any) => {
-    if (section.type === 'skills' || section.type === 'languages') return false;
+    if (section.type === "skills" || section.type === "languages") return false;
     const lowerTitle = section.title.toLowerCase();
-    const isCourse = section.type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
-    const isSimpleList = lowerTitle.includes('interest') || lowerTitle.includes('hobb');
-    return isSimpleList || (isCourse && coursesStyle === 'simple');
+    const isCourse =
+      section.type === "certifications" ||
+      lowerTitle.includes("course") ||
+      lowerTitle.includes("certif");
+    const isSimpleList =
+      lowerTitle.includes("interest") || lowerTitle.includes("hobb");
+    return isSimpleList || (isCourse && coursesStyle === "simple");
   };
 
   const content = `
@@ -817,9 +848,10 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
       <!-- Left Sidebar -->
       <aside style="width: 30%; background-color: ${color}; color: white; padding: ${margins.top}px 24px ${margins.bottom}px ${margins.left}px; display: flex; flex-direction: column; gap: ${sectionMargin}px;">
         <div style="text-align: center;">
-          ${personalInfo.picture 
-            ? `<img src="${personalInfo.picture}" alt="${escapeHtml(personalInfo.fullName)}" style="width: 128px; height: 128px; border-radius: 50%; margin: 0 auto 16px; object-fit: cover; border: 4px solid rgba(255,255,255,0.3); display: block;" />`
-            : `<div style="width: 128px; height: 128px; background-color: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700;">${personalInfo.fullName.charAt(0)}</div>`
+          ${
+            personalInfo.picture
+              ? `<img src="${personalInfo.picture}" alt="${escapeHtml(personalInfo.fullName)}" style="width: 128px; height: 128px; border-radius: 50%; margin: 0 auto 16px; object-fit: cover; border: 4px solid rgba(255,255,255,0.3); display: block;" />`
+              : `<div style="width: 128px; height: 128px; background-color: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700;">${personalInfo.fullName.charAt(0)}</div>`
           }
           <h1 style="font-size: 24px; font-weight: 700; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">
             ${escapeHtml(personalInfo.fullName)}
@@ -925,10 +957,363 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
 }
 
 // ============================================================================
+// Executive Template — Polished, corporate, serif-flavored, subtle color accents
+// ============================================================================
+
+function renderExecutiveTemplate(data: ResumeData, color: string): string {
+  const { personalInfo, sections, metadata } = data;
+  const skillsStyle: SkillsDisplayStyle =
+    metadata?.skillsDisplayStyle || "tags";
+  const languagesStyle: LanguagesDisplayStyle =
+    metadata?.languagesDisplayStyle || "level";
+  const coursesStyle: CoursesDisplayStyle =
+    metadata?.coursesDisplayStyle || "simple";
+
+  const direction =
+    metadata?.layoutDirection === "ltr"
+      ? "ltr"
+      : metadata?.layoutDirection === "rtl"
+        ? "rtl"
+        : metadata?.language === "ar"
+          ? "rtl"
+          : "ltr";
+
+  const visibleSections = sections.filter(
+    (s) =>
+      s.visible !== false &&
+      s.items &&
+      s.items.some((i: any) => i.visible !== false),
+  );
+
+  const compactClass = metadata?.compactMode ? "1.2" : "1.6";
+  const margins = metadata?.margins || {
+    top: 48,
+    bottom: 48,
+    left: 48,
+    right: 48,
+  };
+  const spacingLevel = metadata?.spacingLevel ?? 3;
+  const sectionMargin = spacingLevel * 10;
+  const itemGap = spacingLevel * 5;
+
+  const renderSkillsExec = (section: (typeof sections)[0]) => {
+    const items = section.items.filter((item) => item.visible !== false);
+    if (skillsStyle === "tags") {
+      return `<div style="display:flex;flex-wrap:wrap;gap:6px;font-size:13px;">
+        ${items.map((item) => `<span style="border:1px solid ${color};color:${color};padding:3px 10px;border-radius:2px;">${escapeHtml(item.title)}</span>`).join("")}
+      </div>`;
+    }
+    return `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:13px;">
+      ${items
+        .map((item) => {
+          const level = parseLevel(item.level);
+          const display =
+            skillsStyle === "dots"
+              ? renderLevelDots(level, color)
+              : skillsStyle === "bar"
+                ? renderLevelBar(level, color)
+                : `<span style="color:#6b7280;font-size:12px;">${level}</span>`;
+          return `<div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:500;">${escapeHtml(item.title)}</span>${display}</div>`;
+        })
+        .join("")}
+    </div>`;
+  };
+
+  const renderLanguagesExec = (section: (typeof sections)[0]) => {
+    const items = section.items.filter((item) => item.visible !== false);
+    return `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:13px;">
+      ${items
+        .map((item) => {
+          const level = parseLevel(item.level || item.subtitle);
+          const display =
+            languagesStyle === "dots"
+              ? renderLevelDots(level, color)
+              : languagesStyle === "bar"
+                ? renderLevelBar(level, color)
+                : `<span style="color:#6b7280;font-size:12px;">${level}</span>`;
+          return `<div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:500;">${escapeHtml(item.title)}</span>${display}</div>`;
+        })
+        .join("")}
+    </div>`;
+  };
+
+  const shouldUseSimple = (s: (typeof sections)[0]) => {
+    const lt = (s.title || "").toLowerCase();
+    const isCourse =
+      s.type === "certifications" ||
+      lt.includes("course") ||
+      lt.includes("certif");
+    const isList = lt.includes("interest") || lt.includes("hobb");
+    return isList || (isCourse && coursesStyle === "simple");
+  };
+
+  const renderSimpleCols = (section: (typeof sections)[0]) => {
+    const items = section.items.filter((i) => i.visible !== false);
+    const cols = metadata?.sectionColumns?.[section.id] ?? 3;
+    return `<div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:6px;font-size:13px;">
+      ${items.map((item) => `<div>• ${escapeHtml(item.title)}</div>`).join("")}
+    </div>`;
+  };
+
+  const content = `
+    <div style="padding:${margins.top}px ${margins.right}px ${margins.bottom}px ${margins.left}px;min-height:100%;background:white;color:#1a1a1a;line-height:${compactClass};">
+      <!-- Executive Header -->
+      <header style="margin-bottom:${sectionMargin}px;border-bottom:3px solid ${color};padding-bottom:20px;">
+        <h1 style="font-size:32px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:${color};margin-bottom:6px;">
+          ${escapeHtml(personalInfo.fullName)}
+        </h1>
+        ${personalInfo.jobTitle ? `<div style="font-size:16px;color:#4b5563;font-style:italic;margin-bottom:12px;">${escapeHtml(personalInfo.jobTitle)}</div>` : ""}
+        <div style="font-size:13px;color:#4b5563;display:flex;flex-wrap:wrap;gap:12px;">
+          ${personalInfo.email ? `<span>${escapeHtml(personalInfo.email)}</span>` : ""}
+          ${personalInfo.phone ? `<span>| ${escapeHtml(personalInfo.phone)}</span>` : ""}
+          ${personalInfo.city || personalInfo.country ? `<span>| ${escapeHtml([personalInfo.city, personalInfo.country].filter(Boolean).join(", "))}</span>` : ""}
+          ${personalInfo.linkedin ? `<span>| <a href="${normalizeLinkedInUrl(personalInfo.linkedin)}" style="color:${color};">LinkedIn</a></span>` : ""}
+          ${personalInfo.github ? `<span>| <a href="${normalizeGitHubUrl(personalInfo.github)}" style="color:${color};">GitHub</a></span>` : ""}
+          ${personalInfo.website ? `<span>| <a href="${normalizeWebsiteUrl(personalInfo.website)}" style="color:${color};">Website</a></span>` : ""}
+        </div>
+      </header>
+
+      ${
+        personalInfo.summary
+          ? `
+        <section style="margin-bottom:${sectionMargin}px;">
+          <h2 style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:${color};border-bottom:1px solid #d1d5db;padding-bottom:6px;margin-bottom:10px;">
+            ${metadata?.language === "ar" ? "الملخص المهني" : "Executive Summary"}
+          </h2>
+          <p style="font-size:14px;color:#374151;line-height:1.6;">${escapeHtml(personalInfo.summary)}</p>
+        </section>
+      `
+          : ""
+      }
+
+      ${visibleSections
+        .map((section) => {
+          const items = section.items.filter((i) => i.visible !== false);
+          if (items.length === 0) return "";
+          return `
+          <section style="margin-bottom:${sectionMargin}px;">
+            <h2 style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:${color};border-bottom:1px solid #d1d5db;padding-bottom:6px;margin-bottom:10px;">
+              ${escapeHtml(section.title)}
+            </h2>
+            ${
+              section.type === "skills"
+                ? renderSkillsExec(section)
+                : section.type === "languages"
+                  ? renderLanguagesExec(section)
+                  : shouldUseSimple(section)
+                    ? renderSimpleCols(section)
+                    : `<div style="display:flex;flex-direction:column;gap:${itemGap}px;">
+                  ${items
+                    .map(
+                      (item) => `
+                    <div>
+                      <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <div>
+                          <span style="font-size:15px;font-weight:600;">${escapeHtml(item.title)}</span>
+                          ${item.subtitle ? `<span style="font-size:14px;color:#6b7280;"> — ${escapeHtml(item.subtitle)}</span>` : ""}
+                        </div>
+                        ${item.date || item.location ? `<span style="font-size:12px;color:#6b7280;white-space:nowrap;">${escapeHtml([item.date, item.location].filter(Boolean).join(" | "))}</span>` : ""}
+                      </div>
+                      ${item.description ? `<div style="font-size:13px;color:#374151;white-space:pre-wrap;margin-top:4px;padding-left:2px;">${escapeHtml(item.description)}</div>` : ""}
+                    </div>
+                  `,
+                    )
+                    .join("")}
+                </div>`
+            }
+          </section>
+        `;
+        })
+        .join("")}
+    </div>
+  `;
+
+  const bodyFont = metadata?.bodyFontFamily || metadata?.fontFamily || "Inter";
+  const headingFont =
+    metadata?.headingFontFamily || metadata?.fontFamily || "Inter";
+  return wrapInHtmlDocument(content, direction, bodyFont, headingFont);
+}
+
+// ============================================================================
+// Minimal Template — Ultra-clean, no borders, generous whitespace, muted tones
+// ============================================================================
+
+function renderMinimalTemplate(data: ResumeData, color: string): string {
+  const { personalInfo, sections, metadata } = data;
+  const skillsStyle: SkillsDisplayStyle =
+    metadata?.skillsDisplayStyle || "tags";
+  const languagesStyle: LanguagesDisplayStyle =
+    metadata?.languagesDisplayStyle || "level";
+  const coursesStyle: CoursesDisplayStyle =
+    metadata?.coursesDisplayStyle || "simple";
+
+  const direction =
+    metadata?.layoutDirection === "ltr"
+      ? "ltr"
+      : metadata?.layoutDirection === "rtl"
+        ? "rtl"
+        : metadata?.language === "ar"
+          ? "rtl"
+          : "ltr";
+
+  const visibleSections = sections.filter(
+    (s) =>
+      s.visible !== false &&
+      s.items &&
+      s.items.some((i: any) => i.visible !== false),
+  );
+
+  const compactClass = metadata?.compactMode ? "1.25" : "1.7";
+  const margins = metadata?.margins || {
+    top: 40,
+    bottom: 40,
+    left: 56,
+    right: 56,
+  };
+  const spacingLevel = metadata?.spacingLevel ?? 3;
+  const sectionMargin = spacingLevel * 10;
+  const itemGap = spacingLevel * 5;
+
+  const renderSkillsMin = (section: (typeof sections)[0]) => {
+    const items = section.items.filter((i) => i.visible !== false);
+    if (skillsStyle === "tags") {
+      return `<div style="font-size:13px;color:#374151;line-height:2;">${items.map((i) => escapeHtml(i.title)).join("  ·  ")}</div>`;
+    }
+    return `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;font-size:13px;">
+      ${items
+        .map((item) => {
+          const level = parseLevel(item.level);
+          const display =
+            skillsStyle === "dots"
+              ? renderLevelDots(level, color)
+              : skillsStyle === "bar"
+                ? renderLevelBar(level, color)
+                : `<span style="color:#9ca3af;font-size:12px;">${level}</span>`;
+          return `<div style="display:flex;justify-content:space-between;align-items:center;"><span>${escapeHtml(item.title)}</span>${display}</div>`;
+        })
+        .join("")}
+    </div>`;
+  };
+
+  const renderLanguagesMin = (section: (typeof sections)[0]) => {
+    const items = section.items.filter((i) => i.visible !== false);
+    return `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;font-size:13px;">
+      ${items
+        .map((item) => {
+          const level = parseLevel(item.level || item.subtitle);
+          const display =
+            languagesStyle === "dots"
+              ? renderLevelDots(level, color)
+              : languagesStyle === "bar"
+                ? renderLevelBar(level, color)
+                : `<span style="color:#9ca3af;font-size:12px;">${level}</span>`;
+          return `<div style="display:flex;justify-content:space-between;align-items:center;"><span>${escapeHtml(item.title)}</span>${display}</div>`;
+        })
+        .join("")}
+    </div>`;
+  };
+
+  const shouldUseSimple = (s: (typeof sections)[0]) => {
+    const lt = (s.title || "").toLowerCase();
+    const isCourse =
+      s.type === "certifications" ||
+      lt.includes("course") ||
+      lt.includes("certif");
+    const isList = lt.includes("interest") || lt.includes("hobb");
+    return isList || (isCourse && coursesStyle === "simple");
+  };
+
+  const renderSimpleCols = (section: (typeof sections)[0]) => {
+    const items = section.items.filter((i) => i.visible !== false);
+    const cols = metadata?.sectionColumns?.[section.id] ?? 3;
+    return `<div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:4px;font-size:13px;color:#4b5563;">
+      ${items.map((item) => `<div>${escapeHtml(item.title)}</div>`).join("")}
+    </div>`;
+  };
+
+  const content = `
+    <div style="padding:${margins.top}px ${margins.right}px ${margins.bottom}px ${margins.left}px;min-height:100%;background:white;color:#1f2937;line-height:${compactClass};">
+      <!-- Minimal Header -->
+      <header style="margin-bottom:${sectionMargin + 8}px;">
+        <h1 style="font-size:28px;font-weight:300;letter-spacing:0.06em;text-transform:uppercase;color:#111827;margin-bottom:8px;">
+          ${escapeHtml(personalInfo.fullName)}
+        </h1>
+        ${personalInfo.jobTitle ? `<div style="font-size:14px;color:#6b7280;margin-bottom:12px;">${escapeHtml(personalInfo.jobTitle)}</div>` : ""}
+        <div style="font-size:12px;color:#9ca3af;display:flex;flex-wrap:wrap;gap:8px;">
+          ${personalInfo.email ? `<span>${escapeHtml(personalInfo.email)}</span>` : ""}
+          ${personalInfo.phone ? `<span>·</span><span>${escapeHtml(personalInfo.phone)}</span>` : ""}
+          ${personalInfo.city || personalInfo.country ? `<span>·</span><span>${escapeHtml([personalInfo.city, personalInfo.country].filter(Boolean).join(", "))}</span>` : ""}
+          ${personalInfo.linkedin ? `<span>·</span><a href="${normalizeLinkedInUrl(personalInfo.linkedin)}" style="color:${color};">LinkedIn</a>` : ""}
+          ${personalInfo.github ? `<span>·</span><a href="${normalizeGitHubUrl(personalInfo.github)}" style="color:${color};">GitHub</a>` : ""}
+          ${personalInfo.website ? `<span>·</span><a href="${normalizeWebsiteUrl(personalInfo.website)}" style="color:${color};">Website</a>` : ""}
+        </div>
+      </header>
+
+      ${
+        personalInfo.summary
+          ? `
+        <section style="margin-bottom:${sectionMargin}px;">
+          <p style="font-size:13px;color:#4b5563;line-height:1.7;">${escapeHtml(personalInfo.summary)}</p>
+        </section>
+      `
+          : ""
+      }
+
+      ${visibleSections
+        .map((section) => {
+          const items = section.items.filter((i) => i.visible !== false);
+          if (items.length === 0) return "";
+          return `
+          <section style="margin-bottom:${sectionMargin}px;">
+            <h2 style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:${color};margin-bottom:10px;">
+              ${escapeHtml(section.title)}
+            </h2>
+            ${
+              section.type === "skills"
+                ? renderSkillsMin(section)
+                : section.type === "languages"
+                  ? renderLanguagesMin(section)
+                  : shouldUseSimple(section)
+                    ? renderSimpleCols(section)
+                    : `<div style="display:flex;flex-direction:column;gap:${itemGap}px;">
+                  ${items
+                    .map(
+                      (item) => `
+                    <div>
+                      <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <span style="font-size:14px;font-weight:500;">${escapeHtml(item.title)}${item.subtitle ? `<span style="font-weight:400;color:#6b7280;"> — ${escapeHtml(item.subtitle)}</span>` : ""}</span>
+                        ${item.date || item.location ? `<span style="font-size:11px;color:#9ca3af;">${escapeHtml([item.date, item.location].filter(Boolean).join(" · "))}</span>` : ""}
+                      </div>
+                      ${item.description ? `<div style="font-size:13px;color:#4b5563;white-space:pre-wrap;margin-top:4px;">${escapeHtml(item.description)}</div>` : ""}
+                    </div>
+                  `,
+                    )
+                    .join("")}
+                </div>`
+            }
+          </section>
+        `;
+        })
+        .join("")}
+    </div>
+  `;
+
+  const bodyFont = metadata?.bodyFontFamily || metadata?.fontFamily || "Inter";
+  const headingFont =
+    metadata?.headingFontFamily || metadata?.fontFamily || "Inter";
+  return wrapInHtmlDocument(content, direction, bodyFont, headingFont);
+}
+
+// ============================================================================
 // Main Export Function
 // ============================================================================
 
-export type TemplateType = "modern" | "classic" | "creative";
+export type TemplateType =
+  | "modern"
+  | "classic"
+  | "creative"
+  | "executive"
+  | "minimal";
 
 export function renderResumeHtml(
   data: ResumeData,
@@ -938,8 +1323,12 @@ export function renderResumeHtml(
   switch (template) {
     case "classic":
       return renderClassicTemplate(data, color);
+    case "executive":
+      return renderExecutiveTemplate(data, color);
     case "creative":
       return renderCreativeTemplate(data, color);
+    case "minimal":
+      return renderMinimalTemplate(data, color);
     case "modern":
     default:
       return renderModernTemplate(data, color);

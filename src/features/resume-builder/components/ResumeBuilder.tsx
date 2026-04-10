@@ -12,7 +12,10 @@ import { useFileUpload } from "../hooks/useFileUpload";
 import { MobileViewToggle } from "./MobileViewToggle";
 import { EditorSidebar } from "./EditorSidebar";
 import { PreviewPanel } from "./PreviewPanel";
-import { useTourAutoStart, getResumeBuilderTourSteps } from "@/features/onboarding";
+import {
+  useTourAutoStart,
+  getResumeBuilderTourSteps,
+} from "@/features/onboarding";
 import { SaveDialog } from "./SaveDialog";
 import { AuthGateDialog } from "./AuthGateDialog";
 
@@ -89,6 +92,8 @@ export function ResumeBuilder({
           isSaving={builder.isSaving}
           onSaveClick={builder.handleSaveClick}
           onResetClick={builder.handleReset}
+          saveStatus={builder.saveStatus}
+          lastSavedAt={builder.lastSavedAt}
           isUploading={upload.isUploading}
           fileInputRef={upload.fileInputRef}
           onFileUpload={upload.handleFileUpload}
