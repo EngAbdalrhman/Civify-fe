@@ -271,6 +271,7 @@ function AuditTabContent({ entityTypes, useAllEndpoint = false }: AuditTabConten
       <GenericList<AuditLog>
         data={data}
         columns={columnsWithActions}
+        mobilePrimaryColumns={['entityType', 'action', 'performedBy', 'performedAt']}
         isLoading={isLoading}
         meta={{
           page: currentPage,
@@ -497,6 +498,7 @@ function CvLogTabContent() {
       <GenericList
         data={data as any}
         columns={columnsWithActions}
+        mobilePrimaryColumns={['requestId', 'action', 'success', 'createdAt']}
         isLoading={isLoading}
         meta={{
           page: currentPage,
@@ -629,6 +631,7 @@ function SubscriptionAuditTabContent() {
     <GenericList<SubscriptionAuditLog>
       data={data}
       columns={subscriptionAuditColumns}
+      mobilePrimaryColumns={['auditType', 'userId', 'subscriptionId', 'createdAt']}
       isLoading={isLoading}
       meta={{
         page: currentPage,
@@ -749,6 +752,7 @@ function BillingAuditTabContent() {
     <GenericList<BillingAuditLog>
       data={data}
       columns={billingAuditColumns}
+      mobilePrimaryColumns={['auditType', 'gateway', 'gatewayStatus', 'createdAt']}
       isLoading={isLoading}
       meta={{
         page: currentPage,
@@ -879,6 +883,7 @@ function TokenUsageTabContent() {
     <GenericList<TokenUsageLog>
       data={data}
       columns={tokenUsageColumns}
+      mobilePrimaryColumns={['usageType', 'source', 'tokensUsed', 'createdAt']}
       isLoading={isLoading}
       meta={{
         page: currentPage,

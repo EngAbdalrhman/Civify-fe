@@ -132,6 +132,7 @@ export default function SubscriptionsPage() {
          <GenericList
             data={data}
             columns={columns}
+            mobilePrimaryColumns={['userEmail', 'planName', 'status', 'endDate']}
             meta={pagination}
             isLoading={loading}
             onFilterChange={(filters) => setParams(prev => ({ ...prev, filters, page: 0 }))}
