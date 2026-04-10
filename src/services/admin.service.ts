@@ -40,6 +40,9 @@ export interface AdminStats {
   totalApiCalls: number;
   apiCallsThisMonth: number;
   activeSubscriptions: number;
+  periodRevenue: number;
+  revenueThisMonth: number;
+  totalRevenue: number;
 }
 
 // ============================================

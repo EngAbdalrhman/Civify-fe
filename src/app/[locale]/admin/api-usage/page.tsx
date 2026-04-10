@@ -167,6 +167,7 @@ export default function ApiUsagePage() {
          <GenericList
             data={data}
             columns={columns}
+            mobilePrimaryColumns={['user', 'endpoint', 'statusCode', 'timestamp']}
             meta={pagination}
             isLoading={loading}
             onFilterChange={(filters) => setParams(prev => ({ ...prev, filters, page: 0 }))}

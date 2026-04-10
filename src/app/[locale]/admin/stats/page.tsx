@@ -17,6 +17,15 @@ import { adminService, type AdminStats } from '@/services/admin.service';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from 'recharts';
 
 type StatsPeriod = 'MONTHLY' | 'QUARTERLY' | 'YEARLY' | 'OVERALL';
 
@@ -221,11 +230,53 @@ export default function StatsPage() {
 
           {/* Chart Placeholders */}
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="h-[300px] flex items-center justify-center">
-              <p className="text-muted-foreground">Revenue Chart (Coming Soon)</p>
+            <Card className="h-[300px]">
+              <CardHeader>
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Revenue Chart
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="h-[230px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={[
+                      { name: getPeriodLabel(), value: stats?.periodRevenue || 0 },
+                      { name: 'This Month', value: stats?.revenueThisMonth || 0 },
+                      { name: 'All Time', value: stats?.totalRevenue || 0 },
+                    ]}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <RechartsTooltip />
+                    <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
             </Card>
-            <Card className="h-[300px] flex items-center justify-center">
-              <p className="text-muted-foreground">User Growth Chart (Coming Soon)</p>
+            <Card className="h-[300px]">
+              <CardHeader>
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  User and CV Snapshot
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="h-[230px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={[
+                      { name: 'Users', value: stats?.totalUsers || 0 },
+                      { name: 'Subscribed', value: stats?.subscribedUsers || 0 },
+                      { name: 'CVs', value: stats?.totalCVs || 0 },
+                    ]}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <RechartsTooltip />
+                    <Bar dataKey="value" fill="#10b981" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
             </Card>
           </div>
         </>

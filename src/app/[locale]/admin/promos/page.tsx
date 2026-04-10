@@ -302,6 +302,7 @@ export default function PromosPage() {
         <GenericList<PromoCode>
           data={data}
           columns={columns}
+          mobilePrimaryColumns={['code', 'discountValue', 'active', 'expiresAt']}
           meta={pagination}
           isLoading={loading}
           actions={actions}
