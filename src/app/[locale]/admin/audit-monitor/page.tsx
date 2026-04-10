@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { FileSearch, Users, CreditCard, Settings, RefreshCcw, Wallet, Coins } from 'lucide-react';
+import { FileSearch, Users, CreditCard, Settings, RefreshCcw, Wallet, Coins, Copy } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GenericList } from '@/components/generic-list/GenericList';
 import type { ColumnDef, FilterState, SortState, InputDataModel, FilterOperation } from '@/components/generic-list/types';
@@ -116,6 +116,15 @@ function buildInputDataModel<T>(
     page,
     size,
   };
+}
+
+async function copyToClipboard(value: string) {
+  try {
+    await navigator.clipboard.writeText(value);
+    toast.success('Request ID copied');
+  } catch {
+    toast.error('Failed to copy Request ID');
+  }
 }
 
 // Value viewer dialog
@@ -306,9 +315,15 @@ const cvLogColumns: ColumnDef<any>[] = [
       const id = value as string;
       if (!id) return '-';
       return (
-        <span className="font-mono text-xs" title={id}>
-          {id.substring(0, 8)}...
-        </span>
+        <button
+          type="button"
+          className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-mono text-xs hover:bg-muted"
+          title="Click to copy full request ID"
+          onClick={() => copyToClipboard(id)}
+        >
+          <span>{id.substring(0, 8)}...</span>
+          <Copy className="h-3 w-3" />
+        </button>
       );
     },
   },

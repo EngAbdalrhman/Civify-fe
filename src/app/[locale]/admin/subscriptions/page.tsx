@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { CreditCard, Shield } from 'lucide-react';
 import { adminService } from '@/services/admin.service';
@@ -21,32 +21,6 @@ export default function SubscriptionsPage() {
       totalPages: 0
   });
 
-  const fetchData = async (page: number, size: number, filters: any = [], sorts: any = []) => {
-      setLoading(true);
-      try {
-          const inputData = {
-              page,
-              size,
-              filters,
-              sorts // TODO: GenericList might pass filters as object, need conversion
-          };
-          // We need to use adminService.filterSubscriptions
-          // But generically we need to build input model
-           // Using helper if possible, or manual
-           // GenericList's onFilterChange gives us FilterState
-           // We need to convert FilterState to FilterCriteria[]
-           
-           // We'll rely on the handler to pass fully formed InputData if we use buildInputDataModel there.
-           // But here we implement a simple loader.
-           
-           // Actually, let's implement the handler logic inside onFilterChange and just call service there
-      } catch (error) {
-          console.error(error);
-      } finally {
-          setLoading(false);
-      }
-  };
-  
   // Columns
   const columns: ColumnDef<any>[] = useMemo(() => [
       {
@@ -110,26 +84,33 @@ export default function SubscriptionsPage() {
       sort: null as any
   });
 
-  // Effect to load data when params change
-  useMemo(() => {
-     const load = async () => {
-         setLoading(true);
-         try {
-             // Use helper to build model
-             // We need columns to know operations
-             const model = buildInputDataModel(params.filters, columns, params.sort, params.page, params.size);
-             const res = await adminService.filterSubscriptions(model);
-             setData(res.content);
-             setPagination({
-                 page: res.page,
-                 size: res.size,
-                 totalElements: res.totalElements,
-                 totalPages: res.totalPages
-             });
-         } catch(e) { console.error(e); }
-         finally { setLoading(false); }
-     };
-     load();
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        const model = buildInputDataModel(
+          params.filters,
+          columns,
+          params.sort,
+          params.page,
+          params.size,
+        );
+        const res = await adminService.filterSubscriptions(model);
+        setData(res.content);
+        setPagination({
+          page: res.page,
+          size: res.size,
+          totalElements: res.totalElements,
+          totalPages: res.totalPages,
+        });
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void load();
   }, [params, columns]);
 
   return (
