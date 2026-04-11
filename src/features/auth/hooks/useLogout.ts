@@ -29,7 +29,7 @@ export const useLogout = () => {
       clearPermissions();
     },
     onSuccess: () => {
-      toast.success("Logged out successfully");
+      // toast.success("Logged out successfully");
       router.push("/login");
     },
     onError: () => {

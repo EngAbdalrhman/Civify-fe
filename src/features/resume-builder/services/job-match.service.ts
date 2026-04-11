@@ -81,5 +81,11 @@ export const jobMatchService = {
             params: { page, size, sort: 'analyzedAt,desc' }
         });
         return response.data.data;
+    },
+    async tailorResume(request: import('@/features/upload-cv/types').CvTailorRequest): Promise<import('@/features/upload-cv/types').CvTailorResponse> {
+        const response = await apiClient.post<CommonResponse<import('@/features/upload-cv/types').CvTailorResponse>>(
+            "/v1/cvs/tailor", request, { timeout: 180000 }
+        );
+        return response.data.data;
     }
 };

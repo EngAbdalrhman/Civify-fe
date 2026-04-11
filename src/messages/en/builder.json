@@ -105,6 +105,15 @@
     "required": "Required",
     "preferred": "Preferred",
     "aiSuggestions": "AI Tailoring Suggestions",
-    "section": "Target Section"
+    "section": "Target Section",
+    "tailorButton": "Tailor My Resume",
+    "tailoring": "Tailoring...",
+    "tailorComplete": "Resume tailored successfully!",
+    "applyButton": "Apply Changes to Resume",
+    "applied": "Tailored resume applied!",
+    "beforeScore": "Before",
+    "afterScore": "After",
+    "changes": "What Changed",
+    "warnings": "Warnings"
   }
 }

@@ -20,7 +20,7 @@ import {
   Calendar,
   Gift,
   Copy,
-  Users
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -166,7 +166,8 @@ export default function SettingsPage() {
       const fetchReferrals = async () => {
         setIsReferralLoading(true);
         try {
-          const res = await apiClient.get<typeof referralStats>("/v1/referrals/me");
+          const res =
+            await apiClient.get<typeof referralStats>("/v1/referrals/me");
           setReferralStats(res.data);
         } catch (error) {
           toast.error("Failed to load referral stats");
@@ -265,7 +266,6 @@ export default function SettingsPage() {
         preferences as unknown as object,
       );
       setPreferences(response.data);
-      toast.success("Preferences saved successfully");
     } catch {
       toast.error("Failed to save preferences");
     } finally {
@@ -349,7 +349,6 @@ export default function SettingsPage() {
               data: { password: deleteAccountPassword },
             },
       );
-      toast.success("Account deleted successfully");
       setShowDeleteDialog(false);
       // Clear local storage and redirect
       localStorage.removeItem("accessToken");
@@ -1114,7 +1113,8 @@ export default function SettingsPage() {
                   Invite & Earn
                 </CardTitle>
                 <CardDescription>
-                  Share your referral code with friends. You both get bonus tokens when they sign up!
+                  Share your referral code with friends. You both get bonus
+                  tokens when they sign up!
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -1130,14 +1130,18 @@ export default function SettingsPage() {
                           <Users className="h-4 w-4" />
                           <span className="text-sm">Total Referrals</span>
                         </div>
-                        <p className="text-3xl font-bold">{referralStats.referralCount}</p>
+                        <p className="text-3xl font-bold">
+                          {referralStats.referralCount}
+                        </p>
                       </div>
                       <div className="p-4 rounded-lg border bg-muted/30">
                         <div className="flex items-center gap-2 text-muted-foreground mb-1">
                           <Gift className="h-4 w-4" />
                           <span className="text-sm">Tokens Earned</span>
                         </div>
-                        <p className="text-3xl font-bold">{referralStats.tokensEarnedFromReferrals}</p>
+                        <p className="text-3xl font-bold">
+                          {referralStats.tokensEarnedFromReferrals}
+                        </p>
                       </div>
                     </div>
 
@@ -1145,7 +1149,11 @@ export default function SettingsPage() {
                       <div className="space-y-2">
                         <Label>Your Referral Code</Label>
                         <div className="flex gap-2">
-                          <Input readOnly value={referralStats.referralCode} className="font-mono text-center tracking-wider max-w-[200px]" />
+                          <Input
+                            readOnly
+                            value={referralStats.referralCode}
+                            className="font-mono text-center tracking-wider max-w-[200px]"
+                          />
                           <Button variant="outline" onClick={copyReferralCode}>
                             <Copy className="h-4 w-4 mr-2" />
                             Copy
@@ -1156,7 +1164,10 @@ export default function SettingsPage() {
                       <div className="space-y-2">
                         <Label>Your Referral Link</Label>
                         <div className="flex gap-2">
-                          <Input readOnly value={`${typeof window !== 'undefined' ? window.location.origin : ''}/signup?ref=${referralStats.referralCode}`} />
+                          <Input
+                            readOnly
+                            value={`${typeof window !== "undefined" ? window.location.origin : ""}/signup?ref=${referralStats.referralCode}`}
+                          />
                           <Button onClick={copyReferralLink}>
                             <Copy className="h-4 w-4 mr-2" />
                             Copy Link
