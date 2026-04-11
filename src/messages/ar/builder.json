@@ -3,6 +3,7 @@
   "tabs": {
     "content": "المحتوى",
     "design": "التصميم",
+    "target": "الوظيفة المستهدفة",
     "export": "التصدير"
   },
   "actions": {
@@ -84,5 +85,25 @@
     "description": "لديك سيرة ذاتية غير محفوظة من جلسة سابقة. هل تريد الاستمرار في تعديلها أو البدء من جديد؟",
     "continue": "متابعة التعديل",
     "startFresh": "البدء من جديد"
+  },
+  "targetJob": {
+    "title": "تحليل الوظيفة المستهدفة",
+    "subtitle": "حلل مدى توافق سيرتك الذاتية مع وظيفة محددة.",
+    "urlLabel": "رابط إعلان الوظيفة (LinkedIn, Indeed, إلخ)",
+    "pasteLabel": "الصق وصف الوظيفة",
+    "pastePlaceholder": "الصق وصف الوظيفة الكامل هنا...",
+    "or": "أو",
+    "analyzeButton": "تحليل التوافق",
+    "analyzing": "جاري التحليل...",
+    "inputRequired": "يرجى تقديم رابط الوظيفة أو لصق وصف الوظيفة.",
+    "analysisComplete": "اكتمل التحليل",
+    "analysisFailed": "فشل تحليل التوافق",
+    "overallMatch": "التوافق العام",
+    "skillsMatch": "توافق المهارات",
+    "roleDetails": "تفاصيل الوظيفة",
+    "missingSkills": "المهارات الناقصة",
+    "matchedSkills": "المهارات المتطابقة",
+    "required": "مطلوب",
+    "preferred": "مفضل"
   }
 }

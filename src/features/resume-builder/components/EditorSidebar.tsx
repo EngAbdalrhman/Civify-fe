@@ -3,12 +3,13 @@
 import {RefObject} from "react";
 import {Button} from "@/components/ui/button";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {Download, FileText, Loader2, Palette, RotateCcw, Save, Upload,} from "lucide-react";
+import {Download, FileText, Loader2, Palette, RotateCcw, Save, Upload, Target} from "lucide-react";
 import {useTranslations} from "next-intl";
 import {ResumeData} from "@/features/upload-cv/types";
 import {EditorPanel} from "./EditorPanel";
 import {DesignPanel} from "./DesignPanel";
 import {ExportPanel} from "./ExportPanel";
+import {TargetJobPanel} from "./TargetJobPanel";
 import {FILE_ACCEPT} from "../utils/constants";
 import {BuilderSaveStatus} from "./BuilderSaveStatus";
 import type {BuilderSaveStatus as SaveStatusType} from "../types";
@@ -146,7 +147,7 @@ export function EditorSidebar({
                     className="flex-1 flex flex-col min-h-0"
                 >
                     <div className="px-4 pt-4">
-                        <TabsList className="w-full grid grid-cols-3">
+                        <TabsList className="w-full grid grid-cols-4">
                             <TabsTrigger
                                 data-tour="rb-tab-content"
                                 value="content"
@@ -162,6 +163,14 @@ export function EditorSidebar({
                             >
                                 <Palette className="h-4 w-4"/>
                                 <span className="hidden sm:inline">{t("tabs.design")}</span>
+                            </TabsTrigger>
+                            <TabsTrigger
+                                data-tour="rb-tab-target"
+                                value="target"
+                                className="flex gap-2"
+                            >
+                                <Target className="h-4 w-4"/>
+                                <span className="hidden sm:inline">{t("tabs.target")}</span>
                             </TabsTrigger>
                             <TabsTrigger
                                 data-tour="rb-tab-export"
@@ -182,6 +191,10 @@ export function EditorSidebar({
 
                             <TabsContent value="design" className="mt-0">
                                 <DesignPanel data={resumeData} onChange={onResumeDataChange}/>
+                            </TabsContent>
+
+                            <TabsContent value="target" className="mt-0">
+                                <TargetJobPanel data={resumeData} onChange={onResumeDataChange}/>
                             </TabsContent>
 
                             <TabsContent value="export" className="mt-0">
