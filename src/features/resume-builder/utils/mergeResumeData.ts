@@ -1,4 +1,4 @@
-import { ResumeData, BaseItem } from "@/features/upload-cv/types";
+import { ResumeData, SectionItem } from "@/features/upload-cv/types";
 import { v4 as uuidv4 } from 'uuid';
 
 export type MergeMode = 'replace' | 'append';
@@ -28,7 +28,7 @@ export function mergeResumeData(
     if (options.sections.personalInfo && incoming.personalInfo) {
         if (!result.personalInfo) {
             result.personalInfo = {
-                fullName: "", jobTitle: "", phone: "", address: "", email: "", linkedin: "", summary: "", photoUrl: ""
+                fullName: "", jobTitle: "", phone: "", address: "", email: "", linkedin: "", summary: "", picture: ""
             };
         }
         
@@ -41,12 +41,13 @@ export function mergeResumeData(
         if (pi.email) result.personalInfo.email = pi.email;
         if (pi.phone) result.personalInfo.phone = pi.phone;
         if (pi.address) result.personalInfo.address = pi.address;
+        if (pi.picture) result.personalInfo.picture = pi.picture;
         
-        // Preserve any existing photoUrl since LinkedIn text parse won't have it
+        // Preserve any existing picture since LinkedIn text parse won't have it
     }
 
     // Process lists (experience, education, skills, etc.)
-    const processSectionList = (type: string, incomingItems: BaseItem[], shouldMerge: boolean) => {
+    const processSectionList = (type: string, incomingItems: SectionItem[], shouldMerge: boolean) => {
         if (!shouldMerge || !incomingItems || incomingItems.length === 0) return;
         
         // Find existing section index
