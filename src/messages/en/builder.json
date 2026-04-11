@@ -115,5 +115,32 @@
     "afterScore": "After",
     "changes": "What Changed",
     "warnings": "Warnings"
+  },
+  "linkedin": {
+    "importButton": "Import from LinkedIn",
+    "dialogTitle": "Import from LinkedIn",
+    "pasteLabel": "Paste your LinkedIn profile text",
+    "pastePlaceholder": "Copy your LinkedIn profile page and paste it here...",
+    "parseButton": "Parse Profile",
+    "parsing": "Parsing...",
+    "preview": "Preview",
+    "sections": "Import sections",
+    "personalInfo": "Personal Info",
+    "experience": "Experience",
+    "education": "Education",
+    "skills": "Skills",
+    "modeReplace": "Replace",
+    "modeAppend": "Merge (Append)",
+    "applyButton": "Apply to Resume",
+    "parseSuccess": "Profile parsed successfully!",
+    "parseFailed": "Failed to parse LinkedIn profile",
+    "items": "{count} items"
+  },
+  "interviewPrep": {
+    "title": "Interview Preparation",
+    "generateButton": "Generate Interview Questions",
+    "generating": "Generating...",
+    "category": "Category",
+    "hint": "Hint"
   }
 }

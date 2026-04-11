@@ -60,7 +60,7 @@ export function TargetJobPanel({ data, onChange }: TargetJobPanelProps) {
     try {
       const response = await jobMatchService.tailorResume({
         resumeData: data,
-        jobDescription: result?.parsedJd?.responsibilities?.join(" ") || jobDescription, 
+        jobDescription: result?.parsedJd?.responsibilities?.join(" ") || jobDescription,
         jobTitle: result?.parsedJd?.jobTitle,
         companyName: result?.parsedJd?.companyName,
       });
@@ -248,10 +248,10 @@ export function TargetJobPanel({ data, onChange }: TargetJobPanelProps) {
                     </div>
                   ))}
                 </div>
-                
+
                 <div className="mt-6">
-                  <Button 
-                    onClick={handleTailorResume} 
+                  <Button
+                    onClick={handleTailorResume}
                     disabled={isTailoring}
                     className="w-full"
                   >
@@ -265,7 +265,7 @@ export function TargetJobPanel({ data, onChange }: TargetJobPanelProps) {
             {tailorResult && (
               <div className="bg-muted p-4 rounded-xl space-y-4 mt-6">
                 <h3 className="font-semibold text-center">{t("targetJob.changes")}</h3>
-                
+
                 <div className="flex justify-between items-center bg-background rounded-lg p-4 border shadow-sm">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-muted-foreground">{tailorResult.originalAtsScore?.overall || result?.overallScore || 0}%</div>
@@ -297,14 +297,69 @@ export function TargetJobPanel({ data, onChange }: TargetJobPanelProps) {
                   </div>
                 )}
 
-                <Button 
-                  onClick={handleApplyTailored}
-                  variant="default"
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white mt-2"
-                >
-                  <CheckCircle2 className="w-4 h-4 mr-2" />
-                  {t("targetJob.applyButton")}
-                </Button>
+                {tailorResult.interviewPrep && tailorResult.interviewPrep.questions?.length > 0 && (
+                  <div className="bg-background border rounded-lg p-4 shadow-sm mt-4">
+                    <h4 className="font-semibold text-primary mb-3 flex items-center gap-2">
+                      <Lightbulb className="w-4 h-4" />
+                      {t("interviewPrep.title") || "Interview Preparation"}
+                    </h4>
+                    <div className="space-y-4">
+                      {tailorResult.interviewPrep.questions.map((q: any, i: number) => (
+                        <div key={i} className="border-l-2 border-primary/30 pl-3">
+                          <p className="font-medium text-sm">{q.question}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            <span className="font-semibold">{t("interviewPrep.category") || "Category"}:</span> {q.category}
+                          </p>
+                          {q.hint && (
+                            <p className="text-xs text-primary/80 mt-1 italic">
+                              <span className="font-semibold">{t("interviewPrep.hint") || "Hint"}:</span> {q.hint}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-2 mt-4">
+                  {!tailorResult.interviewPrep && (
+                    <Button
+                      onClick={async () => {
+                        setIsTailoring(true);
+                        try {
+                          const response = await jobMatchService.tailorResume({
+                            resumeData: data,
+                            jobDescription: result?.parsedJd?.responsibilities?.join(" ") || jobDescription,
+                            jobTitle: result?.parsedJd?.jobTitle,
+                            companyName: result?.parsedJd?.companyName,
+                            includeInterviewQuestions: true // Request prep this time
+                          });
+                          setTailorResult(response);
+                          toast.success(t("targetJob.tailorComplete"));
+                        } catch (error: any) {
+                          toast.error(error?.message || t("targetJob.analysisFailed"));
+                        } finally {
+                          setIsTailoring(false);
+                        }
+                      }}
+                      variant="outline"
+                      className="w-full"
+                      disabled={isTailoring}
+                    >
+                      {isTailoring ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Lightbulb className="mr-2 h-4 w-4" />}
+                      {t("interviewPrep.generateButton") || "Generate Interview Questions"}
+                    </Button>
+                  )}
+
+                  <Button
+                    onClick={handleApplyTailored}
+                    variant="default"
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                  >
+                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                    {t("targetJob.applyButton")}
+                  </Button>
+                </div>
               </div>
             )}
           </div>

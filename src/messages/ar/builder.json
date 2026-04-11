@@ -115,5 +115,32 @@
     "afterScore": "بعد",
     "changes": "ما الذي تغير",
     "warnings": "تحذيرات"
+  },
+  "linkedin": {
+    "importButton": "استيراد من LinkedIn",
+    "dialogTitle": "استيراد من LinkedIn",
+    "pasteLabel": "الصق نص ملفك الشخصي على LinkedIn",
+    "pastePlaceholder": "انسخ صفحة ملفك الشخصي على LinkedIn والصقها هنا...",
+    "parseButton": "تحليل الملف الشخصي",
+    "parsing": "جاري التحليل...",
+    "preview": "معاينة",
+    "sections": "استيراد الأقسام",
+    "personalInfo": "المعلومات الشخصية",
+    "experience": "الخبرات",
+    "education": "التعليم",
+    "skills": "المهارات",
+    "modeReplace": "استبدال",
+    "modeAppend": "دمج (إضافة)",
+    "applyButton": "تطبيق على السيرة الذاتية",
+    "parseSuccess": "تم تحليل الملف الشخصي بنجاح!",
+    "parseFailed": "فشل تحليل ملف LinkedIn",
+    "items": "{count} عناصر"
+  },
+  "interviewPrep": {
+    "title": "التحضير للمقابلة",
+    "generateButton": "إنشاء أسئلة المقابلة",
+    "generating": "جاري الإنشاء...",
+    "category": "الفئة",
+    "hint": "تلميح"
   }
 }
