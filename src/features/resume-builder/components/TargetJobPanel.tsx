@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Loader2, Target, CheckCircle2, AlertCircle, XCircle } from "lucide-react";
+import { Loader2, Target, CheckCircle2, AlertCircle, XCircle, Lightbulb } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ResumeData } from "@/features/upload-cv/types";
 import { jobMatchService, JobMatchResult } from "../services/job-match.service";
@@ -151,6 +151,31 @@ export function TargetJobPanel({ data, onChange }: TargetJobPanelProps) {
                                 <div className="flex flex-wrap gap-2 text-sm">
                                     {result.matchedSkills.map((match, i) => (
                                         <span key={i} className="bg-emerald-500/10 px-2 py-1 rounded-md">{match.skill}</span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {result.suggestions && result.suggestions.length > 0 && (
+                            <div className="bg-primary/5 text-foreground border border-primary/20 border-l-4 rounded-lg p-4 mt-6">
+                                <div className="flex items-center gap-2 font-semibold mb-3">
+                                    <Lightbulb className="h-4 w-4 text-primary" />
+                                    <h4>{t("targetJob.aiSuggestions")}</h4>
+                                </div>
+                                <div className="space-y-3">
+                                    {result.suggestions.map((sug, i) => (
+                                        <div key={i} className="bg-background rounded p-3 text-sm border shadow-sm">
+                                            <div className="flex justify-between items-start mb-1">
+                                                <span className="font-semibold text-primary">{sug.action}</span>
+                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${sug.priority === 'HIGH' ? 'bg-destructive/10 text-destructive' : sug.priority === 'MEDIUM' ? 'bg-orange-500/10 text-orange-600' : 'bg-green-500/10 text-green-600'}`}>
+                                                    {sug.priority || 'NORMAL'}
+                                                </span>
+                                            </div>
+                                            <p className="text-muted-foreground">{sug.reason}</p>
+                                            <div className="mt-2 text-xs flex justify-between items-center text-muted-foreground">
+                                                <span>{t("targetJob.section")}: <strong>{sug.section}</strong></span>
+                                            </div>
+                                        </div>
                                     ))}
                                 </div>
                             </div>

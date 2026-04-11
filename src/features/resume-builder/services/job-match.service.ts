@@ -75,5 +75,11 @@ export const jobMatchService = {
     async analyzeMatch(request: JobMatchRequest): Promise<JobMatchResult> {
         const response = await apiClient.post<CommonResponse<JobMatchResult>>("/v1/job-match/analyze", request);
         return response.data.data;
+    },
+    async getHistory(page = 0, size = 10): Promise<{ content: any[], totalElements: number }> {
+        const response = await apiClient.get<CommonResponse<any>>("/v1/job-match/history", {
+            params: { page, size, sort: 'analyzedAt,desc' }
+        });
+        return response.data.data;
     }
 };

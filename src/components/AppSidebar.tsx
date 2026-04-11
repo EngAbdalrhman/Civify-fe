@@ -12,6 +12,7 @@ import {
   FileEdit,
   PanelLeftClose,
   PanelLeft,
+  Target,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { usePermissions } from "@/hooks/use-permissions";
@@ -55,6 +56,7 @@ export function AppSidebar({
   // Permission checks for menu items
   const canViewApiKeys = hasAnyPermission(["API.ACCESS", "API.KEY.CREATE"]);
   const canViewAnalytics = hasAnyPermission(["STATS.VIEW", "API_USAGE.VIEW"]);
+  const canViewJobMatches = hasAnyPermission(["CV.JOB_MATCH"]);
 
   useEffect(() => {
     setMounted(true);
@@ -181,6 +183,18 @@ export function AppSidebar({
               <UploadCloud className="h-4 w-4 shrink-0" />
               {!shouldShowCollapsed && t("upload")}
             </Link>
+
+            {/* Job Matches Analytics */}
+            {isAuthenticated && canViewJobMatches && (
+              <Link
+                href="/app/job-matches"
+                className={getLinkClasses("/app/job-matches")}
+                title={shouldShowCollapsed ? "Job Matches" : undefined}
+              >
+                <Target className="h-4 w-4 shrink-0" />
+                {!shouldShowCollapsed && "Job Matches"}
+              </Link>
+            )}
 
             {/* Analytics - requires STATS.VIEW or API_USAGE.VIEW */}
             {isAuthenticated && canViewAnalytics && (

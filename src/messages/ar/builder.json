@@ -47,7 +47,6 @@
     "parseSuccess": "تم تحليل السيرة الذاتية بنجاح!",
     "parseError": "فشل تحليل السيرة الذاتية. يرجى المحاولة مرة أخرى.",
     "fullscreenError": "ملء الشاشة غير مدعوم",
-
     "loginAction": "تسجيل الدخول"
   },
   "tokenLimit": {
@@ -104,6 +103,8 @@
     "missingSkills": "المهارات الناقصة",
     "matchedSkills": "المهارات المتطابقة",
     "required": "مطلوب",
-    "preferred": "مفضل"
+    "preferred": "مفضل",
+    "aiSuggestions": "اقتراحات الذكاء الاصطناعي للتخصيص",
+    "section": "القسم المستهدف"
   }
 }

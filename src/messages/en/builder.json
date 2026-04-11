@@ -47,7 +47,6 @@
     "parseSuccess": "Resume parsed successfully!",
     "parseError": "Failed to parse resume. Please try again.",
     "fullscreenError": "Fullscreen not supported",
-
     "loginAction": "Login"
   },
   "tokenLimit": {
@@ -104,6 +103,8 @@
     "missingSkills": "Missing Core Skills",
     "matchedSkills": "Matched Skills",
     "required": "Required",
-    "preferred": "Preferred"
+    "preferred": "Preferred",
+    "aiSuggestions": "AI Tailoring Suggestions",
+    "section": "Target Section"
   }
 }
