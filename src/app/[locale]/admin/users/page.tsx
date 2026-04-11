@@ -435,8 +435,77 @@ export default function UsersPage() {
           </div>
         </div>
 
-        {/* Table (Image 1 design) */}
-        <div className="overflow-x-auto">
+        {/* Mobile Cards */}
+        <div className="grid gap-3 p-4 md:hidden">
+          {isLoading ? (
+            <div className="rounded-xl border bg-card p-6 text-center text-sm text-muted-foreground">
+              Loading...
+            </div>
+          ) : users.length === 0 ? (
+            <div className="rounded-xl border bg-card p-6 text-center text-sm text-muted-foreground">
+              {tc("noData")}
+            </div>
+          ) : (
+            users.map((user) => {
+              const canModify = hasPermission(ADMIN_ACTION_PERMISSIONS.USER_EDIT);
+              return (
+                <div key={user.id} className="rounded-xl border bg-card p-3 shadow-sm">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        User
+                      </span>
+                      <span className="text-sm font-medium">{getUserDisplayName(user)}</span>
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        Email
+                      </span>
+                      <span className="text-sm break-all">{user.email}</span>
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        Plan
+                      </span>
+                      <span className="text-sm">{user.plan || "Free"}</span>
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        Status
+                      </span>
+                      <span className="text-sm">{user.status}</span>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex items-center justify-end gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={actionButtonStyles}
+                      onClick={() => handleViewUser(user)}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    {canModify && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className={
+                          user.status === "ACTIVE" ? banButtonStyles : unbanButtonStyles
+                        }
+                        onClick={() => handleToggleBan(user)}
+                      >
+                        <Ban className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Desktop Table */}
+        <div className="hidden overflow-x-auto md:block">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b">

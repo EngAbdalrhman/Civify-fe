@@ -54,6 +54,7 @@ interface GenericListProps<T = Record<string, unknown>> {
   onRefresh?: () => void;
   locale?: string; // e.g., 'en', 'ar'
   defaultSort?: SortState;
+  mobilePrimaryColumns?: string[];
 }
 
 /**
@@ -121,6 +122,7 @@ export function GenericList<
   onRefresh,
   locale = "en",
   defaultSort,
+  mobilePrimaryColumns = [],
 }: GenericListProps<T>) {
   const [filters, setFilters] = useState<FilterState>({});
   const [sort, setSort] = useState<SortState | null>(defaultSort || null);
@@ -274,6 +276,10 @@ export function GenericList<
 
   const directActions = actions.filter((a) => !a.showInMenu);
   const menuActions = actions.filter((a) => a.showInMenu);
+  const resolvedMobileColumns =
+    mobilePrimaryColumns.length > 0
+      ? columns.filter((column) => mobilePrimaryColumns.includes(column.key))
+      : columns.slice(0, 4);
 
   return (
     <div className="space-y-4 p-1">
@@ -301,9 +307,109 @@ export function GenericList<
         )}
       </div>
 
-      {/* Table */}
+      {/* Mobile Cards */}
+      <div className="grid gap-3 md:hidden">
+        {isLoading ? (
+          <div className="rounded-xl border bg-card p-6 text-center text-sm text-muted-foreground">
+            Loading data...
+          </div>
+        ) : data.length === 0 ? (
+          <div className="rounded-xl border bg-card p-6 text-center text-sm text-muted-foreground">
+            {emptyMessage}
+          </div>
+        ) : (
+          data.map((item, index) => (
+            <div
+              key={item.id || index}
+              className="rounded-xl border bg-card p-3 shadow-sm"
+            >
+              <div className="space-y-2">
+                {resolvedMobileColumns.map((column) => (
+                  <div
+                    key={column.key}
+                    className="flex items-start justify-between gap-3"
+                  >
+                    <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      {column.label}
+                    </span>
+                    <span className="text-sm text-right break-all">
+                      {formatValue(item, column)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {actions.length > 0 && (
+                <div className="mt-3 flex items-center justify-end gap-1">
+                  {directActions
+                    .filter(
+                      (action) => !action.condition || action.condition(item),
+                    )
+                    .map((action, i) => (
+                      <Button
+                        key={i}
+                        variant={action.variant || "ghost"}
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                        onClick={() => action.onClick(item)}
+                        title={action.label}
+                      >
+                        {typeof action.icon === "function"
+                          ? action.icon(item)
+                          : (action.icon as React.ReactNode)}
+                      </Button>
+                    ))}
+                  {menuActions.some(
+                    (action) => !action.condition || action.condition(item),
+                  ) && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                        >
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40">
+                        {menuActions
+                          .filter(
+                            (action) => !action.condition || action.condition(item),
+                          )
+                          .map((action, i) => (
+                            <DropdownMenuItem
+                              key={i}
+                              onClick={() => action.onClick(item)}
+                              className={cn(
+                                "cursor-pointer",
+                                action.variant === "destructive" &&
+                                  "text-error focus:text-error focus:bg-error/10",
+                              )}
+                            >
+                              {action.icon && (
+                                <span className="mr-2 w-4 h-4 flex items-center justify-center">
+                                  {typeof action.icon === "function"
+                                    ? action.icon(item)
+                                    : (action.icon as React.ReactNode)}
+                                </span>
+                              )}
+                              {action.label}
+                            </DropdownMenuItem>
+                          ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                </div>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop Table */}
       <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="hidden overflow-x-auto md:block">
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow className="hover:bg-transparent">

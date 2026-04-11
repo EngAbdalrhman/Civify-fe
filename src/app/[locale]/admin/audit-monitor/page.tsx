@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { FileSearch, Users, CreditCard, Settings, RefreshCcw, Wallet, Coins } from 'lucide-react';
+import { FileSearch, Users, CreditCard, Settings, RefreshCcw, Wallet, Coins, Copy } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GenericList } from '@/components/generic-list/GenericList';
 import type { ColumnDef, FilterState, SortState, InputDataModel, FilterOperation } from '@/components/generic-list/types';
@@ -116,6 +116,15 @@ function buildInputDataModel<T>(
     page,
     size,
   };
+}
+
+async function copyToClipboard(value: string) {
+  try {
+    await navigator.clipboard.writeText(value);
+    toast.success('Request ID copied');
+  } catch {
+    toast.error('Failed to copy Request ID');
+  }
 }
 
 // Value viewer dialog
@@ -262,6 +271,7 @@ function AuditTabContent({ entityTypes, useAllEndpoint = false }: AuditTabConten
       <GenericList<AuditLog>
         data={data}
         columns={columnsWithActions}
+        mobilePrimaryColumns={['entityType', 'action', 'performedBy', 'performedAt']}
         isLoading={isLoading}
         meta={{
           page: currentPage,
@@ -306,9 +316,15 @@ const cvLogColumns: ColumnDef<any>[] = [
       const id = value as string;
       if (!id) return '-';
       return (
-        <span className="font-mono text-xs" title={id}>
-          {id.substring(0, 8)}...
-        </span>
+        <button
+          type="button"
+          className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-mono text-xs hover:bg-muted"
+          title="Click to copy full request ID"
+          onClick={() => copyToClipboard(id)}
+        >
+          <span>{id.substring(0, 8)}...</span>
+          <Copy className="h-3 w-3" />
+        </button>
       );
     },
   },
@@ -482,6 +498,7 @@ function CvLogTabContent() {
       <GenericList
         data={data as any}
         columns={columnsWithActions}
+        mobilePrimaryColumns={['requestId', 'action', 'success', 'createdAt']}
         isLoading={isLoading}
         meta={{
           page: currentPage,
@@ -614,6 +631,7 @@ function SubscriptionAuditTabContent() {
     <GenericList<SubscriptionAuditLog>
       data={data}
       columns={subscriptionAuditColumns}
+      mobilePrimaryColumns={['auditType', 'userId', 'subscriptionId', 'createdAt']}
       isLoading={isLoading}
       meta={{
         page: currentPage,
@@ -734,6 +752,7 @@ function BillingAuditTabContent() {
     <GenericList<BillingAuditLog>
       data={data}
       columns={billingAuditColumns}
+      mobilePrimaryColumns={['auditType', 'gateway', 'gatewayStatus', 'createdAt']}
       isLoading={isLoading}
       meta={{
         page: currentPage,
@@ -864,6 +883,7 @@ function TokenUsageTabContent() {
     <GenericList<TokenUsageLog>
       data={data}
       columns={tokenUsageColumns}
+      mobilePrimaryColumns={['usageType', 'source', 'tokensUsed', 'createdAt']}
       isLoading={isLoading}
       meta={{
         page: currentPage,
