@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -97,12 +97,17 @@ export function LinkedInImportDialog({ open, onClose, onApply, showMergeOptions 
 
                 {step === "paste" ? (
                     <div className="space-y-4 py-4">
-                        <Textarea
-                            placeholder={t("linkedin.pastePlaceholder")}
-                            value={profileText}
-                            onChange={(e) => setProfileText(e.target.value)}
-                            className="min-h-[200px]"
-                        />
+                        <div className="space-y-2">
+                            <Label>{t("linkedin.pasteLabel")}</Label>
+                            <Input
+                                placeholder={t("linkedin.pastePlaceholder")}
+                                value={profileText}
+                                onChange={(e) => setProfileText(e.target.value)}
+                            />
+                        </div>
+                        <p className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-md border">
+                            {t("linkedin.helpText") || "Tip: If the URL doesn't work, you can also paste your full LinkedIn profile text (Copy-Paste from your profile page)."}
+                        </p>
                     </div>
                 ) : (
                     <div className="space-y-6 py-4">
