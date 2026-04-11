@@ -13,6 +13,7 @@ import {TargetJobPanel} from "./TargetJobPanel";
 import {FILE_ACCEPT} from "../utils/constants";
 import {BuilderSaveStatus} from "./BuilderSaveStatus";
 import type {BuilderSaveStatus as SaveStatusType} from "../types";
+import {usePermissions} from "@/hooks/use-permissions";
 
 interface EditorSidebarProps {
     // Resume data
@@ -71,6 +72,8 @@ export function EditorSidebar({
                                   onAuthGate,
                               }: EditorSidebarProps) {
     const t = useTranslations("builder");
+    const { hasAnyPermission } = usePermissions();
+    const canViewJobMatches = hasAnyPermission(["CV.JOB_MATCH"]);
 
     return (
         <div
@@ -147,7 +150,7 @@ export function EditorSidebar({
                     className="flex-1 flex flex-col min-h-0"
                 >
                     <div className="px-4 pt-4">
-                        <TabsList className="w-full grid grid-cols-4">
+                        <TabsList className={`w-full grid ${canViewJobMatches ? 'grid-cols-4' : 'grid-cols-3'}`}>
                             <TabsTrigger
                                 data-tour="rb-tab-content"
                                 value="content"
@@ -164,14 +167,16 @@ export function EditorSidebar({
                                 <Palette className="h-4 w-4"/>
                                 <span className="hidden sm:inline">{t("tabs.design")}</span>
                             </TabsTrigger>
-                            <TabsTrigger
-                                data-tour="rb-tab-target"
-                                value="target"
-                                className="flex gap-2"
-                            >
-                                <Target className="h-4 w-4"/>
-                                <span className="hidden sm:inline">{t("tabs.target")}</span>
-                            </TabsTrigger>
+                            {canViewJobMatches && (
+                                <TabsTrigger
+                                    data-tour="rb-tab-target"
+                                    value="target"
+                                    className="flex gap-2"
+                                >
+                                    <Target className="h-4 w-4"/>
+                                    <span className="hidden sm:inline">{t("tabs.target")}</span>
+                                </TabsTrigger>
+                            )}
                             <TabsTrigger
                                 data-tour="rb-tab-export"
                                 value="export"
@@ -193,9 +198,11 @@ export function EditorSidebar({
                                 <DesignPanel data={resumeData} onChange={onResumeDataChange}/>
                             </TabsContent>
 
-                            <TabsContent value="target" className="mt-0">
-                                <TargetJobPanel data={resumeData} onChange={onResumeDataChange}/>
-                            </TabsContent>
+                            {canViewJobMatches && (
+                                <TabsContent value="target" className="mt-0">
+                                    <TargetJobPanel data={resumeData} onChange={onResumeDataChange}/>
+                                </TabsContent>
+                            )}
 
                             <TabsContent value="export" className="mt-0">
                                 <ExportPanel

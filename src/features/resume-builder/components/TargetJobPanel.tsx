@@ -17,6 +17,7 @@ import {
 import { useTranslations } from "next-intl";
 import { ResumeData } from "@/features/upload-cv/types";
 import { jobMatchService, JobMatchResult } from "../services/job-match.service";
+import { CvTailorResponse } from "@/features/upload-cv/types";
 
 interface TargetJobPanelProps {
   data: ResumeData;
@@ -28,6 +29,8 @@ export function TargetJobPanel({ data, onChange }: TargetJobPanelProps) {
   const [jobDescription, setJobDescription] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<JobMatchResult | null>(null);
+  const [isTailoring, setIsTailoring] = useState(false);
+  const [tailorResult, setTailorResult] = useState<CvTailorResponse | null>(null);
   const t = useTranslations("builder");
 
   const handleAnalyze = async () => {
@@ -49,6 +52,31 @@ export function TargetJobPanel({ data, onChange }: TargetJobPanelProps) {
       toast.error(msg);
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const handleTailorResume = async () => {
+    setIsTailoring(true);
+    try {
+      const response = await jobMatchService.tailorResume({
+        resumeData: data,
+        jobDescription: result?.parsedJd?.responsibilities?.join(" ") || jobDescription, 
+        jobTitle: result?.parsedJd?.jobTitle,
+        companyName: result?.parsedJd?.companyName,
+      });
+      setTailorResult(response);
+      toast.success(t("targetJob.tailorComplete"));
+    } catch (error: any) {
+      toast.error(error?.message || t("targetJob.analysisFailed"));
+    } finally {
+      setIsTailoring(false);
+    }
+  };
+
+  const handleApplyTailored = () => {
+    if (tailorResult?.tailoredCv) {
+      onChange(tailorResult.tailoredCv);
+      toast.success(t("targetJob.applied"));
     }
   };
 
@@ -220,6 +248,63 @@ export function TargetJobPanel({ data, onChange }: TargetJobPanelProps) {
                     </div>
                   ))}
                 </div>
+                
+                <div className="mt-6">
+                  <Button 
+                    onClick={handleTailorResume} 
+                    disabled={isTailoring}
+                    className="w-full"
+                  >
+                    {isTailoring && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {isTailoring ? t("targetJob.tailoring") : t("targetJob.tailorButton")}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {tailorResult && (
+              <div className="bg-muted p-4 rounded-xl space-y-4 mt-6">
+                <h3 className="font-semibold text-center">{t("targetJob.changes")}</h3>
+                
+                <div className="flex justify-between items-center bg-background rounded-lg p-4 border shadow-sm">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-muted-foreground">{tailorResult.originalAtsScore?.overall || result?.overallScore || 0}%</div>
+                    <div className="text-xs text-muted-foreground uppercase mt-1">{t("targetJob.beforeScore")}</div>
+                  </div>
+                  <AlertCircle className="text-muted-foreground opacity-30 h-8 w-8" />
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-primary">{tailorResult.atsScore?.overall || 0}%</div>
+                    <div className="text-xs text-primary uppercase mt-1">{t("targetJob.afterScore")}</div>
+                  </div>
+                </div>
+
+                {tailorResult.validationWarnings && tailorResult.validationWarnings.length > 0 && (
+                  <div className="bg-amber-500/10 text-amber-700 border border-amber-500/20 p-3 rounded-lg text-sm">
+                    <div className="font-semibold flex items-center gap-2 mb-2">
+                      <AlertCircle className="w-4 h-4" /> {t("targetJob.warnings")}
+                    </div>
+                    <ul className="list-disc pl-4 space-y-1">
+                      {tailorResult.validationWarnings.map((w, i) => <li key={i}>{w}</li>)}
+                    </ul>
+                  </div>
+                )}
+
+                {tailorResult.changes && tailorResult.changes.length > 0 && (
+                  <div className="bg-background border rounded-lg p-4 text-sm shadow-sm">
+                    <ul className="list-disc pl-4 space-y-1.5 text-muted-foreground">
+                      {tailorResult.changes.map((c, i) => <li key={i}>{c}</li>)}
+                    </ul>
+                  </div>
+                )}
+
+                <Button 
+                  onClick={handleApplyTailored}
+                  variant="default"
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white mt-2"
+                >
+                  <CheckCircle2 className="w-4 h-4 mr-2" />
+                  {t("targetJob.applyButton")}
+                </Button>
               </div>
             )}
           </div>
