@@ -2134,9 +2134,7 @@ export default function UploadPage() {
           </div>
 
           {/* Additional Features Tabs - Below the main content */}
-          {(() => {
-            const hasAdditionalFeatures = !!(tailorResponse.coverLetter || (tailorResponse.interviewPrep?.questions?.length ?? 0) > 0 || (tailorResponse.roadmap?.steps?.length ?? 0) > 0);
-            return hasAdditionalFeatures && (
+          {hasAdditionalFeatures && (
             <Card data-tour="upload-step4-additional-tabs">
               <CardContent className="p-0">
                   <Tabs
@@ -2305,8 +2303,7 @@ export default function UploadPage() {
                 </Tabs>
               </CardContent>
             </Card>
-          );
-          })()}
+          )}
 
           {/* Navigation */}
           <div className="flex justify-between gap-3">
