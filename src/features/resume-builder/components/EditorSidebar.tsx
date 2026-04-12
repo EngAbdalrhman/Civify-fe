@@ -3,7 +3,7 @@
 import {RefObject} from "react";
 import {Button} from "@/components/ui/button";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {Download, FileText, Loader2, Palette, RotateCcw, Save, Upload, Target, Linkedin} from "lucide-react";
+import {Download, FileText, Loader2, Palette, RotateCcw, Save, Upload, Target} from "lucide-react";
 import {useTranslations} from "next-intl";
 import {ResumeData} from "@/features/upload-cv/types";
 import {EditorPanel} from "./EditorPanel";
@@ -14,9 +14,6 @@ import {FILE_ACCEPT} from "../utils/constants";
 import {BuilderSaveStatus} from "./BuilderSaveStatus";
 import type {BuilderSaveStatus as SaveStatusType} from "../types";
 import {usePermissions} from "@/hooks/use-permissions";
-import { LinkedInImportDialog } from "./LinkedInImportDialog";
-import { mergeResumeData, MergeMode } from "../utils/mergeResumeData";
-import { useState } from "react";
 
 interface EditorSidebarProps {
     // Resume data
@@ -77,16 +74,6 @@ export function EditorSidebar({
     const t = useTranslations("builder");
     const { hasAnyPermission } = usePermissions();
     const canViewJobMatches = hasAnyPermission(["CV.JOB_MATCH"]);
-    
-    const [showLinkedInDialog, setShowLinkedInDialog] = useState(false);
-
-    const handleLinkedInApply = (incomingData: ResumeData, mode: MergeMode, sectionsToMerge: any) => {
-        const mergedData = mergeResumeData(resumeData, incomingData, {
-            mode,
-            sections: sectionsToMerge
-        });
-        onResumeDataChange(mergedData);
-    };
 
     return (
         <div
@@ -109,15 +96,6 @@ export function EditorSidebar({
                             accept={FILE_ACCEPT}
                             className="hidden"
                         />
-
-                        <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            onClick={isGuest ? onAuthGate : () => setShowLinkedInDialog(true)} 
-                            title={t("linkedin.importButton") || "Import from LinkedIn"}
-                        >
-                            <Linkedin className="h-4 w-4" />
-                        </Button>
 
                         <Button
                             variant="outline"
@@ -204,13 +182,6 @@ export function EditorSidebar({
                     </div>
 
                     <div className="flex-1 overflow-y-auto min-h-0">
-                        {/* LinkedIn Import Dialog */}
-                        <LinkedInImportDialog 
-                            open={showLinkedInDialog} 
-                            onClose={() => setShowLinkedInDialog(false)} 
-                            onApply={handleLinkedInApply}
-                            showMergeOptions={true}
-                        />
                         <div className="p-4 pb-24 md:pb-20">
                             <TabsContent value="content" className="mt-0 space-y-6">
                                 <EditorPanel data={resumeData} onChange={onResumeDataChange}/>

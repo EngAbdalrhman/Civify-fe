@@ -71,19 +71,6 @@ interface CommonResponse<T> {
     data: T;
 }
 
-export interface JobMatchAnalytics {
-  totalAnalyses: number;
-  averageScore: number;
-  strongestArea: string;
-  weakestArea: string;
-  topMissingSkills: string[];
-  recentTrends: {
-    targetJobTitle: string;
-    atsScore: number;
-    analyzedAt: string;
-  }[];
-}
-
 export const jobMatchService = {
     async analyzeMatch(request: JobMatchRequest): Promise<JobMatchResult> {
         const response = await apiClient.post<CommonResponse<JobMatchResult>>("/v1/job-match/analyze", request);
@@ -99,10 +86,6 @@ export const jobMatchService = {
         const response = await apiClient.post<CommonResponse<import('@/features/upload-cv/types').CvTailorResponse>>(
             "/v1/cvs/tailor", request, { timeout: 180000 }
         );
-        return response.data.data;
-    },
-    async getAnalytics(): Promise<JobMatchAnalytics> {
-        const response = await apiClient.get<CommonResponse<JobMatchAnalytics>>("/v1/job-match/analytics");
         return response.data.data;
     }
 };

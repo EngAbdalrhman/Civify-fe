@@ -31,7 +31,6 @@ import {
     UploadCloud,
     X,
     Zap,
-    User,
 } from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
@@ -69,7 +68,6 @@ import {ResumeService, ResumeSummary} from "@/services/resume.service";
 import {JobApplicationService} from "@/services/job-application.service";
 import {getAccessToken} from "@/utils/cookies";
 import {AuthGateDialog} from "@/features/resume-builder/components/AuthGateDialog";
-import { LinkedInImportDialog } from "@/features/resume-builder/components/LinkedInImportDialog";
 // import { AdBanner } from "@/components/ads/AdBanner";
 import {
     getUploadStep2TourSteps,
@@ -92,7 +90,6 @@ export default function UploadPage() {
   // State
   const [currentStep, setCurrentStep] = useState(1);
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
-  const [showLinkedInDialog, setShowLinkedInDialog] = useState(false);
   const [tailorResponse, setTailorResponse] = useState<CvTailorResponse | null>(
     null,
   );
@@ -161,6 +158,8 @@ export default function UploadPage() {
       const file = event.target.files?.[0];
       if (!file) return;
 
+      // Removed duplicate auth check here since it's now in handleUploadClick
+
       const validTypes = [
         "application/pdf",
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -185,6 +184,7 @@ export default function UploadPage() {
           }
         },
         onError: (error: any) => {
+          // Handle TOKEN_LIMIT_EXCEEDED error
           if (
             error?.errorCode === "TOKEN_LIMIT_EXCEEDED" ||
             error?.message === "TOKEN_LIMIT_EXCEEDED"
@@ -225,6 +225,7 @@ export default function UploadPage() {
       const file = event.dataTransfer.files?.[0];
       if (!file) return;
 
+      // Auth check
       const token = getAccessToken();
       if (!token) {
         setShowAuthGate(true);
@@ -268,6 +269,7 @@ export default function UploadPage() {
   );
 
   const handleManualEntry = useCallback(() => {
+    // Auth check
     const token = getAccessToken();
     if (!token) {
       setShowAuthGate(true);
@@ -278,13 +280,9 @@ export default function UploadPage() {
     setCurrentStep(2);
   }, []);
 
-  const handleLinkedInApply = (incomingData: ResumeData) => {
-    setResumeData(incomingData);
-    setCurrentStep(2);
-  };
-
   // Handler for opening resume selector
   const handleOpenResumeSelector = useCallback(async () => {
+    // Auth check
     const token = getAccessToken();
     if (!token) {
       setShowAuthGate(true);
@@ -342,6 +340,7 @@ export default function UploadPage() {
         template,
         color,
       });
+      // toast.success('PDF downloaded successfully!');
     } catch (error) {
       console.error("PDF export failed:", error);
       toast.error(t("errors.exportPdfFailed"));
@@ -357,6 +356,7 @@ export default function UploadPage() {
     try {
       const filename = `${tailorResponse.tailoredCv.personalInfo.fullName || "cv"}_tailored`;
       await exportToDocx(tailorResponse.tailoredCv, filename);
+      // toast.success('DOCX downloaded successfully!');
     } catch (error) {
       console.error("DOCX export failed:", error);
       toast.error(t("errors.exportDocxFailed"));
@@ -377,6 +377,7 @@ export default function UploadPage() {
         tailorResponse.tailoredCv,
       );
       setSavedResumeId(saved.id);
+      // toast.success('CV saved to My Resumes!');
     } catch (error) {
       console.error("Save to resumes failed:", error);
       toast.error(t("errors.saveFailed"));
@@ -400,6 +401,7 @@ export default function UploadPage() {
         applicationStatus: "draft",
       });
       setTrackedApplicationId(application.id);
+      // toast.success('Added to Job Tracker!');
     } catch (error) {
       console.error("Track application failed:", error);
       toast.error(t("errors.trackFailed"));
@@ -437,6 +439,7 @@ export default function UploadPage() {
   const handleGenerate = useCallback(() => {
     if (!resumeData) return;
 
+    // Validate job description
     const trimmedDesc = jobDescription.trim();
     if (!trimmedDesc) {
       setJobDescriptionError(t("errors.jobDescRequired"));
@@ -462,6 +465,7 @@ export default function UploadPage() {
         onSuccess: (data) => {
           setTailorResponse(data);
           setCurrentStep(4);
+          // toast.success('CV tailored successfully!');
         },
       },
     );
@@ -479,6 +483,7 @@ export default function UploadPage() {
   const handleScrapeJd = useCallback(async () => {
     if (!jdUrl) return;
 
+    // Basic URL validation
     try {
       new URL(jdUrl);
     } catch (_) {
@@ -504,6 +509,7 @@ export default function UploadPage() {
     }
   }, [jdUrl, t]);
 
+  // Update personal info
   const updatePersonalInfo = useCallback((field: string, value: string) => {
     setResumeData((prev) =>
       prev
@@ -515,6 +521,7 @@ export default function UploadPage() {
     );
   }, []);
 
+  // Add section item
   const addSectionItem = useCallback((sectionId: string) => {
     setResumeData((prev) => {
       if (!prev) return null;
@@ -542,6 +549,7 @@ export default function UploadPage() {
     });
   }, []);
 
+  // Update section item
   const updateSectionItem = useCallback(
     (
       sectionId: string,
@@ -569,6 +577,7 @@ export default function UploadPage() {
     [],
   );
 
+  // Remove section item
   const removeSectionItem = useCallback((sectionId: string, itemId: string) => {
     setResumeData((prev) => {
       if (!prev) return null;
@@ -586,6 +595,7 @@ export default function UploadPage() {
     });
   }, []);
 
+  // Add new section
   const addSection = useCallback(
     (type: ResumeSection["type"], title: string) => {
       setResumeData((prev) => {
@@ -607,6 +617,7 @@ export default function UploadPage() {
     [],
   );
 
+  // Mask value for display
   const maskValue = useCallback(
     (value: string | undefined) => {
       if (!maskPII || !value) return value || "";
@@ -615,6 +626,7 @@ export default function UploadPage() {
     [maskPII],
   );
 
+  // Get display value
   const getDisplayValue = useCallback(
     (fieldPath: string, value: string | undefined) => {
       if (maskPII && PII_FIELDS.includes(fieldPath as any)) {
@@ -625,12 +637,14 @@ export default function UploadPage() {
     [maskPII, maskValue],
   );
 
+  // Check if required fields are filled
   const isResumeValid = useCallback(() => {
     if (!resumeData) return false;
     const { personalInfo } = resumeData;
     return !!(personalInfo.fullName && personalInfo.email);
   }, [resumeData]);
 
+  // Get section type for rendering
   const getSectionType = (
     section: ResumeSection,
   ): "skills" | "languages" | "default" => {
@@ -640,6 +654,16 @@ export default function UploadPage() {
     return "default";
   };
 
+  // Check if there are additional features to show in tabs
+  const hasAdditionalFeatures = useMemo(() => {
+    if (!tailorResponse) return false;
+    return !!(
+      tailorResponse.coverLetter ||
+      tailorResponse.interviewPrep?.questions?.length ||
+      tailorResponse.roadmap?.steps?.length
+    );
+  }, [tailorResponse]);
+
   const steps = [
     { id: 1, title: t("steps.uploadCv"), icon: UploadCloud },
     { id: 2, title: t("steps.reviewData"), icon: FileText },
@@ -647,6 +671,7 @@ export default function UploadPage() {
     { id: 4, title: t("steps.result"), icon: CheckCircle2 },
   ];
 
+  // Get score color
   const getScoreColor = (score: number) => {
     if (score >= 70) return "text-green-600";
     if (score >= 40) return "text-yellow-600";
@@ -661,11 +686,13 @@ export default function UploadPage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-12">
+      {/* Header */}
       <div data-tour="upload-header">
         <h1 className="text-3xl font-bold tracking-tight">{t("pageTitle")}</h1>
         <p className="text-muted-foreground mt-2">{t("pageSubtitle")}</p>
       </div>
 
+      {/* Stepper */}
       <div data-tour="upload-stepper" className="flex items-center justify-center mb-8 overflow-x-auto pb-2">
         <div className="flex items-center gap-2 sm:gap-4">
           {steps.map((step, index) => (
@@ -695,6 +722,7 @@ export default function UploadPage() {
         </div>
       </div>
 
+      {/* Step 1: Upload */}
       {currentStep === 1 && (
         <div className="max-w-2xl mx-auto space-y-4">
           <Card
@@ -749,49 +777,32 @@ export default function UploadPage() {
             </div>
           </div>
 
-          <div data-tour="upload-alternatives" className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {/* Side by side buttons */}
+          <div data-tour="upload-alternatives" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Button
               variant="outline"
+              className="w-full"
               size="lg"
-              className="h-20 w-full flex-col gap-2 rounded-xl"
               onClick={handleManualEntry}
             >
-              <User className="h-5 w-5 text-muted-foreground" />
-              <span>{t("addManually")}</span>
+              <FileEdit className="ltr:mr-2 rtl:ml-2 h-4 w-4" />
+              {t("addManually")}
             </Button>
 
             <Button
               variant="outline"
+              className="w-full"
               size="lg"
-              className="h-20 w-full flex-col gap-2 rounded-xl"
-              onClick={() => setShowLinkedInDialog(true)}
-            >
-              <Linkedin className="h-5 w-5 text-blue-600" />
-              <span>{t("linkedin.importButton") || "Import from LinkedIn"}</span>
-            </Button>
-
-            <Button
-              variant="outline"
-              size="lg"
-              className="h-20 w-full flex-col gap-2 rounded-xl"
               onClick={handleOpenResumeSelector}
             >
-              <FolderOpen className="h-5 w-5 text-muted-foreground" />
-              <span>{t("fillFromResumes")}</span>
+              <FolderOpen className="ltr:mr-2 rtl:ml-2 h-4 w-4" />
+              {t("fillFromResumes")}
             </Button>
           </div>
         </div>
       )}
 
-      {currentStep === 1 && (
-          <LinkedInImportDialog 
-              open={showLinkedInDialog} 
-              onClose={() => setShowLinkedInDialog(false)} 
-              onApply={handleLinkedInApply} 
-              showMergeOptions={false}
-          />
-      )}
-
+      {/* Resume Selector Dialog */}
       <Dialog open={showResumeSelector} onOpenChange={setShowResumeSelector}>
         <DialogContent className="max-w-md">
           <DialogHeader>
@@ -853,8 +864,10 @@ export default function UploadPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Step 2: Review/Edit Data */}
       {currentStep === 2 && resumeData && (
         <div className="space-y-6 max-w-3xl mx-auto">
+          {/* Personal Info */}
           <Card data-tour="upload-step2-personal-info">
             <CardHeader>
               <CardTitle>{t("personalInfo.title")}</CardTitle>
@@ -950,6 +963,7 @@ export default function UploadPage() {
             </CardContent>
           </Card>
 
+          {/* Dynamic Sections */}
           <Accordion
             data-tour="upload-step2-sections"
             type="single"
@@ -960,7 +974,9 @@ export default function UploadPage() {
           {resumeData.sections.map((section) => {
             const sectionType = getSectionType(section);
 
+            // Skills Section: Consolidated single-block editing
             if (sectionType === "skills") {
+              // Get all skills as titles from items
               const allSkills = section.items
                 .map((item) => item.title)
                 .filter(Boolean);
@@ -977,6 +993,7 @@ export default function UploadPage() {
                       <Textarea
                         value={allSkills.join(", ")}
                         onChange={(e) => {
+                          // Parse comma-separated input into individual items
                           const newSkills = e.target.value
                             .split(",")
                             .map((s) => s.trim())
@@ -1009,6 +1026,7 @@ export default function UploadPage() {
                         rows={3}
                       />
                     </div>
+                    {/* Visual Tags */}
                     {allSkills.length > 0 && (
                       <div className="flex flex-wrap gap-1.5">
                         {allSkills.slice(0, 15).map((skill, idx) => (
@@ -1066,6 +1084,7 @@ export default function UploadPage() {
               );
             }
 
+            // Other sections: Normal item-by-item rendering
             return (
               <AccordionItem key={section.id} value={section.id} className="border rounded-lg">
                 <AccordionTrigger className="px-6 py-4 hover:no-underline">
@@ -1133,6 +1152,7 @@ export default function UploadPage() {
                         </div>
                       ) : section.type.toLowerCase() === "certifications" ||
                         section.title.toLowerCase().includes("course") ? (
+                        /* Courses/Certifications: Name + optional provider */
                         <Input
                           value={item.title}
                           onChange={(e) =>
@@ -1146,6 +1166,7 @@ export default function UploadPage() {
                           placeholder="Course/Certification Name"
                         />
                       ) : section.title.toLowerCase().includes("interest") ? (
+                        /* Interests: Name only */
                         <Input
                           value={item.title}
                           onChange={(e) =>
@@ -1160,6 +1181,7 @@ export default function UploadPage() {
                         />
                       ) : section.title.toLowerCase().includes("activit") ||
                         section.title.toLowerCase().includes("volunteer") ? (
+                        /* Activities/Volunteering: Title + Role + Date */
                         <div className="space-y-3">
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <Input
@@ -1201,6 +1223,7 @@ export default function UploadPage() {
                           />
                         </div>
                       ) : section.type.toLowerCase() === "projects" ? (
+                        /* Projects: Name + Tech Stack + Date + Description (no location) */
                         <>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <Input
@@ -1255,6 +1278,7 @@ export default function UploadPage() {
                           />
                         </>
                       ) : (
+                        /* Default: Experience, Education - Full fields */
                         <>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <Input
@@ -1342,6 +1366,7 @@ export default function UploadPage() {
           })}
           </Accordion>
 
+          {/* Add New Section Dropdown + Navigation */}
           <div
             data-tour="upload-step2-actions"
             className="flex justify-between items-center gap-3"
@@ -1439,6 +1464,7 @@ export default function UploadPage() {
         </div>
       )}
 
+      {/* Step 3: Job Description */}
       {currentStep === 3 && (
         <div className="max-w-3xl mx-auto space-y-6">
           <Card data-tour="upload-step3-job-details">
@@ -1561,6 +1587,8 @@ export default function UploadPage() {
             </CardContent>
           </Card>
 
+          {/*<AdBanner />*/}
+
           <div data-tour="upload-step3-generate" className="flex justify-between gap-3">
             <Button variant="outline" onClick={() => setCurrentStep(2)}>
               <ArrowLeft className="mr-2 h-4 w-4" /> {t("actions.back")}
@@ -1585,9 +1613,12 @@ export default function UploadPage() {
         </div>
       )}
 
+      {/* Step 4: Result - Original Layout */}
       {currentStep === 4 && tailorResponse && (
         <div className="space-y-6">
+          {/* Main Layout: Sidebar + Preview + Tips */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Left Sidebar */}
             <div className="lg:col-span-1 space-y-4">
               {/* Status Card */}
               <Card data-tour="upload-step4-downloads">
