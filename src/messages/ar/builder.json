@@ -119,9 +119,8 @@
   "linkedin": {
     "importButton": "استيراد من LinkedIn",
     "dialogTitle": "استيراد من LinkedIn",
-    "pasteLabel": "رابط الملف الشخصي أو النص",
-    "pastePlaceholder": "الصق رابط ملفك الشخصي أو نص الملف بالكامل...",
-    "helpText": "نصيحة: إذا لم يعمل الرابط (بسبب قيود LinkedIn)، يمكنك أيضاً لصق نص ملفك الشخصي بالكامل مباشرة في المربع أعلاه.",
+    "pasteLabel": "الصق نص ملفك الشخصي على LinkedIn",
+    "pastePlaceholder": "انسخ صفحة ملفك الشخصي على LinkedIn والصقها هنا...",
     "parseButton": "تحليل الملف الشخصي",
     "parsing": "جاري التحليل...",
     "preview": "معاينة",

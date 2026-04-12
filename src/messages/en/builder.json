@@ -119,9 +119,8 @@
   "linkedin": {
     "importButton": "Import from LinkedIn",
     "dialogTitle": "Import from LinkedIn",
-    "pasteLabel": "LinkedIn Profile URL or Text",
-    "pastePlaceholder": "Paste your LinkedIn profile URL or full profile text...",
-    "helpText": "Tip: If the URL doesn't work (due to LinkedIn restrictions), you can also paste your full LinkedIn profile text directly into the box above.",
+    "pasteLabel": "Paste your LinkedIn profile text",
+    "pastePlaceholder": "Copy your LinkedIn profile page and paste it here...",
     "parseButton": "Parse Profile",
     "parsing": "Parsing...",
     "preview": "Preview",
