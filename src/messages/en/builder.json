@@ -3,6 +3,7 @@
   "tabs": {
     "content": "Content",
     "design": "Design",
+    "target": "Target Job",
     "export": "Export"
   },
   "actions": {
@@ -46,7 +47,6 @@
     "parseSuccess": "Resume parsed successfully!",
     "parseError": "Failed to parse resume. Please try again.",
     "fullscreenError": "Fullscreen not supported",
-
     "loginAction": "Login"
   },
   "tokenLimit": {
@@ -84,5 +84,36 @@
     "description": "You have an unsaved resume from a previous session. Would you like to continue editing it or start fresh?",
     "continue": "Continue Editing",
     "startFresh": "Start Fresh"
+  },
+  "targetJob": {
+    "title": "Target Job Analysis",
+    "subtitle": "Analyze how well your resume matches a specific job role.",
+    "urlLabel": "Job Posting URL (LinkedIn, Indeed, etc.)",
+    "pasteLabel": "Paste Job Description",
+    "pastePlaceholder": "Paste the full job description here...",
+    "or": "OR",
+    "analyzeButton": "Analyze Job Match",
+    "analyzing": "Analyzing Match...",
+    "inputRequired": "Please provide either a Job URL or paste a Job Description.",
+    "analysisComplete": "Analysis Complete",
+    "analysisFailed": "Failed to analyze job match",
+    "overallMatch": "Overall Match",
+    "skillsMatch": "Skills Match",
+    "roleDetails": "Role Details",
+    "missingSkills": "Missing Core Skills",
+    "matchedSkills": "Matched Skills",
+    "required": "Required",
+    "preferred": "Preferred",
+    "aiSuggestions": "AI Tailoring Suggestions",
+    "section": "Target Section",
+    "tailorButton": "Tailor My Resume",
+    "tailoring": "Tailoring...",
+    "tailorComplete": "Resume tailored successfully!",
+    "applyButton": "Apply Changes to Resume",
+    "applied": "Tailored resume applied!",
+    "beforeScore": "Before",
+    "afterScore": "After",
+    "changes": "What Changed",
+    "warnings": "Warnings"
   }
 }

@@ -3,6 +3,7 @@
   "tabs": {
     "content": "المحتوى",
     "design": "التصميم",
+    "target": "الوظيفة المستهدفة",
     "export": "التصدير"
   },
   "actions": {
@@ -46,7 +47,6 @@
     "parseSuccess": "تم تحليل السيرة الذاتية بنجاح!",
     "parseError": "فشل تحليل السيرة الذاتية. يرجى المحاولة مرة أخرى.",
     "fullscreenError": "ملء الشاشة غير مدعوم",
-
     "loginAction": "تسجيل الدخول"
   },
   "tokenLimit": {
@@ -84,5 +84,36 @@
     "description": "لديك سيرة ذاتية غير محفوظة من جلسة سابقة. هل تريد الاستمرار في تعديلها أو البدء من جديد؟",
     "continue": "متابعة التعديل",
     "startFresh": "البدء من جديد"
+  },
+  "targetJob": {
+    "title": "تحليل الوظيفة المستهدفة",
+    "subtitle": "حلل مدى توافق سيرتك الذاتية مع وظيفة محددة.",
+    "urlLabel": "رابط إعلان الوظيفة (LinkedIn, Indeed, إلخ)",
+    "pasteLabel": "الصق وصف الوظيفة",
+    "pastePlaceholder": "الصق وصف الوظيفة الكامل هنا...",
+    "or": "أو",
+    "analyzeButton": "تحليل التوافق",
+    "analyzing": "جاري التحليل...",
+    "inputRequired": "يرجى تقديم رابط الوظيفة أو لصق وصف الوظيفة.",
+    "analysisComplete": "اكتمل التحليل",
+    "analysisFailed": "فشل تحليل التوافق",
+    "overallMatch": "التوافق العام",
+    "skillsMatch": "توافق المهارات",
+    "roleDetails": "تفاصيل الوظيفة",
+    "missingSkills": "المهارات الناقصة",
+    "matchedSkills": "المهارات المتطابقة",
+    "required": "مطلوب",
+    "preferred": "مفضل",
+    "aiSuggestions": "اقتراحات الذكاء الاصطناعي للتخصيص",
+    "section": "القسم المستهدف",
+    "tailorButton": "تخصيص سيرتي الذاتية",
+    "tailoring": "جاري التخصيص...",
+    "tailorComplete": "تم تخصيص السيرة الذاتية بنجاح!",
+    "applyButton": "تطبيق التغييرات على السيرة الذاتية",
+    "applied": "تم تطبيق السيرة الذاتية المخصصة!",
+    "beforeScore": "قبل",
+    "afterScore": "بعد",
+    "changes": "ما الذي تغير",
+    "warnings": "تحذيرات"
   }
 }

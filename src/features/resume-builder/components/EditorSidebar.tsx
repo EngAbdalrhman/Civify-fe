@@ -3,15 +3,17 @@
 import {RefObject} from "react";
 import {Button} from "@/components/ui/button";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {Download, FileText, Loader2, Palette, RotateCcw, Save, Upload,} from "lucide-react";
+import {Download, FileText, Loader2, Palette, RotateCcw, Save, Upload, Target} from "lucide-react";
 import {useTranslations} from "next-intl";
 import {ResumeData} from "@/features/upload-cv/types";
 import {EditorPanel} from "./EditorPanel";
 import {DesignPanel} from "./DesignPanel";
 import {ExportPanel} from "./ExportPanel";
+import {TargetJobPanel} from "./TargetJobPanel";
 import {FILE_ACCEPT} from "../utils/constants";
 import {BuilderSaveStatus} from "./BuilderSaveStatus";
 import type {BuilderSaveStatus as SaveStatusType} from "../types";
+import {usePermissions} from "@/hooks/use-permissions";
 
 interface EditorSidebarProps {
     // Resume data
@@ -70,6 +72,8 @@ export function EditorSidebar({
                                   onAuthGate,
                               }: EditorSidebarProps) {
     const t = useTranslations("builder");
+    const { hasAnyPermission } = usePermissions();
+    const canViewJobMatches = hasAnyPermission(["CV.JOB_MATCH"]);
 
     return (
         <div
@@ -77,12 +81,12 @@ export function EditorSidebar({
             className={`w-full lg:w-[450px] shrink-0 border-r bg-card flex flex-col h-full z-10 shadow-xl ${mobileView === "editor" ? "flex" : "hidden"} lg:flex`}
         >
             {/* Header */}
-            <div data-tour="rb-header" className="p-4 border-b flex items-center justify-between bg-card">
+            <div className="flex flex-col">
+                <div data-tour="rb-header" className="p-4 border-b flex items-center justify-between bg-card">
                 <h1 className="font-bold text-xl flex items-center gap-2">
                     <span className="text-primary">Civify</span>{" "}
-                    {t("title").replace("Civify ", "")}
+                    {t("title").replace("Civify", "").replace("Resume", "")}
                 </h1>
-                    <BuilderSaveStatus status={saveStatus} lastSavedAt={lastSavedAt}/>
                     <div className="flex gap-2">
                         {/* Hidden file input for upload */}
                         <input
@@ -116,16 +120,6 @@ export function EditorSidebar({
                         >
                             <RotateCcw className="h-4 w-4"/>
                         </Button>
-                        {/* <Button
-            variant="outline"
-            size="sm"
-            onClick={onCalculateScore}
-            disabled={isCalculatingScore}
-            className="gap-2"
-            title="ATS Score"
-          >
-            <Target className="h-4 w-4" />
-          </Button> */}
                         <Button
                             variant="default"
                             size="sm"
@@ -137,8 +131,11 @@ export function EditorSidebar({
                             {isSaving ? t("actions.saving") : t("actions.save")}
                         </Button>
                     </div>
+            </div>
+                <div className="justify-items-center">
+                    <BuilderSaveStatus status={saveStatus} lastSavedAt={lastSavedAt}/>
                 </div>
-
+        </div>
                 {/* Tabs */}
                 <Tabs
                     value={activeTab}
@@ -146,7 +143,7 @@ export function EditorSidebar({
                     className="flex-1 flex flex-col min-h-0"
                 >
                     <div className="px-4 pt-4">
-                        <TabsList className="w-full grid grid-cols-3">
+                        <TabsList className={`w-full grid ${canViewJobMatches ? 'grid-cols-4' : 'grid-cols-3'}`}>
                             <TabsTrigger
                                 data-tour="rb-tab-content"
                                 value="content"
@@ -163,6 +160,16 @@ export function EditorSidebar({
                                 <Palette className="h-4 w-4"/>
                                 <span className="hidden sm:inline">{t("tabs.design")}</span>
                             </TabsTrigger>
+                            {canViewJobMatches && (
+                                <TabsTrigger
+                                    data-tour="rb-tab-target"
+                                    value="target"
+                                    className="flex gap-2"
+                                >
+                                    <Target className="h-4 w-4"/>
+                                    <span className="hidden sm:inline">{t("tabs.target")}</span>
+                                </TabsTrigger>
+                            )}
                             <TabsTrigger
                                 data-tour="rb-tab-export"
                                 value="export"
@@ -183,6 +190,12 @@ export function EditorSidebar({
                             <TabsContent value="design" className="mt-0">
                                 <DesignPanel data={resumeData} onChange={onResumeDataChange}/>
                             </TabsContent>
+
+                            {canViewJobMatches && (
+                                <TabsContent value="target" className="mt-0">
+                                    <TargetJobPanel data={resumeData} onChange={onResumeDataChange}/>
+                                </TabsContent>
+                            )}
 
                             <TabsContent value="export" className="mt-0">
                                 <ExportPanel

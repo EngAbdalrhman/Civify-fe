@@ -58,7 +58,7 @@ export function ExportPanel({
         template,
         color,
       });
-      toast.success("PDF Downloaded");
+      // toast.success("PDF Downloaded");
     } catch (e) {
       console.error(e);
       toast.error("Failed to export PDF");
@@ -82,7 +82,7 @@ export function ExportPanel({
         `${data.personalInfo.fullName.replace(/\s+/g, "_")}_CV`,
         translations,
       );
-      toast.success("DOCX Downloaded");
+      // toast.success("DOCX Downloaded");
     } catch (e) {
       console.error(e);
       toast.error("Failed to export DOCX");

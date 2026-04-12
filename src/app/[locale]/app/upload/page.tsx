@@ -496,7 +496,6 @@ export default function UploadPage() {
       const content = await JobApplicationService.scrapeJd(jdUrl);
       if (content) {
         setJobDescription(content);
-        toast.success(t("scrapeSuccess") || "Job description imported!");
       } else {
         toast.error(t("errors.scrapeEmpty") || "No content found");
       }
@@ -2227,7 +2226,6 @@ export default function UploadPage() {
                             navigator.clipboard.writeText(
                               tailorResponse.coverLetter || "",
                             );
-                            toast.success("Copied to clipboard!");
                           }}
                         >
                           Copy

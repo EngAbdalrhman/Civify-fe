@@ -124,6 +124,8 @@ export interface CvTailorResponse {
   roadmap?: Roadmap;
   coverLetter?: string;
   processingTimeMs?: number;
+  changes?: string[];
+  validationWarnings?: string[];
 }
 
 export interface CvTailorRequest {
