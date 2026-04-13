@@ -16,6 +16,7 @@ import {
     FolderOpen,
     Github,
     Globe,
+    HelpCircle,
     Linkedin,
     Loader2,
     Mail,
@@ -75,6 +76,7 @@ import {
     getUploadStep4TourSteps,
     getUploadTourSteps,
     useTourAutoStart,
+    useTour,
 } from "@/features/onboarding";
 import {ensureUniqueSectionItemIds} from "@/features/resume-builder/utils/normalizeResumeIds";
 
@@ -126,6 +128,8 @@ export default function UploadPage() {
   const { mutate: tailorCv, isPending: isTailoring } = useTailorCv();
 
   // Tour
+  const { startTour } = useTour();
+
   useTourAutoStart("upload", getUploadTourSteps(tTour), { enabled: currentStep === 1 });
   useTourAutoStart("upload-step2", getUploadStep2TourSteps(tTour), {
     enabled: currentStep === 2 && !!resumeData,
@@ -142,6 +146,17 @@ export default function UploadPage() {
     }),
     { enabled: currentStep === 4 && !!tailorResponse },
   );
+
+  const handleStartTour = useCallback(() => {
+    if (currentStep === 1) startTour("upload", getUploadTourSteps(tTour));
+    else if (currentStep === 2) startTour("upload-step2", getUploadStep2TourSteps(tTour));
+    else if (currentStep === 3) startTour("upload-step3", getUploadStep3TourSteps(tTour));
+    else if (currentStep === 4) startTour("upload-step4", getUploadStep4TourSteps(tTour, {
+      hasCoverLetter: !!tailorResponse?.coverLetter,
+      hasInterviewPrep: !!tailorResponse?.interviewPrep?.questions?.length,
+      hasRoadmap: !!tailorResponse?.roadmap?.steps?.length,
+    }));
+  }, [currentStep, startTour, tTour, tailorResponse]);
 
   // Handlers
   const handleUploadClick = useCallback(() => {
@@ -687,9 +702,20 @@ export default function UploadPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-12">
       {/* Header */}
-      <div data-tour="upload-header">
-        <h1 className="text-3xl font-bold tracking-tight">{t("pageTitle")}</h1>
-        <p className="text-muted-foreground mt-2">{t("pageSubtitle")}</p>
+      <div data-tour="upload-header" className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">{t("pageTitle")}</h1>
+          <p className="text-muted-foreground mt-2">{t("pageSubtitle")}</p>
+        </div>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleStartTour} 
+          className="text-muted-foreground hover:text-foreground hidden sm:flex shrink-0"
+        >
+          <HelpCircle className="w-4 h-4 ltr:mr-2 rtl:ml-2" />
+          {tTour("common.help") || "Tour"}
+        </Button>
       </div>
 
       {/* Stepper */}

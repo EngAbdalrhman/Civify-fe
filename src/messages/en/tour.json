@@ -3,7 +3,8 @@
     "skipTour": "Skip tour",
     "nextStep": "Next",
     "prevStep": "Back",
-    "doneButton": "Done"
+    "doneButton": "Done",
+    "help": "Tour Help"
   },
   "upload": {
     "step1": {
