@@ -26,7 +26,13 @@ export function DashboardNavbar() {
   const locale = useLocale();
   const { logout, isLoggingOut } = useLogout();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { data: userProfile } = useUserProfile();
+
+  // Avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Check authentication status on mount
   useEffect(() => {
@@ -40,8 +46,8 @@ export function DashboardNavbar() {
 
     // Re-check on window focus (in case user logs in/out in another tab)
     window.addEventListener("focus", checkAuth);
-    // Also poll periodically to catch cookie changes
-    const interval = setInterval(checkAuth, 1000);
+    // Poll periodically (5s is sufficient, focus handles immediate changes)
+    const interval = setInterval(checkAuth, 5000);
 
     return () => {
       window.removeEventListener("focus", checkAuth);
@@ -99,12 +105,20 @@ export function DashboardNavbar() {
         <LanguageSwitcher />
         <ThemeToggle />
 
-        {/* Real-time Notifications - only show for authenticated users */}
-        {isAuthenticated && <NotificationBell />}
+        {!mounted ? (
+          /* Skeleton placeholder during hydration to prevent CLS */
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-full bg-muted animate-pulse" />
+            <div className="w-10 h-10 rounded-full bg-muted animate-pulse" />
+          </div>
+        ) : (
+          <>
+            {/* Real-time Notifications - only show for authenticated users */}
+            {isAuthenticated && <NotificationBell />}
 
-        {/* User Profile / Sign In */}
-        {isAuthenticated ? (
-          <DropdownMenu>
+            {/* User Profile / Sign In */}
+            {isAuthenticated ? (
+              <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
@@ -203,13 +217,15 @@ export function DashboardNavbar() {
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
-        ) : (
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/login">
-              <LogIn className="h-4 w-4 mr-2" />
-              {t("nav.signIn")}
-            </Link>
-          </Button>
+            ) : (
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/login">
+                  <LogIn className="h-4 w-4 mr-2" />
+                  {t("nav.signIn")}
+                </Link>
+              </Button>
+            )}
+          </>
         )}
       </div>
     </div>

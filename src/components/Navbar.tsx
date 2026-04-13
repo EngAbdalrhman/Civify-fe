@@ -63,8 +63,8 @@ export function Navbar() {
 
     // Re-check on window focus (in case user logged in/out in another tab)
     window.addEventListener("focus", checkAuth);
-    // Also poll periodically to catch cookie changes
-    const interval = setInterval(checkAuth, 1000);
+    // Also poll periodically to catch cookie changes (5s is sufficient)
+    const interval = setInterval(checkAuth, 5000);
 
     return () => {
       window.removeEventListener("focus", checkAuth);
@@ -89,16 +89,16 @@ export function Navbar() {
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
+          {/* Logo — fixed container dimensions prevent CLS when src swaps on hydration */}
           <Link href="/" className="flex items-center space-x-2">
-            <div className="flex items-center">
+            <div className="flex items-center w-[150px] h-[32px]">
               <Image
                 src={logoSrc}
                 alt="Civify Logo"
                 width={150}
                 height={32}
                 className="object-contain"
-                // style={{ width: "auto", height: "auto" }}
+                priority
               />
             </div>
           </Link>
@@ -144,7 +144,13 @@ export function Navbar() {
           <div className="hidden md:flex items-center space-x-3">
             <LanguageSwitcher />
             <ThemeToggle />
-            {isAuthenticated ? (
+            {!mounted ? (
+              /* Skeleton placeholder during hydration to prevent CLS */
+              <div className="flex items-center space-x-3">
+                <div className="w-[100px] h-9 rounded-md bg-muted animate-pulse" />
+                <div className="w-9 h-9 rounded-full bg-muted animate-pulse" />
+              </div>
+            ) : isAuthenticated ? (
               /* User is logged in - show user menu */
               <>
                 <Button variant="outline" asChild>

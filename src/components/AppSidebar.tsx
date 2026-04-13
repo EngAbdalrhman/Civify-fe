@@ -118,19 +118,20 @@ export function AppSidebar({
               shouldShowCollapsed && "justify-center",
             )}
           >
-            {/* Logo */}
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg">
+            {/* Logo — fixed container prevents CLS on src swap */}
+            <div className={cn(
+              "flex items-center justify-center rounded-lg",
+              shouldShowCollapsed ? "h-8 w-8" : "h-[35px] w-[75px]"
+            )}>
               <Link href="/" className="flex items-center space-x-2">
-                <div className="flex items-center">
-                  <Image
-                    src={logoSrc}
-                    alt="Civify Logo"
-                    width={shouldShowCollapsed ? 32 : 75}
-                    height={shouldShowCollapsed ? 32 : 35}
-                    className="object-contain"
-                    style={{ width: "auto", height: "auto" }}
-                  />
-                </div>
+                <Image
+                  src={logoSrc}
+                  alt="Civify Logo"
+                  width={shouldShowCollapsed ? 32 : 75}
+                  height={shouldShowCollapsed ? 32 : 35}
+                  className="object-contain"
+                  priority
+                />
               </Link>
             </div>
             {!shouldShowCollapsed && (
