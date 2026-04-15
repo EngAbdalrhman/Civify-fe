@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
@@ -132,6 +132,8 @@ export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
 
   // Search & Filters
+  // localSearchTerm = instant UI feedback; debouncedSearch = triggers API calls
+  const [localSearchTerm, setLocalSearchTerm] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [planFilter, setPlanFilter] = useState<string>("all");
@@ -314,12 +316,17 @@ export default function UsersPage() {
     filterUsers(filters);
   }, [searchTerm, statusFilter, planFilter, sourceFilter, filterUsers]);
 
-  // Debounce search
+  // Debounce search input → update the actual searchTerm after 500ms
   useEffect(() => {
     const timer = setTimeout(() => {
-      applyFilters();
-    }, 400);
+      setSearchTerm(localSearchTerm);
+    }, 500);
     return () => clearTimeout(timer);
+  }, [localSearchTerm]);
+
+  // Apply filters when the debounced searchTerm or dropdowns change
+  useEffect(() => {
+    applyFilters();
   }, [searchTerm, statusFilter, planFilter, sourceFilter]);
 
   const handlePageChange = (page: number) => {
@@ -376,8 +383,8 @@ export default function UsersPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder={t("searchPlaceholder")}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                value={localSearchTerm}
+                onChange={(e) => setLocalSearchTerm(e.target.value)}
                 className="pl-9 h-9 bg-muted/30 border-muted"
               />
             </div>

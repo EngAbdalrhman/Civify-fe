@@ -3,7 +3,8 @@
     "skipTour": "تخطي الجولة",
     "nextStep": "التالي",
     "prevStep": "السابق",
-    "doneButton": "إنهاء"
+    "doneButton": "إنهاء",
+    "help": "جولة إرشادية"
   },
   "upload": {
     "step1": {
