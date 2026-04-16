@@ -9,7 +9,7 @@
     "badge": "Zoho Recruit Extension",
     "title": "Supercharge Your ATS",
     "titleAccent": "With AI.",
-    "subtitle": "Bring the power of Civify directly into Zoho Recruit. Parse resumes, assess candidates, and generate executive summaries without ever leaving your ATS.",
+    "subtitle": "Bring the power of Civify directly into Zoho Recruit. Mask resumes With one Click.",
     "ctaPrimary": "Get It on Zoho Marketplace",
     "ctaSecondary": "Generate API Key",
     "trustLine": "Official Zoho Recruit Integration",
@@ -54,8 +54,8 @@
       "description": "Paste your Civify API key into the Zoho Recruit extension settings page to authenticate."
     },
     "step4": {
-      "title": "Start Parsing",
-      "description": "Open any candidate record in Zoho Recruit and click the Civify button to parse and assess immediately."
+      "title": "Start Masking",
+      "description": "Open any candidate record in Zoho Recruit and click the Civify button to mask immediately."
     }
   },
   "tutorial": {

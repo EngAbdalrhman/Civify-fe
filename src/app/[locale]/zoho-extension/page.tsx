@@ -111,7 +111,7 @@ export default async function ZohoExtensionPage({
       />
       <div className="flex flex-col min-h-screen">
         <ZohoHeroSection />
-        <ZohoFeaturesSection />
+        {/* <ZohoFeaturesSection /> */}
         <ZohoHowItWorksSection />
         <ZohoTutorialVideoSection />
         <ZohoFAQSection />
