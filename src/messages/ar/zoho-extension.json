@@ -9,7 +9,7 @@
     "badge": "إضافة Zoho Recruit",
     "title": "عزز نظام التوظيف الخاص بك",
     "titleAccent": "بالذكاء الاصطناعي.",
-    "subtitle": "اجلب قوة Civify مباشرة إلى Zoho Recruit. قم بتحليل السير الذاتية وتقييم المرشحين وإنشاء ملخصات تنفيذية دون مغادرة نظام تتبع المتقدمين.",
+    "subtitle": "اجلب قوة Civify مباشرة إلى Zoho Recruit. قم بإخفاء البيانات الشخصية من السير الذاتية بنقرة واحدة.",
     "ctaPrimary": "احصل عليها من متجر Zoho",
     "ctaSecondary": "إنشاء مفتاح API",
     "trustLine": "تكامل رسمي مع Zoho Recruit",
@@ -54,8 +54,8 @@
       "description": "الصق مفتاح Civify API الخاص بك في صفحة إعدادات إضافة Zoho Recruit للمصادقة."
     },
     "step4": {
-      "title": "بدء التحليل",
-      "description": "افتح سجل أي مرشح في Zoho Recruit وانقر على زر Civify للتحليل والتقييم فوراً."
+      "title": "بدء الأخفاء",
+      "description": "افتح سجل أي مرشح في Zoho Recruit وانقر على زر Civify للأخفاء فوراً."
     }
   },
   "tutorial": {

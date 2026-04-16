@@ -103,6 +103,11 @@ export function TourProvider({ children }: { children: ReactNode }) {
   const startTour = useCallback((pageId: string, steps: DriveStep[]) => {
     if (!isClient) return;
 
+    // Disabled on mobile view
+    // if (typeof window !== 'undefined' && window.innerWidth < 768) {
+    //   return;
+    // }
+
     // Use translation keys with fallback
     const nextText = t("nextStep") || "Next";
     const prevText = t("prevStep") || "Back";
