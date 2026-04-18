@@ -4,19 +4,22 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Link } from "@/i18n/routing";
 import { useMyActiveSubscription } from "@/features/plans/hooks/useSubscription";
+import { cn } from "@/lib/utils";
 
 const ADS_ENABLED = process.env.NEXT_PUBLIC_ADS_ENABLED !== "false";
 
-export function AdBanner() {
+interface AdBannerProps {
+    orientation?: "horizontal" | "vertical";
+    className?: string;
+}
+
+export function AdBanner({ orientation = "horizontal", className }: AdBannerProps = {}) {
     const {
         data: subscription,
         isLoading,
         isError: isSubscriptionError,
     } = useMyActiveSubscription();
     const [isPwa, setIsPwa] = useState(false);
-
-    const AD_WIDTH = 970;
-    const AD_HEIGHT = 250;
 
     useEffect(() => {
         // useEffect only runs on the client, so no 'typeof window' check is needed.
@@ -49,31 +52,52 @@ export function AdBanner() {
     if (isPaidPlan) return null;
 
     return (
-        <div className="my-3 sm:my-4 p-3 sm:p-4 border border-dashed border-border rounded-lg flex flex-col items-center justify-center relative overflow-visible bg-muted/30">
+        <div 
+            className={cn(
+                "relative flex items-center justify-center overflow-visible border border-dashed border-border rounded-lg bg-muted/30 transition-all",
+                orientation === "horizontal" 
+                    ? "w-full my-3 sm:my-4 p-2 sm:p-4" 
+                    : "w-full max-w-[320px] mx-auto my-3 sm:my-4 p-2 sm:p-4",
+                className
+            )}
+        >
             <a
                 href="mailto:ceo@civify.cv"
-                className="relative z-0 mx-auto block overflow-hidden"
-                style={{ width: `${AD_WIDTH}px`, height: "auto" }}
+                className="relative z-0 block w-full h-full overflow-hidden rounded group"
                 aria-label="Contact Civify for ad space"
             >
-                <Image
-                    src="/ad%20with%20us.png"
-                    alt="Advertise with Civify"
-                    width={AD_WIDTH}
-                    height={AD_HEIGHT}
-                    loading="lazy"
-                    style={{
-                        width: "100%",
-                        height: "auto",
-                        display: "block",
-                    }}
-                />
+                <div className={cn(
+                    "relative w-full overflow-hidden flex items-center justify-center transition-transform group-hover:scale-[1.01]",
+                    orientation === "vertical" 
+                        ? "aspect-[300/250] sm:aspect-[300/600]" // Medium Rectangle on mobile, Half Page on desktop
+                        : "aspect-[320/100] sm:aspect-[970/250]" // Mobile Banner on mobile, Billboard on desktop
+                )}>
+                    <Image
+                        src="/ad%20with%20us.png"
+                        alt="Advertise with Civify"
+                        fill
+                        className="object-contain"
+                        sizes={
+                            orientation === "vertical" 
+                                ? "(max-width: 640px) 300px, 300px" 
+                                : "(max-width: 640px) 100vw, 970px"
+                        }
+                        loading="lazy"
+                    />
+                </div>
             </a>
 
             {/* Remove Ads badge */}
             <Link
                 href="/plans"
-                className="absolute top-0 right-0 -mt-2 -mr-1 sm:-mt-3 sm:-mr-2 text-[10px] sm:text-[11px] bg-primary text-primary-foreground px-3 py-1.5 sm:py-1 min-h-[44px] sm:min-h-0 min-w-[44px] sm:min-w-0 flex items-center justify-center rounded-full shadow-sm hover:opacity-90 active:scale-95 transition-all font-medium z-10"
+                className={cn(
+                    "absolute flex items-center justify-center rounded-full bg-primary text-primary-foreground font-medium shadow-sm transition-all hover:opacity-90 active:scale-95 z-10",
+                    "text-[10px] sm:text-[11px] px-3 py-1 sm:py-1",
+                    "min-h-[44px] sm:min-h-0 min-w-[44px] sm:min-w-0", // Larger touch target for mobile
+                    orientation === "horizontal"
+                        ? "-top-3 -right-2 sm:-top-3 sm:-right-3"
+                        : "-top-3 -right-2 sm:-top-3 sm:-right-3"
+                )}
             >
                 Remove Ads
             </Link>
