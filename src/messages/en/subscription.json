@@ -5,7 +5,7 @@
     "nature": "Nature of Subscription",
     "natureDesc": "Our services operate on a recurring subscription basis (monthly/yearly). Upon completing the payment, the subscriber immediately gains full access to the agreed digital services.",
     "noRefund": "No Refund Policy",
-    "noRefundDesc": "Due to the digital nature of the service and its immediate availability for use, all payments collected for current subscription periods are non-refundable in whole or in part, and the subscriber is not entitled to claim a refund after service activation, in accordance with applicable laws governing digital goods and services.",
+    "noRefundDesc": "Due to the digital nature of the service and its immediate availability for use, all payments collected for current subscription periods are non-refundable in whole or in part, and the subscriber is not entitled to claim a refund after service activation, in accordance with applicable laws governing digital goods and services. Exceptions are made in cases of lack of service availability, where a refund for the affected months may be issued upon providing proof of payment.",
     "autoRenew": "Cancel Auto-Renewal",
     "autoRenewDesc": "The subscriber has the right to cancel the \"Auto-Renewal\" of the subscription at any time through their account dashboard.",
     "cancellationEffect": "Effect of Cancellation",

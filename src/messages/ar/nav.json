@@ -30,5 +30,8 @@
     "switch": "تغيير اللغة"
   },
   "signIn": "تسجيل الدخول",
-  "startForFree": "إنشاء حساب"
+  "startForFree": "إنشاء حساب",
+  "referrals": "الإحالات",
+  "extensions": "الإضافات",
+  "jobMatches": "مطابقة الوظائف"
 }

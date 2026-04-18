@@ -1,12 +1,14 @@
 import { Metadata } from 'next';
 import { MatchAnalytics } from '@/features/job-matches/components/MatchAnalytics';
 import { Target } from 'lucide-react';
+import { getTranslations } from 'next-intl/server';
 
 export const metadata: Metadata = {
     title: "Job Matches | HICv",
 };
 
 export default async function JobMatchesPage() {
+    const t = await getTranslations("dashboard.jobMatches");
     return (
         <div className="flex flex-col gap-8 pb-10">
             <div className="flex flex-col gap-2">
@@ -14,10 +16,10 @@ export default async function JobMatchesPage() {
                     <div className="p-2 bg-primary/10 rounded-lg">
                         <Target className="w-6 h-6 text-primary" />
                     </div>
-                    Job Match History
+                    {t("title")}
                 </h1>
                 <p className="text-muted-foreground text-lg">
-                    Review your past job matches and analyze your skill gaps.
+                    {t("subtitle")}
                 </p>
             </div>
             

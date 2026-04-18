@@ -43,5 +43,15 @@
     "startFrom": "Starting from",
     "upgradeNow": "Try Now",
     "learnMore": "Learn More"
+  },
+  "jobMatches": {
+    "title": "Job Match History",
+    "subtitle": "Review your past job matches and analyze your skill gaps.",
+    "noMatchesTitle": "No Job Matches Yet",
+    "noMatchesDesc": "Start optimizing your resume for specific job descriptions using our Job Match feature inside the Resume Builder.",
+    "match": "Match",
+    "jobTarget": "Job Target",
+    "skills": "Skills",
+    "keywords": "Keywords"
   }
 }

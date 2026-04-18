@@ -13,6 +13,9 @@ import {
   PanelLeftClose,
   PanelLeft,
   Target,
+  Gift,
+  CreditCard,
+  Puzzle,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { usePermissions } from "@/hooks/use-permissions";
@@ -190,10 +193,10 @@ export function AppSidebar({
               <Link
                 href="/app/job-matches"
                 className={getLinkClasses("/app/job-matches")}
-                title={shouldShowCollapsed ? "Job Matches" : undefined}
+                title={shouldShowCollapsed ? t("jobMatches") : undefined}
               >
                 <Target className="h-4 w-4 shrink-0" />
-                {!shouldShowCollapsed && "Job Matches"}
+                {!shouldShowCollapsed && t("jobMatches")}
               </Link>
             )}
 
@@ -242,6 +245,41 @@ export function AppSidebar({
               <HelpCircle className="h-4 w-4 shrink-0" />
               {!shouldShowCollapsed && t("helpCenter")}
             </Link>
+
+            {/* Utility Section: Referrals, Plans, Extensions */}
+            <div className="pt-4 mt-4 border-t space-y-1">
+              {/* Referrals - authenticated only */}
+              {isAuthenticated && (
+                <Link
+                  href="/app/referrals"
+                  className={getLinkClasses("/app/referrals")}
+                  title={shouldShowCollapsed ? t("referrals") : undefined}
+                >
+                  <Gift className="h-4 w-4 shrink-0" />
+                  {!shouldShowCollapsed && t("referrals")}
+                </Link>
+              )}
+
+              {/* Plans - visible for all */}
+              <Link
+                href="/plans"
+                className={getLinkClasses("/plans")}
+                title={shouldShowCollapsed ? t("plans") : undefined}
+              >
+                <CreditCard className="h-4 w-4 shrink-0" />
+                {!shouldShowCollapsed && t("plans")}
+              </Link>
+
+              {/* Extensions - visible for all */}
+              <Link
+                href="/extension"
+                className={getLinkClasses("/extension")}
+                title={shouldShowCollapsed ? t("extensions") : undefined}
+              >
+                <Puzzle className="h-4 w-4 shrink-0" />
+                {!shouldShowCollapsed && t("extensions")}
+              </Link>
+            </div>
 
             {isAdmin && (
               <Link

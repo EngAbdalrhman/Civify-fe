@@ -30,5 +30,8 @@
     "switch": "Switch Language"
   },
   "signIn": "Sign In",
-  "startForFree": "Start for Free"
+  "startForFree": "Start for Free",
+  "referrals": "Referrals",
+  "extensions": "Extensions",
+  "jobMatches": "Job Matches"
 }
