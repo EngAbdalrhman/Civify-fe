@@ -193,10 +193,10 @@ export function AppSidebar({
               <Link
                 href="/app/job-matches"
                 className={getLinkClasses("/app/job-matches")}
-                title={shouldShowCollapsed ? "Job Matches" : undefined}
+                title={shouldShowCollapsed ? t("jobMatches") : undefined}
               >
                 <Target className="h-4 w-4 shrink-0" />
-                {!shouldShowCollapsed && "Job Matches"}
+                {!shouldShowCollapsed && t("jobMatches")}
               </Link>
             )}
 

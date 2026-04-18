@@ -38,9 +38,9 @@ export function MatchAnalytics() {
                 <div className="rounded-full bg-primary/10 p-6 mb-4">
                     <Target className="h-12 w-12 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">No Job Matches Yet</h3>
+                <h3 className="text-xl font-semibold mb-2">{t("jobMatches.noMatchesTitle")}</h3>
                 <p className="text-muted-foreground w-[90%] md:w-1/2">
-                    Start optimizing your resume for specific job descriptions using our Job Match feature inside the Resume Builder.
+                    {t("jobMatches.noMatchesDesc")}
                 </p>
             </div>
         );
@@ -61,12 +61,12 @@ export function MatchAnalytics() {
                                 record.overallScore >= 50 ? 'bg-orange-500/10 text-orange-600' :
                                 'bg-destructive/10 text-destructive'
                             }`}>
-                                {record.overallScore}% Match
+                                {record.overallScore}% {t("jobMatches.match")}
                             </span>
                         </div>
                         <h4 className="font-semibold text-lg line-clamp-1 mb-1">
                             <Briefcase className="h-4 w-4 inline mr-2 text-muted-foreground" />
-                            {record.jobTitle || "Job Target"}
+                            {record.jobTitle || t("jobMatches.jobTarget")}
                         </h4>
                         {record.companyName && record.companyName !== 'null' && (
                             <p className="text-sm text-muted-foreground flex items-center gap-2 mb-4">
@@ -75,8 +75,8 @@ export function MatchAnalytics() {
                             </p>
                         )}
                         <div className="mt-4 pt-4 border-t flex justify-between items-center text-sm">
-                            <span className="text-muted-foreground">Skills: {record.skillsScore}%</span>
-                            <span className="text-muted-foreground">Keywords: {record.keywordScore}%</span>
+                            <span className="text-muted-foreground">{t("jobMatches.skills")}: {record.skillsScore}%</span>
+                            <span className="text-muted-foreground">{t("jobMatches.keywords")}: {record.keywordScore}%</span>
                         </div>
                     </div>
                 ))}
