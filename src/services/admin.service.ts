@@ -331,6 +331,27 @@ export interface BillingAuditLog {
 }
 
 // ============================================
+// Billing Transaction Types
+// ============================================
+
+export type TransactionType = "SUBSCRIPTION" | "TOKEN_TOPUP" | "RENEWAL" | "REFUND";
+export type PaymentStatus = "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
+
+export interface BillingTransaction {
+  id: string;
+  userId: number;
+  orderId: string;
+  type: TransactionType;
+  status: PaymentStatus;
+  amount: number;
+  currency: string;
+  gateway: string;
+  subscriptionId?: number;
+  completedAt?: string;
+  createdAt: string;
+}
+
+// ============================================
 // Token Usage Log Types
 // ============================================
 
@@ -738,6 +759,20 @@ class AdminService {
   ): Promise<PagedResponse<BillingAuditLog>> {
     const response = await apiClient.post<PagedResponse<BillingAuditLog>>(
       "/v1/admin/audit/billing/filter",
+      data,
+    );
+    return response.data;
+  }
+
+  // ==========================================
+  // Billing Transactions
+  // ==========================================
+
+  async filterBillingTransactions(
+    data: InputDataModel,
+  ): Promise<PagedResponse<BillingTransaction>> {
+    const response = await apiClient.post<PagedResponse<BillingTransaction>>(
+      "/v1/admin/audit/transactions/filter",
       data,
     );
     return response.data;
