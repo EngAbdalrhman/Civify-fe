@@ -88,6 +88,7 @@ export interface AdminPlan {
   description?: string;
   details?: string;
   cvLimit?: number;
+  jobMatchLimit?: number;
   tokenLimit?: number;
   watermark: boolean;
   monthlyPrice: string;
@@ -124,6 +125,7 @@ export interface CreatePlanRequest {
   name: string;
   description?: string;
   cvLimit?: number;
+  jobMatchLimit?: number;
   tokenLimit?: number;
   watermark?: boolean;
   monthlyPrice: number;

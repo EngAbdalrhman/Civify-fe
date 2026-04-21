@@ -83,6 +83,8 @@
       "annualPrice": "Annual Price ($)",
       "cvLimit": "CV Limit (Empty = Unlimited)",
       "cvLimitPlaceholder": "Leave empty for unlimited",
+      "jobMatchLimit": "Job Match Limit (Empty = Unlimited)",
+      "jobMatchLimitPlaceholder": "Leave empty for unlimited",
       "tokenLimit": "Token Limit (Empty = Unlimited)",
       "tokenLimitPlaceholder": "Monthly AI token allowance",
       "linkedGroup": "Linked Group",

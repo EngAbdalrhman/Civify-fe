@@ -22,7 +22,7 @@ export default async function JobMatchesPage() {
                     {t("subtitle")}
                 </p>
             </div>
-            
+
             <MatchAnalytics />
         </div>
     );

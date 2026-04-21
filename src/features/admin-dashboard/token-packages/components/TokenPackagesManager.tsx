@@ -177,6 +177,22 @@ export function TokenPackagesManager() {
     }
   };
 
+  const handleActivateTokenPackage = async (pkg: TokenPackage) => {
+    if (!confirm(`Are you sure you want to activate "${pkg.name}"?`)) return;
+
+    try {
+      await tokenPackageAdminApi.update(pkg.id, { active: true });
+      toast.success("Token package activated");
+      fetchTokenPackages();
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Failed to activate token package";
+      toast.error(message);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -258,14 +274,25 @@ export function TokenPackagesManager() {
                         <Edit2 className="h-3 w-3 ltr:mr-1 rtl:ml-1" />
                         {tc("edit")}
                       </Button>
-                      {pkg.active && (
+                      {pkg.active ? (
                         <Button
                           variant="ghost"
                           size="sm"
                           className="text-destructive hover:text-destructive"
                           onClick={() => handleDeactivateTokenPackage(pkg)}
+                          title={tc("deactivate")}
                         >
                           <Trash2 className="h-3 w-3" />
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                          onClick={() => handleActivateTokenPackage(pkg)}
+                          title={tc("activate")}
+                        >
+                          <Plus className="h-3 w-3" />
                         </Button>
                       )}
                     </div>

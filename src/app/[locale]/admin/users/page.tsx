@@ -456,7 +456,11 @@ export default function UsersPage() {
             users.map((user) => {
               const canModify = hasPermission(ADMIN_ACTION_PERMISSIONS.USER_EDIT);
               return (
-                <div key={user.id} className="rounded-xl border bg-card p-3 shadow-sm">
+                <div 
+                  key={user.id} 
+                  className="rounded-xl border bg-card p-3 shadow-sm cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => handleViewUser(user)}
+                >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -488,7 +492,10 @@ export default function UsersPage() {
                       variant="ghost"
                       size="icon"
                       className={actionButtonStyles}
-                      onClick={() => handleViewUser(user)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleViewUser(user);
+                      }}
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
@@ -499,7 +506,10 @@ export default function UsersPage() {
                         className={
                           user.status === "ACTIVE" ? banButtonStyles : unbanButtonStyles
                         }
-                        onClick={() => handleToggleBan(user)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleBan(user);
+                        }}
                       >
                         <Ban className="h-4 w-4" />
                       </Button>

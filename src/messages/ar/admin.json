@@ -83,6 +83,8 @@
       "annualPrice": "السعر السنوي ($)",
       "cvLimit": "حد السير الذاتية (فارغ = غير محدود)",
       "cvLimitPlaceholder": "اتركه فارغاً للسماح بعدد غير محدود",
+      "jobMatchLimit": "حد مطابقة الوظائف (فارغ = غير محدود)",
+      "jobMatchLimitPlaceholder": "اتركه فارغاً للسماح بعدد غير محدود",
       "tokenLimit": "حد الرموز (فارغ = غير محدود)",
       "tokenLimitPlaceholder": "حصة رموز الذكاء الاصطناعي الشهرية",
       "linkedGroup": "المجموعة المرتبطة",
