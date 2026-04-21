@@ -79,6 +79,7 @@
       "namePlaceholder": "مثال: الخطة الاحترافية",
       "description": "الوصف",
       "descriptionPlaceholder": "وصف مختصر للخطة",
+      "currency": "العملة",
       "monthlyPrice": "السعر الشهري ($)",
       "annualPrice": "السعر السنوي ($)",
       "cvLimit": "حد السير الذاتية (فارغ = غير محدود)",

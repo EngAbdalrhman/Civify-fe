@@ -79,6 +79,7 @@
       "namePlaceholder": "e.g. Pro Plan",
       "description": "Description",
       "descriptionPlaceholder": "Short description of the plan",
+      "currency": "Currency",
       "monthlyPrice": "Monthly Price ($)",
       "annualPrice": "Annual Price ($)",
       "cvLimit": "CV Limit (Empty = Unlimited)",
