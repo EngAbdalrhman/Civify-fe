@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { DatePicker } from '@/components/ui/date-picker';
 import {
   Select,
   SelectContent,
@@ -376,11 +377,13 @@ export default function PromosPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="expiresAt">{t('expires')}</Label>
-                <Input
-                  id="expiresAt"
-                  type="date"
-                  value={formData.expiresAt}
-                  onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
+                <DatePicker
+                  date={formData.expiresAt ? new Date(formData.expiresAt) : undefined}
+                  setDate={(date) => setFormData({ 
+                    ...formData, 
+                    expiresAt: date ? date.toISOString().split('T')[0] : '' 
+                  })}
+                  placeholder="Select expiry date"
                 />
               </div>
             </div>

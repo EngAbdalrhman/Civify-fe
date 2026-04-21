@@ -6,7 +6,6 @@ import {
   Activity,
   Shield,
   Bell,
-  TrendingUp,
   FileSearch,
   Clock,
   Receipt,
