@@ -150,47 +150,6 @@ function wrapInHtmlDocument(
     a:hover {
       text-decoration: underline;
     }
-
-    /* ── Print / PDF page-break rules ── */
-    @page {
-      margin: 0;
-    }
-
-    section {
-      page-break-inside: avoid;
-      break-inside: avoid;
-    }
-
-    /* If a section is too tall to fit on one page, allow breaking inside
-       but still keep headings glued to their content. */
-    @supports (break-inside: auto) {
-      section {
-        break-inside: auto;
-      }
-    }
-
-    h1, h2, h3, h4 {
-      page-break-after: avoid;
-      break-after: avoid;
-    }
-
-    /* Keep individual resume items (experience, project, etc.) together */
-    section > div > div {
-      page-break-inside: avoid;
-      break-inside: avoid;
-    }
-
-    /* Prevent lone lines at top/bottom of pages */
-    p, li, div {
-      orphans: 3;
-      widows: 3;
-    }
-
-    /* Avoid a heading appearing alone at the bottom of a page */
-    h2 + *, h3 + * {
-      page-break-before: avoid;
-      break-before: avoid;
-    }
   </style>
 </head>
 <body>
@@ -427,7 +386,7 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
                   .filter((i) => i.visible !== false)
                   .map(
                     (item) => `
-                  <div style="page-break-inside: avoid;">
+                  <div>
                     <div style="display: flex; justify-content: space-between; font-weight: 700; color: #1f2937; font-size: 14px;">
                       <span>${escapeHtml(item.title)}</span>
                       <span>${escapeHtml(item.date || "")}</span>
@@ -1147,7 +1106,7 @@ function renderExecutiveTemplate(data: ResumeData, color: string): string {
                   ${items
                     .map(
                       (item) => `
-                    <div style="page-break-inside: avoid;">
+                    <div>
                       <div style="display:flex;justify-content:space-between;align-items:baseline;">
                         <div>
                           <span style="font-size:15px;font-weight:600;">${escapeHtml(item.title)}</span>
@@ -1320,7 +1279,7 @@ function renderMinimalTemplate(data: ResumeData, color: string): string {
                   ${items
                     .map(
                       (item) => `
-                    <div style="page-break-inside: avoid;">
+                    <div>
                       <div style="display:flex;justify-content:space-between;align-items:baseline;">
                         <span style="font-size:14px;font-weight:500;">${escapeHtml(item.title)}${item.subtitle ? `<span style="font-weight:400;color:#6b7280;"> — ${escapeHtml(item.subtitle)}</span>` : ""}</span>
                         ${item.date || item.location ? `<span style="font-size:11px;color:#9ca3af;">${escapeHtml([item.date, item.location].filter(Boolean).join(" · "))}</span>` : ""}
