@@ -35,3 +35,10 @@ export const useTokenUsageLogs = (data: InputDataModel) => {
     queryFn: () => adminService.filterTokenUsageLogs(data),
   });
 };
+
+export const useBillingTransactions = (data: InputDataModel) => {
+  return useQuery({
+    queryKey: ["admin", "audit", "billing-transactions", data],
+    queryFn: () => adminService.filterBillingTransactions(data),
+  });
+};

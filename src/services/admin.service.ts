@@ -88,6 +88,7 @@ export interface AdminPlan {
   description?: string;
   details?: string;
   cvLimit?: number;
+  jobMatchLimit?: number;
   tokenLimit?: number;
   watermark: boolean;
   monthlyPrice: string;
@@ -124,6 +125,7 @@ export interface CreatePlanRequest {
   name: string;
   description?: string;
   cvLimit?: number;
+  jobMatchLimit?: number;
   tokenLimit?: number;
   watermark?: boolean;
   monthlyPrice: number;
@@ -325,6 +327,27 @@ export interface BillingAuditLog {
   paymentMethod?: string;
   result?: string;
   ipAddress?: string;
+  createdAt: string;
+}
+
+// ============================================
+// Billing Transaction Types
+// ============================================
+
+export type TransactionType = "SUBSCRIPTION" | "TOKEN_TOPUP" | "RENEWAL" | "REFUND";
+export type PaymentStatus = "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
+
+export interface BillingTransaction {
+  id: string;
+  userId: number;
+  orderId: string;
+  type: TransactionType;
+  status: PaymentStatus;
+  amount: number;
+  currency: string;
+  gateway: string;
+  subscriptionId?: number;
+  completedAt?: string;
   createdAt: string;
 }
 
@@ -736,6 +759,20 @@ class AdminService {
   ): Promise<PagedResponse<BillingAuditLog>> {
     const response = await apiClient.post<PagedResponse<BillingAuditLog>>(
       "/v1/admin/audit/billing/filter",
+      data,
+    );
+    return response.data;
+  }
+
+  // ==========================================
+  // Billing Transactions
+  // ==========================================
+
+  async filterBillingTransactions(
+    data: InputDataModel,
+  ): Promise<PagedResponse<BillingTransaction>> {
+    const response = await apiClient.post<PagedResponse<BillingTransaction>>(
+      "/v1/admin/audit/transactions/filter",
       data,
     );
     return response.data;

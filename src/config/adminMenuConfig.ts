@@ -6,9 +6,9 @@ import {
   Activity,
   Shield,
   Bell,
-  TrendingUp,
   FileSearch,
   Clock,
+  Receipt,
   LucideIcon 
 } from 'lucide-react';
 
@@ -45,9 +45,9 @@ export const ADMIN_MENU_ITEMS: AdminMenuItem[] = [
     permission: 'PROMO.VIEW' 
   },
   { 
-    path: '/admin/subscriptions', 
-    icon: TrendingUp, 
-    labelKey: 'subscriptions', 
+    path: '/admin/transactions', 
+    icon: Receipt, 
+    labelKey: 'transactions', 
     permission: 'SUBSCRIPTION.VIEW' 
   },
   { 

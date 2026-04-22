@@ -77,6 +77,7 @@ export function PlansManager() {
     annualPrice: "",
     currency: "EGP",
     cvLimit: "",
+    jobMatchLimit: "",
     tokenLimit: "",
     watermark: true,
     linkedGroupId: "",
@@ -119,6 +120,7 @@ export function PlansManager() {
       annualPrice: "",
       currency: "EGP",
       cvLimit: "",
+      jobMatchLimit: "",
       tokenLimit: "",
       watermark: true,
       linkedGroupId: "",
@@ -141,6 +143,7 @@ export function PlansManager() {
       annualPrice: plan.annualPrice,
       currency: plan.currency || "EGP",
       cvLimit: plan.cvLimit?.toString() || "",
+      jobMatchLimit: plan.jobMatchLimit?.toString() || "",
       tokenLimit: plan.tokenLimit?.toString() || "",
       watermark: plan.watermark ?? true,
       linkedGroupId: plan.linkedGroupId?.toString() || "",
@@ -165,6 +168,9 @@ export function PlansManager() {
         currency: planFormData.currency,
         cvLimit: planFormData.cvLimit
           ? parseInt(planFormData.cvLimit)
+          : undefined,
+        jobMatchLimit: planFormData.jobMatchLimit
+          ? parseInt(planFormData.jobMatchLimit)
           : undefined,
         tokenLimit: planFormData.tokenLimit
           ? parseInt(planFormData.tokenLimit)
@@ -302,6 +308,12 @@ export function PlansManager() {
                     {plan.cvLimit ?? "∞"}
                   </span>{" "}
                   CVs
+                </div>
+                <div>
+                  <span className="font-medium text-foreground">
+                    {plan.jobMatchLimit ?? "∞"}
+                  </span>{" "}
+                  Job Matches
                 </div>
                 <div>
                   <span className="font-medium text-foreground">
@@ -445,7 +457,7 @@ export function PlansManager() {
             </div>
 
             {/* Limits */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="cvLimit">{t("form.cvLimit")}</Label>
                 <Input
@@ -459,6 +471,21 @@ export function PlansManager() {
                     })
                   }
                   placeholder={t("form.cvLimitPlaceholder")}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="jobMatchLimit">{t("form.jobMatchLimit")}</Label>
+                <Input
+                  id="jobMatchLimit"
+                  type="number"
+                  value={planFormData.jobMatchLimit}
+                  onChange={(e) =>
+                    setPlanFormData({
+                      ...planFormData,
+                      jobMatchLimit: e.target.value,
+                    })
+                  }
+                  placeholder={t("form.jobMatchLimitPlaceholder")}
                 />
               </div>
               <div className="space-y-2">
