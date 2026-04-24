@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { MonthPicker } from '@/features/resume-builder/components/editor/MonthPicker';
+import { MonthPicker } from '@/components/ui/MonthPicker';
 import { Trash2, Plus, Eye, EyeOff } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 
