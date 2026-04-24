@@ -15,6 +15,7 @@ import help from "./help.json";
 import landing from "./landing.json";
 import metadata from "./metadata.json";
 import nav from "./nav.json";
+import notFound from "./notFound.json";
 import onboarding from "./onboarding.json";
 import payment from "./payment.json";
 import plans from "./plans.json";
@@ -47,6 +48,7 @@ export default {
   landing,
   metadata,
   nav,
+  notFound,
   onboarding,
   payment,
   plans,

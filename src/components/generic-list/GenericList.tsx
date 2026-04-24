@@ -105,6 +105,163 @@ export function buildInputDataModel(
   return inputData;
 }
 
+function MobileCard<
+  T extends { id?: string | number } = Record<string, unknown> & {
+    id?: string | number;
+  },
+>({
+  item,
+  index,
+  columns,
+  mobilePrimaryColumns,
+  actions,
+  formatValue,
+}: {
+  item: T;
+  index: number;
+  columns: ColumnDef<T>[];
+  mobilePrimaryColumns: string[];
+  actions: ActionDef<T>[];
+  formatValue: (item: T, column: ColumnDef<T>) => React.ReactNode;
+}) {
+  const [expanded, setExpanded] = React.useState(false);
+  
+  const resolvedMobileColumns =
+    mobilePrimaryColumns.length > 0
+      ? columns.filter((column) => mobilePrimaryColumns.includes(column.key))
+      : columns.slice(0, 4);
+
+  const hiddenColumns = columns.filter((c) => !resolvedMobileColumns.includes(c));
+  const directActions = actions.filter((a) => !a.showInMenu);
+  const menuActions = actions.filter((a) => a.showInMenu);
+
+  return (
+    <div
+      className="rounded-xl border bg-card p-3 shadow-sm flex flex-col gap-3 cursor-pointer transition-colors hover:bg-muted/30"
+      onClick={() => hiddenColumns.length > 0 && setExpanded(!expanded)}
+    >
+      <div className="space-y-2">
+        {resolvedMobileColumns.map((column) => (
+          <div
+            key={column.key}
+            className="flex items-start justify-between gap-3"
+          >
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground mt-0.5">
+              {column.label}
+            </span>
+            <span className="text-sm text-right break-all">
+              {formatValue(item, column)}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {expanded && hiddenColumns.length > 0 && (
+        <div className="space-y-2 pt-2 border-t mt-1 animate-in fade-in slide-in-from-top-2 duration-200">
+          {hiddenColumns.map((column) => (
+            <div
+              key={column.key}
+              className="flex items-start justify-between gap-3"
+            >
+              <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground mt-0.5">
+                {column.label}
+              </span>
+              <span className="text-sm text-right break-all">
+                {formatValue(item, column)}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {(hiddenColumns.length > 0 || actions.length > 0) && (
+        <div className="flex items-center justify-between pt-1">
+          {hiddenColumns.length > 0 ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs text-muted-foreground h-7 px-2 -ml-2"
+              onClick={(e) => {
+                e.stopPropagation();
+                setExpanded(!expanded);
+              }}
+            >
+              {expanded ? "Hide Details" : "View Details"}
+            </Button>
+          ) : (
+            <div />
+          )}
+
+          {actions.length > 0 && (
+            <div
+              className="flex items-center justify-end gap-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {directActions
+                .filter((action) => !action.condition || action.condition(item))
+                .map((action, i) => (
+                  <Button
+                    key={i}
+                    variant={action.variant || "ghost"}
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                    onClick={() => action.onClick(item)}
+                    title={action.label}
+                  >
+                    {typeof action.icon === "function"
+                      ? action.icon(item)
+                      : (action.icon as React.ReactNode)}
+                  </Button>
+                ))}
+              {menuActions.some(
+                (action) => !action.condition || action.condition(item),
+              ) && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                    >
+                      <MoreVertical className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-40">
+                    {menuActions
+                      .filter(
+                        (action) => !action.condition || action.condition(item),
+                      )
+                      .map((action, i) => (
+                        <DropdownMenuItem
+                          key={i}
+                          onClick={() => action.onClick(item)}
+                          className={cn(
+                            "cursor-pointer",
+                            action.variant === "destructive" &&
+                              "text-error focus:text-error focus:bg-error/10",
+                          )}
+                        >
+                          {action.icon && (
+                            <span className="mr-2 w-4 h-4 flex items-center justify-center">
+                              {typeof action.icon === "function"
+                                ? action.icon(item)
+                                : (action.icon as React.ReactNode)}
+                            </span>
+                          )}
+                          {action.label}
+                        </DropdownMenuItem>
+                      ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function GenericList<
   T extends { id?: string | number } = Record<string, unknown> & {
     id?: string | number;
@@ -319,90 +476,15 @@ export function GenericList<
           </div>
         ) : (
           data.map((item, index) => (
-            <div
+            <MobileCard
               key={item.id || index}
-              className="rounded-xl border bg-card p-3 shadow-sm"
-            >
-              <div className="space-y-2">
-                {resolvedMobileColumns.map((column) => (
-                  <div
-                    key={column.key}
-                    className="flex items-start justify-between gap-3"
-                  >
-                    <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      {column.label}
-                    </span>
-                    <span className="text-sm text-right break-all">
-                      {formatValue(item, column)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              {actions.length > 0 && (
-                <div className="mt-3 flex items-center justify-end gap-1">
-                  {directActions
-                    .filter(
-                      (action) => !action.condition || action.condition(item),
-                    )
-                    .map((action, i) => (
-                      <Button
-                        key={i}
-                        variant={action.variant || "ghost"}
-                        size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                        onClick={() => action.onClick(item)}
-                        title={action.label}
-                      >
-                        {typeof action.icon === "function"
-                          ? action.icon(item)
-                          : (action.icon as React.ReactNode)}
-                      </Button>
-                    ))}
-                  {menuActions.some(
-                    (action) => !action.condition || action.condition(item),
-                  ) && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                        >
-                          <MoreVertical className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-40">
-                        {menuActions
-                          .filter(
-                            (action) => !action.condition || action.condition(item),
-                          )
-                          .map((action, i) => (
-                            <DropdownMenuItem
-                              key={i}
-                              onClick={() => action.onClick(item)}
-                              className={cn(
-                                "cursor-pointer",
-                                action.variant === "destructive" &&
-                                  "text-error focus:text-error focus:bg-error/10",
-                              )}
-                            >
-                              {action.icon && (
-                                <span className="mr-2 w-4 h-4 flex items-center justify-center">
-                                  {typeof action.icon === "function"
-                                    ? action.icon(item)
-                                    : (action.icon as React.ReactNode)}
-                                </span>
-                              )}
-                              {action.label}
-                            </DropdownMenuItem>
-                          ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                </div>
-              )}
-            </div>
+              item={item}
+              index={index}
+              columns={columns}
+              mobilePrimaryColumns={mobilePrimaryColumns}
+              actions={actions}
+              formatValue={formatValue}
+            />
           ))
         )}
       </div>

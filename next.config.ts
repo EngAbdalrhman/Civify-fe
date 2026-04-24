@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   output: "standalone",
   serverExternalPackages: ["puppeteer-core"],
+  experimental: {
+    globalNotFound: true,
+  },
 
   // 👇 MOVED TO ROOT (Stable in Next.js 16)
   turbopack: {
