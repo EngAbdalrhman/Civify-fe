@@ -8,10 +8,12 @@ import { useTranslations } from "next-intl";
 import { useResumeBuilder } from "../hooks/useResumeBuilder";
 import { useFullscreen } from "../hooks/useFullscreen";
 import { useFileUpload } from "../hooks/useFileUpload";
+import { useResumeTranslation } from "../hooks/useResumeTranslation";
 
 import { MobileViewToggle } from "./MobileViewToggle";
 import { EditorSidebar } from "./EditorSidebar";
 import { PreviewPanel } from "./PreviewPanel";
+import { TranslateDialog } from "./TranslateDialog";
 import {
   useTourAutoStart,
   getResumeBuilderTourSteps,
@@ -58,6 +60,11 @@ export function ResumeBuilder({
     onSuccess: builder.handleResumeDataUpdate,
   });
 
+  const translation = useResumeTranslation(
+    builder.resumeData,
+    builder.handleTranslateComplete
+  );
+
   useTourAutoStart("resume-builder", getResumeBuilderTourSteps(tTour));
 
   const handleFullScreenToggle = async () => {
@@ -102,6 +109,8 @@ export function ResumeBuilder({
           onCalculateScore={builder.handleCalculateScore}
           isGuest={builder.isGuest}
           onAuthGate={builder.handleAuthGatedAction}
+          isTranslating={translation.isTranslating}
+          onTranslateClick={() => translation.setShowTranslateDialog(true)}
         />
 
         {/* Right Area - Live Preview */}
@@ -165,6 +174,17 @@ export function ResumeBuilder({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Translate Dialog */}
+      <TranslateDialog
+        open={translation.showTranslateDialog}
+        onOpenChange={translation.setShowTranslateDialog}
+        currentLanguage={builder.resumeData.metadata?.language || 'en'}
+        onTranslate={translation.handleTranslate}
+        isTranslating={translation.isTranslating}
+        saveMode={translation.translateSaveMode}
+        onSaveModeChange={translation.handleSaveModeChange}
+      />
     </>
   );
 }

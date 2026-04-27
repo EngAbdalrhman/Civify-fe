@@ -42,5 +42,10 @@ export const ResumeService = {
   calculateScore: async (resumeData: ResumeData): Promise<AtsScore> => {
     const response = await apiClient.post<CommonResponse<AtsScore>>('/v1/cvs/score', { resumeData });
     return response.data.data;
+  },
+
+  translate: async (resumeData: ResumeData, targetLanguage: string): Promise<import('@/features/upload-cv/types').CvTranslateResponse> => {
+    const response = await apiClient.post<CommonResponse<import('@/features/upload-cv/types').CvTranslateResponse>>('/v1/cvs/translate', { resumeData, targetLanguage });
+    return response.data.data;
   }
 };

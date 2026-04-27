@@ -138,6 +138,14 @@ export interface CvTailorRequest {
   includeRoadmap?: boolean;
 }
 
+export interface CvTranslateResponse {
+  translatedCv: ResumeData;
+  sourceLanguage: string;
+  targetLanguage: string;
+  tokensUsed: number;
+  processingTimeMs: number;
+}
+
 // Empty resume template for manual entry
 export const emptyResumeData: ResumeData = {
   personalInfo: {
