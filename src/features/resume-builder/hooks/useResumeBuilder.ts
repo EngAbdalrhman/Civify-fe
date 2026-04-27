@@ -56,6 +56,7 @@ interface UseResumeBuilderReturn {
   handleCalculateScore: () => Promise<void>;
   handleResumeDataUpdate: (data: ResumeData) => void;
   handleAuthGatedAction: () => void;
+  handleTranslateComplete: (translatedData: ResumeData, saveMode: 'new' | 'replace', targetLang: string) => Promise<void>;
 }
 
 export function useResumeBuilder({
