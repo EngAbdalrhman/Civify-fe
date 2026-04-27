@@ -5,7 +5,7 @@ import type { ColumnDef, FilterType } from './types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Calendar } from '@/components/ui/calendar';
+import { MonthPicker } from '@/components/ui/MonthPicker';
 import {
   Select,
   SelectContent,
@@ -14,7 +14,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Filter, X } from 'lucide-react';
-import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 interface ColumnFilterProps {
@@ -31,6 +30,11 @@ interface ColumnFilterProps {
 export function ColumnFilter({ column, value, onChange }: ColumnFilterProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [localValue, setLocalValue] = React.useState<string | number | boolean | null | undefined>(value);
+
+  const getMonthValue = (dateValue: string | number | boolean | null | undefined) => {
+    if (typeof dateValue !== 'string') return '';
+    return /^\d{4}-\d{2}/.test(dateValue) ? dateValue.slice(0, 7) : '';
+  };
 
   // Sync local value when prop changes or popover opens
   React.useEffect(() => {
@@ -134,13 +138,12 @@ export function ColumnFilter({ column, value, onChange }: ColumnFilterProps) {
               </Select>
             ) : column.filterType === 'date' ? (
               <div className="flex flex-col gap-2">
-                <Calendar
-                  mode="single"
-                  selected={localValue ? new Date(String(localValue)) : undefined}
-                  onSelect={(date) =>
-                    setLocalValue(date ? format(date, 'yyyy-MM-dd') : undefined)
+                <MonthPicker
+                  value={getMonthValue(localValue)}
+                  onChange={(monthValue) =>
+                    setLocalValue(monthValue ? `${monthValue}-01` : undefined)
                   }
-                  className="rounded-md border-0"
+                  placeholder={`Filter ${column.label}...`}
                 />
               </div>
             ) : column.filterType === 'number' ? (

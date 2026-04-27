@@ -115,5 +115,36 @@
     "afterScore": "After",
     "changes": "What Changed",
     "warnings": "Warnings"
+  },
+  "translate": {
+    "title": "Translate Resume",
+    "subtitle": "Choose a target language to translate your resume content.",
+    "currentLanguage": "Current language",
+    "translateTo": "Translate to {language}",
+    "translating": "Translating to {language}...",
+    "success": "Resume translated to {language} successfully!",
+    "error": "Failed to translate resume. Please try again.",
+    "savePreference": "After translation:",
+    "saveAsNew": "Save as new resume",
+    "saveAsNewHint": "Creates \"{title} - {code}\"",
+    "replaceExisting": "Replace current resume",
+    "replaceHint": "Overwrites the current resume",
+    "confirm": "Translate",
+    "languages": {
+      "en": "English",
+      "ar": "Arabic",
+      "fr": "French",
+      "de": "German",
+      "es": "Spanish",
+      "pt": "Portuguese",
+      "zh": "Chinese",
+      "ja": "Japanese",
+      "ko": "Korean",
+      "tr": "Turkish",
+      "hi": "Hindi",
+      "it": "Italian",
+      "nl": "Dutch",
+      "ru": "Russian"
+    }
   }
 }

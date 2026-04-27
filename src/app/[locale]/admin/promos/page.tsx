@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { DatePicker } from '@/components/ui/date-picker';
+import { MonthPicker } from '@/components/ui/MonthPicker';
 import {
   Select,
   SelectContent,
@@ -68,6 +68,9 @@ export default function PromosPage() {
     expiresAt: '',
     applicabilityType: 'ALL' as PromoApplicabilityType,
   });
+
+  const getMonthValue = (dateValue: string) =>
+    /^\d{4}-\d{2}/.test(dateValue) ? dateValue.slice(0, 7) : '';
 
   // Column definitions
   const columns: ColumnDef<PromoCode>[] = useMemo(() => [
@@ -377,13 +380,15 @@ export default function PromosPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="expiresAt">{t('expires')}</Label>
-                <DatePicker
-                  date={formData.expiresAt ? new Date(formData.expiresAt) : undefined}
-                  setDate={(date) => setFormData({ 
-                    ...formData, 
-                    expiresAt: date ? date.toISOString().split('T')[0] : '' 
-                  })}
-                  placeholder="Select expiry date"
+                <MonthPicker
+                  value={getMonthValue(formData.expiresAt)}
+                  onChange={(monthValue) =>
+                    setFormData({
+                      ...formData,
+                      expiresAt: monthValue ? `${monthValue}-01` : '',
+                    })
+                  }
+                  placeholder="Select expiry month"
                 />
               </div>
             </div>

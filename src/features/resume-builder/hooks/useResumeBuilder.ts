@@ -56,6 +56,7 @@ interface UseResumeBuilderReturn {
   handleCalculateScore: () => Promise<void>;
   handleResumeDataUpdate: (data: ResumeData) => void;
   handleAuthGatedAction: () => void;
+  handleTranslateComplete: (translatedData: ResumeData, saveMode: 'new' | 'replace', targetLang: string) => Promise<void>;
 }
 
 export function useResumeBuilder({
@@ -237,6 +238,46 @@ export function useResumeBuilder({
     originalDataRef.current = data;
   };
 
+  const handleTranslateComplete = async (translatedData: ResumeData, saveMode: 'new' | 'replace', targetLang: string) => {
+    const dataToSave = ensureUniqueSectionItemIds(translatedData) as ResumeData;
+    
+    // Auto switch layout direction based on language
+    const rtlLanguages = ['ar', 'he', 'fa', 'ur'];
+    if (!dataToSave.metadata) dataToSave.metadata = {};
+    if (rtlLanguages.includes(targetLang.toLowerCase())) {
+      dataToSave.metadata.layoutDirection = 'rtl';
+    } else {
+      dataToSave.metadata.layoutDirection = 'ltr';
+    }
+
+    setResumeData(dataToSave);
+    originalDataRef.current = dataToSave;
+
+    if (isGuest) return;
+
+    try {
+      setSaveStatus("saving");
+      if (saveMode === 'new') {
+        const newTitle = `${resumeTitle} - ${targetLang}`;
+        setResumeTitle(newTitle);
+        const created = await ResumeService.create(newTitle, dataToSave);
+        setCurrentResumeId(created.id);
+        toast.success(t("toasts.saveSuccess"));
+      } else {
+        if (currentResumeId) {
+          await ResumeService.update(currentResumeId, resumeTitle, dataToSave);
+          toast.success(t("toasts.saveSuccess"));
+        }
+      }
+      setLastSavedAt(new Date().toISOString());
+      setSaveStatus("saved");
+    } catch (error) {
+      console.error('Save translation error:', error);
+      setSaveStatus("error");
+      toast.error(t("toasts.saveError"));
+    }
+  };
+
   return {
     // State
     resumeData,
@@ -277,5 +318,6 @@ export function useResumeBuilder({
     handleCalculateScore,
     handleResumeDataUpdate,
     handleAuthGatedAction,
+    handleTranslateComplete,
   };
 }
