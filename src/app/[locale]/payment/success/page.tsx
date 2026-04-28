@@ -68,7 +68,7 @@ function PaymentSuccessContent() {
 
       if (result.verified) {
         setVerified(true);
-        toast.success(t("verifiedToast"));
+        // toast.success(t("verifiedToast"));
         // Refresh permissions/group to update UI (e.g. remove "Free Plan" badge)
         await refetch();
       } else {

@@ -82,10 +82,25 @@ class TokenPackageService {
   /**
    * Purchase a token package
    */
-  async purchasePackage(packageId: number, promoCode?: string): Promise<TokenPurchaseResult> {
+  async purchasePackage(
+    packageId: number,
+    promoCode?: string,
+    gateway?: string,
+    paymentMethod?: string,
+    phoneNumber?: string,
+  ): Promise<TokenPurchaseResult> {
     const params = new URLSearchParams();
     if (promoCode) {
       params.append('promoCode', promoCode);
+    }
+    if (gateway) {
+      params.append('gateway', gateway);
+    }
+    if (paymentMethod) {
+      params.append('paymentMethod', paymentMethod);
+    }
+    if (phoneNumber) {
+      params.append('phoneNumber', phoneNumber);
     }
     
     const response = await apiClient.post<TokenPurchaseResult>(
