@@ -40,7 +40,7 @@ export function ZohoCTASection() {
               className="group h-14 bg-white px-8 text-base font-semibold text-blue-700 shadow-xl hover:bg-blue-50 active:scale-95 transition-all"
             >
               <a
-                href="https://marketplace.zoho.com/app/preview/recruit/civify"
+                href="https://marketplace.zoho.com/app/preview/recruit/civify-for-zoho-recruit"
                 target="_blank"
                 rel="noopener noreferrer"
               >
