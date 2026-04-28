@@ -10,8 +10,8 @@
     "title": "Your AI Resume Assistant,",
     "titleAccent": "Right Inside LinkedIn.",
     "subtitle": "Automatically extract job descriptions from LinkedIn, Indeed, or Wuzzuf — then tailor your CV, generate cover letters, and mask personal details in one click.",
-    "ctaPrimary": "Generate API Key",
-    "ctaSecondary": "Get the Extension",
+    "ctaPrimary": "Get the Extension",
+    "ctaSecondary": "Generate API Key",
     "trustLine": "Supports English & Arabic",
     "statUsers": "60+",
     "statUsersLabel": "Users",
@@ -220,8 +220,8 @@
   "cta": {
     "title": "Ready to Supercharge Your Job Search?",
     "subtitle": "Generate your API key, install the extension, and start tailoring resumes on LinkedIn in under 2 minutes.",
-    "ctaPrimary": "Generate API Key",
-    "ctaSecondary": "Install Extension",
+    "ctaPrimary": "Get the Extension",
+    "ctaSecondary": "Generate API Key",
     "reassurance": "Free to start · Takes 2 minutes · No credit card required"
   }
 }
