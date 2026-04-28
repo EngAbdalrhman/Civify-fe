@@ -137,7 +137,7 @@ export default function TransactionsPage() {
       page: 0,
       size: 10,
       filters: {} as any,
-      sort: null as any
+      sort: { field: "createdAt", direction: "DESC" } as any
   });
 
   useEffect(() => {
