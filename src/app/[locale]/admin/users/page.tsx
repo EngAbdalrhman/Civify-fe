@@ -180,7 +180,7 @@ export default function UsersPage() {
 
         const [stats, plans] = (await Promise.all([
           shouldFetchStats
-            ? adminService.getStats("MONTHLY").catch(() => null)
+            ? adminService.getStats("OVERALL").catch(() => null)
             : Promise.resolve(null),
           shouldFetchPlans
             ? adminService.getPlanLookup().catch(() => [])
@@ -190,7 +190,7 @@ export default function UsersPage() {
         if (stats) {
           setMetrics({
             totalUsers: stats.totalUsers || 0,
-            activeUsers: stats.subscribedUsers || 0,
+            activeUsers: stats.activeSubscriptions || stats.subscribedUsers || 0,
             newUsers: 0,
           });
         }
