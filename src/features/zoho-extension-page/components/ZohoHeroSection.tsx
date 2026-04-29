@@ -67,7 +67,7 @@ export function ZohoHeroSection() {
               className="group h-14 px-8 text-base font-semibold shadow-md active:scale-95 transition-all"
             >
               <a
-                href="https://marketplace.zoho.com/app/preview/recruit/civify"
+                href="https://marketplace.zoho.com/app/preview/recruit/civify-for-zoho-recruit"
                 target="_blank"
                 rel="noopener noreferrer"
               >
