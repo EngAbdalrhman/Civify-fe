@@ -279,6 +279,7 @@ export function useResumeBuilder({
   const handleResumeDataUpdate = (data: ResumeData) => {
     setResumeData(data);
     originalDataRef.current = data;
+    lastSavedDataRef.current = data;
   };
 
   const handleTranslateComplete = async (translatedData: ResumeData, saveMode: 'new' | 'replace', targetLang: string) => {
@@ -295,6 +296,7 @@ export function useResumeBuilder({
 
     setResumeData(dataToSave);
     originalDataRef.current = dataToSave;
+    lastSavedDataRef.current = dataToSave;
 
     if (isGuest) return;
 
