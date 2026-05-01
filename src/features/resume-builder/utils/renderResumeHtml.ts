@@ -301,35 +301,15 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
     `;
   };
 
-  const isCertOrCourse = (type: string, title: string) => {
-    const lowerTitle = title.toLowerCase();
-    return (
-      type === "certifications" ||
-      lowerTitle.includes("course") ||
-      lowerTitle.includes("certif")
-    );
-  };
-
-  const isSimpleListSection = (type: string, title: string) => {
-    const lowerTitle = title.toLowerCase();
-    return (
-      type === "interests" ||
-      lowerTitle.includes("interest") ||
-      lowerTitle.includes("hobby") ||
-      lowerTitle.includes("hobbies")
-    );
-  };
-
   const shouldUseSimpleColumns = (section: any) => {
-    if (section.type === "skills" || section.type === "languages") return false;
-    if (
-      isCertOrCourse(section.type, section.title) &&
-      coursesStyle === "simple"
-    )
-      return true;
-    if (isSimpleListSection(section.type, section.title)) return true;
-    if (metadata?.sectionColumns?.[section.id]) return true;
-    return false;
+    if (section.visible === false) return false;
+    if (['experience', 'education', 'skills', 'languages', 'projects'].includes(section.type)) {
+      return false;
+    }
+    if (section.type === 'certifications') {
+      return coursesStyle === 'simple';
+    }
+    return true;
   };
 
   const content = `
@@ -565,15 +545,14 @@ function renderModernTemplate(data: ResumeData, color: string): string {
   };
 
   const shouldUseSimpleColumns = (section: any) => {
-    if (section.type === "skills" || section.type === "languages") return false;
-    const lowerTitle = section.title.toLowerCase();
-    const isCourse =
-      section.type === "certifications" ||
-      lowerTitle.includes("course") ||
-      lowerTitle.includes("certif");
-    const isSimpleList =
-      lowerTitle.includes("interest") || lowerTitle.includes("hobb");
-    return isSimpleList || (isCourse && coursesStyle === "simple");
+    if (section.visible === false) return false;
+    if (['experience', 'education', 'skills', 'languages', 'projects'].includes(section.type)) {
+      return false;
+    }
+    if (section.type === 'certifications') {
+      return coursesStyle === 'simple';
+    }
+    return true;
   };
 
   // SVG icons for Modern template
@@ -832,15 +811,14 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
   };
 
   const shouldUseSimpleColumns = (section: any) => {
-    if (section.type === "skills" || section.type === "languages") return false;
-    const lowerTitle = section.title.toLowerCase();
-    const isCourse =
-      section.type === "certifications" ||
-      lowerTitle.includes("course") ||
-      lowerTitle.includes("certif");
-    const isSimpleList =
-      lowerTitle.includes("interest") || lowerTitle.includes("hobb");
-    return isSimpleList || (isCourse && coursesStyle === "simple");
+    if (section.visible === false) return false;
+    if (['experience', 'education', 'skills', 'languages', 'projects'].includes(section.type)) {
+      return false;
+    }
+    if (section.type === 'certifications') {
+      return coursesStyle === 'simple';
+    }
+    return true;
   };
 
   const content = `
@@ -1038,13 +1016,14 @@ function renderExecutiveTemplate(data: ResumeData, color: string): string {
   };
 
   const shouldUseSimple = (s: (typeof sections)[0]) => {
-    const lt = (s.title || "").toLowerCase();
-    const isCourse =
-      s.type === "certifications" ||
-      lt.includes("course") ||
-      lt.includes("certif");
-    const isList = lt.includes("interest") || lt.includes("hobb");
-    return isList || (isCourse && coursesStyle === "simple");
+    if (s.visible === false) return false;
+    if (['experience', 'education', 'skills', 'languages', 'projects'].includes(s.type)) {
+      return false;
+    }
+    if (s.type === 'certifications') {
+      return coursesStyle === 'simple';
+    }
+    return true;
   };
 
   const renderSimpleCols = (section: (typeof sections)[0]) => {
@@ -1214,13 +1193,14 @@ function renderMinimalTemplate(data: ResumeData, color: string): string {
   };
 
   const shouldUseSimple = (s: (typeof sections)[0]) => {
-    const lt = (s.title || "").toLowerCase();
-    const isCourse =
-      s.type === "certifications" ||
-      lt.includes("course") ||
-      lt.includes("certif");
-    const isList = lt.includes("interest") || lt.includes("hobb");
-    return isList || (isCourse && coursesStyle === "simple");
+    if (s.visible === false) return false;
+    if (['experience', 'education', 'skills', 'languages', 'projects'].includes(s.type)) {
+      return false;
+    }
+    if (s.type === 'certifications') {
+      return coursesStyle === 'simple';
+    }
+    return true;
   };
 
   const renderSimpleCols = (section: (typeof sections)[0]) => {
