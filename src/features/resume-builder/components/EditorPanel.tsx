@@ -407,6 +407,7 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
             <PersonalInfoForm
               data={data.personalInfo}
               onChange={updatePersonalInfo}
+              templateId={data.metadata?.templateId}
             />
           </AccordionContent>
         </AccordionItem>

@@ -9,9 +9,10 @@ import { useTranslations } from "next-intl";
 interface PersonalInfoFormProps {
   data: ResumeData["personalInfo"];
   onChange: (data: ResumeData["personalInfo"]) => void;
+  templateId?: string;
 }
 
-export function PersonalInfoForm({ data, onChange }: PersonalInfoFormProps) {
+export function PersonalInfoForm({ data, onChange, templateId }: PersonalInfoFormProps) {
   const t = useTranslations("editor.personalForm");
 
   const handleChange = (
@@ -58,6 +59,7 @@ export function PersonalInfoForm({ data, onChange }: PersonalInfoFormProps) {
         </div>
       </div>
 
+      {templateId === 'creative' && (
       <div className="space-y-2">
         <Label>Profile Picture</Label>
         <div className="flex items-center gap-4">
@@ -84,6 +86,7 @@ export function PersonalInfoForm({ data, onChange }: PersonalInfoFormProps) {
           )}
         </div>
       </div>
+      )}
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
