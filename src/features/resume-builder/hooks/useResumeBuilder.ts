@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { ResumeData, AtsScore, emptyResumeData } from "@/features/upload-cv/types";
+import { ResumeData, AtsScore } from "@/features/upload-cv/types";
 import { ResumeService } from "@/services/resume.service";
 import { useGuestResumeStorage } from "./useGuestResumeStorage";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
@@ -255,15 +255,8 @@ export function useResumeBuilder({
   };
 
   const handleReset = () => {
-    setResumeData(emptyResumeData);
-    setResumeTitle("Untitled Resume");
-    setCurrentResumeId(null);
-    titleSetByUserRef.current = false;
-    originalDataRef.current = emptyResumeData;
-    lastSavedDataRef.current = emptyResumeData;
-    setSaveStatus("idle");
-    setLastSavedAt(null);
-    toast.info(t("toasts.resetInfo"));
+    setResumeData(originalDataRef.current);
+    // toast.info(t("toasts.resetInfo"));
   };
 
   const handleCalculateScore = async () => {
