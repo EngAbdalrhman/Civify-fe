@@ -92,7 +92,7 @@ class SubscriptionService {
     // Job Match Limit
     if (plan.jobMatchLimit === null) {
       features.push({ text: 'Unlimited job matches', included: true });
-    } else if (plan.jobMatchLimit > 0) {
+    } else if ((plan.jobMatchLimit ?? 0) > 0) {
       features.push({ text: `${plan.jobMatchLimit} job matches per month`, included: true });
     } else {
       features.push({ text: 'AI job matching', included: false });
