@@ -95,6 +95,7 @@ export function useResumeBuilder({
 
   const router = useRouter();
   const originalDataRef = useRef<ResumeData>(initialData);
+  const lastSavedDataRef = useRef<ResumeData>(initialData);
   const titleSetByUserRef = useRef(false);
   const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const t = useTranslations("builder");
@@ -109,6 +110,7 @@ export function useResumeBuilder({
   // Update ref when initialData changes — preserve user-set title
   useEffect(() => {
     originalDataRef.current = initialData;
+    lastSavedDataRef.current = initialData;
     setResumeData(initialData);
     // Only derive title if user hasn't manually set one
     if (!titleSetByUserRef.current) {
@@ -138,14 +140,14 @@ export function useResumeBuilder({
 
     // Only save if data has actually changed
     const currentJson = JSON.stringify(resumeData);
-    const originalJson = JSON.stringify(originalDataRef.current);
-    if (currentJson === originalJson) return;
+    const lastSavedJson = JSON.stringify(lastSavedDataRef.current);
+    if (currentJson === lastSavedJson) return;
 
     setSaveStatus("saving");
     try {
       const dataToSave = ensureUniqueSectionItemIds(resumeData) as ResumeData;
       await ResumeService.update(currentResumeId, resumeTitle, dataToSave);
-      originalDataRef.current = dataToSave;
+      lastSavedDataRef.current = dataToSave;
       setResumeData(dataToSave);
       setLastSavedAt(new Date().toISOString());
       setSaveStatus("saved");
@@ -205,7 +207,7 @@ export function useResumeBuilder({
       }
       // Update local state with the normalized data to avoid sync issues
       setResumeData(dataToSave);
-      originalDataRef.current = dataToSave;
+      lastSavedDataRef.current = dataToSave;
       setLastSavedAt(new Date().toISOString());
       setSaveStatus("saved");
       toast.success(t("toasts.saveSuccess"));
@@ -238,7 +240,8 @@ export function useResumeBuilder({
       
       // Update local state with the normalized data to avoid sync issues
       setResumeData(dataToSave);
-      originalDataRef.current = dataToSave;
+      lastSavedDataRef.current = dataToSave;
+      originalDataRef.current = dataToSave; // New resume, so new original data
       setLastSavedAt(new Date().toISOString());
       setSaveStatus("saved");
       toast.success(t("toasts.saveSuccess"));
