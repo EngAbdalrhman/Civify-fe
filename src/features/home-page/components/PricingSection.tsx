@@ -20,93 +20,12 @@ import { isAuthenticated } from "@/utils/cookies";
 export function PricingSection() {
   const t = useTranslations("landing.pricing");
   const router = useRouter();
-  const { plans, isLoading, error, isAnnual, setIsAnnual } = usePlans();
+  const { displayPlans, isLoading, error, isAnnual, setIsAnnual } = usePlans();
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
 
   useEffect(() => {
     setIsUserAuthenticated(isAuthenticated());
   }, []);
-
-  // Transform plans to display format with localized features
-  const displayPlans = useMemo(() => {
-    if (!plans || plans.length === 0) return [];
-
-    return plans
-      .filter((plan) => {
-        if (isAnnual && plan.allowAnnualBilling === false) {
-          return false;
-        }
-        return true;
-      })
-      .map((plan) => {
-        const features: string[] = [];
-        const name = plan.name.toLowerCase();
-
-        // CV Limit (Storage)
-        if (plan.cvLimit === null) {
-          features.push(t("features.cvStorageUnlimited"));
-        } else {
-          features.push(t("features.cvStorage", { count: plan.cvLimit }));
-        }
-
-        // Standard features
-        features.push(t("features.aiTailoring"));
-        features.push(t("features.masking"));
-        features.push(t("features.pdfExport"));
-
-        // Watermark
-        if (!plan.watermark) {
-          features.push(t("features.noWatermark"));
-        }
-
-        // API Access
-        if (plan.hasApiAccess) {
-          features.push(t("features.apiAccess"));
-        }
-
-        // All plans get basic support
-        features.push(t("features.basicSupport"));
-
-        const price = isAnnual
-          ? parseFloat(plan.annualPrice)
-          : parseFloat(plan.monthlyPrice);
-        const isPopular =
-          name.includes("premium") ||
-          name.includes("pro") ||
-          name.includes("beta");
-        const isFreePlan = name === "free";
-
-        // Capitalize first letter of each word for display
-        const displayName = plan.name
-          .split(" ")
-          .map(
-            (word: string) =>
-              word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
-          )
-          .join(" ");
-
-        return {
-          id: name.replace(/\s+/g, "-").toLowerCase(),
-          planId: plan.id,
-          name: displayName,
-          price,
-          period: isAnnual
-            ? t("yearly").toLowerCase()
-            : t("monthly").toLowerCase(),
-          description: plan.description,
-          features,
-          highlighted: isPopular,
-          cta: isFreePlan ? t("getStarted") : t("selectPlan"),
-          ctaLink: isFreePlan ? "/signup" : `/checkout?planId=${plan.id}`,
-        };
-      })
-      // Sort by backend sortOrder field
-      .sort((a, b) => {
-        const aPlan = plans.find(p => p.id === a.planId);
-        const bPlan = plans.find(p => p.id === b.planId);
-        return (aPlan?.sortOrder ?? 999) - (bPlan?.sortOrder ?? 999);
-      });
-  }, [plans, isAnnual, t]);
 
   const handlePlanSelect = (ctaLink: string) => {
     // If it's a signup link (free plan), just go there
@@ -244,10 +163,10 @@ export function PricingSection() {
                                 {tier.features.map((feature, index) => (
                                   <li
                                     key={index}
-                                    className="flex items-start gap-3"
+                                    className={`flex items-start gap-3 ${!feature.included ? 'opacity-50' : ''}`}
                                   >
-                                    <Check className="h-5 w-5 flex-shrink-0 text-green-600" />
-                                    <span className="text-sm">{feature}</span>
+                                    <Check className={`h-5 w-5 flex-shrink-0 ${feature.included ? 'text-green-600' : 'text-muted-foreground opacity-50'}`} />
+                                    <span className={`text-sm ${!feature.included ? 'line-through text-muted-foreground' : ''}`}>{feature.text}</span>
                                   </li>
                                 ))}
                               </ul>
@@ -319,9 +238,9 @@ export function PricingSection() {
                       {/* Features */}
                       <ul className="mb-8 flex-1 space-y-3">
                         {tier.features.map((feature, index) => (
-                          <li key={index} className="flex items-start gap-3">
-                            <Check className="h-5 w-5 flex-shrink-0 text-green-600" />
-                            <span className="text-sm">{feature}</span>
+                          <li key={index} className={`flex items-start gap-3 ${!feature.included ? 'opacity-50' : ''}`}>
+                            <Check className={`h-5 w-5 flex-shrink-0 ${feature.included ? 'text-green-600' : 'text-muted-foreground opacity-50'}`} />
+                            <span className={`text-sm ${!feature.included ? 'line-through text-muted-foreground' : ''}`}>{feature.text}</span>
                           </li>
                         ))}
                       </ul>
