@@ -68,7 +68,7 @@ export function ResumeBuilderContent() {
     try {
       const created = await ResumeService.create(title, normalized);
       setSyncedResumeId(created.id);
-      toast.success("Resume saved to your account!");
+      // toast.success("Resume saved to your account!");
 
       // Clear localStorage after successful sync
       guestStorage.clearGuestResume();

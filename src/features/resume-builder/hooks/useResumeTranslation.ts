@@ -36,7 +36,7 @@ export function useResumeTranslation(
       
       onTranslateComplete(response.translatedCv, translateSaveMode, targetLanguage);
       
-      toast.success(t('success', { language: t(`languages.${targetLanguage}`) }));
+      // toast.success(t('success', { language: t(`languages.${targetLanguage}`) }));
       setShowTranslateDialog(false);
     } catch (error) {
       console.error('Translation failed:', error);

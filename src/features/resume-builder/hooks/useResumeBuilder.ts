@@ -210,7 +210,7 @@ export function useResumeBuilder({
       lastSavedDataRef.current = dataToSave;
       setLastSavedAt(new Date().toISOString());
       setSaveStatus("saved");
-      toast.success(t("toasts.saveSuccess"));
+      // toast.success(t("toasts.saveSuccess"));
     } catch (error) {
       console.error(error);
       setSaveStatus("error");
@@ -244,7 +244,7 @@ export function useResumeBuilder({
       originalDataRef.current = dataToSave; // New resume, so new original data
       setLastSavedAt(new Date().toISOString());
       setSaveStatus("saved");
-      toast.success(t("toasts.saveSuccess"));
+      // toast.success(t("toasts.saveSuccess"));
     } catch (error) {
       console.error(error);
       setSaveStatus("error");
@@ -307,11 +307,11 @@ export function useResumeBuilder({
         setResumeTitle(newTitle);
         const created = await ResumeService.create(newTitle, dataToSave);
         setCurrentResumeId(created.id);
-        toast.success(t("toasts.saveSuccess"));
+        // toast.success(t("toasts.saveSuccess"));
       } else {
         if (currentResumeId) {
           await ResumeService.update(currentResumeId, resumeTitle, dataToSave);
-          toast.success(t("toasts.saveSuccess"));
+          // toast.success(t("toasts.saveSuccess"));
         }
       }
       setLastSavedAt(new Date().toISOString());
