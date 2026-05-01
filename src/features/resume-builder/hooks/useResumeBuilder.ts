@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { ResumeData, AtsScore } from "@/features/upload-cv/types";
+import { ResumeData, AtsScore, emptyResumeData } from "@/features/upload-cv/types";
 import { ResumeService } from "@/services/resume.service";
 import { useGuestResumeStorage } from "./useGuestResumeStorage";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
@@ -233,11 +233,11 @@ export function useResumeBuilder({
     try {
       const dataToSave = ensureUniqueSectionItemIds(resumeData) as ResumeData;
       const created = await ResumeService.create(newTitle, dataToSave);
-      
+
       titleSetByUserRef.current = true;
       setResumeTitle(newTitle);
       setCurrentResumeId(created.id);
-      
+
       // Update local state with the normalized data to avoid sync issues
       setResumeData(dataToSave);
       lastSavedDataRef.current = dataToSave;
@@ -255,7 +255,14 @@ export function useResumeBuilder({
   };
 
   const handleReset = () => {
-    setResumeData(originalDataRef.current);
+    setResumeData(emptyResumeData);
+    setResumeTitle("Untitled Resume");
+    setCurrentResumeId(null);
+    titleSetByUserRef.current = false;
+    originalDataRef.current = emptyResumeData;
+    lastSavedDataRef.current = emptyResumeData;
+    setSaveStatus("idle");
+    setLastSavedAt(null);
     toast.info(t("toasts.resetInfo"));
   };
 
@@ -284,7 +291,7 @@ export function useResumeBuilder({
 
   const handleTranslateComplete = async (translatedData: ResumeData, saveMode: 'new' | 'replace', targetLang: string) => {
     const dataToSave = ensureUniqueSectionItemIds(translatedData) as ResumeData;
-    
+
     // Auto switch layout direction based on language
     const rtlLanguages = ['ar', 'he', 'fa', 'ur'];
     if (!dataToSave.metadata) dataToSave.metadata = {};
