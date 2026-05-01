@@ -1,19 +1,19 @@
 "use client";
 
-import { RefObject } from "react";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, FileText, Loader2, Palette, RotateCcw, Save, Upload, Target, Languages } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { ResumeData } from "@/features/upload-cv/types";
-import { EditorPanel } from "./EditorPanel";
-import { DesignPanel } from "./DesignPanel";
-import { ExportPanel } from "./ExportPanel";
-import { TargetJobPanel } from "./TargetJobPanel";
-import { FILE_ACCEPT } from "../utils/constants";
-import { BuilderSaveStatus } from "./BuilderSaveStatus";
-import type { BuilderSaveStatus as SaveStatusType } from "../types";
-import { usePermissions } from "@/hooks/use-permissions";
+import {RefObject} from "react";
+import {Button} from "@/components/ui/button";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {Download, FileText, Languages, Loader2, Palette, RotateCcw, Save, Target, Upload} from "lucide-react";
+import {useTranslations} from "next-intl";
+import {ResumeData} from "@/features/upload-cv/types";
+import {EditorPanel} from "./EditorPanel";
+import {DesignPanel} from "./DesignPanel";
+import {ExportPanel} from "./ExportPanel";
+import {TargetJobPanel} from "./TargetJobPanel";
+import {FILE_ACCEPT} from "../utils/constants";
+import {BuilderSaveStatus} from "./BuilderSaveStatus";
+import type {BuilderSaveStatus as SaveStatusType} from "../types";
+import {usePermissions} from "@/hooks/use-permissions";
 
 interface EditorSidebarProps {
     // Resume data
@@ -53,6 +53,9 @@ interface EditorSidebarProps {
     // Translation
     isTranslating: boolean;
     onTranslateClick: () => void;
+
+    // Preferences
+    autoSaveEnabled?: boolean;
 }
 
 export function EditorSidebar({
@@ -76,6 +79,7 @@ export function EditorSidebar({
     onAuthGate,
     isTranslating,
     onTranslateClick,
+    autoSaveEnabled = true,
 }: EditorSidebarProps) {
     const t = useTranslations("builder");
     const { hasAnyPermission } = usePermissions();
@@ -89,12 +93,12 @@ export function EditorSidebar({
         >
             {/* Header */}
             <div className="flex flex-col">
-                <div data-tour="rb-header" className="p-4 border-b flex items-center justify-between bg-card">
-                    <h1 className="font-bold text-xl flex items-center gap-2">
+                <div data-tour="rb-header" className="p-4 border-b flex items-center justify-between bg-card overflow-hidden gap-2">
+                    <h1 className="font-bold text-xl flex items-center gap-1.5 whitespace-nowrap overflow-hidden text-ellipsis">
                         <span className="text-primary">Civify</span>{" "}
-                        {t("title").replace("Civify", "").replace("Resume", "")}
+                        <span className="truncate">{t("title").replace("Civify", "").replace("Resume Builder", "Builder").replace("السيرة الذاتية", "").trim()}</span>
                     </h1>
-                    <div className="flex gap-2">
+                    <div className="flex gap-1 sm:gap-2 shrink-0">
                         {/* Hidden file input for upload */}
                         <input
                             type="file"
@@ -109,7 +113,7 @@ export function EditorSidebar({
                             size="sm"
                             onClick={isGuest && onAuthGate ? onAuthGate : onUploadClick}
                             disabled={isUploading}
-                            className="gap-2"
+                            className="gap-2 px-2 sm:px-3"
                             title={t("actions.upload")}
                         >
                             {isUploading ? (
@@ -147,15 +151,17 @@ export function EditorSidebar({
                             size="sm"
                             onClick={onSaveClick}
                             disabled={isSaving}
-                            className="gap-2"
+                            className="gap-2 px-2 sm:px-3"
                         >
                             <Save className="h-4 w-4" />
-                            {isSaving ? t("actions.saving") : t("actions.save")}
+                            <span className="hidden sm:inline">{isSaving ? t("actions.saving") : t("actions.save")}</span>
                         </Button>
                     </div>
                 </div>
                 <div className="justify-items-center">
-                    <BuilderSaveStatus status={saveStatus} lastSavedAt={lastSavedAt} />
+                    {autoSaveEnabled && (
+                        <BuilderSaveStatus status={saveStatus} lastSavedAt={lastSavedAt} />
+                    )}
                 </div>
             </div>
             {/* Tabs */}
@@ -164,41 +170,41 @@ export function EditorSidebar({
                 onValueChange={onActiveTabChange}
                 className="flex-1 flex flex-col min-h-0"
             >
-                <div className="px-4 pt-4">
-                    <TabsList className={`w-full grid ${canViewJobMatches ? 'grid-cols-4' : 'grid-cols-3'}`}>
+                <div className="px-2 sm:px-4 pt-4">
+                    <TabsList className={`w-full grid h-auto ${canViewJobMatches ? 'grid-cols-4' : 'grid-cols-3'} gap-1 p-1`}>
                         <TabsTrigger
                             data-tour="rb-tab-content"
                             value="content"
-                            className="flex gap-2"
+                            className="flex gap-1.5 py-2 px-1 text-xs sm:text-sm"
                         >
-                            <FileText className="h-4 w-4" />
-                            <span className="hidden sm:inline">{t("tabs.content")}</span>
+                            <FileText className="h-4 w-4 shrink-0" />
+                            <span className="hidden sm:inline truncate">{t("tabs.content")}</span>
                         </TabsTrigger>
                         <TabsTrigger
                             data-tour="rb-tab-design"
                             value="design"
-                            className="flex gap-2"
+                            className="flex gap-1.5 py-2 px-1 text-xs sm:text-sm"
                         >
-                            <Palette className="h-4 w-4" />
-                            <span className="hidden sm:inline">{t("tabs.design")}</span>
+                            <Palette className="h-4 w-4 shrink-0" />
+                            <span className="hidden sm:inline truncate">{t("tabs.design")}</span>
                         </TabsTrigger>
                         {canViewJobMatches && (
                             <TabsTrigger
                                 data-tour="rb-tab-target"
                                 value="target"
-                                className="flex gap-2"
+                                className="flex gap-1.5 py-2 px-1 text-xs sm:text-sm"
                             >
-                                <Target className="h-4 w-4" />
-                                <span className="hidden sm:inline">{t("tabs.target")}</span>
+                                <Target className="h-4 w-4 shrink-0" />
+                                <span className="hidden sm:inline truncate">{t("tabs.target")}</span>
                             </TabsTrigger>
                         )}
                         <TabsTrigger
                             data-tour="rb-tab-export"
                             value="export"
-                            className="flex gap-2"
+                            className="flex gap-1.5 py-2 px-1 text-xs sm:text-sm"
                         >
-                            <Download className="h-4 w-4" />
-                            <span className="hidden sm:inline">{t("tabs.export")}</span>
+                            <Download className="h-4 w-4 shrink-0" />
+                            <span className="hidden sm:inline truncate">{t("tabs.export")}</span>
                         </TabsTrigger>
                     </TabsList>
                 </div>

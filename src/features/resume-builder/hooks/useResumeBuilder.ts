@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { ResumeData, AtsScore } from "@/features/upload-cv/types";
 import { ResumeService } from "@/services/resume.service";
 import { useGuestResumeStorage } from "./useGuestResumeStorage";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { ensureUniqueSectionItemIds } from "@/features/resume-builder/utils/normalizeResumeIds";
 import type { BuilderSaveStatus } from "@/features/resume-builder/types";
 
@@ -57,6 +58,8 @@ interface UseResumeBuilderReturn {
   handleResumeDataUpdate: (data: ResumeData) => void;
   handleAuthGatedAction: () => void;
   handleTranslateComplete: (translatedData: ResumeData, saveMode: 'new' | 'replace', targetLang: string) => Promise<void>;
+  autoSaveEnabled: boolean;
+  handleSaveAsNew: (title: string) => Promise<void>;
 }
 
 export function useResumeBuilder({
@@ -92,6 +95,7 @@ export function useResumeBuilder({
 
   const router = useRouter();
   const originalDataRef = useRef<ResumeData>(initialData);
+  const lastSavedDataRef = useRef<ResumeData>(initialData);
   const titleSetByUserRef = useRef(false);
   const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const t = useTranslations("builder");
@@ -99,9 +103,14 @@ export function useResumeBuilder({
   // Guest storage
   const { saveGuestResume } = useGuestResumeStorage();
 
+  // User preferences
+  const { data: userPrefs } = useUserPreferences();
+  const autoSaveEnabled = userPrefs?.autoSaveEnabled ?? true;
+
   // Update ref when initialData changes — preserve user-set title
   useEffect(() => {
     originalDataRef.current = initialData;
+    lastSavedDataRef.current = initialData;
     setResumeData(initialData);
     // Only derive title if user hasn't manually set one
     if (!titleSetByUserRef.current) {
@@ -131,14 +140,14 @@ export function useResumeBuilder({
 
     // Only save if data has actually changed
     const currentJson = JSON.stringify(resumeData);
-    const originalJson = JSON.stringify(originalDataRef.current);
-    if (currentJson === originalJson) return;
+    const lastSavedJson = JSON.stringify(lastSavedDataRef.current);
+    if (currentJson === lastSavedJson) return;
 
     setSaveStatus("saving");
     try {
       const dataToSave = ensureUniqueSectionItemIds(resumeData) as ResumeData;
       await ResumeService.update(currentResumeId, resumeTitle, dataToSave);
-      originalDataRef.current = dataToSave;
+      lastSavedDataRef.current = dataToSave;
       setResumeData(dataToSave);
       setLastSavedAt(new Date().toISOString());
       setSaveStatus("saved");
@@ -148,7 +157,7 @@ export function useResumeBuilder({
   }, [isGuest, currentResumeId, resumeData, resumeTitle]);
 
   useEffect(() => {
-    if (isGuest || !currentResumeId) return;
+    if (isGuest || !currentResumeId || !autoSaveEnabled) return;
 
     // Clear any pending timer
     if (autosaveTimerRef.current) {
@@ -164,7 +173,7 @@ export function useResumeBuilder({
         clearTimeout(autosaveTimerRef.current);
       }
     };
-  }, [resumeData, persistResume, isGuest, currentResumeId]);
+  }, [resumeData, persistResume, isGuest, currentResumeId, autoSaveEnabled]);
 
   const handleAuthGatedAction = useCallback(() => {
     setShowAuthGate(true);
@@ -198,10 +207,44 @@ export function useResumeBuilder({
       }
       // Update local state with the normalized data to avoid sync issues
       setResumeData(dataToSave);
-      originalDataRef.current = dataToSave;
+      lastSavedDataRef.current = dataToSave;
       setLastSavedAt(new Date().toISOString());
       setSaveStatus("saved");
-      toast.success(t("toasts.saveSuccess"));
+      // toast.success(t("toasts.saveSuccess"));
+    } catch (error) {
+      console.error(error);
+      setSaveStatus("error");
+      toast.error(t("toasts.saveError"));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveAsNew = async (newTitle: string) => {
+    if (!newTitle.trim()) {
+      toast.error(t("toasts.enterTitle"));
+      return;
+    }
+
+    setIsSaving(true);
+    setShowSaveDialog(false);
+
+    setSaveStatus("saving");
+    try {
+      const dataToSave = ensureUniqueSectionItemIds(resumeData) as ResumeData;
+      const created = await ResumeService.create(newTitle, dataToSave);
+
+      titleSetByUserRef.current = true;
+      setResumeTitle(newTitle);
+      setCurrentResumeId(created.id);
+
+      // Update local state with the normalized data to avoid sync issues
+      setResumeData(dataToSave);
+      lastSavedDataRef.current = dataToSave;
+      originalDataRef.current = dataToSave; // New resume, so new original data
+      setLastSavedAt(new Date().toISOString());
+      setSaveStatus("saved");
+      // toast.success(t("toasts.saveSuccess"));
     } catch (error) {
       console.error(error);
       setSaveStatus("error");
@@ -213,7 +256,7 @@ export function useResumeBuilder({
 
   const handleReset = () => {
     setResumeData(originalDataRef.current);
-    toast.info(t("toasts.resetInfo"));
+    // toast.info(t("toasts.resetInfo"));
   };
 
   const handleCalculateScore = async () => {
@@ -236,11 +279,12 @@ export function useResumeBuilder({
   const handleResumeDataUpdate = (data: ResumeData) => {
     setResumeData(data);
     originalDataRef.current = data;
+    lastSavedDataRef.current = data;
   };
 
   const handleTranslateComplete = async (translatedData: ResumeData, saveMode: 'new' | 'replace', targetLang: string) => {
     const dataToSave = ensureUniqueSectionItemIds(translatedData) as ResumeData;
-    
+
     // Auto switch layout direction based on language
     const rtlLanguages = ['ar', 'he', 'fa', 'ur'];
     if (!dataToSave.metadata) dataToSave.metadata = {};
@@ -252,6 +296,7 @@ export function useResumeBuilder({
 
     setResumeData(dataToSave);
     originalDataRef.current = dataToSave;
+    lastSavedDataRef.current = dataToSave;
 
     if (isGuest) return;
 
@@ -262,11 +307,11 @@ export function useResumeBuilder({
         setResumeTitle(newTitle);
         const created = await ResumeService.create(newTitle, dataToSave);
         setCurrentResumeId(created.id);
-        toast.success(t("toasts.saveSuccess"));
+        // toast.success(t("toasts.saveSuccess"));
       } else {
         if (currentResumeId) {
           await ResumeService.update(currentResumeId, resumeTitle, dataToSave);
-          toast.success(t("toasts.saveSuccess"));
+          // toast.success(t("toasts.saveSuccess"));
         }
       }
       setLastSavedAt(new Date().toISOString());
@@ -319,5 +364,7 @@ export function useResumeBuilder({
     handleResumeDataUpdate,
     handleAuthGatedAction,
     handleTranslateComplete,
+    autoSaveEnabled,
+    handleSaveAsNew,
   };
 }

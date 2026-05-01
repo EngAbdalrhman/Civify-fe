@@ -117,11 +117,14 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
   };
 
   const shouldUseSimpleColumns = (section: any) => {
-    if (section.type === 'skills' || section.type === 'languages') return false;
-    const lowerTitle = section.title.toLowerCase();
-    const isCourse = section.type === 'certifications' || lowerTitle.includes('course') || lowerTitle.includes('certif');
-    const isSimpleList = lowerTitle.includes('interest') || lowerTitle.includes('hobb');
-    return isSimpleList || (isCourse && coursesStyle === 'simple');
+    if (section.visible === false) return false;
+    if (['experience', 'education', 'skills', 'languages', 'projects'].includes(section.type)) {
+      return false;
+    }
+    if (section.type === 'certifications') {
+      return coursesStyle === 'simple';
+    }
+    return true;
   };
 
   const visibleSections = sections.filter(s => s.visible !== false && s.items && s.items.some((i: any) => i.visible !== false));

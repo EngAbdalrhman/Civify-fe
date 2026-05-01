@@ -30,11 +30,18 @@ export function ResumeBuilderContent() {
     const hasCache = guestStorage.hasGuestResume();
 
     if (!isGuest && hasCache) {
-      // User just logged in and has cached guest data — trigger sync
-      const cached = guestStorage.loadGuestResume();
-      if (cached) {
-        syncGuestResume(cached);
-        return;
+      // Only sync guest data when user has NO existing resume open.
+      // If resumeId exists, the user is editing a saved resume — skip sync
+      // to avoid creating a duplicate on every page refresh.
+      if (resumeId) {
+        // Stale guest cache from a previous session — just clear it
+        guestStorage.clearGuestResume();
+      } else {
+        const cached = guestStorage.loadGuestResume();
+        if (cached) {
+          syncGuestResume(cached);
+          return;
+        }
       }
     }
 
@@ -61,7 +68,7 @@ export function ResumeBuilderContent() {
     try {
       const created = await ResumeService.create(title, normalized);
       setSyncedResumeId(created.id);
-      toast.success("Resume saved to your account!");
+      // toast.success("Resume saved to your account!");
 
       // Clear localStorage after successful sync
       guestStorage.clearGuestResume();

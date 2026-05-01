@@ -136,14 +136,14 @@ export function MinimalTemplate({ data, color }: TemplateProps) {
   };
 
   const shouldUseSimple = (section: any) => {
-    if (section.type === "skills" || section.type === "languages") return false;
-    const lt = section.title.toLowerCase();
-    const isCourse =
-      section.type === "certifications" ||
-      lt.includes("course") ||
-      lt.includes("certif");
-    const isList = lt.includes("interest") || lt.includes("hobb");
-    return isList || (isCourse && coursesStyle === "simple");
+    if (section.visible === false) return false;
+    if (['experience', 'education', 'skills', 'languages', 'projects'].includes(section.type)) {
+      return false;
+    }
+    if (section.type === 'certifications') {
+      return coursesStyle === 'simple';
+    }
+    return true;
   };
 
   const renderSimple = (section: any) => {
