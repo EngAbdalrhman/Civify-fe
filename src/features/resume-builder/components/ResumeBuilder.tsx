@@ -111,6 +111,7 @@ export function ResumeBuilder({
           onAuthGate={builder.handleAuthGatedAction}
           isTranslating={translation.isTranslating}
           onTranslateClick={() => translation.setShowTranslateDialog(true)}
+          autoSaveEnabled={builder.autoSaveEnabled}
         />
 
         {/* Right Area - Live Preview */}
@@ -130,6 +131,8 @@ export function ResumeBuilder({
         title={builder.resumeTitle}
         onTitleChange={builder.setResumeTitle}
         onConfirm={builder.handleSaveConfirm}
+        showSaveAsNew={!builder.autoSaveEnabled && !!builder.currentResumeId}
+        onSaveAsNew={builder.handleSaveAsNew}
       />
 
       {/* Auth Gate Dialog (for guests) */}

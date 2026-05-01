@@ -53,6 +53,9 @@ interface EditorSidebarProps {
     // Translation
     isTranslating: boolean;
     onTranslateClick: () => void;
+
+    // Preferences
+    autoSaveEnabled?: boolean;
 }
 
 export function EditorSidebar({
@@ -76,6 +79,7 @@ export function EditorSidebar({
     onAuthGate,
     isTranslating,
     onTranslateClick,
+    autoSaveEnabled = true,
 }: EditorSidebarProps) {
     const t = useTranslations("builder");
     const { hasAnyPermission } = usePermissions();
@@ -155,7 +159,9 @@ export function EditorSidebar({
                     </div>
                 </div>
                 <div className="justify-items-center">
-                    <BuilderSaveStatus status={saveStatus} lastSavedAt={lastSavedAt} />
+                    {autoSaveEnabled && (
+                        <BuilderSaveStatus status={saveStatus} lastSavedAt={lastSavedAt} />
+                    )}
                 </div>
             </div>
             {/* Tabs */}

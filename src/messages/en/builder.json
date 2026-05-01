@@ -21,7 +21,12 @@
     "label": "Resume Title",
     "placeholder": "e.g. Software Engineer CV",
     "cancel": "Cancel",
-    "confirm": "Save"
+    "confirm": "Save",
+    "saveAsNew": "Save as New",
+    "saveAsNewTitle": "Save as New Resume",
+    "saveAsNewDescription": "Enter a title for the new copy.",
+    "create": "Create",
+    "back": "Back"
   },
   "exportPanel": {
     "title": "Ready to download?",

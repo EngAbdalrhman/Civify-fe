@@ -18,6 +18,7 @@ import {
   XCircle,
   CheckCircle,
   Calendar,
+  Save,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,11 +57,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 
 import { useUserProfile } from "@/hooks/useUserProfile";
-
-interface UserPreferences {
-  preferredLanguage: "EN" | "AR";
-  preferredTheme: "LIGHT" | "DARK";
-}
+import { useUserPreferences, useUpdateUserPreferences, UserPreferences } from "@/hooks/useUserPreferences";
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("profile");
@@ -105,11 +102,22 @@ export default function SettingsPage() {
   const [isToggling2FA, setIsToggling2FA] = useState(false);
 
   // Preferences state
+  const { data: fetchedPreferences, isLoading: isPrefsLoading } = useUserPreferences();
+  const updatePreferencesMutation = useUpdateUserPreferences();
+  
   const [preferences, setPreferences] = useState<UserPreferences>({
     preferredLanguage: "EN",
     preferredTheme: "LIGHT",
+    autoSaveEnabled: true,
   });
-  const [isPrefsLoading, setIsPrefsLoading] = useState(true);
+  
+  // Sync fetched preferences to local state
+  useEffect(() => {
+    if (fetchedPreferences) {
+      setPreferences(fetchedPreferences);
+    }
+  }, [fetchedPreferences]);
+
   const [isSavingPrefs, setIsSavingPrefs] = useState(false);
 
   // Avatar upload state
@@ -132,22 +140,7 @@ export default function SettingsPage() {
   const cancelMutation = useCancelSubscription();
   const [showCancelDialog, setShowCancelDialog] = useState(false);
 
-  // Fetch preferences
-  useEffect(() => {
-    const fetchPreferences = async () => {
-      try {
-        const response = await apiClient.get<UserPreferences>(
-          "/v1/users/me/preferences",
-        );
-        setPreferences(response.data);
-      } catch {
-        // Use defaults if preferences not set
-      } finally {
-        setIsPrefsLoading(false);
-      }
-    };
-    fetchPreferences();
-  }, []);
+
 
   // Save profile
   const handleSaveProfile = async () => {
@@ -216,11 +209,9 @@ export default function SettingsPage() {
   const handleSavePreferences = async () => {
     setIsSavingPrefs(true);
     try {
-      const response = await apiClient.put<UserPreferences>(
-        "/v1/users/me/preferences",
-        preferences as unknown as object,
-      );
-      setPreferences(response.data);
+      const updated = await updatePreferencesMutation.mutateAsync(preferences);
+      setPreferences(updated);
+      toast.success("Preferences updated successfully");
     } catch {
       toast.error("Failed to save preferences");
     } finally {
@@ -803,6 +794,36 @@ export default function SettingsPage() {
                         >
                           🌙 Dark
                         </Button>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Auto Save Preference */}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Save className="h-5 w-5 text-muted-foreground" />
+                        <Label className="text-base font-medium">
+                          Resume Builder
+                        </Label>
+                      </div>
+                      <div className="flex items-center justify-between border rounded-lg p-4 bg-muted/50">
+                        <div className="space-y-0.5">
+                          <Label className="text-base">Auto Save</Label>
+                          <p className="text-sm text-muted-foreground">
+                            Automatically save your resume edits every few seconds.
+                            When disabled, you must manually click Save or Save as New.
+                          </p>
+                        </div>
+                        <Switch
+                          checked={preferences.autoSaveEnabled}
+                          onCheckedChange={(checked) =>
+                            setPreferences({
+                              ...preferences,
+                              autoSaveEnabled: checked,
+                            })
+                          }
+                        />
                       </div>
                     </div>
                   </>
