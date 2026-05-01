@@ -87,6 +87,7 @@ export function PlansManager() {
     isFeatured: false,
     sortOrder: "0",
     hasApiAccess: false,
+    allowTranslation: false,
   });
 
   // Fetch plans
@@ -130,6 +131,7 @@ export function PlansManager() {
       isFeatured: false,
       sortOrder: "0",
       hasApiAccess: false,
+      allowTranslation: false,
     });
     setIsPlanDialogOpen(true);
   };
@@ -153,6 +155,7 @@ export function PlansManager() {
       isFeatured: plan.isFeatured ?? false,
       sortOrder: plan.sortOrder?.toString() || "0",
       hasApiAccess: plan.hasApiAccess ?? false,
+      allowTranslation: plan.allowTranslation ?? false,
     });
     setIsPlanDialogOpen(true);
   };
@@ -187,6 +190,7 @@ export function PlansManager() {
         isFeatured: planFormData.isFeatured,
         sortOrder: parseInt(planFormData.sortOrder) || 0,
         hasApiAccess: planFormData.hasApiAccess,
+        allowTranslation: planFormData.allowTranslation,
       };
 
       if (editingPlan) {
@@ -374,7 +378,7 @@ export function PlansManager() {
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto">
+          <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto overflow-x-hidden p-1">
             <div className="space-y-2">
               <Label htmlFor="planName">{t("form.name")} *</Label>
               <Input
@@ -634,6 +638,21 @@ export function PlansManager() {
                   />
                   <Label htmlFor="hasApiAccess" className="text-sm">
                     {t("form.apiAccess")}
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="allowTranslation"
+                    checked={planFormData.allowTranslation}
+                    onCheckedChange={(checked) =>
+                      setPlanFormData({
+                        ...planFormData,
+                        allowTranslation: checked,
+                      })
+                    }
+                  />
+                  <Label htmlFor="allowTranslation" className="text-sm">
+                    {t("form.allowTranslation") || "Allow Translation"}
                   </Label>
                 </div>
               </div>

@@ -102,6 +102,7 @@
       "showWatermark": "إظهار العلامة المائية",
       "sortOrder": "ترتيب العرض",
       "apiAccess": "الوصول للـ API",
+      "allowTranslation": "السماح بالترجمة",
       "update": "تحديث"
     }
   },

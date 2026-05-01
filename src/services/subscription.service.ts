@@ -74,33 +74,56 @@ class SubscriptionService {
     price: number;
     period: string;
     description: string;
-    features: string[];
+    features: { text: string; included: boolean }[];
     highlighted: boolean;
     cta: string;
     ctaLink: string;
   } {
-    const features: string[] = [];
+    const features: { text: string; included: boolean }[] = [];
     const name = plan.name.toLowerCase();
 
     // CV Limit
     if (plan.cvLimit === null) {
-      features.push('Unlimited CV generations');
+      features.push({ text: 'Unlimited CV generations', included: true });
     } else {
-      features.push(`${plan.cvLimit} CV generations per month`);
+      features.push({ text: `${plan.cvLimit} CV generations per month`, included: true });
+    }
+
+    // Job Match Limit
+    if (plan.jobMatchLimit === null) {
+      features.push({ text: 'Unlimited job matches', included: true });
+    } else if (plan.jobMatchLimit > 0) {
+      features.push({ text: `${plan.jobMatchLimit} job matches per month`, included: true });
+    } else {
+      features.push({ text: 'AI job matching', included: false });
     }
 
     // Standard features
-    features.push('AI-powered CV tailoring');
-    features.push('Personal information masking');
-    features.push('PDF export');
+    features.push({ text: 'AI-powered CV tailoring', included: true });
+    features.push({ text: 'Personal information masking', included: true });
+    features.push({ text: 'PDF export', included: true });
 
     // Watermark
     if (!plan.watermark) {
-      features.push('No watermark');
+      features.push({ text: 'No watermark', included: true });
+    }
+
+    // Translation Feature
+    if (plan.allowTranslation) {
+      features.push({ text: 'Multilingual AI translation', included: true });
+    } else {
+      features.push({ text: 'Multilingual AI translation', included: false });
+    }
+
+    // API Access
+    if (plan.hasApiAccess) {
+      features.push({ text: 'Developer API access', included: true });
+    } else {
+      features.push({ text: 'Developer API access', included: false });
     }
 
     // All plans get basic support
-    features.push('Basic support');
+    features.push({ text: 'Basic support', included: true });
 
     const price = isAnnual ? parseFloat(plan.annualPrice) : parseFloat(plan.monthlyPrice);
     const isPopular = name.includes('premium') || name.includes('pro') || name.includes('beta');

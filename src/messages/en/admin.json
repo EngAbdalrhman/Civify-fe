@@ -102,6 +102,7 @@
       "showWatermark": "Show Watermark",
       "sortOrder": "Sort Order",
       "apiAccess": "API Access",
+      "allowTranslation": "Allow Translation",
       "update": "Update"
     }
   },

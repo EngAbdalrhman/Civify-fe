@@ -37,33 +37,51 @@ export function usePlans(options: UsePlansOptions = {}): UsePlansReturn {
 
   // Transform plan to display format with translations
   const transformPlanToDisplay = useCallback((plan: SubscriptionPlan, annual: boolean): PricingTierDisplay => {
-    const features: string[] = [];
+    const features: { text: string; included: boolean }[] = [];
     const name = plan.name.toLowerCase();
 
     // CV Limit
     if (plan.cvLimit === null) {
-      features.push(t('features.cvStorageUnlimited'));
+      features.push({ text: t('features.cvStorageUnlimited'), included: true });
     } else {
-      features.push(t('features.cvStorage', { count: plan.cvLimit }));
+      features.push({ text: t('features.cvStorage', { count: plan.cvLimit }), included: true });
+    }
+
+    // Job Match Limit
+    if (plan.jobMatchLimit === null) {
+      features.push({ text: t('features.jobMatchUnlimited'), included: true });
+    } else if ((plan.jobMatchLimit ?? 0) > 0) {
+      features.push({ text: t('features.jobMatch', { count: plan.jobMatchLimit }), included: true });
+    } else {
+      features.push({ text: t('features.jobMatch', { count: 0 }), included: false });
     }
 
     // Standard features
-    features.push(t('features.aiTailoring'));
-    features.push(t('features.masking'));
-    features.push(t('features.pdfExport'));
+    features.push({ text: t('features.aiTailoring'), included: true });
+    features.push({ text: t('features.masking'), included: true });
+    features.push({ text: t('features.pdfExport'), included: true });
 
     // Watermark
     if (!plan.watermark) {
-      features.push(t('features.noWatermark'));
+      features.push({ text: t('features.noWatermark'), included: true });
     }
 
     // API Access
     if (plan.hasApiAccess) {
-      features.push(t('features.apiAccess'));
+      features.push({ text: t('features.apiAccess'), included: true });
+    } else {
+      features.push({ text: t('features.apiAccess'), included: false });
+    }
+
+    // Translation
+    if (plan.allowTranslation) {
+      features.push({ text: t('features.translation'), included: true });
+    } else {
+      features.push({ text: t('features.translation'), included: false });
     }
 
     // All plans get basic support
-    features.push(t('features.basicSupport'));
+    features.push({ text: t('features.basicSupport'), included: true });
 
     const price = annual ? parseFloat(plan.annualPrice) : parseFloat(plan.monthlyPrice);
     const isPopular = name.includes('premium') || name.includes('pro') || name.includes('beta');
