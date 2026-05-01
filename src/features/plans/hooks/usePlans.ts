@@ -51,7 +51,7 @@ export function usePlans(options: UsePlansOptions = {}): UsePlansReturn {
     if (plan.jobMatchLimit === null) {
       features.push({ text: t('features.jobMatchUnlimited'), included: true });
     } else if ((plan.jobMatchLimit ?? 0) > 0) {
-      features.push({ text: t('features.jobMatch', { count: plan.jobMatchLimit }), included: true });
+      features.push({ text: t('features.jobMatch', { count: plan.jobMatchLimit as number }), included: true });
     } else {
       features.push({ text: t('features.jobMatch', { count: 0 }), included: false });
     }
