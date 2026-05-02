@@ -75,7 +75,13 @@ export function buildInputDataModel(
 
     const column = columns.find((c) => c.key === key);
     const operation: FilterOperation =
-      column?.filterOperation || ("MATCH" as FilterOperation);
+      column?.filterOperation ||
+      (column?.filterType === "number" ||
+      column?.filterType === "dropdown" ||
+      column?.filterType === "select" ||
+      column?.filterType === "date"
+        ? ("EQUAL" as FilterOperation)
+        : ("MATCH" as FilterOperation));
 
     filterItems.push({
       fieldName: key,

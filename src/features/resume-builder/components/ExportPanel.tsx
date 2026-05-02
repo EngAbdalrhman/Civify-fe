@@ -14,7 +14,20 @@ import {
   type TemplateType,
 } from "@/features/upload-cv/utils/exportCv";
 import { toast } from "sonner";
-import { useState } from "react"; // Added useState import
+import { useState } from "react";
+import { useHasPermission } from "@/hooks/use-permissions";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Crown } from "lucide-react";
+import Link from "next/link";
 
 import enTranslations from "@/messages/en";
 import arTranslations from "@/messages/ar";
@@ -35,6 +48,9 @@ export function ExportPanel({
   const t = useTranslations("builder.exportPanel");
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+  const canExportDocx = useHasPermission("CV.EXPORT.DOCX");
 
   const getTranslations = () => {
     return data.metadata?.language === "ar" ? arTranslations : enTranslations;
@@ -72,6 +88,12 @@ export function ExportPanel({
       onAuthGate();
       return;
     }
+
+    if (!canExportDocx) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
     if (isExportingPdf || isExportingDocx) return;
 
     setIsExportingDocx(true);
@@ -155,6 +177,32 @@ export function ExportPanel({
       <div className="p-4 bg-muted/50 rounded-lg text-sm text-balance text-muted-foreground text-center">
         {t("tip")}
       </div>
+
+      {/* Upgrade Plan Modal */}
+      <AlertDialog open={showUpgradeModal} onOpenChange={setShowUpgradeModal}>
+        <AlertDialogContent className="sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Crown className="h-5 w-5 text-amber-500" />
+              {t("upgradeRequired.title")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("upgradeRequired.description")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0 mt-4">
+            <AlertDialogCancel className="sm:mr-auto sm:rtl:ml-auto sm:rtl:mr-0">
+              {t("upgradeRequired.cancel")}
+            </AlertDialogCancel>
+            <Link href="/plans" className="w-full sm:w-auto">
+              <AlertDialogAction className="w-full gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 border-0">
+                <Crown className="h-4 w-4 fill-current" />
+                {t("upgradeRequired.upgrade")}
+              </AlertDialogAction>
+            </Link>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

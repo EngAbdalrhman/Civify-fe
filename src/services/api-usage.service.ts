@@ -75,7 +75,7 @@ class ApiUsageService {
     if (params.endpoint) {
       input.filters?.push({
         fieldName: 'endpoint',
-        operation: 'cn', // contains
+        operation: 'MATCH',
         value: params.endpoint,
       });
     }
@@ -114,16 +114,16 @@ class ApiUsageService {
     };
 
     if (params.endpoint) {
-      input.filters?.push({ fieldName: 'endpoint', operation: 'cn', value: params.endpoint });
+      input.filters?.push({ fieldName: 'endpoint', operation: 'MATCH', value: params.endpoint });
     }
     if (params.email) {
-      input.filters?.push({ fieldName: 'user.email', operation: 'eq', value: params.email });
+      input.filters?.push({ fieldName: 'user.email', operation: 'EQUAL', value: params.email });
     }
     if (params.method) {
-      input.filters?.push({ fieldName: 'method', operation: 'eq', value: params.method });
+      input.filters?.push({ fieldName: 'method', operation: 'EQUAL', value: params.method });
     }
     if (params.statusCode) {
-      input.filters?.push({ fieldName: 'statusCode', operation: 'eq', value: params.statusCode });
+      input.filters?.push({ fieldName: 'statusCode', operation: 'EQUAL', value: params.statusCode });
     }
 
     const response = await apiClient.post<{ data: ApiUsageLogsResponse }>(
