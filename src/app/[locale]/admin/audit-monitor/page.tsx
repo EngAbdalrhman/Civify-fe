@@ -129,9 +129,18 @@ function buildInputDataModel<T>(
     )
     .map(([key, value]) => {
       const column = columns.find((c) => c.key === key);
+      const operation =
+        column?.filterOperation ||
+        (column?.filterType === "number" ||
+        column?.filterType === "dropdown" ||
+        column?.filterType === "select" ||
+        column?.filterType === "date"
+          ? "EQUAL"
+          : "MATCH");
+
       return {
         fieldName: key,
-        operation: (column?.filterOperation || "LIKE") as FilterOperation,
+        operation: operation as FilterOperation,
         value: value as string | number | boolean | null,
       };
     });

@@ -48,12 +48,12 @@ export default function ApiUsagePage() {
           sortable: true,
       },
       {
-          key: 'user', // Access flat fields via render
+          key: 'user.email',
           label: 'User',
           render: (_, item) => (
              <div className="flex flex-col">
-                 <span className="font-medium">{item.userName || 'System'}</span>
-                 <span className="text-xs text-muted-foreground">{item.userEmail || '-'}</span>
+                 <span className="font-medium">{item.userEmail || 'System'}</span>
+                 <span className="text-xs text-muted-foreground">{item.userId ? `#${item.userId}` : '-'}</span>
              </div>
           ),
           filterable: true,
@@ -61,7 +61,7 @@ export default function ApiUsagePage() {
           filterOperation: FilterOperation.MATCH
       },
       {
-          key: 'apiKey',
+          key: 'apiKey.keyPreview',
           label: 'API Key',
           render: (_, item) => <span className="font-mono text-xs">{item.apiKey || '-'}</span>,
           sortable: true,
@@ -98,11 +98,6 @@ export default function ApiUsagePage() {
                 {item.errorMessage || '-'}
             </span>
           )
-      },
-      {
-          key: 'responseTimeMs',
-          label: 'Duration (ms)',
-          sortable: true
       },
       {
           key: 'timestamp',
@@ -167,7 +162,7 @@ export default function ApiUsagePage() {
          <GenericList
             data={data}
             columns={columns}
-            mobilePrimaryColumns={['user', 'endpoint', 'statusCode', 'timestamp']}
+            mobilePrimaryColumns={['user.email', 'endpoint', 'statusCode', 'timestamp']}
             meta={pagination}
             isLoading={loading}
             onFilterChange={(filters) => setParams(prev => ({ ...prev, filters, page: 0 }))}

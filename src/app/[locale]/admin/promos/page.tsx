@@ -111,6 +111,7 @@ export default function PromosPage() {
       sortable: true,
       filterable: true,
       filterType: 'select',
+      filterOperation: FilterOperation.EQUAL,
       filterOptions: [
         { label: 'All', value: 'ALL' },
         { label: 'Plan', value: 'PLAN' },
@@ -142,6 +143,7 @@ export default function PromosPage() {
       sortable: true,
       filterable: true,
       filterType: 'select',
+      filterOperation: FilterOperation.EQUAL,
       filterOptions: [
         { label: tc('active'), value: 'true' },
         { label: tc('inactive'), value: 'false' },
