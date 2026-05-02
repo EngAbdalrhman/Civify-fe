@@ -18,6 +18,7 @@ export interface SubscriptionPlan {
   sortOrder?: number;
   hasApiAccess?: boolean;
   allowTranslation?: boolean;
+  allowDocExport?: boolean;
   jobMatchLimit?: number | null;
 }
 

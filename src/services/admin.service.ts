@@ -104,6 +104,7 @@ export interface AdminPlan {
   sortOrder: number;
   hasApiAccess?: boolean;
   allowTranslation?: boolean;
+  allowDocExport?: boolean;
   // Linked group
   linkedGroupId?: number;
   linkedGroupName?: string;
@@ -144,6 +145,7 @@ export interface CreatePlanRequest {
   sortOrder?: number;
   hasApiAccess?: boolean;
   allowTranslation?: boolean;
+  allowDocExport?: boolean;
 }
 
 export interface UpdatePlanRequest extends Partial<CreatePlanRequest> {}

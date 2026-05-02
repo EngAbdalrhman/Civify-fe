@@ -119,6 +119,7 @@
       "aiTailoring": "AI Resume Tailoring",
       "masking": "Personal Info Masking",
       "pdfExport": "PDF Export",
+      "docExport": "Word Document Export",
       "noWatermark": "No Watermark",
       "apiAccess": "API Access for Integrations",
       "translation": "Multilingual AI Translation",

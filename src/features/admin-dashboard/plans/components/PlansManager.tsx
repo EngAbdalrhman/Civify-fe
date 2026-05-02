@@ -88,6 +88,7 @@ export function PlansManager() {
     sortOrder: "0",
     hasApiAccess: false,
     allowTranslation: false,
+    allowDocExport: false,
   });
 
   // Fetch plans
@@ -132,6 +133,7 @@ export function PlansManager() {
       sortOrder: "0",
       hasApiAccess: false,
       allowTranslation: false,
+      allowDocExport: false,
     });
     setIsPlanDialogOpen(true);
   };
@@ -156,6 +158,7 @@ export function PlansManager() {
       sortOrder: plan.sortOrder?.toString() || "0",
       hasApiAccess: plan.hasApiAccess ?? false,
       allowTranslation: plan.allowTranslation ?? false,
+      allowDocExport: plan.allowDocExport ?? false,
     });
     setIsPlanDialogOpen(true);
   };
@@ -191,6 +194,7 @@ export function PlansManager() {
         sortOrder: parseInt(planFormData.sortOrder) || 0,
         hasApiAccess: planFormData.hasApiAccess,
         allowTranslation: planFormData.allowTranslation,
+        allowDocExport: planFormData.allowDocExport,
       };
 
       if (editingPlan) {
@@ -653,6 +657,21 @@ export function PlansManager() {
                   />
                   <Label htmlFor="allowTranslation" className="text-sm">
                     {t("form.allowTranslation") || "Allow Translation"}
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="allowDocExport"
+                    checked={planFormData.allowDocExport}
+                    onCheckedChange={(checked) =>
+                      setPlanFormData({
+                        ...planFormData,
+                        allowDocExport: checked,
+                      })
+                    }
+                  />
+                  <Label htmlFor="allowDocExport" className="text-sm">
+                    {t("form.allowDocExport") || "Allow Doc Export"}
                   </Label>
                 </div>
               </div>

@@ -103,6 +103,7 @@
       "sortOrder": "ترتيب العرض",
       "apiAccess": "الوصول للـ API",
       "allowTranslation": "السماح بالترجمة",
+      "allowDocExport": "السماح بتصدير مستند Word",
       "update": "تحديث"
     }
   },

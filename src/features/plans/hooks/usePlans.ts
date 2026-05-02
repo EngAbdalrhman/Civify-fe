@@ -60,6 +60,9 @@ export function usePlans(options: UsePlansOptions = {}): UsePlansReturn {
     features.push({ text: t('features.aiTailoring'), included: true });
     features.push({ text: t('features.masking'), included: true });
     features.push({ text: t('features.pdfExport'), included: true });
+    
+    // Doc Export
+    features.push({ text: t('features.docExport'), included: !!plan.allowDocExport });
 
     // Watermark
     if (!plan.watermark) {
