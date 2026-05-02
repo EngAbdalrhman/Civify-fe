@@ -102,6 +102,8 @@
       "showWatermark": "Show Watermark",
       "sortOrder": "Sort Order",
       "apiAccess": "API Access",
+      "allowTranslation": "Allow Translation",
+      "allowDocExport": "Allow Doc Export",
       "update": "Update"
     }
   },

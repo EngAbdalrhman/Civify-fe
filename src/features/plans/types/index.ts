@@ -17,6 +17,9 @@ export interface SubscriptionPlan {
   allowAnnualBilling?: boolean;
   sortOrder?: number;
   hasApiAccess?: boolean;
+  allowTranslation?: boolean;
+  allowDocExport?: boolean;
+  jobMatchLimit?: number | null;
 }
 
 export interface PlanFeature {
@@ -74,7 +77,7 @@ export interface PricingTierDisplay {
   price: number;
   period: string;
   description: string;
-  features: string[];
+  features: { text: string; included: boolean }[];
   highlighted?: boolean;
   cta: string;
   ctaLink: string;

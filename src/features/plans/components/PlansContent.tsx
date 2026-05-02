@@ -17,7 +17,15 @@ import { isAuthenticated } from "@/utils/cookies";
 
 import { useState, useEffect } from "react";
 
-export default function PlansContent() {
+interface PlansContentProps {
+  hideFAQ?: boolean;
+  isHeadingH1?: boolean;
+}
+
+export default function PlansContent({ 
+  hideFAQ = false, 
+  isHeadingH1 = true 
+}: PlansContentProps = {}) {
   const t = useTranslations("plans");
   const router = useRouter();
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
@@ -65,11 +73,17 @@ export default function PlansContent() {
   }
 
   return (
-    <div className="py-20 px-4">
+    <div className="py-20 px-4 overflow-x-hidden">
       <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-          {t("title")}
-        </h1>
+        {isHeadingH1 ? (
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+            {t("title")}
+          </h1>
+        ) : (
+          <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
+            {t("title")}
+          </h2>
+        )}
         <p className="text-xl text-muted-foreground">{t("subtitle")}</p>
 
         {/* Billing Toggle */}
@@ -147,9 +161,9 @@ export default function PlansContent() {
 
                       <ul className="mb-8 flex-1 space-y-4">
                         {plan.features.map((feature, i) => (
-                          <li key={i} className="flex items-center gap-3">
-                            <Check className="h-5 w-5 flex-shrink-0 text-primary" />
-                            <span className="text-sm">{feature}</span>
+                          <li key={i} className={`flex items-center gap-3 ${!feature.included ? 'opacity-50' : ''}`}>
+                            <Check className={`h-5 w-5 flex-shrink-0 ${feature.included ? 'text-primary' : 'text-muted-foreground opacity-50'}`} />
+                            <span className={`text-sm ${!feature.included ? 'line-through text-muted-foreground' : ''}`}>{feature.text}</span>
                           </li>
                         ))}
                       </ul>
@@ -205,9 +219,9 @@ export default function PlansContent() {
 
               <ul className="mb-8 flex-1 space-y-4">
                 {plan.features.map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3">
-                    <Check className="h-5 w-5 flex-shrink-0 text-primary" />
-                    <span className="text-sm">{feature}</span>
+                  <li key={i} className={`flex items-center gap-3 ${!feature.included ? 'opacity-50' : ''}`}>
+                    <Check className={`h-5 w-5 flex-shrink-0 ${feature.included ? 'text-primary' : 'text-muted-foreground opacity-50'}`} />
+                    <span className={`text-sm ${!feature.included ? 'line-through text-muted-foreground' : ''}`}>{feature.text}</span>
                   </li>
                 ))}
               </ul>
@@ -226,10 +240,11 @@ export default function PlansContent() {
       )}
 
       {/* FAQ Section */}
-      <div className="max-w-3xl mx-auto mt-24">
-        <h2 className="text-3xl font-bold text-center mb-12">
-          {t("faqTitle")}
-        </h2>
+      {!hideFAQ && (
+        <div className="max-w-3xl mx-auto mt-24">
+          <h2 className="text-3xl font-bold text-center mb-12">
+            {t("faqTitle")}
+          </h2>
         <div className="space-y-4">
           {[
             {
@@ -255,6 +270,7 @@ export default function PlansContent() {
           ))}
         </div>
       </div>
+      )}
 
       {/* Footer Info */}
       <div className="text-center mt-16 text-muted-foreground text-sm">
