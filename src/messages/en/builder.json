@@ -41,6 +41,12 @@
       "description": "Editable in Microsoft Word or Google Docs.",
       "exporting": "Generating DOCX..."
     },
+    "upgradeRequired": {
+      "title": "Upgrade Plan Required",
+      "description": "Exporting your resume to a Word Document (.docx) is a premium feature. Please upgrade your subscription plan to unlock this capability and easily edit your resume in Word.",
+      "cancel": "Cancel",
+      "upgrade": "View Plans"
+    },
     "tip": "Tip: Review your resume in the preview panel before downloading to ensure everything looks perfect."
   },
   "toasts": {
