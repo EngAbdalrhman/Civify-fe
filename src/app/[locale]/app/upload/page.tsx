@@ -478,6 +478,13 @@ export default function UploadPage() {
       },
       {
         onSuccess: (data) => {
+          // Explicitly set the template to "modern" for tailored CVs
+          if (data.tailoredCv) {
+            data.tailoredCv.metadata = {
+              ...(data.tailoredCv.metadata || {}),
+              templateId: "modern",
+            };
+          }
           setTailorResponse(data);
           setCurrentStep(4);
           // toast.success('CV tailored successfully!');
@@ -865,11 +872,11 @@ export default function UploadPage() {
                 </Button>
               </div>
             ) : (
-              <div className="space-y-2 max-h-[300px] overflow-y-auto">
+              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 rtl:pr-0 rtl:pl-2">
                 {storedResumes.map((resume) => (
                   <button
                     key={resume.id}
-                    className="w-full flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors text-left"
+                    className="w-full flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors text-start"
                     onClick={() => handleSelectStoredResume(resume)}
                   >
                     <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -881,7 +888,7 @@ export default function UploadPage() {
                         {new Date(resume.updatedAt).toLocaleDateString()}
                       </p>
                     </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                    <ArrowRight className="h-4 w-4 text-muted-foreground rtl:-scale-x-100" />
                   </button>
                 ))}
               </div>
