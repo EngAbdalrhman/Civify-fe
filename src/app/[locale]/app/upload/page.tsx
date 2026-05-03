@@ -41,6 +41,7 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/comp
 import {Separator} from "@/components/ui/separator";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger,} from "@/components/ui/accordion";
 import {Switch} from "@/components/ui/switch";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,} from "@/components/ui/dropdown-menu";
 import {
@@ -59,7 +60,6 @@ import {useTailorCv, useUploadCv} from "@/features/upload-cv/hooks";
 import {
     type CvTailorResponse,
     emptyResumeData,
-    PII_FIELDS,
     type ResumeData,
     type ResumeSection,
 } from "@/features/upload-cv/types";
@@ -69,6 +69,7 @@ import {ResumeService, ResumeSummary} from "@/services/resume.service";
 import {JobApplicationService} from "@/services/job-application.service";
 import {getAccessToken} from "@/utils/cookies";
 import {AuthGateDialog} from "@/features/resume-builder/components/AuthGateDialog";
+import {ResumePreview} from "@/features/resume-builder/components/ResumePreview";
 // import { AdBanner } from "@/components/ads/AdBanner";
 import {
     getUploadStep2TourSteps,
@@ -108,11 +109,7 @@ export default function UploadPage() {
   const [showTokenLimitModal, setShowTokenLimitModal] = useState(false);
   const [jobDescriptionError, setJobDescriptionError] = useState("");
   const [isSavingResume, setIsSavingResume] = useState(false);
-  const [isTrackingApplication, setIsTrackingApplication] = useState(false);
   const [savedResumeId, setSavedResumeId] = useState<string | null>(null);
-  const [trackedApplicationId, setTrackedApplicationId] = useState<
-    number | null
-  >(null);
   const [isDragging, setIsDragging] = useState(false);
   const [jdUrl, setJdUrl] = useState("");
   const [isScraping, setIsScraping] = useState(false);
@@ -173,8 +170,6 @@ export default function UploadPage() {
       const file = event.target.files?.[0];
       if (!file) return;
 
-      // Removed duplicate auth check here since it's now in handleUploadClick
-
       const validTypes = [
         "application/pdf",
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -199,7 +194,6 @@ export default function UploadPage() {
           }
         },
         onError: (error: any) => {
-          // Handle TOKEN_LIMIT_EXCEEDED error
           if (
             error?.errorCode === "TOKEN_LIMIT_EXCEEDED" ||
             error?.message === "TOKEN_LIMIT_EXCEEDED"
@@ -240,7 +234,6 @@ export default function UploadPage() {
       const file = event.dataTransfer.files?.[0];
       if (!file) return;
 
-      // Auth check
       const token = getAccessToken();
       if (!token) {
         setShowAuthGate(true);
@@ -284,7 +277,6 @@ export default function UploadPage() {
   );
 
   const handleManualEntry = useCallback(() => {
-    // Auth check
     const token = getAccessToken();
     if (!token) {
       setShowAuthGate(true);
@@ -295,9 +287,7 @@ export default function UploadPage() {
     setCurrentStep(2);
   }, []);
 
-  // Handler for opening resume selector
   const handleOpenResumeSelector = useCallback(async () => {
-    // Auth check
     const token = getAccessToken();
     if (!token) {
       setShowAuthGate(true);
@@ -317,7 +307,6 @@ export default function UploadPage() {
     }
   }, [router, t]);
 
-  // Handler for selecting a stored resume
   const handleSelectStoredResume = useCallback(
     async (resume: ResumeSummary) => {
       setShowResumeSelector(false);
@@ -338,8 +327,8 @@ export default function UploadPage() {
   );
 
   // Download handlers
-  const handleDownloadPdf = useCallback(async () => {
-    if (!tailorResponse) return;
+  const handleDownloadPdf = async () => {
+    if (!tailorResponse?.tailoredCv) return;
 
     setIsExportingPdf(true);
     try {
@@ -347,22 +336,20 @@ export default function UploadPage() {
 
       const template = (tailorResponse.tailoredCv.metadata?.templateId ||
         "modern") as TemplateType;
-      const color =
-        tailorResponse.tailoredCv.metadata?.primaryColor || "#000000";
+      const color = tailorResponse.tailoredCv.metadata?.primaryColor || "#000000";
 
       await exportToPdfPuppeteer(tailorResponse.tailoredCv, {
         filename,
         template,
         color,
       });
-      // toast.success('PDF downloaded successfully!');
     } catch (error) {
       console.error("PDF export failed:", error);
       toast.error(t("errors.exportPdfFailed"));
     } finally {
       setIsExportingPdf(false);
     }
-  }, [tailorResponse]);
+  };
 
   const handleDownloadDocx = useCallback(async () => {
     if (!tailorResponse) return;
@@ -371,7 +358,6 @@ export default function UploadPage() {
     try {
       const filename = `${tailorResponse.tailoredCv.personalInfo.fullName || "cv"}_tailored`;
       await exportToDocx(tailorResponse.tailoredCv, filename);
-      // toast.success('DOCX downloaded successfully!');
     } catch (error) {
       console.error("DOCX export failed:", error);
       toast.error(t("errors.exportDocxFailed"));
@@ -380,7 +366,6 @@ export default function UploadPage() {
     }
   }, [tailorResponse]);
 
-  // Save tailored CV to My Resumes
   const handleSaveToResumes = useCallback(async () => {
     if (!tailorResponse?.tailoredCv) return;
 
@@ -392,7 +377,6 @@ export default function UploadPage() {
         tailorResponse.tailoredCv,
       );
       setSavedResumeId(saved.id);
-      // toast.success('CV saved to My Resumes!');
     } catch (error) {
       console.error("Save to resumes failed:", error);
       toast.error(t("errors.saveFailed"));
@@ -400,30 +384,6 @@ export default function UploadPage() {
       setIsSavingResume(false);
     }
   }, [tailorResponse, jobTitle]);
-
-  // Track as Job Application
-  const handleTrackApplication = useCallback(async () => {
-    if (!tailorResponse) return;
-
-    setIsTrackingApplication(true);
-    try {
-      const application = await JobApplicationService.create({
-        jobTitle: jobTitle || "Unknown Position",
-        company: companyName || "Unknown Company",
-        jobDescription: jobDescription,
-        tailoredCV: JSON.stringify(tailorResponse.tailoredCv),
-        coverLetter: tailorResponse.coverLetter || undefined,
-        applicationStatus: "draft",
-      });
-      setTrackedApplicationId(application.id);
-      // toast.success('Added to Job Tracker!');
-    } catch (error) {
-      console.error("Track application failed:", error);
-      toast.error(t("errors.trackFailed"));
-    } finally {
-      setIsTrackingApplication(false);
-    }
-  }, [tailorResponse, jobTitle, companyName, jobDescription]);
 
   const handleEditInResumeBuilder = useCallback(async () => {
     if (!tailorResponse?.tailoredCv) return;
@@ -454,7 +414,6 @@ export default function UploadPage() {
   const handleGenerate = useCallback(() => {
     if (!resumeData) return;
 
-    // Validate job description
     const trimmedDesc = jobDescription.trim();
     if (!trimmedDesc) {
       setJobDescriptionError(t("errors.jobDescRequired"));
@@ -480,7 +439,6 @@ export default function UploadPage() {
         onSuccess: (data) => {
           setTailorResponse(data);
           setCurrentStep(4);
-          // toast.success('CV tailored successfully!');
         },
       },
     );
@@ -498,7 +456,6 @@ export default function UploadPage() {
   const handleScrapeJd = useCallback(async () => {
     if (!jdUrl) return;
 
-    // Basic URL validation
     try {
       new URL(jdUrl);
     } catch (_) {
@@ -524,7 +481,6 @@ export default function UploadPage() {
     }
   }, [jdUrl, t]);
 
-  // Update personal info
   const updatePersonalInfo = useCallback((field: string, value: string) => {
     setResumeData((prev) =>
       prev
@@ -536,7 +492,6 @@ export default function UploadPage() {
     );
   }, []);
 
-  // Add section item
   const addSectionItem = useCallback((sectionId: string) => {
     setResumeData((prev) => {
       if (!prev) return null;
@@ -564,7 +519,6 @@ export default function UploadPage() {
     });
   }, []);
 
-  // Update section item
   const updateSectionItem = useCallback(
     (
       sectionId: string,
@@ -592,7 +546,6 @@ export default function UploadPage() {
     [],
   );
 
-  // Remove section item
   const removeSectionItem = useCallback((sectionId: string, itemId: string) => {
     setResumeData((prev) => {
       if (!prev) return null;
@@ -610,7 +563,6 @@ export default function UploadPage() {
     });
   }, []);
 
-  // Add new section
   const addSection = useCallback(
     (type: ResumeSection["type"], title: string) => {
       setResumeData((prev) => {
@@ -632,34 +584,12 @@ export default function UploadPage() {
     [],
   );
 
-  // Mask value for display
-  const maskValue = useCallback(
-    (value: string | undefined) => {
-      if (!maskPII || !value) return value || "";
-      return "•".repeat(Math.min(value.length, 20));
-    },
-    [maskPII],
-  );
-
-  // Get display value
-  const getDisplayValue = useCallback(
-    (fieldPath: string, value: string | undefined) => {
-      if (maskPII && PII_FIELDS.includes(fieldPath as any)) {
-        return maskValue(value);
-      }
-      return value || "";
-    },
-    [maskPII, maskValue],
-  );
-
-  // Check if required fields are filled
   const isResumeValid = useCallback(() => {
     if (!resumeData) return false;
     const { personalInfo } = resumeData;
     return !!(personalInfo.fullName && personalInfo.email);
   }, [resumeData]);
 
-  // Get section type for rendering
   const getSectionType = (
     section: ResumeSection,
   ): "skills" | "languages" | "default" => {
@@ -669,7 +599,6 @@ export default function UploadPage() {
     return "default";
   };
 
-  // Check if there are additional features to show in tabs
   const hasAdditionalFeatures = useMemo(() => {
     if (!tailorResponse) return false;
     return !!(
@@ -686,7 +615,6 @@ export default function UploadPage() {
     { id: 4, title: t("steps.result"), icon: CheckCircle2 },
   ];
 
-  // Get score color
   const getScoreColor = (score: number) => {
     if (score >= 70) return "text-green-600";
     if (score >= 40) return "text-yellow-600";
@@ -803,7 +731,6 @@ export default function UploadPage() {
             </div>
           </div>
 
-          {/* Side by side buttons */}
           <div data-tour="upload-alternatives" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Button
               variant="outline"
@@ -865,11 +792,11 @@ export default function UploadPage() {
                 </Button>
               </div>
             ) : (
-              <div className="space-y-2 max-h-[300px] overflow-y-auto">
+              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 rtl:pr-0 rtl:pl-2">
                 {storedResumes.map((resume) => (
                   <button
                     key={resume.id}
-                    className="w-full flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors text-left"
+                    className="w-full flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors text-start"
                     onClick={() => handleSelectStoredResume(resume)}
                   >
                     <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -881,7 +808,7 @@ export default function UploadPage() {
                         {new Date(resume.updatedAt).toLocaleDateString()}
                       </p>
                     </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                    <ArrowRight className="h-4 w-4 text-muted-foreground rtl:-scale-x-100" />
                   </button>
                 ))}
               </div>
@@ -1002,7 +929,6 @@ export default function UploadPage() {
 
             // Skills Section: Consolidated single-block editing
             if (sectionType === "skills") {
-              // Get all skills as titles from items
               const allSkills = section.items
                 .map((item) => item.title)
                 .filter(Boolean);
@@ -1019,7 +945,6 @@ export default function UploadPage() {
                       <Textarea
                         value={allSkills.join(", ")}
                         onChange={(e) => {
-                          // Parse comma-separated input into individual items
                           const newSkills = e.target.value
                             .split(",")
                             .map((s) => s.trim())
@@ -1052,58 +977,6 @@ export default function UploadPage() {
                         rows={3}
                       />
                     </div>
-                    {/* Visual Tags */}
-                    {allSkills.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {allSkills.slice(0, 15).map((skill, idx) => (
-                          <span
-                            key={idx}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-md border border-blue-200"
-                          >
-                            {skill}
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const newSkills = allSkills.filter(
-                                  (_, i) => i !== idx,
-                                );
-                                setResumeData((prev) => {
-                                  if (!prev) return null;
-                                  return {
-                                    ...prev,
-                                    sections: prev.sections.map((s) =>
-                                      s.id === section.id
-                                        ? {
-                                            ...s,
-                                            items: newSkills.map((sk, i) => ({
-                                              id: `skill-${i}`,
-                                              title: sk,
-                                              subtitle: "",
-                                              date: "",
-                                              description: "",
-                                              location: "",
-                                              tags: [],
-                                              isVisible: true,
-                                            })),
-                                          }
-                                        : s,
-                                    ),
-                                  };
-                                });
-                              }}
-                              className="ml-0.5 hover:text-red-600 transition-colors"
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </span>
-                        ))}
-                        {allSkills.length > 15 && (
-                          <span className="px-2.5 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-md">
-                            +{allSkills.length - 15} more
-                          </span>
-                        )}
-                      </div>
-                    )}
                   </div>
                   </AccordionContent>
                 </AccordionItem>
@@ -1130,11 +1003,6 @@ export default function UploadPage() {
                       <Plus className="h-4 w-4 mr-1" /> Add
                     </Button>
                   </div>
-                  {section.items.length === 0 && (
-                    <p className="text-sm text-muted-foreground text-center py-4">
-                      No items yet. Click "Add" to add your {section.type}.
-                    </p>
-                  )}
                   {section.items.map((item) => (
                     <div
                       key={item.id}
@@ -1154,231 +1022,49 @@ export default function UploadPage() {
                           <Input
                             value={item.title}
                             onChange={(e) =>
-                              updateSectionItem(
-                                section.id,
-                                item.id,
-                                "title",
-                                e.target.value,
-                              )
+                              updateSectionItem(section.id, item.id, "title", e.target.value)
                             }
                             placeholder="Language (e.g., English)"
                           />
                           <Input
                             value={item.subtitle || ""}
                             onChange={(e) =>
-                              updateSectionItem(
-                                section.id,
-                                item.id,
-                                "subtitle",
-                                e.target.value,
-                              )
+                              updateSectionItem(section.id, item.id, "subtitle", e.target.value)
                             }
                             placeholder="Level (e.g., Native, Fluent)"
                           />
                         </div>
-                      ) : section.type.toLowerCase() === "certifications" ||
-                        section.title.toLowerCase().includes("course") ? (
-                        /* Courses/Certifications: Name + optional provider */
-                        <Input
-                          value={item.title}
-                          onChange={(e) =>
-                            updateSectionItem(
-                              section.id,
-                              item.id,
-                              "title",
-                              e.target.value,
-                            )
-                          }
-                          placeholder="Course/Certification Name"
-                        />
-                      ) : section.title.toLowerCase().includes("interest") ? (
-                        /* Interests: Name only */
-                        <Input
-                          value={item.title}
-                          onChange={(e) =>
-                            updateSectionItem(
-                              section.id,
-                              item.id,
-                              "title",
-                              e.target.value,
-                            )
-                          }
-                          placeholder="Interest (e.g., Chess, Photography)"
-                        />
-                      ) : section.title.toLowerCase().includes("activit") ||
-                        section.title.toLowerCase().includes("volunteer") ? (
-                        /* Activities/Volunteering: Title + Role + Date */
-                        <div className="space-y-3">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <Input
-                              value={item.title}
-                              onChange={(e) =>
-                                updateSectionItem(
-                                  section.id,
-                                  item.id,
-                                  "title",
-                                  e.target.value,
-                                )
-                              }
-                              placeholder="Organization/Event Name"
-                            />
-                            <Input
-                              value={item.subtitle || ""}
-                              onChange={(e) =>
-                                updateSectionItem(
-                                  section.id,
-                                  item.id,
-                                  "subtitle",
-                                  e.target.value,
-                                )
-                              }
-                              placeholder="Role (e.g., Volunteer, Organizer)"
-                            />
-                          </div>
-                          <Input
-                            value={item.date || ""}
-                            onChange={(e) =>
-                              updateSectionItem(
-                                section.id,
-                                item.id,
-                                "date",
-                                e.target.value,
-                              )
-                            }
-                            placeholder="Date (e.g., 01/2024 or 2023 - 2024)"
-                          />
-                        </div>
-                      ) : section.type.toLowerCase() === "projects" ? (
-                        /* Projects: Name + Tech Stack + Date + Description (no location) */
-                        <>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <Input
-                              value={item.title}
-                              onChange={(e) =>
-                                updateSectionItem(
-                                  section.id,
-                                  item.id,
-                                  "title",
-                                  e.target.value,
-                                )
-                              }
-                              placeholder="Project Name"
-                            />
-                            <Input
-                              value={item.subtitle || ""}
-                              onChange={(e) =>
-                                updateSectionItem(
-                                  section.id,
-                                  item.id,
-                                  "subtitle",
-                                  e.target.value,
-                                )
-                              }
-                              placeholder="Tech Stack / Category"
-                            />
-                          </div>
-                          <Input
-                            value={item.date || ""}
-                            onChange={(e) =>
-                              updateSectionItem(
-                                section.id,
-                                item.id,
-                                "date",
-                                e.target.value,
-                              )
-                            }
-                            placeholder="2024 or 01/2024 - Present"
-                          />
-                          <Textarea
-                            value={item.description || ""}
-                            onChange={(e) =>
-                              updateSectionItem(
-                                section.id,
-                                item.id,
-                                "description",
-                                e.target.value,
-                              )
-                            }
-                            placeholder="Brief description of the project..."
-                            rows={2}
-                          />
-                        </>
                       ) : (
-                        /* Default: Experience, Education - Full fields */
                         <>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <Input
                               value={item.title}
                               onChange={(e) =>
-                                updateSectionItem(
-                                  section.id,
-                                  item.id,
-                                  "title",
-                                  e.target.value,
-                                )
+                                updateSectionItem(section.id, item.id, "title", e.target.value)
                               }
-                              placeholder={
-                                section.type === "experience"
-                                  ? "Job Title"
-                                  : "Title"
-                              }
+                              placeholder="Title"
                             />
                             <Input
                               value={item.subtitle || ""}
                               onChange={(e) =>
-                                updateSectionItem(
-                                  section.id,
-                                  item.id,
-                                  "subtitle",
-                                  e.target.value,
-                                )
+                                updateSectionItem(section.id, item.id, "subtitle", e.target.value)
                               }
-                              placeholder={
-                                section.type === "experience"
-                                  ? "Company"
-                                  : section.type === "education"
-                                    ? "Institution"
-                                    : "Subtitle"
-                              }
+                              placeholder="Subtitle"
                             />
                           </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <Input
-                              value={item.date || ""}
-                              onChange={(e) =>
-                                updateSectionItem(
-                                  section.id,
-                                  item.id,
-                                  "date",
-                                  e.target.value,
-                                )
-                              }
-                              placeholder={t("sections.placeholders.date")}
-                            />
-                            <Input
-                              value={item.location || ""}
-                              onChange={(e) =>
-                                updateSectionItem(
-                                  section.id,
-                                  item.id,
-                                  "location",
-                                  e.target.value,
-                                )
-                              }
-                              placeholder={t("sections.placeholders.location")}
-                            />
-                          </div>
+                          <Input
+                            value={item.date || ""}
+                            onChange={(e) =>
+                              updateSectionItem(section.id, item.id, "date", e.target.value)
+                            }
+                            placeholder="Date"
+                          />
                           <Textarea
                             value={item.description || ""}
                             onChange={(e) =>
-                              updateSectionItem(
-                                section.id,
-                                item.id,
-                                "description",
-                                e.target.value,
-                              )
+                              updateSectionItem(section.id, item.id, "description", e.target.value)
                             }
-                            placeholder={t("sections.placeholders.description")}
+                            placeholder="Description"
                             rows={2}
                           />
                         </>
@@ -1392,7 +1078,6 @@ export default function UploadPage() {
           })}
           </Accordion>
 
-          {/* Add New Section Dropdown + Navigation */}
           <div
             data-tour="upload-step2-actions"
             className="flex justify-between items-center gap-3"
@@ -1411,64 +1096,20 @@ export default function UploadPage() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   {[
-                    {
-                      type: "experience",
-                      title: t("sections.experience"),
-                      match: ["experience", "professional experience"],
-                    },
-                    {
-                      type: "education",
-                      title: t("sections.education"),
-                      match: ["education"],
-                    },
-                    {
-                      type: "projects",
-                      title: t("sections.projects"),
-                      match: ["project"],
-                    },
-                    {
-                      type: "skills",
-                      title: t("sections.skills"),
-                      match: ["skill", "competenc"],
-                    },
-                    {
-                      type: "languages",
-                      title: t("sections.languages"),
-                      match: ["language"],
-                    },
-                    {
-                      type: "certifications",
-                      title: t("sections.certifications"),
-                      match: ["course", "certif"],
-                    },
-                    {
-                      type: "custom",
-                      title: t("sections.interests"),
-                      match: ["interest", "hobby"],
-                    },
-                    {
-                      type: "custom",
-                      title: t("sections.activities"),
-                      match: ["activit", "volunteer"],
-                    },
+                    { type: "experience", title: t("sections.experience"), match: ["experience", "professional experience"] },
+                    { type: "education", title: t("sections.education"), match: ["education"] },
+                    { type: "projects", title: t("sections.projects"), match: ["project"] },
+                    { type: "skills", title: t("sections.skills"), match: ["skill", "competenc"] },
+                    { type: "languages", title: t("sections.languages"), match: ["language"] },
+                    { type: "certifications", title: t("sections.certifications"), match: ["course", "certif"] },
+                    { type: "custom", title: t("sections.interests"), match: ["interest", "hobby"] },
+                    { type: "custom", title: t("sections.activities"), match: ["activit", "volunteer"] },
                   ]
-                    .filter(
-                      (s) =>
-                        !resumeData.sections.some((existing) =>
-                          s.match.some((m) =>
-                            existing.title.toLowerCase().includes(m),
-                          ),
-                        ),
-                    )
+                    .filter((s) => !resumeData.sections.some((existing) => s.match.some((m) => existing.title.toLowerCase().includes(m))))
                     .map((s) => (
                       <DropdownMenuItem
                         key={s.title}
-                        onClick={() =>
-                          addSection(
-                            s.type as ResumeSection["type"],
-                            s.title.toUpperCase(),
-                          )
-                        }
+                        onClick={() => addSection(s.type as ResumeSection["type"], s.title.toUpperCase())}
                         className="cursor-pointer"
                       >
                         <Plus className="h-4 w-4 mr-2 text-muted-foreground" />
@@ -1540,10 +1181,6 @@ export default function UploadPage() {
                     {t("actions.import") || "Import"}
                   </Button>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {t("upload.importUrlDesc") ||
-                    "Paste a LinkedIn or Indeed job URL to automatically extract the description."}
-                </p>
               </div>
 
               <div className="space-y-2">
@@ -1613,8 +1250,6 @@ export default function UploadPage() {
             </CardContent>
           </Card>
 
-          {/*<AdBanner />*/}
-
           <div data-tour="upload-step3-generate" className="flex justify-between gap-3">
             <Button variant="outline" onClick={() => setCurrentStep(2)}>
               <ArrowLeft className="mr-2 h-4 w-4" /> {t("actions.back")}
@@ -1639,79 +1274,39 @@ export default function UploadPage() {
         </div>
       )}
 
-      {/* Step 4: Result - Original Layout */}
+      {/* Step 4: Result */}
       {currentStep === 4 && tailorResponse && (
         <div className="space-y-6">
-          {/* Main Layout: Sidebar + Preview + Tips */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Left Sidebar */}
             <div className="lg:col-span-1 space-y-4">
-              {/* Status Card */}
               <Card data-tour="upload-step4-downloads">
                 <CardContent className="pt-6 space-y-4">
                   <div className="flex items-center gap-2 text-green-600">
                     <CheckCircle2 className="h-5 w-5" />
-                    <span className="font-semibold">
-                      {t("upload.cvGenerated")}
-                    </span>
+                    <span className="font-semibold">{t("upload.cvGenerated")}</span>
                   </div>
                   <p className="text-sm text-muted-foreground">
                     {t("upload.cvReadyDesc")}
                   </p>
 
                   <div className="space-y-2">
-                    <Button
-                      className="w-full"
-                      size="sm"
-                      onClick={handleDownloadPdf}
-                      disabled={isExportingPdf || isExportingDocx}
-                    >
+                    <Button className="w-full" size="sm" onClick={handleDownloadPdf} disabled={isExportingPdf || isExportingDocx}>
                       <Download className="mr-2 h-4 w-4" />
-                      {isExportingPdf
-                        ? t("upload.exporting")
-                        : t("upload.downloadPdf")}
+                      {isExportingPdf ? t("upload.exporting") : t("upload.downloadPdf")}
                     </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      size="sm"
-                      onClick={handleDownloadDocx}
-                      disabled={isExportingPdf || isExportingDocx}
-                    >
+                    <Button variant="outline" className="w-full" size="sm" onClick={handleDownloadDocx} disabled={isExportingPdf || isExportingDocx}>
                       <Download className="mr-2 h-4 w-4" />
-                      {isExportingDocx
-                        ? t("upload.exporting")
-                        : t("upload.downloadDocx")}
+                      {isExportingDocx ? t("upload.exporting") : t("upload.downloadDocx")}
                     </Button>
                   </div>
 
                   <Separator className="my-3" />
 
                   <div className="space-y-2">
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      size="sm"
-                      onClick={handleSaveToResumes}
-                      disabled={isSavingResume || !!savedResumeId}
-                    >
+                    <Button variant="outline" className="w-full" size="sm" onClick={handleSaveToResumes} disabled={isSavingResume || !!savedResumeId}>
                       <Save className="mr-2 h-4 w-4" />
-                      {savedResumeId
-                        ? t("upload.saved")
-                        : isSavingResume
-                          ? t("upload.saving")
-                          : t("upload.saveToResumes")}
+                      {savedResumeId ? t("upload.saved") : isSavingResume ? t("upload.saving") : t("upload.saveToResumes")}
                     </Button>
-                    {/* <Button 
-                      variant="outline" 
-                      className="w-full" 
-                      size="sm"
-                      onClick={handleTrackApplication}
-                      disabled={isTrackingApplication || !!trackedApplicationId}
-                    >
-                      <Bookmark className="mr-2 h-4 w-4" />
-                      {trackedApplicationId ? 'Added to Tracker' : isTrackingApplication ? 'Adding...' : 'Track Application'}
-                    </Button> */}
                   </div>
                 </CardContent>
               </Card>
@@ -1719,91 +1314,80 @@ export default function UploadPage() {
               {/* Refine Options */}
               <Card data-tour="upload-step4-refine">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">
-                    {t("upload.refineResult")}
-                  </CardTitle>
+                  <CardTitle className="text-base">{t("upload.refineResult")}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    size="sm"
-                    onClick={handleEditInResumeBuilder}
-                    disabled={isSavingResume}
-                  >
+                  <Button variant="ghost" className="w-full justify-start" size="sm" onClick={handleEditInResumeBuilder} disabled={isSavingResume}>
                     <Edit2 className="mr-2 h-4 w-4" />{" "}
                     {isSavingResume ? t("upload.saving") : t("upload.editSections")}
                   </Button>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    size="sm"
-                    onClick={() => setCurrentStep(3)}
-                  >
+                  <Button variant="ghost" className="w-full justify-start" size="sm" onClick={() => setCurrentStep(3)}>
                     <RefreshCw className="mr-2 h-4 w-4" />{" "}
                     {t("upload.regenerateVariant")}
                   </Button>
+                  <Separator className="my-2" />
+                  <div className="space-y-2 pt-1">
+                    <Label className="text-xs text-muted-foreground">Template</Label>
+                    <Select 
+                      value={tailorResponse.tailoredCv.metadata?.templateId || "modern"} 
+                      onValueChange={(val) => {
+                        setTailorResponse(prev => prev ? {
+                          ...prev,
+                          tailoredCv: { ...prev.tailoredCv, metadata: { ...(prev.tailoredCv.metadata || {}), templateId: val as TemplateType } }
+                        } : prev);
+                      }}
+                    >
+                      <SelectTrigger className="w-full h-8 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="modern">Modern</SelectItem>
+                        <SelectItem value="classic">Classic</SelectItem>
+                        <SelectItem value="creative">Creative</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </CardContent>
               </Card>
 
               {/* ATS Score */}
               <Card data-tour="upload-step4-ats">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">
-                    {t("upload.atsMatchScore")}
-                  </CardTitle>
+                  <CardTitle className="text-base">{t("upload.atsMatchScore")}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Before/After Comparison */}
                   {tailorResponse.originalAtsScore && (
                     <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg mb-3">
                       <div className="text-center">
-                        <p className="text-xs text-muted-foreground mb-1">
-                          {t("upload.before")}
-                        </p>
-                        <span
-                          className={`text-xl font-bold ${getScoreColor(tailorResponse.originalAtsScore.overall)}`}
-                        >
+                        <p className="text-xs text-muted-foreground mb-1">{t("upload.before")}</p>
+                        <span className={`text-xl font-bold ${getScoreColor(tailorResponse.originalAtsScore.overall)}`}>
                           {tailorResponse.originalAtsScore.overall}%
                         </span>
                       </div>
                       <div className="flex flex-col items-center">
                         <ArrowRight className="h-5 w-5 text-muted-foreground" />
-                        {tailorResponse.atsScore.overall >
-                          tailorResponse.originalAtsScore.overall && (
+                        {tailorResponse.atsScore.overall > tailorResponse.originalAtsScore.overall && (
                           <span className="text-xs text-green-600 font-semibold">
-                            +
-                            {tailorResponse.atsScore.overall -
-                              tailorResponse.originalAtsScore.overall}
-                            %
+                            +{tailorResponse.atsScore.overall - tailorResponse.originalAtsScore.overall}%
                           </span>
                         )}
                       </div>
                       <div className="text-center">
-                        <p className="text-xs text-muted-foreground mb-1">
-                          {t("upload.after")}
-                        </p>
-                        <span
-                          className={`text-xl font-bold ${getScoreColor(tailorResponse.atsScore.overall)}`}
-                        >
+                        <p className="text-xs text-muted-foreground mb-1">{t("upload.after")}</p>
+                        <span className={`text-xl font-bold ${getScoreColor(tailorResponse.atsScore.overall)}`}>
                           {tailorResponse.atsScore.overall}%
                         </span>
                       </div>
                     </div>
                   )}
 
-                  {/* Main Score Display */}
                   <div className="space-y-2">
                     <div className="flex items-baseline gap-2">
-                      <span
-                        className={`text-4xl font-bold ${getScoreColor(tailorResponse.atsScore.overall)}`}
-                      >
+                      <span className={`text-4xl font-bold ${getScoreColor(tailorResponse.atsScore.overall)}`}>
                         {tailorResponse.atsScore.overall}%
                       </span>
                       <span className="text-sm text-muted-foreground">
-                        {tailorResponse.originalAtsScore
-                          ? "Optimized Score"
-                          : "Match Rate"}
+                        {tailorResponse.originalAtsScore ? "Optimized Score" : "Match Rate"}
                       </span>
                     </div>
                     <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -1815,374 +1399,64 @@ export default function UploadPage() {
                     <div className="grid grid-cols-2 gap-2 mt-3 text-sm">
                       <div>
                         <p className="text-muted-foreground">Keywords</p>
-                        <p className="font-semibold">
-                          {tailorResponse.atsScore.keywordMatch}%
-                        </p>
+                        <p className="font-semibold">{tailorResponse.atsScore.keywordMatch}%</p>
                       </div>
                       <div>
                         <p className="text-muted-foreground">Skills</p>
-                        <p className="font-semibold">
-                          {tailorResponse.atsScore.skillsMatch}%
-                        </p>
+                        <p className="font-semibold">{tailorResponse.atsScore.skillsMatch}%</p>
                       </div>
                     </div>
                   </div>
 
-                  {/* Missing Keywords */}
-                  {tailorResponse.atsScore.missingKeywords &&
-                    tailorResponse.atsScore.missingKeywords.length > 0 && (
-                      <div>
-                        <p className="text-sm font-medium mb-2">
-                          Missing Keywords
-                        </p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {tailorResponse.atsScore.missingKeywords
-                            .slice(0, 10)
-                            .map((keyword, i) => (
-                              <span
-                                key={i}
-                                className="px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-xs rounded"
-                              >
-                                {keyword}
-                              </span>
-                            ))}
-                        </div>
+                  {tailorResponse.atsScore.missingKeywords && tailorResponse.atsScore.missingKeywords.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium mb-2">Missing Keywords</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {tailorResponse.atsScore.missingKeywords.slice(0, 10).map((keyword, i) => (
+                          <span key={i} className="px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-xs rounded">
+                            {keyword}
+                          </span>
+                        ))}
                       </div>
-                    )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
-
-              {/*<AdBanner />*/}
             </div>
 
-            {/* Main Preview */}
             <div className="lg:col-span-3">
               <Card data-tour="upload-step4-preview">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-base">Preview</CardTitle>
                   <div className="flex items-center gap-2">
-                    <Switch
-                      checked={maskPII}
-                      onCheckedChange={setMaskPII}
-                      id="mask-pii"
-                    />
-                    <Label
-                      htmlFor="mask-pii"
-                      className="text-sm flex items-center gap-1"
-                    >
-                      {maskPII ? (
-                        <EyeOff className="h-3.5 w-3.5" />
-                      ) : (
-                        <Eye className="h-3.5 w-3.5" />
-                      )}
+                    <Switch checked={maskPII} onCheckedChange={setMaskPII} id="mask-pii" />
+                    <Label htmlFor="mask-pii" className="text-sm flex items-center gap-1">
+                      {maskPII ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                       Mask Personal Info
                     </Label>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {/* CV Preview Document */}
-                  <div
-                    ref={cvPreviewRef}
-                    className="bg-white rounded-[1px] border shadow-sm mx-auto w-full max-w-[850px] min-h-[1100px] p-[40px] text-gray-900 font-sans leading-relaxed selection:bg-blue-100"
-                  >
-                    <div className="space-y-6">
-                      {/* Header */}
-                      <header className="border-b-2 border-gray-800 pb-5">
-                        <h1 className="text-4xl font-bold uppercase tracking-tight text-gray-900 mb-3">
-                          {getDisplayValue(
-                            "personalInfo.fullName",
-                            tailorResponse.tailoredCv.personalInfo.fullName,
-                          )}
-                        </h1>
-
-                        <div className="flex flex-wrap items-center gap-y-2 text-sm text-gray-700 font-medium">
-                          {tailorResponse.tailoredCv.personalInfo.email && (
-                            <span className="flex items-center hover:text-primary transition-colors">
-                              <Mail className="w-3.5 h-3.5 mr-1.5" />
-                              {getDisplayValue(
-                                "personalInfo.email",
-                                tailorResponse.tailoredCv.personalInfo.email,
-                              )}
-                            </span>
-                          )}
-                          {tailorResponse.tailoredCv.personalInfo.phone && (
-                            <>
-                              <span className="mx-3 text-gray-300">|</span>
-                              <span className="flex items-center hover:text-primary transition-colors">
-                                <Phone className="w-3.5 h-3.5 mr-1.5" />
-                                {getDisplayValue(
-                                  "personalInfo.phone",
-                                  tailorResponse.tailoredCv.personalInfo.phone,
-                                )}
-                              </span>
-                            </>
-                          )}
-                          {(tailorResponse.tailoredCv.personalInfo.city ||
-                            tailorResponse.tailoredCv.personalInfo.country) && (
-                            <>
-                              <span className="mx-3 text-gray-300">|</span>
-                              <span className="flex items-center hover:text-primary transition-colors">
-                                <MapPin className="w-3.5 h-3.5 mr-1.5" />
-                                {[
-                                  tailorResponse.tailoredCv.personalInfo.city,
-                                  tailorResponse.tailoredCv.personalInfo
-                                    .country,
-                                ]
-                                  .filter(Boolean)
-                                  .join(", ")}
-                              </span>
-                            </>
-                          )}
-                        </div>
-
-                        {/* Social Links */}
-                        {(tailorResponse.tailoredCv.personalInfo.linkedin ||
-                          tailorResponse.tailoredCv.personalInfo.github ||
-                          tailorResponse.tailoredCv.personalInfo.website) && (
-                          <div className="flex flex-wrap items-center gap-y-2 mt-2 text-sm text-gray-700 font-medium">
-                            {tailorResponse.tailoredCv.personalInfo.linkedin &&
-                              (maskPII ? (
-                                <span className="mr-4 text-gray-400">
-                                  ••••••••••••
-                                </span>
-                              ) : (
-                                <a
-                                  href={
-                                    tailorResponse.tailoredCv.personalInfo.linkedin.startsWith(
-                                      "http",
-                                    )
-                                      ? tailorResponse.tailoredCv.personalInfo
-                                          .linkedin
-                                      : tailorResponse.tailoredCv.personalInfo.linkedin.includes(
-                                            "linkedin.com",
-                                          )
-                                        ? `https://${tailorResponse.tailoredCv.personalInfo.linkedin}`
-                                        : `https://linkedin.com/in/${tailorResponse.tailoredCv.personalInfo.linkedin}`
-                                  }
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="flex items-center mr-4 text-blue-700 hover:text-blue-900 transition-colors hover:underline"
-                                >
-                                  <Linkedin className="w-3.5 h-3.5 mr-1.5" />
-                                  {tailorResponse.tailoredCv.personalInfo.linkedin
-                                    .replace(
-                                      /^https?:\/\/(www\.)?linkedin\.com\/in\//,
-                                      "",
-                                    )
-                                    .replace(/\/$/, "")}
-                                </a>
-                              ))}
-                            {tailorResponse.tailoredCv.personalInfo.github &&
-                              (maskPII ? (
-                                <span className="mr-4 text-gray-400">
-                                  ••••••••••••
-                                </span>
-                              ) : (
-                                <a
-                                  href={
-                                    tailorResponse.tailoredCv.personalInfo.github.startsWith(
-                                      "http",
-                                    )
-                                      ? tailorResponse.tailoredCv.personalInfo
-                                          .github
-                                      : tailorResponse.tailoredCv.personalInfo.github.includes(
-                                            "github.com",
-                                          )
-                                        ? `https://${tailorResponse.tailoredCv.personalInfo.github}`
-                                        : `https://github.com/${tailorResponse.tailoredCv.personalInfo.github}`
-                                  }
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="flex items-center mr-4 text-gray-800 hover:text-black transition-colors hover:underline"
-                                >
-                                  <Github className="w-3.5 h-3.5 mr-1.5" />
-                                  {tailorResponse.tailoredCv.personalInfo.github
-                                    .replace(
-                                      /^https?:\/\/(www\.)?github\.com\//,
-                                      "",
-                                    )
-                                    .replace(/\/$/, "")}
-                                </a>
-                              ))}
-                            {tailorResponse.tailoredCv.personalInfo.website &&
-                              (maskPII ? (
-                                <span className="mr-4 text-gray-400">
-                                  ••••••••••••
-                                </span>
-                              ) : (
-                                <a
-                                  href={
-                                    tailorResponse.tailoredCv.personalInfo.website.startsWith(
-                                      "http",
-                                    )
-                                      ? tailorResponse.tailoredCv.personalInfo
-                                          .website
-                                      : `https://${tailorResponse.tailoredCv.personalInfo.website}`
-                                  }
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="flex items-center mr-4 text-emerald-700 hover:text-emerald-900 transition-colors hover:underline"
-                                >
-                                  <Globe className="w-3.5 h-3.5 mr-1.5" />
-                                  {tailorResponse.tailoredCv.personalInfo.website
-                                    .replace(/^https?:\/\/(www\.)?/, "")
-                                    .replace(/\/$/, "")}
-                                </a>
-                              ))}
-                          </div>
-                        )}
-                      </header>
-
-                      {/* Summary */}
-                      {tailorResponse.tailoredCv.personalInfo.summary && (
-                        <section>
-                          <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-3 flex items-center gap-2">
-                            <span className="w-1 h-3.5 bg-gray-900 rounded-sm inline-block"></span>
-                            Professional Summary
-                          </h2>
-                          <div className="text-[0.925rem] text-gray-800 leading-relaxed text-justify">
-                            {tailorResponse.tailoredCv.personalInfo.summary}
-                          </div>
-                        </section>
-                      )}
-
-                      {/* Dynamic Sections */}
-                      {tailorResponse.tailoredCv.sections.map(
-                        (section, sectionIndex) => {
-                        if (!section.items?.length) return null;
-                        const sectionType = section.type.toLowerCase();
-                        const sectionKey = `${section.id || "section"}-${sectionIndex}`;
-
-                        return (
-                          <section key={sectionKey} className="mt-6">
-                            <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-4 border-b border-gray-200 pb-2 flex items-center gap-2">
-                              <span className="w-1 h-3.5 bg-gray-900 rounded-sm inline-block"></span>
-                              {section.title}
-                            </h2>
-
-                            {sectionType === "skills" ? (
-                              <div className="flex flex-wrap gap-2">
-                                {section.items.flatMap((item, itemIndex) =>
-                                  item.tags && item.tags.length > 0
-                                    ? item.tags.map((tag, idx) => (
-                                        <span
-                                          key={`${sectionKey}-${item.id || "item"}-${itemIndex}-${idx}`}
-                                          className="px-3 py-1 bg-gray-100 border border-gray-200 text-gray-800 text-sm font-medium rounded-[4px] hover:bg-gray-200 transition-colors"
-                                        >
-                                          {tag}
-                                        </span>
-                                      ))
-                                    : item.title
-                                      ? [
-                                          <span
-                                            key={`${sectionKey}-${item.id || "item"}-${itemIndex}`}
-                                            className="px-3 py-1 bg-gray-100 border border-gray-200 text-gray-800 text-sm font-medium rounded-[4px]"
-                                          >
-                                            {item.title}
-                                          </span>,
-                                        ]
-                                      : [],
-                                )}
-                              </div>
-                            ) : sectionType === "languages" ? (
-                              <div className="grid grid-cols-2 gap-4">
-                                {section.items.map((item, itemIndex) => (
-                                  <div
-                                    key={`${sectionKey}-${item.id || "item"}-${itemIndex}`}
-                                    className="flex items-center justify-between p-2 bg-gray-50 rounded-md border border-gray-100"
-                                  >
-                                    <span className="font-semibold text-gray-900 text-sm">
-                                      {item.title}
-                                    </span>
-                                    {item.subtitle && (
-                                      <span className="text-gray-600 text-xs uppercase tracking-wide bg-white px-2 py-0.5 rounded shadow-sm border">
-                                        {item.subtitle}
-                                      </span>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="space-y-6">
-                                {section.items.map((item, itemIndex) => (
-                                  <div
-                                    key={`${sectionKey}-${item.id || "item"}-${itemIndex}`}
-                                    className="group"
-                                  >
-                                    <div className="flex justify-between items-baseline mb-1">
-                                      <h3 className="font-bold text-gray-900 text-[1.05rem]">
-                                        {item.title}
-                                        {item.subtitle && (
-                                          <span className="font-normal text-gray-700 mx-2">
-                                            |
-                                          </span>
-                                        )}
-                                        {item.subtitle && (
-                                          <span className="text-gray-700 font-semibold">
-                                            {item.subtitle}
-                                          </span>
-                                        )}
-                                      </h3>
-                                      <div className="text-right shrink-0 ml-4">
-                                        <span className="font-medium text-gray-600 text-sm block">
-                                          {item.date}
-                                        </span>
-                                        {item.location && (
-                                          <span className="text-gray-500 text-xs block mt-0.5">
-                                            {item.location}
-                                          </span>
-                                        )}
-                                      </div>
-                                    </div>
-
-                                    {item.description && (
-                                      <div className="text-[0.925rem] text-gray-800 leading-relaxed mt-1.5 text-justify group-hover:text-gray-950 transition-colors">
-                                        {item.description.includes("•") ||
-                                        item.description.includes("- ") ? (
-                                          <ul className="list-disc leading-relaxed pl-5 space-y-1">
-                                            {item.description
-                                              .split(/(?=[•-])/)
-                                              .map((line, idx) => {
-                                                const cleanLine = line
-                                                  .replace(/^[•-]\s*/, "")
-                                                  .trim();
-                                                if (!cleanLine) return null;
-                                                return (
-                                                  <li
-                                                    key={idx}
-                                                    className="pl-1"
-                                                  >
-                                                    {cleanLine}
-                                                  </li>
-                                                );
-                                              })}
-                                          </ul>
-                                        ) : (
-                                          item.description
-                                        )}
-                                      </div>
-                                    )}
-
-                                    {item.tags && item.tags.length > 0 && (
-                                      <div className="flex flex-wrap gap-x-1.5 gap-y-1 mt-2.5">
-                                        {item.tags.map((tag, idx) => (
-                                          <span
-                                            key={idx}
-                                            className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-gray-100 text-gray-600"
-                                          >
-                                            {tag}
-                                          </span>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </section>
-                        );
-                        },
-                      )}
+                  <div className="overflow-x-auto w-full flex justify-center py-4 bg-muted/10 rounded-lg">
+                    <div style={{ transform: "scale(0.85)", transformOrigin: "top center" }}>
+                      <div ref={cvPreviewRef}>
+                        <ResumePreview
+                          data={{
+                            ...tailorResponse.tailoredCv,
+                            personalInfo: maskPII
+                              ? {
+                                  ...tailorResponse.tailoredCv.personalInfo,
+                                  fullName: "••••••••",
+                                  email: tailorResponse.tailoredCv.personalInfo.email ? "••••••••@••••.•••" : "",
+                                  phone: tailorResponse.tailoredCv.personalInfo.phone ? "•••••••••••" : "",
+                                  linkedin: tailorResponse.tailoredCv.personalInfo.linkedin ? "••••••••" : "",
+                                  github: tailorResponse.tailoredCv.personalInfo.github ? "••••••••" : "",
+                                  website: tailorResponse.tailoredCv.personalInfo.website ? "••••••••" : "",
+                                }
+                              : tailorResponse.tailoredCv.personalInfo,
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </CardContent>
