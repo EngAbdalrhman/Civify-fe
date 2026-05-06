@@ -437,6 +437,12 @@ const handle401Error = async <T>(
       clearAuthAndRedirect();
     } else {
       console.log("[Auth] Refresh failed due to network/server error. Preserving session.");
+      // Provide actionable UX feedback instead of failing silently
+      if (refreshError.status === 429) {
+        toast.error("Too many requests. Please wait a moment and try again.");
+      } else {
+        toast.error("Network connection unstable. Please check your internet.");
+      }
     }
     throw refreshError;
   }
