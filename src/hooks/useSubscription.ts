@@ -10,5 +10,7 @@ export const useActiveSubscription = () => {
       if (!token) return null;
       return subscriptionService.getMyActiveSubscription();
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: true,
   });
 };

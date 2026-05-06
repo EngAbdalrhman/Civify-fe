@@ -131,7 +131,9 @@ const attemptTokenRefresh = async (): Promise<string> => {
     });
 
     if (!response.ok) {
-      throw new Error(`Refresh failed with status ${response.status}`);
+      const error: any = new Error(`Refresh failed with status ${response.status}`);
+      error.status = response.status;
+      throw error;
     }
 
     const data = await response.json();
@@ -405,7 +407,7 @@ const handle401Error = async <T>(
     const headers = new Headers(options.headers);
     headers.set("Authorization", `Bearer ${accessToken}`);
     return await apiClient<T>(url, { ...options, headers, _retry: true });
-  } catch (refreshError) {
+  } catch (refreshError: any) {
     console.log("[Auth] Token refresh failed after all retries");
     isRefreshing = false;
     if (refreshTimeoutId) {
@@ -417,7 +419,18 @@ const handle401Error = async <T>(
         ? refreshError
         : new Error("Refresh failed"),
     );
-    clearAuthAndRedirect();
+    
+    // Only clear auth if the server explicitly rejected the refresh token
+    if (
+      refreshError.status === 401 ||
+      refreshError.status === 403 ||
+      refreshError.status === 400 ||
+      refreshError.message === "Refresh token expired"
+    ) {
+      clearAuthAndRedirect();
+    } else {
+      console.log("[Auth] Refresh failed due to network/server error. Preserving session.");
+    }
     throw refreshError;
   }
 };
