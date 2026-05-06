@@ -157,11 +157,18 @@ const attemptTokenRefresh = async (): Promise<string> => {
     refreshRetryCount = 0;
 
     return accessToken;
-  } catch (error) {
+  } catch (error: any) {
     console.log(
       `[Auth] Token refresh attempt ${refreshRetryCount} failed:`,
       error,
     );
+
+    // If it's an explicit client error (4xx except 429 rate limit), the token is definitively invalid. 
+    // Don't retry, throw immediately so the session is cleared.
+    if (error.status && error.status >= 400 && error.status < 500 && error.status !== 429) {
+      console.log(`[Auth] Token refresh explicitly rejected with status ${error.status}. Aborting retries.`);
+      throw error;
+    }
 
     // If we haven't exceeded max retries, try again
     if (refreshRetryCount < MAX_REFRESH_RETRIES) {
@@ -420,12 +427,12 @@ const handle401Error = async <T>(
         : new Error("Refresh failed"),
     );
     
-    // Only clear auth if the server explicitly rejected the refresh token
+    // Only clear auth if the server explicitly rejected the refresh token (any 4xx except 429)
     if (
-      refreshError.status === 401 ||
-      refreshError.status === 403 ||
-      refreshError.status === 400 ||
-      refreshError.message === "Refresh token expired"
+      refreshError.status &&
+      refreshError.status >= 400 &&
+      refreshError.status < 500 &&
+      refreshError.status !== 429
     ) {
       clearAuthAndRedirect();
     } else {
