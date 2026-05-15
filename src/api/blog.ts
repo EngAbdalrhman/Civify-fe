@@ -1,7 +1,7 @@
 import type { BlogListItem, BlogPost } from "@/types/blog";
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "https://api.civify.cv";
+  process.env.NEXT_PUBLIC_API_URL || "https://civify.cv/apis";
 
 /**
  * Server-side fetch helpers for blog — used in SSR page components.

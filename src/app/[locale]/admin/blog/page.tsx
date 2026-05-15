@@ -99,7 +99,7 @@ export default function AdminBlogPage() {
   const loadPosts = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await apiClient.get<BlogPost[]>("/admin/blogs/");
+      const res = await apiClient.get<BlogPost[]>("/v1/admin/blogs/");
       setPosts(res.data);
     } catch {
       toast.error("Failed to load blog posts");
@@ -157,10 +157,10 @@ export default function AdminBlogPage() {
     setIsSaving(true);
     try {
       if (editingPost) {
-        await apiClient.put(`/admin/blogs/${editingPost.id}`, form);
+        await apiClient.put(`/v1/admin/blogs/${editingPost.id}`, form);
         toast.success("Post updated");
       } else {
-        await apiClient.post("/admin/blogs/", form);
+        await apiClient.post("/v1/admin/blogs/", form);
         toast.success("Post created");
       }
       setIsDialogOpen(false);
@@ -175,7 +175,7 @@ export default function AdminBlogPage() {
   const handleDelete = async (post: BlogPost) => {
     if (!confirm(`Delete "${post.title}"? This cannot be undone.`)) return;
     try {
-      await apiClient.delete(`/admin/blogs/${post.id}`);
+      await apiClient.delete(`/v1/admin/blogs/${post.id}`);
       toast.success("Post deleted");
       loadPosts();
     } catch {
@@ -185,7 +185,7 @@ export default function AdminBlogPage() {
 
   const handleTogglePublish = async (post: BlogPost) => {
     try {
-      await apiClient.put(`/admin/blogs/${post.id}`, { published: !post.published });
+      await apiClient.put(`/v1/admin/blogs/${post.id}`, { published: !post.published });
       toast.success(post.published ? "Post unpublished" : "Post published");
       loadPosts();
     } catch {
@@ -195,7 +195,7 @@ export default function AdminBlogPage() {
 
   const handleToggleFeatured = async (post: BlogPost) => {
     try {
-      await apiClient.put(`/admin/blogs/${post.id}`, { featured: !post.featured });
+      await apiClient.put(`/v1/admin/blogs/${post.id}`, { featured: !post.featured });
       toast.success(post.featured ? "Removed from featured" : "Marked as featured");
       loadPosts();
     } catch {
