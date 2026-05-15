@@ -46,7 +46,7 @@ RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
 # -----------------------------------------------------------------------------
 # 4. Runner Stage
 # -----------------------------------------------------------------------------
-FROM node:20-slim AS runner
+FROM node:22-slim AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -55,6 +55,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # Install Chromium and required dependencies for Puppeteer
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
+       dumb-init \
        ca-certificates \
        chromium \
        fonts-ipafont-gothic \
