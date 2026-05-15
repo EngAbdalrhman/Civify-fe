@@ -1,0 +1,20 @@
+{
+  "title": "Career Resources & Blog",
+  "subtitle": "Expert advice, industry insights, and practical guides to help you land your dream job",
+  "readMore": "Read More",
+  "backToBlog": "Back to Blog",
+  "noPosts": "No articles published yet. Check back soon!",
+  "readingTime": "{time} read",
+  "publishedOn": "Published on",
+  "by": "By",
+  "featured": "Featured",
+  "cta": {
+    "title": "Ready to Build Your Perfect Resume?",
+    "subtitle": "Use AI to tailor your CV for any job description and get 3x more interviews.",
+    "button": "Start Building for Free"
+  },
+  "meta": {
+    "title": "Career Resources & Blog | Civify",
+    "description": "Expert guides on resume writing, ATS optimization, job search strategies, and career advice. Learn how to build a professional CV that gets interviews."
+  }
+}
