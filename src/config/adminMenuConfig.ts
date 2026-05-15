@@ -9,6 +9,7 @@ import {
   FileSearch,
   Clock,
   Receipt,
+  BookOpen,
   LucideIcon 
 } from 'lucide-react';
 
@@ -86,6 +87,12 @@ export const ADMIN_MENU_ITEMS: AdminMenuItem[] = [
     labelKey: 'scheduler', 
     permission: 'SCHEDULER_TRIGGER' 
   },
+  {
+    path: '/admin/blog',
+    icon: BookOpen,
+    labelKey: 'blog',
+    permission: 'VIEW.BLOG',
+  },
 ];
 
 /**
@@ -139,6 +146,12 @@ export const ADMIN_ACTION_PERMISSIONS = {
 
   // Logs
   LOGS_CV: 'LOGS.CV',
+
+  // Blog
+  BLOG_VIEW: 'VIEW.BLOG',
+  BLOG_CREATE: 'CREATE.BLOG',
+  BLOG_EDIT: 'UPDATE.BLOG',
+  BLOG_DELETE: 'DELETE.BLOG',
 } as const;
 
 export type AdminActionPermission = typeof ADMIN_ACTION_PERMISSIONS[keyof typeof ADMIN_ACTION_PERMISSIONS];
