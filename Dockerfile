@@ -12,7 +12,7 @@ RUN corepack enable
 FROM base AS deps
 WORKDIR /app
 COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install --frozen-lockfile
+RUN PNPM_ALLOW_BUILT_DEPENDENCIES=true pnpm install --frozen-lockfile
 
 # -----------------------------------------------------------------------------
 # 3. Builder Stage (ARGS ADDED HERE)
