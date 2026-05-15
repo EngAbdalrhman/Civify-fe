@@ -77,5 +77,13 @@
     "ogDescription": "Read our cancellation and refund policy.",
     "twitterTitle": "Cancellation Policy - Civify",
     "twitterDescription": "Read our cancellation and refund policy."
+  },
+  "blog": {
+    "title": "Career Resources & Blog | Civify",
+    "description": "Expert guides on resume writing, ATS optimization, job search strategies, and career advice. Learn how to build a professional CV that gets interviews.",
+    "ogTitle": "Career Resources & Blog | Civify",
+    "ogDescription": "Expert guides on resume writing, ATS optimization, job search strategies, and career advice.",
+    "twitterTitle": "Career Resources & Blog | Civify",
+    "twitterDescription": "Expert guides on resume writing, ATS optimization, job search strategies, and career advice."
   }
 }

@@ -43,3 +43,5 @@ next-env.d.ts
 # chromium binary for PDF generation (generated at build time)
 /public/chromium-pack.tar
 .idea/
+.kiro/specs/account-deletion-and-job-match-upgrade/requirements.md
+.kiro/*
