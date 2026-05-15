@@ -12,7 +12,7 @@ RUN corepack enable
 FROM base AS deps
 WORKDIR /app
 COPY package.json pnpm-lock.yaml* ./
-RUN PNPM_ALLOW_BUILT_DEPENDENCIES=true pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 # -----------------------------------------------------------------------------
 # 3. Builder Stage (ARGS ADDED HERE)
@@ -55,7 +55,6 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # Install Chromium and required dependencies for Puppeteer
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-       dumb-init \
        ca-certificates \
        chromium \
        fonts-ipafont-gothic \
