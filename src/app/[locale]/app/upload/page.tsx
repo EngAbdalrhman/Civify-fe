@@ -80,6 +80,7 @@ import {
     useTour,
 } from "@/features/onboarding";
 import {ensureUniqueSectionItemIds} from "@/features/resume-builder/utils/normalizeResumeIds";
+import {usePreviewScale} from "@/features/resume-builder/hooks/usePreviewScale";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -89,6 +90,7 @@ export default function UploadPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cvPreviewRef = useRef<HTMLDivElement>(null);
+  const previewContainerRef = useRef<HTMLDivElement>(null);
 
   // State
   const [currentStep, setCurrentStep] = useState(1);
@@ -126,6 +128,12 @@ export default function UploadPage() {
 
   // Tour
   const { startTour } = useTour();
+
+  // Responsive preview scaling for Step 4 (matches Resume Builder)
+  const { scale: previewScale, scaledHeight: previewScaledHeight } = usePreviewScale({
+    containerRef: previewContainerRef,
+    enabled: currentStep === 4,
+  });
 
   useTourAutoStart("upload", getUploadTourSteps(tTour), { enabled: currentStep === 1 });
   useTourAutoStart("upload-step2", getUploadStep2TourSteps(tTour), {
@@ -437,7 +445,18 @@ export default function UploadPage() {
       },
       {
         onSuccess: (data) => {
-          setTailorResponse(data);
+          setTailorResponse({
+            ...data,
+            tailoredCv: {
+              ...data.tailoredCv,
+              metadata: {
+                templateId: "modern",
+                primaryColor: "#2563eb",
+                fontFamily: "Inter",
+                ...(data.tailoredCv.metadata || {}),
+              },
+            },
+          });
           setCurrentStep(4);
         },
       },
@@ -1338,12 +1357,14 @@ export default function UploadPage() {
                       }}
                     >
                       <SelectTrigger className="w-full h-8 text-sm">
-                        <SelectValue />
+                        <SelectValue placeholder="Modern" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="modern">Modern</SelectItem>
                         <SelectItem value="classic">Classic</SelectItem>
                         <SelectItem value="creative">Creative</SelectItem>
+                        <SelectItem value="executive">Executive</SelectItem>
+                        <SelectItem value="minimal">Minimal</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -1437,8 +1458,14 @@ export default function UploadPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="overflow-x-auto w-full flex justify-center py-4 bg-muted/10 rounded-lg">
-                    <div style={{ transform: "scale(0.85)", transformOrigin: "top center" }}>
+                  <div ref={previewContainerRef} className="flex-1 overflow-auto w-full flex justify-center py-4 bg-muted/10 rounded-lg">
+                    <div
+                      className="origin-top transition-transform duration-200 ease-in-out shrink-0"
+                      style={{
+                        transform: `scale(${previewScale})`,
+                        height: previewScaledHeight ? `${previewScaledHeight}px` : "auto",
+                      }}
+                    >
                       <div ref={cvPreviewRef}>
                         <ResumePreview
                           data={{
