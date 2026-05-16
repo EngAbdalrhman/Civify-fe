@@ -34,7 +34,7 @@ export const blogService = {
       // Direct fetch to support SSR in Next.js App Router without token requirements
       const res = await fetch(`${BASE_URL}/v1/blogs`, {
         // next: { revalidate: 3600 }, // Cache for 1 hour
-          cache: 'no-store'
+          next: { revalidate: 60 }
       });
       if (!res.ok) throw new Error("Failed to fetch published posts");
       return await res.json();
@@ -51,7 +51,7 @@ export const blogService = {
   async getFeaturedPosts(): Promise<PublicBlogPost[]> {
     try {
       const res = await fetch(`${BASE_URL}/v1/blogs/featured`, {
-        cache: 'no-store'
+        next: { revalidate: 60 }
       });
       if (!res.ok) throw new Error("Failed to fetch featured posts");
       return await res.json();
@@ -68,7 +68,7 @@ export const blogService = {
   async getPostBySlug(slug: string): Promise<PublicBlogDetails | null> {
     try {
       const res = await fetch(`${BASE_URL}/v1/blogs/${slug}`, {
-        cache: 'no-store'
+        next: { revalidate: 60 }
       });
       if (!res.ok) {
         if (res.status === 404) return null;
@@ -88,7 +88,7 @@ export const blogService = {
   async getAllSlugs(): Promise<string[]> {
     try {
       const res = await fetch(`${BASE_URL}/v1/blogs/slugs`, {
-        cache: 'no-store'
+        next: { revalidate: 60 }
       });
       if (!res.ok) throw new Error("Failed to fetch slugs");
       return await res.json();
