@@ -20,7 +20,10 @@ export interface PublicBlogDetails extends PublicBlogPost {
   updatedAt: string;
 }
 
-const BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? "https://civify.cv/apis").replace(/\/$/, "");
+const isServer = typeof window === "undefined";
+const PUBLIC_API = (process.env.NEXT_PUBLIC_API_URL ?? "https://civify.cv/apis").replace(/\/$/, "");
+const INTERNAL_API = process.env.INTERNAL_API_URL ? process.env.INTERNAL_API_URL.replace(/\/$/, "") : PUBLIC_API;
+const BASE_URL = isServer ? INTERNAL_API : PUBLIC_API;
 
 export const blogService = {
   /**
