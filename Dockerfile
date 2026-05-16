@@ -54,6 +54,13 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Inject build args as ENVs for runtime
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
+ARG INTERNAL_API_URL
+ENV INTERNAL_API_URL=$INTERNAL_API_URL
+
 # Install Chromium and required dependencies for Puppeteer
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
