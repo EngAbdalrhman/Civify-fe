@@ -1,129 +1,170 @@
+import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { notFound } from "next/navigation";
-import type { Metadata } from "next";
-import { fetchPostBySlug, fetchPublishedSlugs } from "@/api/blog";
-import BlogPostContent from "@/features/blog/components/BlogPostContent";
+import { blogService } from "@/services/blog.service";
+import Link from "next/link";
+import { ArrowLeft, ArrowRight, Clock, Calendar, User } from "lucide-react";
+import Image from "next/image";
 
 type Props = {
-  params: Promise<{ locale: string; slug: string }>;
+  params: { locale: string; slug: string };
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
-
-  if (!routing.locales.includes(locale as "en" | "ar")) {
+  if (!routing.locales.includes(locale as any)) {
     notFound();
   }
 
-  const post = await fetchPostBySlug(slug);
-  if (!post) notFound();
-
-  const baseUrl = (
-    process.env.NEXT_PUBLIC_BASE_URL || "https://civify.cv"
-  ).replace(/\/$/, "");
-
-  const description =
-    post.metaDescription || post.excerpt || post.title;
-  const keywords = post.metaKeywords
-    ? post.metaKeywords.split(",").map((k) => k.trim())
-    : undefined;
+  const post = await blogService.getPostBySlug(slug);
+  if (!post) {
+    return { title: "Not Found" };
+  }
 
   return {
     title: post.title,
-    description,
-    keywords,
-    authors: post.author ? [{ name: post.author }] : [{ name: "Civify" }],
+    description: post.metaDescription,
+    keywords: post.metaKeywords ? post.metaKeywords.split(",").map(k => k.trim()) : [],
     openGraph: {
-      type: "article",
       title: post.title,
-      description,
-      url: `${baseUrl}/${locale}/blog/${slug}`,
-      siteName: "Civify",
-      locale: locale === "ar" ? "ar_SA" : "en_US",
-      alternateLocale: locale === "ar" ? "en_US" : "ar_SA",
+      description: post.metaDescription,
+      type: "article",
       publishedTime: post.publishedAt,
-      authors: post.author ? [post.author] : ["Civify"],
-      ...(post.coverImage && {
-        images: [{ url: post.coverImage, width: 1200, height: 630, alt: post.title }],
-      }),
+      authors: [post.authorName || "Civify"],
+      images: post.coverImageUrl ? [{ url: post.coverImageUrl }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
-      description,
-      ...(post.coverImage && { images: [post.coverImage] }),
-    },
-    alternates: {
-      canonical: `/${locale}/blog/${slug}`,
-      languages: {
-        en: `/en/blog/${slug}`,
-        ar: `/ar/blog/${slug}`,
-      },
+      description: post.metaDescription,
+      images: post.coverImageUrl ? [post.coverImageUrl] : undefined,
     },
   };
 }
 
-export async function generateStaticParams() {
-  const slugs = await fetchPublishedSlugs();
-  return routing.locales.flatMap((locale) =>
-    slugs.map((slug) => ({ locale, slug })),
-  );
-}
-
-export default async function BlogPostPage({ params }: Props) {
+export default async function BlogPostPage({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}) {
   const { locale, slug } = await params;
+  setRequestLocale(locale);
 
-  if (!routing.locales.includes(locale as "en" | "ar")) {
+  const t = await getTranslations({ locale, namespace: "blog" });
+  const post = await blogService.getPostBySlug(slug);
+
+  if (!post) {
     notFound();
   }
 
-  setRequestLocale(locale);
+  const isRtl = locale === "ar";
+  const ArrowIcon = isRtl ? ArrowRight : ArrowLeft;
 
-  const post = await fetchPostBySlug(slug);
-  if (!post) notFound();
-
-  const baseUrl = (
-    process.env.NEXT_PUBLIC_BASE_URL || "https://civify.cv"
-  ).replace(/\/$/, "");
-
-  // Article JSON-LD structured data for rich search results
-  const articleJsonLd = {
+  // JSON-LD for Article
+  const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "BlogPosting",
     headline: post.title,
-    description: post.metaDescription || post.excerpt || post.title,
-    url: `${baseUrl}/${locale}/blog/${slug}`,
+    image: post.coverImageUrl ? [post.coverImageUrl] : [],
     datePublished: post.publishedAt,
-    author: {
-      "@type": "Person",
-      name: post.author || "Civify",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Civify",
-      logo: {
-        "@type": "ImageObject",
-        url: `${baseUrl}/civify-logo-simple.png`,
+    dateModified: post.updatedAt,
+    author: [
+      {
+        "@type": "Person",
+        name: post.authorName || "Civify Team",
       },
-    },
-    ...(post.coverImage && {
-      image: {
-        "@type": "ImageObject",
-        url: post.coverImage,
-        width: 1200,
-        height: 630,
-      },
-    }),
+    ],
+    description: post.metaDescription,
   };
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <BlogPostContent post={post} locale={locale} />
+      <div className="container max-w-4xl py-12 md:py-16 space-y-8">
+        <Link
+          href={`/${locale}/blog`}
+          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+        >
+          <ArrowIcon className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
+          {t("backToBlog")}
+        </Link>
+
+        <article className="space-y-8">
+          {/* Header */}
+          <div className="space-y-6 text-center">
+            <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl lg:leading-[1.1]">
+              {post.title}
+            </h1>
+            
+            <div className="flex flex-wrap items-center justify-center gap-4 text-muted-foreground text-sm">
+              {post.authorName && (
+                <div className="flex items-center gap-1.5">
+                  <User className="h-4 w-4" />
+                  <span>{post.authorName}</span>
+                </div>
+              )}
+              {post.publishedAt && (
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="h-4 w-4" />
+                  <span>
+                    {new Date(post.publishedAt).toLocaleDateString(locale, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </span>
+                </div>
+              )}
+              {post.readingTime && (
+                <div className="flex items-center gap-1.5">
+                  <Clock className="h-4 w-4" />
+                  <span>{post.readingTime}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Cover Image */}
+          {post.coverImageUrl && (
+            <div className="aspect-[2/1] relative w-full overflow-hidden rounded-xl border bg-muted">
+              <Image
+                src={post.coverImageUrl}
+                alt={post.title}
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
+          )}
+
+          {/* Content */}
+          {/* The prose classes are from @tailwindcss/typography. 
+              We assume the content might be HTML provided from the admin dashboard.
+              If it doesn't have Tailwind Typography plugin installed, standard classes can be used. */}
+          <div 
+            className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-primary"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
+        </article>
+
+        {/* CTA Footer */}
+        <div className="mt-16 rounded-2xl bg-muted/50 p-8 text-center border">
+          <h2 className="text-2xl font-bold mb-4">{t("cta.title")}</h2>
+          <p className="text-muted-foreground mb-6">
+            {t("cta.subtitle")}
+          </p>
+          <Link
+            href={`/${locale}/signup`}
+            className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
+          >
+            {t("cta.button")}
+          </Link>
+        </div>
+      </div>
     </>
   );
 }
