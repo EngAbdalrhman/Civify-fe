@@ -95,7 +95,7 @@ export default async function BlogPostPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="container max-w-4xl py-12 md:py-16 space-y-8">
+      <div className="container mx-auto max-w-4xl py-12 md:py-16 space-y-8">
         <Link
           href={`/${locale}/blog`}
           className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors"

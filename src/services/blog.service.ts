@@ -20,7 +20,7 @@ export interface PublicBlogDetails extends PublicBlogPost {
   updatedAt: string;
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://civify.cv/apis";
+const BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? "https://civify.cv/apis").replace(/\/$/, "");
 
 export const blogService = {
   /**
@@ -29,7 +29,7 @@ export const blogService = {
   async getPublishedPosts(): Promise<PublicBlogPost[]> {
     try {
       // Direct fetch to support SSR in Next.js App Router without token requirements
-      const res = await fetch(`${BASE_URL}/v1/blogs/`, {
+      const res = await fetch(`${BASE_URL}/v1/blogs`, {
         next: { revalidate: 3600 }, // Cache for 1 hour
       });
       if (!res.ok) throw new Error("Failed to fetch published posts");

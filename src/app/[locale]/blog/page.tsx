@@ -43,7 +43,7 @@ export default async function BlogIndexPage({
   const posts = await blogService.getPublishedPosts();
 
   return (
-    <div className="container max-w-6xl py-12 md:py-24 space-y-12">
+    <div className="container mx-auto max-w-6xl py-12 md:py-24 space-y-12">
       <div className="space-y-4 text-center max-w-3xl mx-auto">
         <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
           {t("title")}
