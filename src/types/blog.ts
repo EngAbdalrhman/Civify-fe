@@ -3,10 +3,9 @@ export interface BlogPost {
   title: string;
   slug: string;
   content: string;
-  excerpt?: string;
   metaDescription?: string;
   metaKeywords?: string;
-  coverImage?: string;
+  coverImageUrl?: string;
   author?: string;
   readingTime?: string;
   publishedAt?: string;
@@ -18,10 +17,9 @@ export interface BlogListItem {
   id: string;
   title: string;
   slug: string;
-  excerpt?: string;
   metaDescription?: string;
   metaKeywords?: string;
-  coverImage?: string;
+  coverImageUrl?: string;
   author?: string;
   readingTime?: string;
   publishedAt?: string;
