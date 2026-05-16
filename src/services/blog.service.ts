@@ -57,8 +57,7 @@ export const blogService = {
       return await res.json();
     } catch (error) {
       console.error("Error fetching published posts:", error);
-      if (process.env.NODE_ENV !== "production") throw error;
-      return [];
+      throw error;
     }
   },
 
@@ -75,8 +74,7 @@ export const blogService = {
       return await res.json();
     } catch (error) {
       console.error("Error fetching featured posts:", error);
-      if (process.env.NODE_ENV !== "production") throw error;
-      return [];
+      throw error;
     }
   },
 
@@ -96,8 +94,7 @@ export const blogService = {
       return await res.json();
     } catch (error) {
       console.error(`Error fetching post by slug ${slug}:`, error);
-      if (process.env.NODE_ENV !== "production") throw error;
-      return null;
+      throw error;
     }
   },
 
@@ -114,8 +111,7 @@ export const blogService = {
       return await res.json();
     } catch (error) {
       console.error("Error fetching slugs:", error);
-      if (process.env.NODE_ENV !== "production") throw error;
-      return [];
+      throw error;
     }
   }
 };
