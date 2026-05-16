@@ -34,10 +34,13 @@ async function resolveUrl(urlStr: string): Promise<string> {
     const url = new URL(urlStr);
     if (!url.hostname.includes('.') || url.hostname.includes('-backend')) {
       const dns = await import('dns/promises');
-      const { address } = await dns.lookup(url.hostname, { family: 4 });
-      return urlStr.replace(url.hostname, address);
+      const addresses = await dns.resolve4(url.hostname);
+      if (addresses && addresses.length > 0) {
+        return urlStr.replace(url.hostname, addresses[0]);
+      }
     }
   } catch (error) {
+    console.warn(`[DNS Bypass] Failed to resolve ${urlStr} via resolve4:`, error);
     // Fallback to original URL on failure
   }
   return urlStr;
