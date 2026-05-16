@@ -1,7 +1,7 @@
+import { getBlogApiBaseUrl } from "@/services/blog.service";
 import type { BlogListItem, BlogPost } from "@/types/blog";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "https://civify.cv/apis";
+const API_BASE = getBlogApiBaseUrl();
 
 /**
  * Server-side fetch helpers for blog — used in SSR page components.
@@ -33,13 +33,14 @@ export async function fetchFeaturedPosts(): Promise<BlogListItem[]> {
   }
 }
 
-export async function fetchPostBySlug(
-  slug: string,
-): Promise<BlogPost | null> {
+export async function fetchPostBySlug(slug: string): Promise<BlogPost | null> {
   try {
-    const res = await fetch(`${API_BASE}/v1/blogs/${slug}`, {
-      next: { revalidate: 300 },
-    });
+    const res = await fetch(
+      `${API_BASE}/v1/blogs/${encodeURIComponent(slug)}`,
+      {
+        next: { revalidate: 300 },
+      },
+    );
     if (!res.ok) return null;
     return res.json();
   } catch {

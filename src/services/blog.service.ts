@@ -92,7 +92,7 @@ function apiUrlFromFrontendBase(
   }
 }
 
-function getBlogApiBaseUrl(): string {
+export function getBlogApiBaseUrl(): string {
   const configuredApiUrl = normalizeUrl(process.env.NEXT_PUBLIC_API_URL);
   const derivedApiUrl = apiUrlFromFrontendBase(
     process.env.NEXT_PUBLIC_BASE_URL,
