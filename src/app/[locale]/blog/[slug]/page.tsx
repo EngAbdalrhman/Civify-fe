@@ -6,9 +6,10 @@ import { blogService } from "@/services/blog.service";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Clock, Calendar, User } from "lucide-react";
 import Image from "next/image";
+import sanitizeHtml from "sanitize-html";
 
 type Props = {
-  params: { locale: string; slug: string };
+  params: Promise<{ locale: string; slug: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -43,12 +44,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+export async function generateStaticParams() {
+  const slugs = await blogService.getAllSlugs();
+  return routing.locales.flatMap((locale) =>
+    slugs.map((slug) => ({ locale, slug })),
+  );
+}
+
 export default async function BlogPostPage({
   params,
-}: {
-  params: Promise<{ locale: string; slug: string }>;
-}) {
+}: Props) {
   const { locale, slug } = await params;
+  
+  if (!routing.locales.includes(locale as any)) {
+    notFound();
+  }
+  
   setRequestLocale(locale);
 
   const t = await getTranslations({ locale, namespace: "blog" });
@@ -147,7 +158,15 @@ export default async function BlogPostPage({
               If it doesn't have Tailwind Typography plugin installed, standard classes can be used. */}
           <div 
             className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-primary"
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ 
+              __html: sanitizeHtml(post.content, {
+                allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'h1', 'h2', 'span']),
+                allowedAttributes: {
+                  ...sanitizeHtml.defaults.allowedAttributes,
+                  '*': ['style', 'class']
+                }
+              }) 
+            }}
           />
         </article>
 

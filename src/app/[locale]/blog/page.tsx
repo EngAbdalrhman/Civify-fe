@@ -4,11 +4,11 @@ import { routing } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 import { blogService } from "@/services/blog.service";
 import Link from "next/link";
-import { Clock, Calendar, ChevronRight } from "lucide-react";
+import { Clock, Calendar } from "lucide-react";
 import Image from "next/image";
 
 type Props = {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -24,12 +24,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
 export default async function BlogIndexPage({
   params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+}: Props) {
   const { locale } = await params;
+  
+  if (!routing.locales.includes(locale as any)) {
+    notFound();
+  }
+  
   setRequestLocale(locale);
 
   const t = await getTranslations({ locale, namespace: "blog" });
