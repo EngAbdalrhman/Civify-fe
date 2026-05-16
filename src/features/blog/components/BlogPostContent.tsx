@@ -21,10 +21,10 @@ export default function BlogPostContent({ post, locale }: BlogPostContentProps) 
   return (
     <main className="min-h-screen bg-background">
       {/* Cover image */}
-      {post.coverImage && (
+      {post.coverImageUrl && (
         <div className="relative h-64 w-full overflow-hidden bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-800 dark:to-purple-900/20 md:h-96">
           <Image
-            src={post.coverImage}
+            src={post.coverImageUrl}
             alt={post.title}
             fill
             priority
@@ -85,9 +85,9 @@ export default function BlogPostContent({ post, locale }: BlogPostContentProps) 
             </div>
 
             {/* Excerpt / description */}
-            {(post.excerpt || post.metaDescription) && (
+            {post.metaDescription && (
               <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-                {post.excerpt || post.metaDescription}
+                {post.metaDescription}
               </p>
             )}
           </header>

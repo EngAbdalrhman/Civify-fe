@@ -56,9 +56,9 @@ function BlogCard({ post }: { post: BlogListItem }) {
       <CardContent className="p-0">
         {/* Cover image */}
         <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-800 dark:to-purple-900/20">
-          {post.coverImage ? (
+          {post.coverImageUrl ? (
             <Image
-              src={post.coverImage}
+              src={post.coverImageUrl}
               alt={post.title}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -109,9 +109,9 @@ function BlogCard({ post }: { post: BlogListItem }) {
           </h2>
 
           {/* Excerpt */}
-          {(post.excerpt || post.metaDescription) && (
+          {post.metaDescription && (
             <p className="mb-4 line-clamp-3 text-sm text-muted-foreground">
-              {post.excerpt || post.metaDescription}
+              {post.metaDescription}
             </p>
           )}
 
