@@ -22,11 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: t("title"),
     description: t("description"),
   };
-}
-
-export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }));
-}
+export const dynamic = 'force-dynamic';
 
 export default async function BlogIndexPage({
   params,

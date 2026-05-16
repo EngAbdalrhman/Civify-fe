@@ -42,14 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       images: post.coverImageUrl ? [post.coverImageUrl] : undefined,
     },
   };
-}
-
-export async function generateStaticParams() {
-  const slugs = await blogService.getAllSlugs();
-  return routing.locales.flatMap((locale) =>
-    slugs.map((slug) => ({ locale, slug })),
-  );
-}
+export const dynamic = 'force-dynamic';
 
 export default async function BlogPostPage({
   params,
