@@ -32,7 +32,7 @@ async function resolveUrl(urlStr: string): Promise<string> {
   if (!isServer) return urlStr;
   try {
     const url = new URL(urlStr);
-    if (!url.hostname.includes('.') || url.hostname === 'civify-backend-uqcqfh') {
+    if (!url.hostname.includes('.') || url.hostname.includes('-backend')) {
       const dns = await import('dns/promises');
       const { address } = await dns.lookup(url.hostname, { family: 4 });
       return urlStr.replace(url.hostname, address);
