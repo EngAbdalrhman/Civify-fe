@@ -25,16 +25,33 @@ const PUBLIC_API = (process.env.NEXT_PUBLIC_API_URL ?? "https://civify.cv/apis")
 const INTERNAL_API = process.env.INTERNAL_API_URL ? process.env.INTERNAL_API_URL.replace(/\/$/, "") : PUBLIC_API;
 const BASE_URL = isServer ? INTERNAL_API : PUBLIC_API;
 
+/**
+ * Resolves internal Docker Swarm hostnames to IPv4
+ */
+async function resolveUrl(urlStr: string): Promise<string> {
+  if (!isServer) return urlStr;
+  try {
+    const url = new URL(urlStr);
+    if (!url.hostname.includes('.') || url.hostname === 'civify-backend-uqcqfh') {
+      const dns = await import('dns/promises');
+      const { address } = await dns.lookup(url.hostname, { family: 4 });
+      return urlStr.replace(url.hostname, address);
+    }
+  } catch (error) {
+    // Fallback to original URL on failure
+  }
+  return urlStr;
+}
+
 export const blogService = {
   /**
    * Get all published blog posts
    */
   async getPublishedPosts(): Promise<PublicBlogPost[]> {
     try {
-      // Direct fetch to support SSR in Next.js App Router without token requirements
-      const res = await fetch(`${BASE_URL}/v1/blogs`, {
-        // next: { revalidate: 3600 }, // Cache for 1 hour
-          next: { revalidate: 60 }
+      const targetUrl = await resolveUrl(`${BASE_URL}/v1/blogs`);
+      const res = await fetch(targetUrl, {
+        next: { revalidate: 60 }
       });
       if (!res.ok) throw new Error("Failed to fetch published posts");
       return await res.json();
@@ -50,7 +67,8 @@ export const blogService = {
    */
   async getFeaturedPosts(): Promise<PublicBlogPost[]> {
     try {
-      const res = await fetch(`${BASE_URL}/v1/blogs/featured`, {
+      const targetUrl = await resolveUrl(`${BASE_URL}/v1/blogs/featured`);
+      const res = await fetch(targetUrl, {
         next: { revalidate: 60 }
       });
       if (!res.ok) throw new Error("Failed to fetch featured posts");
@@ -67,7 +85,8 @@ export const blogService = {
    */
   async getPostBySlug(slug: string): Promise<PublicBlogDetails | null> {
     try {
-      const res = await fetch(`${BASE_URL}/v1/blogs/${slug}`, {
+      const targetUrl = await resolveUrl(`${BASE_URL}/v1/blogs/${slug}`);
+      const res = await fetch(targetUrl, {
         next: { revalidate: 60 }
       });
       if (!res.ok) {
@@ -87,7 +106,8 @@ export const blogService = {
    */
   async getAllSlugs(): Promise<string[]> {
     try {
-      const res = await fetch(`${BASE_URL}/v1/blogs/slugs`, {
+      const targetUrl = await resolveUrl(`${BASE_URL}/v1/blogs/slugs`);
+      const res = await fetch(targetUrl, {
         next: { revalidate: 60 }
       });
       if (!res.ok) throw new Error("Failed to fetch slugs");
