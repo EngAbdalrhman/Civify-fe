@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
 # 1. Base Stage
 # -----------------------------------------------------------------------------
-FROM node:20-slim AS base
+FROM node:22-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
@@ -11,7 +11,7 @@ RUN corepack enable
 # -----------------------------------------------------------------------------
 FROM base AS deps
 WORKDIR /app
-COPY package.json pnpm-lock.yaml* ./
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml* ./
 RUN pnpm install --frozen-lockfile
 
 # -----------------------------------------------------------------------------
@@ -38,6 +38,7 @@ ENV NEXT_PUBLIC_SENTRY_DSN=$NEXT_PUBLIC_SENTRY_DSN
 ENV NEXT_PUBLIC_ADS_ENABLED=$NEXT_PUBLIC_ADS_ENABLED
 ENV NEXT_TELEMETRY_DISABLED=$NEXT_TELEMETRY_DISABLED
 # ------------------------------
+ENV IS_BUILD="true"
 
 RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
     export SENTRY_AUTH_TOKEN=$(cat /run/secrets/SENTRY_AUTH_TOKEN) && \
@@ -46,11 +47,15 @@ RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
 # -----------------------------------------------------------------------------
 # 4. Runner Stage
 # -----------------------------------------------------------------------------
-FROM node:20-slim AS runner
+FROM node:22-slim AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+
+# Inject build args as ENVs for runtime
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
 # Install Chromium and required dependencies for Puppeteer
 RUN apt-get update \

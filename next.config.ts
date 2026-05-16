@@ -11,6 +11,14 @@ const nextConfig: NextConfig = {
   experimental: {
     globalNotFound: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+    ],
+  },
 
   // 👇 MOVED TO ROOT (Stable in Next.js 16)
   turbopack: {

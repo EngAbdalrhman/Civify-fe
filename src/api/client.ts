@@ -131,7 +131,9 @@ const attemptTokenRefresh = async (): Promise<string> => {
     });
 
     if (!response.ok) {
-      throw new Error(`Refresh failed with status ${response.status}`);
+      const error: any = new Error(`Refresh failed with status ${response.status}`);
+      error.status = response.status;
+      throw error;
     }
 
     const data = await response.json();
@@ -155,11 +157,18 @@ const attemptTokenRefresh = async (): Promise<string> => {
     refreshRetryCount = 0;
 
     return accessToken;
-  } catch (error) {
+  } catch (error: any) {
     console.log(
       `[Auth] Token refresh attempt ${refreshRetryCount} failed:`,
       error,
     );
+
+    // If it's an explicit client error (4xx except 429 rate limit), the token is definitively invalid. 
+    // Don't retry, throw immediately so the session is cleared.
+    if (error.status && error.status >= 400 && error.status < 500 && error.status !== 429) {
+      console.log(`[Auth] Token refresh explicitly rejected with status ${error.status}. Aborting retries.`);
+      throw error;
+    }
 
     // If we haven't exceeded max retries, try again
     if (refreshRetryCount < MAX_REFRESH_RETRIES) {
@@ -405,7 +414,7 @@ const handle401Error = async <T>(
     const headers = new Headers(options.headers);
     headers.set("Authorization", `Bearer ${accessToken}`);
     return await apiClient<T>(url, { ...options, headers, _retry: true });
-  } catch (refreshError) {
+  } catch (refreshError: any) {
     console.log("[Auth] Token refresh failed after all retries");
     isRefreshing = false;
     if (refreshTimeoutId) {
@@ -417,7 +426,24 @@ const handle401Error = async <T>(
         ? refreshError
         : new Error("Refresh failed"),
     );
-    clearAuthAndRedirect();
+    
+    // Only clear auth if the server explicitly rejected the refresh token (any 4xx except 429)
+    if (
+      refreshError.status &&
+      refreshError.status >= 400 &&
+      refreshError.status < 500 &&
+      refreshError.status !== 429
+    ) {
+      clearAuthAndRedirect();
+    } else {
+      console.log("[Auth] Refresh failed due to network/server error. Preserving session.");
+      // Provide actionable UX feedback instead of failing silently
+      if (refreshError.status === 429) {
+        toast.error("Too many requests. Please wait a moment and try again.");
+      } else {
+        toast.error("Network connection unstable. Please check your internet.");
+      }
+    }
     throw refreshError;
   }
 };

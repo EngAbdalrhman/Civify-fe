@@ -1,5 +1,6 @@
 import admin from "./admin.json";
 import apiKeys from "./apiKeys.json";
+import blog from "./blog.json";
 import atsScore from "./atsScore.json";
 import auth from "./auth.json";
 import builder from "./builder.json";
@@ -33,6 +34,7 @@ import tour from "./tour.json";
 export default {
   admin,
   apiKeys,
+  blog,
   atsScore,
   auth,
   builder,

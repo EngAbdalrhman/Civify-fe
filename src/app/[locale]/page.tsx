@@ -9,7 +9,7 @@ import {
   PricingSection,
   FAQSection,
   // IntegrationsSection,
-  // BlogPreviewSection,
+  BlogPreviewSection,
   CTASection,
   ResumeBuilderSection,
 } from "@/features/home-page/components";
@@ -124,7 +124,7 @@ const Homepage = async ({
       <PricingSection />
       <FAQSection />
       {/* <IntegrationsSection /> */}
-      {/* <BlogPreviewSection /> */}
+      <BlogPreviewSection />
       <CTASection />
     </>
   );

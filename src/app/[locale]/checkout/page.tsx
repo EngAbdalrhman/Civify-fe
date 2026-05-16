@@ -251,7 +251,7 @@ function CheckoutContent() {
     : priceCalculation?.discount || 0;
   const finalPrice = isInvoiceMode
     ? invoice!.finalAmount
-    : priceCalculation?.totalPrice || originalPrice;
+    : priceCalculation?.totalPrice ?? originalPrice;
   const period = isInvoiceMode
     ? invoice!.billingType === "RENEWAL"
       ? "renewal"
@@ -427,16 +427,18 @@ function CheckoutContent() {
                           {originalPrice.toFixed(2)} EGP
                         </span>
                         <span className="text-green-600">
-                          {finalPrice.toFixed(2)} EGP
+                          {finalPrice === 0 ? t("free") : `${finalPrice.toFixed(2)} EGP`}
                         </span>
                       </>
                     ) : (
                       <span>{finalPrice.toFixed(2)} EGP</span>
                     )}
-                    <span className="text-sm font-normal text-muted-foreground">
-                      {" "}
-                      / {period}
-                    </span>
+                    {finalPrice > 0 && (
+                      <span className="text-sm font-normal text-muted-foreground">
+                        {" "}
+                        / {period}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -645,6 +647,8 @@ function CheckoutContent() {
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Processing...
                   </>
+                ) : finalPrice === 0 ? (
+                  t("free")
                 ) : (
                   <>
                     {t("pay")} {finalPrice.toFixed(2)} EGP

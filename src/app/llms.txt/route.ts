@@ -40,11 +40,13 @@ Key terms: AI resume builder, CV tailoring, ATS score checker, resume match scor
 - [Home](${baseUrl}/en): Main landing page with features overview
 - [Pricing Plans](${baseUrl}/en/plans): Subscription plans and pricing
 - [Chrome Extension](${baseUrl}/en/extension): Browser extension for LinkedIn integration
+- [Blog](${baseUrl}/en/blog): Career resources, resume writing guides, and job search tips
 - [Cancellation Policy](${baseUrl}/en/policy/cancellation): Subscription cancellation details
 
 ## Optional
 - [Arabic Home](${baseUrl}/ar): Arabic version of the platform (full RTL support)
 - [Arabic Pricing](${baseUrl}/ar/plans): Arabic pricing page
+- [Arabic Blog](${baseUrl}/ar/blog): Arabic blog and career resources
 `;
 
   return new NextResponse(content, {
