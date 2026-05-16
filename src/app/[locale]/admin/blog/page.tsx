@@ -31,11 +31,10 @@ interface BlogPost {
   id: number;
   title: string;
   slug: string;
-  excerpt?: string;
-  content: string;
+  content?: string;
   metaDescription?: string;
   metaKeywords?: string;
-  coverImage?: string;
+  coverImageUrl?: string;
   author?: string;
   readingTime?: string;
   published: boolean;
@@ -47,11 +46,10 @@ interface BlogPost {
 interface BlogFormData {
   title: string;
   slug: string;
-  excerpt: string;
   content: string;
   metaDescription: string;
   metaKeywords: string;
-  coverImage: string;
+  coverImageUrl: string;
   author: string;
   readingTime: string;
   published: boolean;
@@ -61,11 +59,10 @@ interface BlogFormData {
 const EMPTY_FORM: BlogFormData = {
   title: "",
   slug: "",
-  excerpt: "",
   content: "",
   metaDescription: "",
   metaKeywords: "",
-  coverImage: "",
+  coverImageUrl: "",
   author: "Civify Team",
   readingTime: "",
   published: false,
@@ -121,23 +118,31 @@ export default function AdminBlogPage() {
     setIsDialogOpen(true);
   };
 
-  const openEdit = (post: BlogPost) => {
-    setEditingPost(post);
-    setForm({
-      title: post.title,
-      slug: post.slug,
-      excerpt: post.excerpt ?? "",
-      content: post.content,
-      metaDescription: post.metaDescription ?? "",
-      metaKeywords: post.metaKeywords ?? "",
-      coverImage: post.coverImage ?? "",
-      author: post.author ?? "Civify Team",
-      readingTime: post.readingTime ?? "",
-      published: post.published,
-      featured: post.featured,
-    });
-    setActiveTab("content");
-    setIsDialogOpen(true);
+  const openEdit = async (post: BlogPost) => {
+    try {
+      setLoading(true);
+      const res = await apiClient.get<BlogPost>(`/v1/admin/blogs/${post.id}`);
+      const fullPost = res.data;
+      setEditingPost(fullPost);
+      setForm({
+        title: fullPost.title,
+        slug: fullPost.slug,
+        content: fullPost.content ?? "",
+        metaDescription: fullPost.metaDescription ?? "",
+        metaKeywords: fullPost.metaKeywords ?? "",
+        coverImageUrl: fullPost.coverImageUrl ?? "",
+        author: fullPost.author ?? "Civify Team",
+        readingTime: fullPost.readingTime ?? "",
+        published: fullPost.published,
+        featured: fullPost.featured,
+      });
+      setActiveTab("content");
+      setIsDialogOpen(true);
+    } catch (error) {
+      toast.error("Failed to load post details");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleTitleChange = (title: string) => {
@@ -404,17 +409,6 @@ export default function AdminBlogPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="excerpt">Excerpt</Label>
-                <Textarea
-                  id="excerpt"
-                  value={form.excerpt}
-                  onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
-                  placeholder="Short summary shown on the blog index page..."
-                  rows={2}
-                />
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="content">Content (HTML) *</Label>
                 <Textarea
                   id="content"
@@ -433,8 +427,8 @@ export default function AdminBlogPage() {
                 <Label htmlFor="coverImage">Cover Image URL</Label>
                 <Input
                   id="coverImage"
-                  value={form.coverImage}
-                  onChange={(e) => setForm({ ...form, coverImage: e.target.value })}
+                  value={form.coverImageUrl}
+                  onChange={(e) => setForm({ ...form, coverImageUrl: e.target.value })}
                   placeholder="https://..."
                 />
               </div>
@@ -506,7 +500,7 @@ export default function AdminBlogPage() {
                       {form.title || "Post title"}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                      {form.metaDescription || form.excerpt || "Meta description will appear here..."}
+                      {form.metaDescription || "Meta description will appear here..."}
                     </div>
                   </div>
                 </div>
