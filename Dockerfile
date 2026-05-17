@@ -2,6 +2,7 @@
 # 1. Base Stage
 # -----------------------------------------------------------------------------
 FROM node:22-slim AS base
+ENV NODE_OPTIONS="--dns-result-order=ipv4first"
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
