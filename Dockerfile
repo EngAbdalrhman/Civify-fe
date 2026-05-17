@@ -51,7 +51,6 @@ RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
 FROM node:22-slim AS runner
 WORKDIR /app
 
-ENV NODE_OPTIONS="--dns-result-order=ipv4first"
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
