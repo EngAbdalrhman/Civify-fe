@@ -42,6 +42,8 @@ function PaymentSuccessContent() {
       let callbackData;
       if (gateway === "paymob") {
         callbackData = paymentService.parsePaymobCallback(searchParams);
+      } else if (gateway === "dodo") {
+        callbackData = paymentService.parseDodoCallback(searchParams);
       } else {
         callbackData = paymentService.parseFawaterakCallback(searchParams);
       }

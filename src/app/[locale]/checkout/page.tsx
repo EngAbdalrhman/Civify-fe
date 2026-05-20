@@ -51,6 +51,8 @@ function CheckoutContent() {
   const [paymentMethod, setPaymentMethod] = useState("CARD");
   const [walletPhone, setWalletPhone] = useState("");
   const [enabledGateways, setEnabledGateways] = useState<string[]>([]);
+  const [conversionRate, setConversionRate] = useState(50.00);
+  const [baseCurrency, setBaseCurrency] = useState<"USD" | "EGP">("USD");
 
   // Promo code validation state
   const [isValidatingPromo, setIsValidatingPromo] = useState(false);
@@ -84,13 +86,22 @@ function CheckoutContent() {
 
       // Load enabled gateways first
       try {
-        const gateways = await paymentService.getEnabledGateways();
-        setEnabledGateways(gateways);
-        if (gateways.length > 0 && !gateways.includes(gateway)) {
-          setGateway(gateways[0]);
+        const config = await paymentService.getPaymentConfig();
+        setEnabledGateways(config.enabledGateways);
+        if (config.conversionRate) {
+          setConversionRate(config.conversionRate);
+        }
+        if (config.baseCurrency) {
+          setBaseCurrency(config.baseCurrency);
+        }
+        if (config.resolvedGateway && config.resolvedGateway !== "default") {
+          setGateway(config.resolvedGateway);
+        } else if (config.enabledGateways.length > 0 && !config.enabledGateways.includes(gateway)) {
+          setGateway(config.enabledGateways[0]);
         }
       } catch {
         setEnabledGateways(["fawaterak"]);
+        setConversionRate(50.00);
       }
 
       // Invoice mode (renewal from email link)
@@ -241,6 +252,24 @@ function CheckoutContent() {
   const displayDescription = isInvoiceMode
     ? invoice!.description
     : plan!.description;
+
+  // Determine dynamic currency based on mode & selected gateway
+  const displayCurrency = isInvoiceMode
+    ? invoice!.currency
+    : gateway === "dodo"
+      ? "USD"
+      : "EGP";
+
+  const priceFactor = isInvoiceMode
+    ? 1
+    : baseCurrency === "USD"
+      ? gateway === "dodo"
+        ? 1
+        : conversionRate
+      : gateway === "dodo"
+        ? 1 / conversionRate
+        : 1;
+
   const originalPrice = isInvoiceMode
     ? invoice!.originalAmount
     : isAnnual
@@ -314,7 +343,7 @@ function CheckoutContent() {
                     >
                       <div className="font-semibold">{t("monthly")}</div>
                       <div className="text-2xl font-bold mt-1">
-                        {parseFloat(plan.monthlyPrice).toFixed(2)} EGP
+                        {(parseFloat(plan.monthlyPrice) * priceFactor).toFixed(2)} {displayCurrency}
                       </div>
                       <div className="text-xs text-muted-foreground">
                         {t("perMonth")}
@@ -333,7 +362,7 @@ function CheckoutContent() {
                       </span>
                       <div className="font-semibold">{t("yearly")}</div>
                       <div className="text-2xl font-bold mt-1">
-                        {parseFloat(plan.annualPrice).toFixed(2)} EGP
+                        {(parseFloat(plan.annualPrice) * priceFactor).toFixed(2)} {displayCurrency}
                       </div>
                       <div className="text-xs text-muted-foreground">
                         {t("perYear")}
@@ -410,12 +439,12 @@ function CheckoutContent() {
               <div className="border-t pt-4 space-y-2">
                 <div className="flex justify-between items-center text-sm text-muted-foreground">
                   <span>{t("subtotal")}</span>
-                  <span>{originalPrice.toFixed(2)} EGP</span>
+                  <span>{(originalPrice * priceFactor).toFixed(2)} {displayCurrency}</span>
                 </div>
                 {discountAmount > 0 && (
                   <div className="flex justify-between items-center text-sm text-green-600">
                     <span>{t("discount")}</span>
-                    <span>-{discountAmount.toFixed(2)} EGP</span>
+                    <span>-{(discountAmount * priceFactor).toFixed(2)} {displayCurrency}</span>
                   </div>
                 )}
                 <div className="flex justify-between items-center text-lg font-bold">
@@ -424,14 +453,14 @@ function CheckoutContent() {
                     {discountAmount > 0 ? (
                       <>
                         <span className="line-through text-muted-foreground text-sm mr-2">
-                          {originalPrice.toFixed(2)} EGP
+                          {(originalPrice * priceFactor).toFixed(2)} {displayCurrency}
                         </span>
                         <span className="text-green-600">
-                          {finalPrice === 0 ? t("free") : `${finalPrice.toFixed(2)} EGP`}
+                          {finalPrice === 0 ? t("free") : `${(finalPrice * priceFactor).toFixed(2)} ${displayCurrency}`}
                         </span>
                       </>
                     ) : (
-                      <span>{finalPrice.toFixed(2)} EGP</span>
+                      <span>{(finalPrice * priceFactor).toFixed(2)} {displayCurrency}</span>
                     )}
                     {finalPrice > 0 && (
                       <span className="text-sm font-normal text-muted-foreground">
@@ -456,6 +485,56 @@ function CheckoutContent() {
             <CardContent className="space-y-6">
               {/* Gateway Selection */}
               <div className="space-y-3">
+                {enabledGateways.includes("dodo") && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setGateway("dodo");
+                      setPaymentMethod("CARD");
+                    }}
+                    className={`w-full flex items-center space-x-3 p-4 rounded-lg border-2 hover:bg-muted/50 cursor-pointer transition-all text-left ${
+                      gateway === "dodo"
+                        ? "border-primary bg-primary/5"
+                        : "border-muted"
+                    }`}
+                  >
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                        gateway === "dodo"
+                          ? "border-primary bg-primary"
+                          : "border-muted-foreground"
+                      }`}
+                    >
+                      {gateway === "dodo" && (
+                        <Check className="h-3 w-3 text-primary-foreground" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-semibold text-lg flex items-center gap-2">
+                        <span>Dodo Payments</span>
+                        <span className="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full font-medium">
+                          Global
+                        </span>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Pay securely with Credit/Debit Cards, Apple Pay, Google Pay or local methods in USD.
+                      </div>
+                    </div>
+                    <div className="flex gap-1 flex-shrink-0">
+                      <div className="w-10 h-6 bg-gradient-to-r from-blue-600 to-blue-800 rounded text-white text-[10px] flex items-center justify-center font-bold">
+                        VISA
+                      </div>
+                      <div className="w-10 h-6 bg-gradient-to-r from-red-500 to-yellow-500 rounded flex items-center justify-center">
+                        <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500 -ml-1"></div>
+                      </div>
+                      <div className="w-10 h-6 bg-slate-900 rounded text-white text-[9px] flex items-center justify-center font-semibold">
+                         Pay
+                      </div>
+                    </div>
+                  </button>
+                )}
+
                 {enabledGateways.includes("fawaterak") && (
                   <button
                     onClick={() => setGateway("fawaterak")}
@@ -651,7 +730,7 @@ function CheckoutContent() {
                   t("free")
                 ) : (
                   <>
-                    {t("pay")} {finalPrice.toFixed(2)} EGP
+                    {t("pay")} {(finalPrice * priceFactor).toFixed(2)} {displayCurrency}
                   </>
                 )}
               </Button>

@@ -71,10 +71,18 @@ export function TokenPurchaseDialog({
   const loadGateways = async () => {
     try {
       setIsLoadingGateways(true);
-      const gateways = await paymentService.getEnabledGateways();
-      setEnabledGateways(gateways);
-      if (gateways.length > 0 && !gateways.includes(gateway)) {
-        setGateway(gateways[0]);
+      const config = await paymentService.getPaymentConfig();
+      setEnabledGateways(config.enabledGateways);
+      if (
+        config.resolvedGateway &&
+        config.resolvedGateway !== 'default' &&
+        config.resolvedGateway !== 'dodo'
+      ) {
+        setGateway(config.resolvedGateway);
+      } else if (config.enabledGateways.length > 0 && !config.enabledGateways.includes(gateway)) {
+        const menaGateway = config.enabledGateways.find((g) => g !== 'dodo');
+        setGateway(menaGateway ?? config.enabledGateways[0]);
+        setGateway(config.enabledGateways[0]);
       }
     } catch {
       setEnabledGateways(['fawaterak']);
@@ -278,7 +286,8 @@ export function TokenPurchaseDialog({
               </div>
             ) : (
               <div className="space-y-3">
-                {/* Gateway Selection */}
+                {/* Dodo for token top-ups: enable when token_packages.dodo_product_id is set (phase 2 UI) */}
+
                 {enabledGateways.includes('fawaterak') && (
                   <button
                     onClick={() => {
