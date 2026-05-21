@@ -65,3 +65,28 @@ jobs:
           curl -X POST "${{ secrets.DOKPLOY_WEBHOOK_DEV_STG }}" \
             -H "Content-Type: application/json" \
             -d "{\"image\": \"${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}\"}"
+
+      # Optional Swarm patch over SSH — off by default (store no server SSH key in GitHub).
+      # Enable only if needed: GitHub var ENABLE_DOKPLOY_SSH_PATCH=true + SSH secrets.
+      # Preferred: set INTERNAL_API_URL in Dokploy (see docs/BLOG_DEPLOY.md).
+      - name: Patch frontend Swarm networking (optional SSH)
+        if: vars.ENABLE_DOKPLOY_SSH_PATCH == 'true'
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DOKPLOY_SSH_HOST }}
+          username: ${{ secrets.DOKPLOY_SSH_USER }}
+          key: ${{ secrets.DOKPLOY_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+            FRONTEND="${{ vars.DOKPLOY_FRONTEND_SWARM_SERVICE }}"
+            BACKEND="${{ vars.DOKPLOY_BACKEND_SWARM_SERVICE }}"
+            API_HOST="${{ vars.DOKPLOY_API_HOST }}"
+            [ -z "$FRONTEND" ] || [ -z "$BACKEND" ] && exit 1
+            [ -z "$API_HOST" ] && API_HOST="stg.civify.cv"
+            BACKEND_VIP=$(sudo docker service inspect "$BACKEND" --format '{{range .Endpoint.VirtualIPs}}{{.Addr}}{{"\n"}}{{end}}' | head -1 | cut -d/ -f1)
+            sudo docker service update \
+              --dns-add 127.0.0.11 \
+              --host-add "${API_HOST}:$(getent hosts "$API_HOST" | awk '{print $1}' | head -1)" \
+              --host-add "${BACKEND}:${BACKEND_VIP}" \
+              "$FRONTEND" || true
