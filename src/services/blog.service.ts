@@ -23,6 +23,7 @@ export type BlogFetchResult<T> =
   | { ok: false; data: T; failed: true };
 
 import dns from "node:dns";
+import fs from "node:fs";
 import net from "node:net";
 
 const isServer = typeof window === "undefined";
@@ -64,7 +65,51 @@ function configureServerDns(): void {
   }
 }
 
-/** Resolve hostname via getaddrinfo (/etc/hosts + DNS). HTTPS uses Host header when connecting by IP. */
+/** Read Swarm host-add entries (works when getaddrinfo cannot). */
+function readIpFromEtcHosts(hostname: string): string | undefined {
+  try {
+    const lines = fs.readFileSync("/etc/hosts", "utf8").split("\n");
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) continue;
+      const parts = trimmed.split(/\s+/);
+      const ip = parts[0];
+      if (parts.slice(1).includes(hostname) && net.isIP(ip)) {
+        return ip;
+      }
+    }
+  } catch {
+    // unreadable / missing
+  }
+  return undefined;
+}
+
+/** Bypass broken Swarm DNS: connect to Traefik/server IP, send correct Host header. */
+function resolveViaIpAndHostHeader(
+  url: string,
+): { url: string; headers: HeadersInit } | null {
+  const parsed = new URL(url);
+  if (net.isIP(parsed.hostname)) {
+    return null;
+  }
+
+  const originalHost = parsed.hostname;
+  const targetIp =
+    process.env.BLOG_SSR_TARGET_IP?.trim() ?? readIpFromEtcHosts(originalHost);
+
+  if (!targetIp) return null;
+
+  parsed.hostname = targetIp;
+  const headers = new Headers();
+  const hostHeader =
+    process.env.BLOG_SSR_HOST_HEADER?.trim() || originalHost;
+  if (parsed.protocol === "https:" || parsed.protocol === "http:") {
+    headers.set("Host", hostHeader);
+  }
+  return { url: parsed.toString(), headers };
+}
+
+/** Resolve hostname via /etc/hosts, env IP override, then getaddrinfo. */
 async function resolveUrlForFetch(
   url: string,
 ): Promise<{ url: string; headers?: HeadersInit }> {
@@ -72,6 +117,9 @@ async function resolveUrlForFetch(
   if (net.isIP(parsed.hostname)) {
     return { url };
   }
+
+  const viaHosts = resolveViaIpAndHostHeader(url);
+  if (viaHosts) return viaHosts;
 
   const originalHost = parsed.hostname;
 
@@ -87,6 +135,9 @@ async function resolveUrlForFetch(
     }
     return { url: parsed.toString(), headers };
   } catch (firstError) {
+    const fallback = resolveViaIpAndHostHeader(url);
+    if (fallback) return fallback;
+
     if (process.env.BLOG_DNS_FORCE === "true") {
       configureServerDns();
       const { address } = await dns.promises.lookup(originalHost, {

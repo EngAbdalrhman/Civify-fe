@@ -108,12 +108,17 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Switch to non-root user
-USER nextjs
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
+    && chown nextjs:nodejs /app
+
+# Entrypoint starts as root (chmod /etc/hosts), then drops to nextjs via runuser
+USER root
 
 EXPOSE 3000
 
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+# Entrypoint runs as root briefly to chmod /etc/hosts, then exec node (standalone server)
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
