@@ -56,6 +56,9 @@ jobs:
           secrets: |
             SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
 
+      # Runtime in Dokploy (not build-args): SERVER_API_URL=http://<backend>:8080/apis
+      # See docs/BLOG_DEPLOY.md
+
       # 5. Trigger Dokploy to Pull and Deploy
       - name: Trigger Dokploy Deployment
         run: |

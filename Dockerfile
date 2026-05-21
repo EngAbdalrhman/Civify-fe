@@ -42,6 +42,7 @@ ENV IS_BUILD="true"
 
 RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
     export SENTRY_AUTH_TOKEN=$(cat /run/secrets/SENTRY_AUTH_TOKEN) && \
+    node -e "const u=(process.env.NEXT_PUBLIC_API_URL||'https://civify.cv/apis')+'/v1/blogs';fetch(u).then(r=>{if(!r.ok)console.warn('WARN: blog API',r.status,'during build');}).catch(e=>console.warn('WARN: blog API unreachable during build:',e.message))" && \
     pnpm run build
 
 # -----------------------------------------------------------------------------
@@ -52,10 +53,19 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+# Prefer IPv4 DNS resolution (mitigates EAI_AGAIN in Docker Swarm)
+ENV NODE_OPTIONS="--dns-result-order=ipv4first"
+
+# Ensure /etc/hosts is consulted by getaddrinfo (debian:slim ships without nsswitch.conf,
+# so Swarm host-add / extra_hosts entries are otherwise ignored → EAI_AGAIN).
+RUN echo "hosts: files dns" > /etc/nsswitch.conf
 
 # Inject build args as ENVs for runtime
 ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_BASE_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
+# INTERNAL_API_URL: set only in Dokploy (frontend service env), NOT in GitHub — see docs/BLOG_DEPLOY.md
 
 # Install Chromium and required dependencies for Puppeteer
 RUN apt-get update \
