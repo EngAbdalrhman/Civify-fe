@@ -91,9 +91,9 @@ RUN apt-get update \
 ENV PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium"
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-# Create non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Create non-root user (nextjs in nodejs group)
+RUN addgroup --system --gid 1001 nodejs \
+    && adduser --system --uid 1001 --ingroup nodejs --no-create-home nextjs
 
 # Create writable directories for Chromium crash handler, user data, and XDG dirs
 RUN mkdir -p /tmp/chromium-crashes /tmp/chromium-data /tmp/.chromium \
