@@ -39,6 +39,7 @@ interface ExportPanelProps {
 }
 
 import { useTranslations } from "next-intl";
+import { useMyActiveSubscription, usePlans } from "@/features/plans/hooks/useSubscription";
 
 export function ExportPanel({
   data,
@@ -51,6 +52,11 @@ export function ExportPanel({
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const canExportDocx = useHasPermission("CV.EXPORT.DOCX");
+  const { data: activeSubscription } = useMyActiveSubscription();
+  const { data: plans } = usePlans();
+  const activePlan = plans?.find((p) => p.id === activeSubscription?.planId);
+  const showWatermarkNote =
+    isGuest || activePlan?.watermark === true;
 
   const getTranslations = () => {
     return data.metadata?.language === "ar" ? arTranslations : enTranslations;
@@ -144,6 +150,11 @@ export function ExportPanel({
                 {isExportingPdf ? t("pdf.exporting") : t("pdf.title")}
               </CardTitle>
               <CardDescription>{t("pdf.description")}</CardDescription>
+              {showWatermarkNote && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Exports include a Civify watermark. Upgrade to remove it.
+                </p>
+              )}
             </div>
           </CardHeader>
         </Card>

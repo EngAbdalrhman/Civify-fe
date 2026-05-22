@@ -13,7 +13,9 @@ import {
   renderResumeHtml,
   type TemplateType,
 } from "@/features/resume-builder/utils/renderResumeHtml";
+import type { WatermarkConfig } from "@/features/resume-builder/types/watermark";
 import type { ResumeData } from "@/features/upload-cv/types";
+import { resolveWatermarkForRequest } from "@/lib/watermark/resolveWatermark";
 
 // ---------------------------------------------------------------------------
 // Shared singleton browser instance
@@ -22,12 +24,10 @@ let browserInstance: Browser | null = null;
 let browserLaunchPromise: Promise<Browser> | null = null;
 
 async function getBrowser(): Promise<Browser> {
-  // If we already have a connected browser, reuse it
   if (browserInstance && browserInstance.connected) {
     return browserInstance;
   }
 
-  // If a launch is already in progress, wait for it (prevents parallel launches)
   if (browserLaunchPromise) {
     return browserLaunchPromise;
   }
@@ -58,7 +58,6 @@ async function getBrowser(): Promise<Browser> {
       },
     });
 
-    // Auto-clear reference when the browser disconnects / crashes
     browser.on("disconnected", () => {
       browserInstance = null;
       browserLaunchPromise = null;
@@ -80,6 +79,7 @@ interface GeneratePdfRequest {
   template?: TemplateType;
   color?: string;
   filename?: string;
+  watermark?: WatermarkConfig;
 }
 
 export async function POST(request: NextRequest) {
@@ -93,6 +93,7 @@ export async function POST(request: NextRequest) {
       template = "modern",
       color = "#000000",
       filename = "resume",
+      watermark: bodyWatermark,
     } = body;
 
     if (!resumeData) {
@@ -102,22 +103,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate HTML from resume data
-    const html = renderResumeHtml(resumeData, template, color);
+    const watermark = await resolveWatermarkForRequest(request, bodyWatermark);
+    const html = renderResumeHtml(resumeData, template, color, watermark);
 
-    // Get the shared browser and open a new page (tab) — NOT a new process
     const browser = await getBrowser();
     page = await browser.newPage();
 
-    // Set content with wait for fonts
     await page.setContent(html, {
       waitUntil: ["networkidle0", "domcontentloaded"],
     });
 
-    // Wait for fonts to fully load
     await page.evaluateHandle("document.fonts.ready");
 
-    // Generate PDF
     const pdfBuffer = await page.pdf({
       format: "A4",
       printBackground: true,
@@ -130,7 +127,6 @@ export async function POST(request: NextRequest) {
       preferCSSPageSize: true,
     });
 
-    // Return PDF as response
     return new NextResponse(Buffer.from(pdfBuffer), {
       status: 200,
       headers: {
@@ -152,7 +148,6 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   } finally {
-    // Close only the page (tab), not the browser
     if (page) {
       try {
         await page.close();

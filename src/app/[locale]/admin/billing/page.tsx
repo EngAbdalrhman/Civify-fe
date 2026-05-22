@@ -7,6 +7,7 @@ import { Package, Coins, CreditCard, Lock, Loader2 } from "lucide-react";
 import { usePermissions } from "@/hooks/use-permissions";
 import { ADMIN_ACTION_PERMISSIONS } from "@/config/adminMenuConfig";
 import { PlansManager } from "@/features/admin-dashboard/plans/components/PlansManager";
+import { AdminWatermarkSettings } from "@/features/admin-dashboard/watermark/components/AdminWatermarkSettings";
 import { TokenPackagesManager } from "@/features/admin-dashboard/token-packages/components/TokenPackagesManager";
 
 export default function BillingPage() {
@@ -90,6 +91,7 @@ export default function BillingPage() {
         {canViewPlans && (
           <TabsContent value="plans" className="space-y-6 mt-6">
             <PlansManager />
+            <AdminWatermarkSettings />
           </TabsContent>
         )}
 

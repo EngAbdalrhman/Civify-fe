@@ -58,6 +58,7 @@ import { Progress } from "@/components/ui/progress";
 
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useUserPreferences, useUpdateUserPreferences, UserPreferences } from "@/hooks/useUserPreferences";
+import { WatermarkBrandingSection } from "@/features/settings/components/WatermarkBrandingSection";
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("profile");
@@ -324,7 +325,7 @@ export default function SettingsPage() {
           className="space-y-4"
           onValueChange={setActiveTab}
         >
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-flex">
+          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-flex">
             <TabsTrigger value="profile" className="gap-2">
               <User className="h-4 w-4 hidden sm:block" />
               Profile
@@ -340,6 +341,10 @@ export default function SettingsPage() {
             <TabsTrigger value="security" className="gap-2">
               <Shield className="h-4 w-4 hidden sm:block" />
               Security
+            </TabsTrigger>
+            <TabsTrigger value="branding" className="gap-2">
+              <Camera className="h-4 w-4 hidden sm:block" />
+              Branding
             </TabsTrigger>
             {/* <TabsTrigger value="notifications" className="gap-2">
               <Bell className="h-4 w-4 hidden sm:block" />
@@ -1108,6 +1113,10 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
           </TabsContent> */}
+
+          <TabsContent value="branding" className="space-y-4">
+            <WatermarkBrandingSection />
+          </TabsContent>
         </Tabs>
       </div>
     </PermissionGuard>
