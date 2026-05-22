@@ -37,6 +37,22 @@ function buildAuthHeaders(request: Request): Headers {
   return headers;
 }
 
+function isServerResolvedWatermark(request: Request, bodyWatermark?: WatermarkConfig): boolean {
+  // Browser export never sends `watermark` in the body; Civify always does.
+  if (bodyWatermark === undefined) {
+    return false;
+  }
+  const internalToken = request.headers.get("x-pdf-internal-token");
+  if (internalToken) {
+    return true;
+  }
+  // Civify may call without a matching PDF_INTERNAL_SECRET on the frontend — still trust body.
+  const hasSession =
+    !!request.headers.get("cookie")?.includes("accessToken=") ||
+    !!request.headers.get("authorization");
+  return !hasSession;
+}
+
 export async function resolveWatermarkForRequest(
   request: Request,
   bodyWatermark?: WatermarkConfig,
@@ -44,17 +60,18 @@ export async function resolveWatermarkForRequest(
   const internalToken = request.headers.get("x-pdf-internal-token");
   const pdfSecret = process.env.PDF_INTERNAL_SECRET;
 
-  // Civify external/browser PDF: policy is already resolved in the request body.
-  // Do not re-fetch watermark-config without auth (that returns the guest/platform watermark).
-  if (internalToken && pdfSecret && internalToken === pdfSecret && bodyWatermark !== undefined) {
+  // Civify already resolved policy in the POST body — never replace with guest watermark-config.
+  if (isServerResolvedWatermark(request, bodyWatermark) && bodyWatermark !== undefined) {
     if (!bodyWatermark.enabled) {
+      console.info("PDF: using server body — watermark disabled");
       return undefined;
     }
     if (bodyWatermark.imageUrl) {
+      console.info("PDF: using server body watermark");
       return bodyWatermark;
     }
     console.warn(
-      "PDF internal request: watermark enabled but imageUrl missing — skipping overlay",
+      "PDF: server body watermark enabled but imageUrl missing — skipping overlay",
     );
     return undefined;
   }

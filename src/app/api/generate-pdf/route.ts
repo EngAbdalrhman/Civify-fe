@@ -108,6 +108,11 @@ export async function POST(request: NextRequest) {
       request,
       bodyWatermark,
     );
+    if (bodyWatermark !== undefined) {
+      console.info(
+        `generate-pdf: body watermark enabled=${bodyWatermark.enabled} resolved=${watermarkResolved?.enabled ?? false} url=${watermarkResolved?.imageUrl ? "set" : "none"}`,
+      );
+    }
     const watermark = await embedWatermarkImage(watermarkResolved);
     const html = renderResumeHtml(resumeData, template, color, watermark);
 

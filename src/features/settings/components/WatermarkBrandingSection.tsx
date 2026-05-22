@@ -20,6 +20,9 @@ import {
   type UserWatermarkSettings,
 } from "@/services/watermark.service";
 
+/** Must match civify BucketService.MAX_WATERMARK_BYTES (512_000) */
+const MAX_WATERMARK_BYTES = 512_000;
+
 export function WatermarkBrandingSection() {
   const [settings, setSettings] = useState<UserWatermarkSettings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -45,6 +48,14 @@ export function WatermarkBrandingSection() {
 
   const handleSave = async () => {
     if (!settings) return;
+    if (
+      settings.enabled &&
+      !settings.usePlatformWatermark &&
+      !settings.logoStorageKey
+    ) {
+      toast.error("Upload a PNG logo (max 500KB) before enabling custom watermark");
+      return;
+    }
     try {
       setSaving(true);
       const updated = await watermarkService.updateUserSettings({
@@ -66,11 +77,21 @@ export function WatermarkBrandingSection() {
   };
 
   const handleUpload = async (file: File) => {
+    if (file.size > MAX_WATERMARK_BYTES) {
+      toast.error(
+        `Logo must be 500KB or smaller (this file is ${Math.round(file.size / 1024)}KB). Compress the PNG and try again.`,
+      );
+      return;
+    }
+    if (!file.type.includes("png") && !file.name.toLowerCase().endsWith(".png")) {
+      toast.error("Logo must be a PNG file");
+      return;
+    }
     try {
       setUploading(true);
       const updated = await watermarkService.uploadUserLogo(file);
       setSettings(updated);
-      // toast.success("Custom watermark uploaded");
+      toast.success("Custom watermark uploaded");
     } catch (e) {
       console.error(e);
       toast.error("Upload failed (PNG, max 500KB)");
