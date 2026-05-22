@@ -265,15 +265,13 @@ export function installSsrDispatcher(): void {
 
   void installUndiciDispatcher(map);
 
-  if (process.env.NODE_ENV !== "production") {
-    console.log(
-      `[SSR Dispatcher] installed. overrides=${Array.from(map.entries())
-        .map(([h, i]) => `${h}=${i}`)
-        .join(",")} fallback=${(
-        process.env.BLOG_SSR_FALLBACK_DNS || DEFAULT_FALLBACK_DNS.join(",")
-      )}`,
-    );
-  }
+  console.log(
+    `[SSR Dispatcher] installed. overrides=${Array.from(map.entries())
+      .map(([h, i]) => `${h}=${i}`)
+      .join(",")} fallback=${
+      process.env.BLOG_SSR_FALLBACK_DNS || DEFAULT_FALLBACK_DNS.join(",")
+    }`,
+  );
 }
 
 async function installUndiciDispatcher(

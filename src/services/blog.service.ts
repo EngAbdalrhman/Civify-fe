@@ -97,6 +97,8 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+let loggedBaseUrl = false;
+
 async function blogFetch(
   path: string,
   init?: RequestInit & { next?: { revalidate?: number } },
@@ -107,17 +109,42 @@ async function blogFetch(
 
   const baseUrl = getBlogApiBaseUrl();
   const url = `${baseUrl}${path}`;
+
+  if (isServer && !loggedBaseUrl) {
+    loggedBaseUrl = true;
+    console.log(
+      `[blog.service] base=${baseUrl} ` +
+        `NEXT_PUBLIC_API_URL=${process.env.NEXT_PUBLIC_API_URL ?? "(unset)"} ` +
+        `SERVER_API_URL=${process.env.SERVER_API_URL ?? "(unset)"} ` +
+        `INTERNAL_API_URL=${process.env.INTERNAL_API_URL ?? "(unset)"}`,
+    );
+  }
+
   let lastError: unknown;
 
   for (let attempt = 0; attempt < FETCH_RETRIES; attempt++) {
     try {
       const { next: nextInit, ...rest } = init ?? {};
-      return await fetch(url, {
+      const res = await fetch(url, {
         ...rest,
         next: { revalidate: REVALIDATE_SECONDS, ...nextInit },
       });
+      if (isServer && !res.ok) {
+        console.warn(
+          `[blog.service] ${url} -> HTTP ${res.status} ${res.statusText}`,
+        );
+      }
+      return res;
     } catch (error) {
       lastError = error;
+      if (isServer) {
+        const cause = (error as { cause?: { code?: string } } | null)?.cause;
+        console.warn(
+          `[blog.service] ${url} attempt ${attempt + 1}/${FETCH_RETRIES} failed: ${
+            (error as Error)?.message ?? error
+          }${cause?.code ? ` (cause=${cause.code})` : ""}`,
+        );
+      }
       if (!isRetryableFetchError(error) || attempt === FETCH_RETRIES - 1) {
         throw error;
       }
