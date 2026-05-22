@@ -1,5 +1,9 @@
 import { installSsrDispatcher } from "@/lib/ssr-dispatcher";
 
+if (typeof window === "undefined") {
+  installSsrDispatcher();
+}
+
 export interface PublicBlogPost {
   id: number;
   title: string;
@@ -98,7 +102,7 @@ async function blogFetch(
   init?: RequestInit & { next?: { revalidate?: number } },
 ): Promise<Response> {
   if (isServer) {
-    await installSsrDispatcher();
+    installSsrDispatcher();
   }
 
   const baseUrl = getBlogApiBaseUrl();
