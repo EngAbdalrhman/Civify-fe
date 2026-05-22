@@ -16,12 +16,14 @@ import {
 import { PermissionGuard } from "@/components/auth/PermissionGuard";
 import { WATERMARK_POSITION_OPTIONS } from "@/features/resume-builder/types/watermark";
 import {
+  validateWatermarkLogoFile,
+  WATERMARK_LOGO_ACCEPT,
+  WATERMARK_LOGO_HINT,
+} from "@/lib/watermark/validateWatermarkLogoFile";
+import {
   watermarkService,
   type UserWatermarkSettings,
 } from "@/services/watermark.service";
-
-/** Must match civify BucketService.MAX_WATERMARK_BYTES (512_000) */
-const MAX_WATERMARK_BYTES = 512_000;
 
 export function WatermarkBrandingSection() {
   const [settings, setSettings] = useState<UserWatermarkSettings | null>(null);
@@ -77,14 +79,9 @@ export function WatermarkBrandingSection() {
   };
 
   const handleUpload = async (file: File) => {
-    if (file.size > MAX_WATERMARK_BYTES) {
-      toast.error(
-        `Logo must be 500KB or smaller (this file is ${Math.round(file.size / 1024)}KB). Compress the PNG and try again.`,
-      );
-      return;
-    }
-    if (!file.type.includes("png") && !file.name.toLowerCase().endsWith(".png")) {
-      toast.error("Logo must be a PNG file");
+    const validationError = validateWatermarkLogoFile(file);
+    if (validationError) {
+      toast.error(validationError);
       return;
     }
     try {
@@ -140,14 +137,27 @@ export function WatermarkBrandingSection() {
 
               <div>
                 <Label className="mb-2 block">Logo (PNG)</Label>
+                <p className="text-xs text-muted-foreground mb-2">
+                  {WATERMARK_LOGO_HINT}
+                </p>
                 <input
                   type="file"
-                  accept="image/png"
+                  accept={WATERMARK_LOGO_ACCEPT}
                   className="text-sm"
                   disabled={uploading}
                   onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) handleUpload(f);
+                    const input = e.target;
+                    const f = input.files?.[0];
+                    if (!f) return;
+                    const validationError = validateWatermarkLogoFile(f);
+                    if (validationError) {
+                      toast.error(validationError);
+                      input.value = "";
+                      return;
+                    }
+                    void handleUpload(f).finally(() => {
+                      input.value = "";
+                    });
                   }}
                 />
               </div>
