@@ -2,53 +2,65 @@
 
 ## What this does
 
-`src/lib/ssr-dispatcher.ts` installs a global undici dispatcher that overrides
-DNS for known civify hosts. SSR fetches to `https://civify.cv/apis/...` and
-`https://stg.civify.cv/apis/...` connect directly to the Traefik server IP
-without any DNS lookup. TLS SNI still uses the real hostname so the certificate
-validates correctly.
+`src/lib/ssr-dispatcher.ts` patches Node's `dns.lookup` at server boot
+(via `instrumentation.ts`) so SSR resolution survives broken Docker DNS:
 
-Built-in defaults (`src/lib/ssr-dispatcher.ts`):
+1. **Known civify hosts** resolve directly to the Traefik IP — no DNS at all.
+2. **Everything else** (Unsplash, ImageKit, Sentry, GA, ...) falls back to
+   Cloudflare/Google DNS when the container's `/etc/resolv.conf` fails with
+   `EAI_AGAIN`. This is why images stopped loading too — same root cause.
+
+TLS SNI uses the real hostname so certs validate. No `/etc/hosts`, no Swarm
+`host-add`, no SSH keys, no Dokploy env changes required.
+
+Built-in defaults:
 
 ```text
 civify.cv      → 34.44.205.35
 stg.civify.cv  → 34.44.205.35
+fallback DNS   → 1.1.1.1, 1.0.0.1, 8.8.8.8, 8.8.4.4
 ```
 
-No Dokploy environment changes required, no SSH keys in GitHub, no
-`docker service update` needed on the server.
+## Graceful failure
+
+Blog service now returns empty / null on any fetch failure rather than
+throwing. Result:
+
+- `/blog` shows the "no posts" empty state if the API is temporarily down
+  (instead of 500).
+- `/blog/<slug>` triggers `notFound()` → 404 page (instead of 500).
+- Homepage `BlogPreviewSection` keeps the section title visible and hides
+  cards (instead of 500).
+
+ISR revalidate dropped from 5 min → 1 min so any cached 404 self-heals fast.
 
 ## Deploy
 
 1. Push to `Staging` branch — GitHub Action builds the image and triggers Dokploy.
 2. Wait for Dokploy to pull and restart.
-3. Open `/en/blog` or any slug page. Blogs render.
+3. Open `/en/blog`, any slug, the homepage. Blogs and cover images all load.
 
 ## Verify (optional)
 
 ```bash
 C=$(sudo docker ps --filter name=cvfrontend-prod --format "{{.ID}}" | head -1)
-sudo docker logs "$C" --tail 20
-# Should show "Ready" with no EAI_AGAIN errors after a blog page load.
+sudo docker logs "$C" --tail 30
+# No EAI_AGAIN errors. Should see "[SSR Dispatcher] installed ..." in dev mode.
 ```
 
-## If the server IP ever changes
-
-Set in Dokploy → frontend → Environment:
+## Env overrides (only if needed)
 
 ```env
+# Server IP changed
 BLOG_SSR_TARGET_IP=<new-ip>
 BLOG_SSR_HOST_HEADER=stg.civify.cv
-```
 
-Or multi-host:
-
-```env
+# Multi-host
 BLOG_SSR_HOST_MAP=civify.cv=<ip>,stg.civify.cv=<ip>
-```
 
-## To disable
+# Different fallback DNS servers
+BLOG_SSR_FALLBACK_DNS=1.1.1.1,8.8.8.8
 
-```env
+# Disable entirely
 BLOG_SSR_DISPATCHER=false
 ```

@@ -31,7 +31,7 @@ export type BlogFetchResult<T> =
 const isServer = typeof window === "undefined";
 const DEFAULT_PUBLIC_API_URL = "https://civify.cv/apis";
 const API_PATH = "/apis";
-export const REVALIDATE_SECONDS = 300;
+export const REVALIDATE_SECONDS = 60;
 const FETCH_RETRIES = 3;
 const FETCH_RETRY_DELAY_MS = 250;
 
@@ -166,8 +166,8 @@ export const blogService = {
       return await parseListResponse(res);
     } catch (error) {
       console.error("Error fetching published posts:", error);
-      if (process.env.IS_BUILD === "true") return [];
-      throw error;
+      // Degrade gracefully so the blog index never 500s.
+      return [];
     }
   },
 
@@ -178,7 +178,6 @@ export const blogService = {
       return await parseListResponse(res);
     } catch (error) {
       console.error("Error fetching featured posts:", error);
-      if (process.env.IS_BUILD === "true") return [];
       throw error;
     }
   },
@@ -200,15 +199,17 @@ export const blogService = {
     try {
       const res = await blogFetch(`/v1/blogs/${encodeURIComponent(slug)}`);
       if (!res.ok) {
-        if (res.status === 404) return null;
+        if (res.status === 404 || res.status === 410) return null;
         throw new Error(`Failed to fetch post with slug: ${slug}`);
       }
       const raw = (await res.json()) as Record<string, unknown>;
       return mapDetails(raw);
     } catch (error) {
       console.error(`Error fetching post by slug ${slug}:`, error);
-      if (process.env.IS_BUILD === "true") return null;
-      throw error;
+      // Prefer rendering a 404 over a 500 page on transient backend / network
+      // failures. The page will route through `notFound()` and Next.js won't
+      // cache the not-found result, so it self-heals on the next request.
+      return null;
     }
   },
 
@@ -219,8 +220,8 @@ export const blogService = {
       return await res.json();
     } catch (error) {
       console.error("Error fetching slugs:", error);
-      if (process.env.IS_BUILD === "true") return [];
-      throw error;
+      // Returning empty falls back to runtime rendering via dynamicParams.
+      return [];
     }
   },
 };

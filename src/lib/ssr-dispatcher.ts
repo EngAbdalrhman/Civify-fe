@@ -1,23 +1,27 @@
 /**
- * SSR DNS bypass for civify hosts.
+ * SSR DNS bypass for civify hosts + global DNS resilience.
  *
  * Why: Dokploy Swarm containers ship with broken DNS (resolv.conf -> 127.0.0.1
- * only) and Swarm host-add writes /etc/hosts as root-only, so the nextjs user
- * cannot read it. Every SSR fetch to civify.cv / stg.civify.cv throws
- * `getaddrinfo EAI_AGAIN`.
+ * only) so every SSR fetch (civify API, Unsplash, ImageKit, ...) can throw
+ * `getaddrinfo EAI_AGAIN`. The result: blogs flicker out, cover images fail to
+ * load, and slug pages 500.
  *
- * Fix: monkey-patch Node's `dns.lookup` and `dns.promises.lookup` so the known
- * civify hosts resolve to the Traefik public IP without touching DNS. TLS SNI
- * still uses the real hostname so the cert validates. ANY code path that uses
- * `dns.lookup` benefits (Node native fetch, undici, http/https).
+ * Fix: monkey-patch `dns.lookup` / `dns.promises.lookup` so that:
+ *   1. Known civify hosts resolve directly to the Traefik IP (no DNS at all).
+ *   2. All other hosts fall back to Cloudflare/Google DNS via `dns.resolve4`
+ *      when the system resolver fails. This makes Unsplash, ImageKit, GA, etc.
+ *      all work even when the container's resolv.conf is broken.
  *
- * Called from `instrumentation.ts` at server boot, before any module captures
- * a reference to the original `dns.lookup`.
+ * TLS SNI still uses the real hostname so certificates validate.
  *
- * Override map precedence:
- *   1. BLOG_SSR_HOST_MAP = "host1=ip1,host2=ip2"
- *   2. BLOG_SSR_HOST_HEADER + BLOG_SSR_TARGET_IP (single pair)
- *   3. Built-in defaults (civify Traefik IP)
+ * Installed from `instrumentation.ts` at server boot, before any other module
+ * captures a reference to `dns.lookup`.
+ *
+ * Env overrides:
+ *   BLOG_SSR_HOST_MAP="host1=ip1,host2=ip2"  (extra static overrides)
+ *   BLOG_SSR_HOST_HEADER + BLOG_SSR_TARGET_IP (single pair)
+ *   BLOG_SSR_FALLBACK_DNS="1.1.1.1,8.8.8.8"  (default Cloudflare + Google)
+ *   BLOG_SSR_DISPATCHER="false"              (disable entirely)
  */
 
 import dns from "node:dns";
@@ -28,6 +32,8 @@ const DEFAULT_HOST_MAP: Record<string, string> = {
   "civify.cv": "34.44.205.35",
   "stg.civify.cv": "34.44.205.35",
 };
+
+const DEFAULT_FALLBACK_DNS = ["1.1.1.1", "1.0.0.1", "8.8.8.8", "8.8.4.4"];
 
 function buildHostMap(): Map<string, string> {
   const map = new Map<string, string>();
@@ -53,14 +59,83 @@ function buildHostMap(): Map<string, string> {
   return map;
 }
 
+function getFallbackResolver(): dns.promises.Resolver {
+  const servers = (
+    process.env.BLOG_SSR_FALLBACK_DNS?.split(",")
+      .map((s) => s.trim())
+      .filter(Boolean) || DEFAULT_FALLBACK_DNS
+  );
+  const resolver = new dns.promises.Resolver({ timeout: 3000, tries: 2 });
+  try {
+    resolver.setServers(servers);
+  } catch {
+    resolver.setServers(DEFAULT_FALLBACK_DNS);
+  }
+  return resolver;
+}
+
+const negativeCache = new Map<string, number>();
+const NEGATIVE_TTL_MS = 30_000;
+const positiveCache = new Map<string, { ip: string; family: number; expires: number }>();
+const POSITIVE_TTL_MS = 60_000;
+
+async function resolveViaFallback(
+  hostname: string,
+): Promise<{ address: string; family: number } | null> {
+  const cached = positiveCache.get(hostname);
+  if (cached && cached.expires > Date.now()) {
+    return { address: cached.ip, family: cached.family };
+  }
+  const negativeAt = negativeCache.get(hostname);
+  if (negativeAt && Date.now() - negativeAt < NEGATIVE_TTL_MS) {
+    return null;
+  }
+
+  try {
+    const resolver = getFallbackResolver();
+    const v4 = await resolver.resolve4(hostname).catch(() => [] as string[]);
+    if (v4.length > 0) {
+      const ip = v4[0];
+      positiveCache.set(hostname, {
+        ip,
+        family: 4,
+        expires: Date.now() + POSITIVE_TTL_MS,
+      });
+      return { address: ip, family: 4 };
+    }
+    const v6 = await resolver.resolve6(hostname).catch(() => [] as string[]);
+    if (v6.length > 0) {
+      const ip = v6[0];
+      positiveCache.set(hostname, {
+        ip,
+        family: 6,
+        expires: Date.now() + POSITIVE_TTL_MS,
+      });
+      return { address: ip, family: 6 };
+    }
+  } catch {
+    // ignore
+  }
+  negativeCache.set(hostname, Date.now());
+  return null;
+}
+
+function isTransientDnsError(err: unknown): boolean {
+  const code = (err as { code?: string } | null)?.code ?? "";
+  return (
+    code === "EAI_AGAIN" ||
+    code === "ENOTFOUND" ||
+    code === "ETIMEDOUT" ||
+    code === "ESERVFAIL"
+  );
+}
+
 export function installSsrDispatcher(): void {
   if (installed) return;
   if (typeof window !== "undefined") return;
   if (process.env.BLOG_SSR_DISPATCHER === "false") return;
 
   const map = buildHostMap();
-  if (map.size === 0) return;
-
   installed = true;
 
   const originalLookup = dns.lookup;
@@ -90,8 +165,12 @@ export function installSsrDispatcher(): void {
       }
     }
 
+    if (!callback) {
+      return (originalLookup as (...a: unknown[]) => unknown).apply(dns, args);
+    }
+
     const ip = resolveOverride(hostname);
-    if (ip && callback) {
+    if (ip) {
       if (options.all) {
         callback(null, [{ address: ip, family: 4 }]);
       } else {
@@ -100,30 +179,71 @@ export function installSsrDispatcher(): void {
       return;
     }
 
-    return (originalLookup as (...a: unknown[]) => unknown).apply(dns, args);
+    // Try the system resolver first, fall back to Cloudflare/Google on EAI_AGAIN.
+    (originalLookup as (...a: unknown[]) => unknown).call(
+      dns,
+      hostname,
+      options,
+      (err: unknown, addr: unknown, family: unknown) => {
+        if (!err) {
+          callback(err, addr, family);
+          return;
+        }
+        if (!isTransientDnsError(err)) {
+          callback(err);
+          return;
+        }
+        if (typeof hostname !== "string") {
+          callback(err);
+          return;
+        }
+        resolveViaFallback(hostname).then((result) => {
+          if (!result) {
+            callback(err);
+            return;
+          }
+          if (options.all) {
+            callback(null, [{ address: result.address, family: result.family }]);
+          } else {
+            callback(null, result.address, result.family);
+          }
+        });
+      },
+    );
   };
 
   const patchedLookupPromise = async function patchedLookupPromise(
     hostname: string,
     options?: unknown,
   ): Promise<unknown> {
+    const all =
+      typeof options === "object" &&
+      options !== null &&
+      (options as { all?: boolean }).all === true;
+
     const ip = resolveOverride(hostname);
     if (ip) {
-      const all =
-        typeof options === "object" &&
-        options !== null &&
-        (options as { all?: boolean }).all === true;
-      if (all) {
-        return [{ address: ip, family: 4 }];
-      }
+      if (all) return [{ address: ip, family: 4 }];
       return { address: ip, family: 4 };
     }
-    return (
-      originalLookupPromise as unknown as (
-        h: string,
-        o?: unknown,
-      ) => Promise<unknown>
-    ).call(dns.promises, hostname, options);
+
+    try {
+      const result = await (
+        originalLookupPromise as unknown as (
+          h: string,
+          o?: unknown,
+        ) => Promise<unknown>
+      ).call(dns.promises, hostname, options);
+      return result;
+    } catch (error) {
+      if (!isTransientDnsError(error)) throw error;
+      const fallback = await resolveViaFallback(hostname);
+      if (!fallback) throw error;
+      if (all) {
+        return [{ address: fallback.address, family: fallback.family }];
+      }
+      return { address: fallback.address, family: fallback.family };
+    }
   };
 
   try {
@@ -147,9 +267,11 @@ export function installSsrDispatcher(): void {
 
   if (process.env.NODE_ENV !== "production") {
     console.log(
-      `[SSR Dispatcher] installed for: ${Array.from(map.entries())
+      `[SSR Dispatcher] installed. overrides=${Array.from(map.entries())
         .map(([h, i]) => `${h}=${i}`)
-        .join(", ")}`,
+        .join(",")} fallback=${(
+        process.env.BLOG_SSR_FALLBACK_DNS || DEFAULT_FALLBACK_DNS.join(",")
+      )}`,
     );
   }
 }
