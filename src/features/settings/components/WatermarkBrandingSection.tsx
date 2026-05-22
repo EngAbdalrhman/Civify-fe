@@ -87,7 +87,7 @@ export function WatermarkBrandingSection() {
           <CardDescription>
             Use your own logo on exported PDFs as watermark.
             {/*Stored at{" "}*/}
-            <code className="text-xs">watermarks bucket: your-user-id/logo.png</code>.
+            <code className="text-xs">civify/watermarks/your-user-id/logo.png</code>.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
