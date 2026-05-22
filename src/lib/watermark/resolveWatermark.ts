@@ -44,14 +44,19 @@ export async function resolveWatermarkForRequest(
   const internalToken = request.headers.get("x-pdf-internal-token");
   const pdfSecret = process.env.PDF_INTERNAL_SECRET;
 
-  if (
-    internalToken &&
-    pdfSecret &&
-    internalToken === pdfSecret &&
-    bodyWatermark?.enabled &&
-    bodyWatermark.imageUrl
-  ) {
-    return bodyWatermark;
+  // Civify external/browser PDF: policy is already resolved in the request body.
+  // Do not re-fetch watermark-config without auth (that returns the guest/platform watermark).
+  if (internalToken && pdfSecret && internalToken === pdfSecret && bodyWatermark !== undefined) {
+    if (!bodyWatermark.enabled) {
+      return undefined;
+    }
+    if (bodyWatermark.imageUrl) {
+      return bodyWatermark;
+    }
+    console.warn(
+      "PDF internal request: watermark enabled but imageUrl missing — skipping overlay",
+    );
+    return undefined;
   }
 
   const backendUrl =
@@ -62,8 +67,20 @@ export async function resolveWatermarkForRequest(
 
   if (backendUrl) {
     try {
+      const policyHeaders = buildAuthHeaders(request);
+      const pdfUserId = request.headers.get("x-pdf-user-id");
+      if (
+        internalToken &&
+        pdfSecret &&
+        internalToken === pdfSecret &&
+        pdfUserId
+      ) {
+        policyHeaders.set("x-pdf-internal-token", internalToken);
+        policyHeaders.set("x-pdf-user-id", pdfUserId);
+      }
+
       const res = await fetch(`${backendUrl}/v1/pdf/watermark-config`, {
-        headers: buildAuthHeaders(request),
+        headers: policyHeaders,
         cache: "no-store",
       });
 
