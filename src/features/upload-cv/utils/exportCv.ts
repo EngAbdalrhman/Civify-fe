@@ -31,6 +31,7 @@ export async function exportToPdfPuppeteer(
   try {
     const response = await fetch("/api/generate-pdf", {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },

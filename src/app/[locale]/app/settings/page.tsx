@@ -58,8 +58,12 @@ import { Progress } from "@/components/ui/progress";
 
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useUserPreferences, useUpdateUserPreferences, UserPreferences } from "@/hooks/useUserPreferences";
+import { WatermarkBrandingSection } from "@/features/settings/components/WatermarkBrandingSection";
+import { usePermissions } from "@/hooks/use-permissions";
 
 export default function SettingsPage() {
+  const { hasPermission } = usePermissions();
+  const canViewBranding = hasPermission("CV.CUSTOM_WATERMARK");
   const [activeTab, setActiveTab] = useState("profile");
 
   // Profile state
@@ -324,7 +328,7 @@ export default function SettingsPage() {
           className="space-y-4"
           onValueChange={setActiveTab}
         >
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-flex">
+          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-flex">
             <TabsTrigger value="profile" className="gap-2">
               <User className="h-4 w-4 hidden sm:block" />
               Profile
@@ -341,6 +345,12 @@ export default function SettingsPage() {
               <Shield className="h-4 w-4 hidden sm:block" />
               Security
             </TabsTrigger>
+            {canViewBranding && (
+              <TabsTrigger value="branding" className="gap-2">
+                <Camera className="h-4 w-4 hidden sm:block" />
+                Branding
+              </TabsTrigger>
+            )}
             {/* <TabsTrigger value="notifications" className="gap-2">
               <Bell className="h-4 w-4 hidden sm:block" />
               Notifications
@@ -1108,6 +1118,12 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
           </TabsContent> */}
+
+          {canViewBranding && (
+            <TabsContent value="branding" className="space-y-4">
+              <WatermarkBrandingSection />
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     </PermissionGuard>

@@ -15,6 +15,8 @@ import {
   normalizeLinkedInUrl,
   normalizeWebsiteUrl,
 } from "@/features/resume-builder/utils/socialLinks";
+import type { WatermarkConfig } from "@/features/resume-builder/types/watermark";
+import { renderWatermarkOverlay } from "@/features/resume-builder/utils/renderWatermark";
 
 // ============================================================================
 // Shared Utilities
@@ -83,6 +85,7 @@ function wrapInHtmlDocument(
   direction: "ltr" | "rtl",
   bodyFontFamily: string = "Inter",
   headingFontFamily: string = "Inter",
+  watermark?: WatermarkConfig,
 ): string {
   // ── Google Fonts registry ──
   const googleFontsMap: Record<string, string> = {
@@ -154,6 +157,7 @@ function wrapInHtmlDocument(
 </head>
 <body>
   ${content}
+  ${watermark ? renderWatermarkOverlay(watermark) : ""}
 </body>
 </html>
   `.trim();
@@ -163,7 +167,7 @@ function wrapInHtmlDocument(
 // Classic Template
 // ============================================================================
 
-function renderClassicTemplate(data: ResumeData, color: string): string {
+function renderClassicTemplate(data: ResumeData, color: string, watermark?: WatermarkConfig): string {
   const { personalInfo, sections, metadata } = data;
   const skillsStyle: SkillsDisplayStyle =
     metadata?.skillsDisplayStyle || "tags";
@@ -399,6 +403,7 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
     direction,
     bodyFontFamily,
     headingFontFamily,
+    watermark,
   );
 }
 
@@ -406,7 +411,7 @@ function renderClassicTemplate(data: ResumeData, color: string): string {
 // Modern Template
 // ============================================================================
 
-function renderModernTemplate(data: ResumeData, color: string): string {
+function renderModernTemplate(data: ResumeData, color: string, watermark?: WatermarkConfig): string {
   const { personalInfo, sections, metadata } = data;
   const skillsStyle: SkillsDisplayStyle =
     metadata?.skillsDisplayStyle || "tags";
@@ -649,6 +654,7 @@ function renderModernTemplate(data: ResumeData, color: string): string {
     direction,
     bodyFontFamily,
     headingFontFamily,
+    watermark,
   );
 }
 
@@ -656,7 +662,7 @@ function renderModernTemplate(data: ResumeData, color: string): string {
 // Creative Template
 // ============================================================================
 
-function renderCreativeTemplate(data: ResumeData, color: string): string {
+function renderCreativeTemplate(data: ResumeData, color: string, watermark?: WatermarkConfig): string {
   const { personalInfo, sections, metadata } = data;
   const skillsStyle: SkillsDisplayStyle =
     metadata?.skillsDisplayStyle || "tags";
@@ -931,6 +937,7 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
     direction,
     bodyFontFamily,
     headingFontFamily,
+    watermark,
   );
 }
 
@@ -938,7 +945,7 @@ function renderCreativeTemplate(data: ResumeData, color: string): string {
 // Executive Template — Polished, corporate, serif-flavored, subtle color accents
 // ============================================================================
 
-function renderExecutiveTemplate(data: ResumeData, color: string): string {
+function renderExecutiveTemplate(data: ResumeData, color: string, watermark?: WatermarkConfig): string {
   const { personalInfo, sections, metadata } = data;
   const skillsStyle: SkillsDisplayStyle =
     metadata?.skillsDisplayStyle || "tags";
@@ -1110,14 +1117,14 @@ function renderExecutiveTemplate(data: ResumeData, color: string): string {
   const bodyFont = metadata?.bodyFontFamily || metadata?.fontFamily || "Inter";
   const headingFont =
     metadata?.headingFontFamily || metadata?.fontFamily || "Inter";
-  return wrapInHtmlDocument(content, direction, bodyFont, headingFont);
+  return wrapInHtmlDocument(content, direction, bodyFont, headingFont, watermark);
 }
 
 // ============================================================================
 // Minimal Template — Ultra-clean, no borders, generous whitespace, muted tones
 // ============================================================================
 
-function renderMinimalTemplate(data: ResumeData, color: string): string {
+function renderMinimalTemplate(data: ResumeData, color: string, watermark?: WatermarkConfig): string {
   const { personalInfo, sections, metadata } = data;
   const skillsStyle: SkillsDisplayStyle =
     metadata?.skillsDisplayStyle || "tags";
@@ -1281,7 +1288,7 @@ function renderMinimalTemplate(data: ResumeData, color: string): string {
   const bodyFont = metadata?.bodyFontFamily || metadata?.fontFamily || "Inter";
   const headingFont =
     metadata?.headingFontFamily || metadata?.fontFamily || "Inter";
-  return wrapInHtmlDocument(content, direction, bodyFont, headingFont);
+  return wrapInHtmlDocument(content, direction, bodyFont, headingFont, watermark);
 }
 
 // ============================================================================
@@ -1299,18 +1306,19 @@ export function renderResumeHtml(
   data: ResumeData,
   template: TemplateType = "modern",
   color: string = "#000000",
+  watermark?: WatermarkConfig,
 ): string {
   switch (template) {
     case "classic":
-      return renderClassicTemplate(data, color);
+      return renderClassicTemplate(data, color, watermark);
     case "executive":
-      return renderExecutiveTemplate(data, color);
+      return renderExecutiveTemplate(data, color, watermark);
     case "creative":
-      return renderCreativeTemplate(data, color);
+      return renderCreativeTemplate(data, color, watermark);
     case "minimal":
-      return renderMinimalTemplate(data, color);
+      return renderMinimalTemplate(data, color, watermark);
     case "modern":
     default:
-      return renderModernTemplate(data, color);
+      return renderModernTemplate(data, color, watermark);
   }
 }
