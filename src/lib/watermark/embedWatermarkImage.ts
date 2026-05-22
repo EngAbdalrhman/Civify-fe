@@ -9,6 +9,10 @@ const LOCAL_WATERMARK_PNG = path.join(
   "watermark.png",
 );
 
+function isPlatformBrandWatermarkUrl(imageUrl: string): boolean {
+  return imageUrl.includes("/brand/watermark");
+}
+
 /**
  * Inline watermark as a data URI so Puppeteer does not depend on external HTTP
  * (presigned R2, wrong frontend host, etc.).
@@ -24,8 +28,10 @@ export async function embedWatermarkImage(
     return config;
   }
 
+  const usePlatformFallback = isPlatformBrandWatermarkUrl(config.imageUrl);
+
   try {
-    if (config.imageUrl.includes("/brand/watermark")) {
+    if (usePlatformFallback) {
       const embedded = await embedLocalPng();
       if (embedded) {
         return { ...config, imageUrl: embedded };
@@ -39,7 +45,11 @@ export async function embedWatermarkImage(
       console.warn(
         `Watermark image fetch failed: ${res.status} ${config.imageUrl}`,
       );
-      return await fallbackLocalPng(config);
+      if (usePlatformFallback) {
+        return await fallbackLocalPng(config);
+      }
+      // Custom branding URL — do not substitute Civify platform logo
+      return config;
     }
 
     const buffer = Buffer.from(await res.arrayBuffer());
@@ -49,8 +59,11 @@ export async function embedWatermarkImage(
       imageUrl: `data:${contentType};base64,${buffer.toString("base64")}`,
     };
   } catch (error) {
-    console.warn("Watermark embed failed, using local fallback:", error);
-    return await fallbackLocalPng(config);
+    console.warn("Watermark embed failed:", error);
+    if (usePlatformFallback) {
+      return await fallbackLocalPng(config);
+    }
+    return config;
   }
 }
 

@@ -37,28 +37,51 @@ function buildAuthHeaders(request: Request): Headers {
   return headers;
 }
 
+/** Civify server-to-server PDF calls must present a matching internal token. */
+function isTrustedServerCall(request: Request): boolean {
+  const internalToken = request.headers.get("x-pdf-internal-token");
+  const pdfSecret = process.env.PDF_INTERNAL_SECRET;
+  return !!(internalToken && pdfSecret && internalToken === pdfSecret);
+}
+
+/**
+ * Watermark resolution rules:
+ *  - Trusted server (Civify) + body  → use body verbatim
+ *  - Untrusted body                   → no watermark (don't substitute platform logo —
+ *                                       would override the user's actual policy)
+ *  - No body, trusted with X-Pdf-User-Id → fetch policy as that user
+ *  - No body, browser session         → fetch policy with cookie/Bearer auth
+ *  - No body, no auth                 → platform watermark default
+ */
 export async function resolveWatermarkForRequest(
   request: Request,
   bodyWatermark?: WatermarkConfig,
 ): Promise<WatermarkConfig | undefined> {
-  const internalToken = request.headers.get("x-pdf-internal-token");
-  const pdfSecret = process.env.PDF_INTERNAL_SECRET;
+  const trustedServer = isTrustedServerCall(request);
 
-  // Civify external/browser PDF: policy is already resolved in the request body.
-  // Do not re-fetch watermark-config without auth (that returns the guest/platform watermark).
-  if (internalToken && pdfSecret && internalToken === pdfSecret && bodyWatermark !== undefined) {
-    if (!bodyWatermark.enabled) {
+  if (bodyWatermark !== undefined) {
+    if (trustedServer) {
+      if (!bodyWatermark.enabled) {
+        console.info("PDF: trusted server body — watermark disabled");
+        return undefined;
+      }
+      if (bodyWatermark.imageUrl) {
+        console.info("PDF: trusted server body watermark");
+        return bodyWatermark;
+      }
+      console.warn(
+        "PDF: trusted server body watermark enabled but imageUrl missing — skipping overlay",
+      );
       return undefined;
     }
-    if (bodyWatermark.imageUrl) {
-      return bodyWatermark;
-    }
-    console.warn(
-      "PDF internal request: watermark enabled but imageUrl missing — skipping overlay",
+    console.error(
+      "PDF: untrusted watermark body received. Set PDF_INTERNAL_SECRET on HICv and Civify to the same value. Skipping watermark to avoid overriding user policy.",
     );
     return undefined;
   }
 
+  const internalToken = request.headers.get("x-pdf-internal-token");
+  const pdfSecret = process.env.PDF_INTERNAL_SECRET;
   const backendUrl =
     process.env.CIVIFY_API_URL ||
     process.env.NEXT_PUBLIC_API_URL ||
@@ -69,13 +92,8 @@ export async function resolveWatermarkForRequest(
     try {
       const policyHeaders = buildAuthHeaders(request);
       const pdfUserId = request.headers.get("x-pdf-user-id");
-      if (
-        internalToken &&
-        pdfSecret &&
-        internalToken === pdfSecret &&
-        pdfUserId
-      ) {
-        policyHeaders.set("x-pdf-internal-token", internalToken);
+      if (trustedServer && pdfUserId) {
+        policyHeaders.set("x-pdf-internal-token", internalToken!);
         policyHeaders.set("x-pdf-user-id", pdfUserId);
       }
 
@@ -102,6 +120,10 @@ export async function resolveWatermarkForRequest(
     } catch (error) {
       console.warn("Failed to resolve watermark from civify:", error);
     }
+  }
+
+  if (trustedServer && internalToken && pdfSecret) {
+    return undefined;
   }
 
   return getDefaultPlatformWatermark(requestOrigin);

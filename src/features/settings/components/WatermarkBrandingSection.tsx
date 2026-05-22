@@ -16,6 +16,11 @@ import {
 import { PermissionGuard } from "@/components/auth/PermissionGuard";
 import { WATERMARK_POSITION_OPTIONS } from "@/features/resume-builder/types/watermark";
 import {
+  validateWatermarkLogoFile,
+  WATERMARK_LOGO_ACCEPT,
+  WATERMARK_LOGO_HINT,
+} from "@/lib/watermark/validateWatermarkLogoFile";
+import {
   watermarkService,
   type UserWatermarkSettings,
 } from "@/services/watermark.service";
@@ -45,6 +50,14 @@ export function WatermarkBrandingSection() {
 
   const handleSave = async () => {
     if (!settings) return;
+    if (
+      settings.enabled &&
+      !settings.usePlatformWatermark &&
+      !settings.logoStorageKey
+    ) {
+      toast.error("Upload a PNG logo (max 500KB) before enabling custom watermark");
+      return;
+    }
     try {
       setSaving(true);
       const updated = await watermarkService.updateUserSettings({
@@ -66,11 +79,16 @@ export function WatermarkBrandingSection() {
   };
 
   const handleUpload = async (file: File) => {
+    const validationError = validateWatermarkLogoFile(file);
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
     try {
       setUploading(true);
       const updated = await watermarkService.uploadUserLogo(file);
       setSettings(updated);
-      // toast.success("Custom watermark uploaded");
+      toast.success("Custom watermark uploaded");
     } catch (e) {
       console.error(e);
       toast.error("Upload failed (PNG, max 500KB)");
@@ -119,14 +137,27 @@ export function WatermarkBrandingSection() {
 
               <div>
                 <Label className="mb-2 block">Logo (PNG)</Label>
+                <p className="text-xs text-muted-foreground mb-2">
+                  {WATERMARK_LOGO_HINT}
+                </p>
                 <input
                   type="file"
-                  accept="image/png"
+                  accept={WATERMARK_LOGO_ACCEPT}
                   className="text-sm"
                   disabled={uploading}
                   onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) handleUpload(f);
+                    const input = e.target;
+                    const f = input.files?.[0];
+                    if (!f) return;
+                    const validationError = validateWatermarkLogoFile(f);
+                    if (validationError) {
+                      toast.error(validationError);
+                      input.value = "";
+                      return;
+                    }
+                    void handleUpload(f).finally(() => {
+                      input.value = "";
+                    });
                   }}
                 />
               </div>
