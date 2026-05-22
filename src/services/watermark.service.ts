@@ -70,6 +70,7 @@ class WatermarkService {
   async getUserSettings(): Promise<UserWatermarkSettings> {
     const res = await apiClient.get<{ data: UserWatermarkSettings }>(
       "/v1/users/me/watermark-settings",
+      { skipErrorToast: true },
     );
     return res.data.data;
   }

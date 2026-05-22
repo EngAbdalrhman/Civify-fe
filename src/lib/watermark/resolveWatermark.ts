@@ -10,7 +10,7 @@ function getDefaultPlatformWatermark(baseUrl: string): WatermarkConfig {
   const envLogo = process.env.WATERMARK_LOGO_URL;
   return {
     enabled: true,
-    imageUrl: envLogo || `${origin}/brand/watermark.svg`,
+    imageUrl: envLogo || `${origin}/brand/watermark.png`,
     opacity: Number(process.env.WATERMARK_OPACITY) || DEFAULT_WATERMARK_OPACITY,
     scale: Number(process.env.WATERMARK_SCALE) || DEFAULT_WATERMARK_SCALE,
     position:

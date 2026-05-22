@@ -2,6 +2,13 @@ import { readFile } from "fs/promises";
 import path from "path";
 import type { WatermarkConfig } from "@/features/resume-builder/types/watermark";
 
+const LOCAL_WATERMARK_PNG = path.join(
+  process.cwd(),
+  "public",
+  "brand",
+  "watermark.png",
+);
+
 /**
  * Inline watermark as a data URI so Puppeteer does not depend on external HTTP
  * (presigned R2, wrong frontend host, etc.).
@@ -19,20 +26,20 @@ export async function embedWatermarkImage(
 
   try {
     if (config.imageUrl.includes("/brand/watermark")) {
-      const localSvg = path.join(process.cwd(), "public", "brand", "watermark.svg");
-      const svgBytes = await readFile(localSvg);
-      return {
-        ...config,
-        imageUrl: `data:image/svg+xml;base64,${svgBytes.toString("base64")}`,
-      };
+      const embedded = await embedLocalPng();
+      if (embedded) {
+        return { ...config, imageUrl: embedded };
+      }
     }
 
-    const res = await fetch(config.imageUrl, { signal: AbortSignal.timeout(15000) });
+    const res = await fetch(config.imageUrl, {
+      signal: AbortSignal.timeout(15000),
+    });
     if (!res.ok) {
       console.warn(
         `Watermark image fetch failed: ${res.status} ${config.imageUrl}`,
       );
-      return await fallbackLocalSvg(config);
+      return await fallbackLocalPng(config);
     }
 
     const buffer = Buffer.from(await res.arrayBuffer());
@@ -43,21 +50,28 @@ export async function embedWatermarkImage(
     };
   } catch (error) {
     console.warn("Watermark embed failed, using local fallback:", error);
-    return await fallbackLocalSvg(config);
+    return await fallbackLocalPng(config);
   }
 }
 
-async function fallbackLocalSvg(
+async function embedLocalPng(): Promise<string | null> {
+  try {
+    const bytes = await readFile(LOCAL_WATERMARK_PNG);
+    return `data:image/png;base64,${bytes.toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
+
+async function fallbackLocalPng(
   config: WatermarkConfig,
 ): Promise<WatermarkConfig> {
-  try {
-    const localSvg = path.join(process.cwd(), "public", "brand", "watermark.svg");
-    const svgBytes = await readFile(localSvg);
-    return {
-      ...config,
-      imageUrl: `data:image/svg+xml;base64,${svgBytes.toString("base64")}`,
-    };
-  } catch {
-    return config;
+  const embedded = await embedLocalPng();
+  if (embedded) {
+    return { ...config, imageUrl: embedded };
   }
+  console.error(
+    `Missing ${LOCAL_WATERMARK_PNG} — add public/brand/watermark.png to the frontend image`,
+  );
+  return config;
 }

@@ -36,9 +36,22 @@ ISR revalidate dropped from 5 min → 1 min so any cached 404 self-heals fast.
 
 ## Deploy
 
-1. Push to `Staging` branch — GitHub Action builds the image and triggers Dokploy.
-2. Wait for Dokploy to pull and restart.
-3. Open `/en/blog`, any slug, the homepage. Blogs and cover images all load.
+1. Push **frontend** to `Staging` — GitHub Action builds and triggers Dokploy.
+2. Deploy **backend** (`civify`) too — fixes Redis blog cache 500s (`publicBlogs-v3` + auto-evict on corrupt entries).
+3. Wait for both services to restart.
+4. Open `/en/blog`, any slug, the homepage. Blogs and cover images all load.
+
+### Backend Redis (shared stg + prod — see `backend/civify/docs/BLOG_REDIS.md`)
+
+**Do not run `FLUSHALL` or `FLUSHDB`** — that clears sessions, permissions, AI cache, etc. for **both** environments.
+
+Delete **only** blog cache keys:
+
+```bash
+redis-cli --scan --pattern '*publicBlogs*' | xargs -r redis-cli DEL
+```
+
+Or deploy backend civify — startup purges `*publicBlogs*` automatically.
 
 ## Verify (optional)
 
