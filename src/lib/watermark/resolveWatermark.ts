@@ -19,6 +19,24 @@ function getDefaultPlatformWatermark(baseUrl: string): WatermarkConfig {
   };
 }
 
+function buildAuthHeaders(request: Request): Headers {
+  const headers = new Headers();
+  const cookie = request.headers.get("cookie");
+  const authorization = request.headers.get("authorization");
+
+  if (cookie) {
+    headers.set("cookie", cookie);
+    const tokenMatch = cookie.match(/(?:^|;\s*)accessToken=([^;]+)/);
+    if (tokenMatch?.[1] && !authorization) {
+      headers.set("authorization", `Bearer ${decodeURIComponent(tokenMatch[1])}`);
+    }
+  }
+  if (authorization) {
+    headers.set("authorization", authorization);
+  }
+  return headers;
+}
+
 export async function resolveWatermarkForRequest(
   request: Request,
   bodyWatermark?: WatermarkConfig,
@@ -44,14 +62,8 @@ export async function resolveWatermarkForRequest(
 
   if (backendUrl) {
     try {
-      const headers = new Headers();
-      const cookie = request.headers.get("cookie");
-      const authorization = request.headers.get("authorization");
-      if (cookie) headers.set("cookie", cookie);
-      if (authorization) headers.set("authorization", authorization);
-
       const res = await fetch(`${backendUrl}/v1/pdf/watermark-config`, {
-        headers,
+        headers: buildAuthHeaders(request),
         cache: "no-store",
       });
 
@@ -62,8 +74,13 @@ export async function resolveWatermarkForRequest(
           return config;
         }
         if (config && !config.enabled) {
+          console.info("PDF watermark disabled by policy for this user");
           return undefined;
         }
+      } else {
+        console.warn(
+          `watermark-config returned ${res.status}, using default watermark`,
+        );
       }
     } catch (error) {
       console.warn("Failed to resolve watermark from civify:", error);

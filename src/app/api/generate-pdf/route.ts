@@ -15,6 +15,7 @@ import {
 } from "@/features/resume-builder/utils/renderResumeHtml";
 import type { WatermarkConfig } from "@/features/resume-builder/types/watermark";
 import type { ResumeData } from "@/features/upload-cv/types";
+import { embedWatermarkImage } from "@/lib/watermark/embedWatermarkImage";
 import { resolveWatermarkForRequest } from "@/lib/watermark/resolveWatermark";
 
 // ---------------------------------------------------------------------------
@@ -103,7 +104,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const watermark = await resolveWatermarkForRequest(request, bodyWatermark);
+    const watermarkResolved = await resolveWatermarkForRequest(
+      request,
+      bodyWatermark,
+    );
+    const watermark = await embedWatermarkImage(watermarkResolved);
     const html = renderResumeHtml(resumeData, template, color, watermark);
 
     const browser = await getBrowser();
