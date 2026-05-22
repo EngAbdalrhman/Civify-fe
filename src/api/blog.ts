@@ -1,54 +1,64 @@
-import { getBlogApiBaseUrl } from "@/services/blog.service";
+import { blogService } from "@/services/blog.service";
 import type { BlogListItem, BlogPost } from "@/types/blog";
 
-const API_BASE = getBlogApiBaseUrl();
-
-/**
- * Server-side fetch helpers for blog — used in SSR page components.
- * These bypass the client-side apiClient (which requires window) and
- * call the backend directly with Next.js fetch caching.
- */
-
-export async function fetchPublishedPosts(): Promise<BlogListItem[]> {
-  try {
-    const res = await fetch(`${API_BASE}/v1/blogs`, {
-      next: { revalidate: 300 }, // revalidate every 5 minutes
-    });
-    if (!res.ok) return [];
-    return res.json();
-  } catch {
-    return [];
-  }
+function toBlogListItem(
+  post: Awaited<ReturnType<typeof blogService.getPublishedPosts>>[number],
+): BlogListItem {
+  return {
+    id: String(post.id),
+    title: post.title,
+    slug: post.slug,
+    metaDescription: post.metaDescription,
+    metaKeywords: post.metaKeywords,
+    coverImageUrl: post.coverImageUrl,
+    author: post.authorName,
+    readingTime: post.readingTime,
+    publishedAt: post.publishedAt,
+    featured: post.featured,
+  };
 }
 
-export async function fetchFeaturedPosts(): Promise<BlogListItem[]> {
-  try {
-    const res = await fetch(`${API_BASE}/v1/blogs/featured`, {
-      next: { revalidate: 300 },
-    });
-    if (!res.ok) return [];
-    return res.json();
-  } catch {
-    return [];
-  }
+function toBlogPost(
+  post: NonNullable<Awaited<ReturnType<typeof blogService.getPostBySlug>>>,
+): BlogPost {
+  return {
+    id: String(post.id),
+    title: post.title,
+    slug: post.slug,
+    content: post.content,
+    metaDescription: post.metaDescription,
+    metaKeywords: post.metaKeywords,
+    coverImageUrl: post.coverImageUrl,
+    author: post.authorName,
+    readingTime: post.readingTime,
+    publishedAt: post.publishedAt,
+    featured: post.featured,
+    published: post.published,
+  };
+}
+
+/** @deprecated Import from blog.service — kept for existing imports */
+export async function fetchPublishedPosts(): Promise<BlogListItem[]> {
+  const posts = await blogService.getPublishedPosts();
+  return posts.map(toBlogListItem);
+}
+
+export async function fetchFeaturedPosts(): Promise<{
+  posts: BlogListItem[];
+  failed: boolean;
+}> {
+  const result = await blogService.getFeaturedPostsSafe();
+  return {
+    posts: result.data.map(toBlogListItem),
+    failed: result.failed,
+  };
 }
 
 export async function fetchPostBySlug(slug: string): Promise<BlogPost | null> {
-  try {
-    const res = await fetch(
-      `${API_BASE}/v1/blogs/${encodeURIComponent(slug)}`,
-      {
-        next: { revalidate: 300 },
-      },
-    );
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
-  }
+  const post = await blogService.getPostBySlug(slug);
+  return post ? toBlogPost(post) : null;
 }
 
 export async function fetchPublishedSlugs(): Promise<string[]> {
-  const posts = await fetchPublishedPosts();
-  return posts.map((p) => p.slug).filter(Boolean);
+  return blogService.getAllSlugs();
 }

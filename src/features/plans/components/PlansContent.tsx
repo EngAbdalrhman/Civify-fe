@@ -14,8 +14,7 @@ import {
 import { usePlans } from "@/features/plans/hooks/usePlans";
 import { Badge } from "@/components/ui/badge";
 import { isAuthenticated } from "@/utils/cookies";
-
-import { useState, useEffect } from "react";
+import { usePermissions } from "@/hooks/use-permissions";
 
 interface PlansContentProps {
   hideFAQ?: boolean;
@@ -28,12 +27,8 @@ export default function PlansContent({
 }: PlansContentProps = {}) {
   const t = useTranslations("plans");
   const router = useRouter();
-  const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
   const { displayPlans, isLoading, error, isAnnual, setIsAnnual } = usePlans();
-
-  useEffect(() => {
-    setIsUserAuthenticated(isAuthenticated());
-  }, []);
+  const { groupName } = usePermissions();
 
   const handlePlanSelect = (ctaLink: string) => {
     // If it's a signup link (free plan), just go there
@@ -42,15 +37,16 @@ export default function PlansContent({
       return;
     }
 
-    if (!isUserAuthenticated) {
-      // Redirect to signup with callback
-      // Construct callback URL: /checkout?planId=X
-      const callbackUrl = encodeURIComponent(ctaLink);
-      router.push(`/signup?callbackUrl=${callbackUrl}`);
-    } else {
-      // Proceed to checkout
-      router.push(ctaLink);
+    // Read cookie at click time (state from useEffect can lag behind a valid session)
+    const loggedIn = isAuthenticated() || !!groupName;
+
+    if (!loggedIn) {
+      const returnTo = encodeURIComponent(ctaLink);
+      router.push(`/login?returnTo=${returnTo}`);
+      return;
     }
+
+    router.push(ctaLink);
   };
 
   if (isLoading) {

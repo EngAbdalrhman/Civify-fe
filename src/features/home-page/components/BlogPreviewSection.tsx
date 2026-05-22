@@ -7,14 +7,25 @@ import Image from "next/image";
 import { fetchFeaturedPosts } from "@/api/blog";
 import type { BlogListItem } from "@/types/blog";
 
-// Server component — fetches featured posts at request time
 export async function BlogPreviewSection() {
   const t = await getTranslations("blog");
-  const posts = await fetchFeaturedPosts();
+  const { posts, failed } = await fetchFeaturedPosts();
 
-  // Fall back to empty state if no posts yet
-  if (posts.length === 0) {
+  if (posts.length === 0 && !failed) {
     return null;
+  }
+
+  if (failed) {
+    return (
+      <section className="bg-gradient-to-b from-blue-50/30 to-background py-20 dark:from-gray-900 dark:to-background md:py-32">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
+            {t("title")}
+          </h2>
+          <p className="text-muted-foreground">{t("subtitle")}</p>
+        </div>
+      </section>
+    );
   }
 
   const displayPosts = posts.slice(0, 3);
@@ -22,7 +33,6 @@ export async function BlogPreviewSection() {
   return (
     <section className="bg-gradient-to-b from-blue-50/30 to-background py-20 dark:from-gray-900 dark:to-background md:py-32">
       <div className="container mx-auto px-4">
-        {/* Section Header */}
         <div className="mx-auto mb-16 max-w-3xl text-center">
           <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
             {t("title")}
@@ -30,14 +40,12 @@ export async function BlogPreviewSection() {
           <p className="text-lg text-muted-foreground">{t("subtitle")}</p>
         </div>
 
-        {/* Blog Posts Grid */}
         <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-3">
           {displayPosts.map((post) => (
             <BlogPreviewCard key={post.id} post={post} readMoreLabel={t("readMore")} />
           ))}
         </div>
 
-        {/* View All CTA */}
         <div className="mt-12 text-center">
           <Button asChild variant="outline" size="lg">
             <Link href="/blog">
@@ -61,7 +69,6 @@ function BlogPreviewCard({
   return (
     <Card className="group overflow-hidden border-2 transition-all duration-300 hover:border-primary hover:shadow-xl hover:shadow-primary/10">
       <CardContent className="p-0">
-        {/* Image */}
         <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-800 dark:to-purple-900/20">
           {post.coverImageUrl ? (
             <Image
@@ -79,7 +86,6 @@ function BlogPreviewCard({
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         </div>
 
-        {/* Content */}
         <div className="p-6">
           {post.readingTime && (
             <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">

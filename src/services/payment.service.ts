@@ -60,11 +60,31 @@ class PaymentService {
   }
 
   /**
+   * Get dynamic payment config including gateways, resolved gateway, currency and conversion rate
+   */
+  async getPaymentConfig(): Promise<{
+    enabledGateways: string[];
+    resolvedGateway: string;
+    currency: string;
+    conversionRate: number;
+    baseCurrency: 'USD' | 'EGP';
+  }> {
+    const response = await apiClient.get<{
+      enabledGateways: string[];
+      resolvedGateway: string;
+      currency: string;
+      conversionRate: number;
+      baseCurrency: 'USD' | 'EGP';
+    }>(API_ENDPOINTS.CONFIG);
+    return response.data;
+  }
+
+  /**
    * Get enabled payment gateways
    */
   async getEnabledGateways(): Promise<string[]> {
-    const response = await apiClient.get<{ enabledGateways: string[] }>(API_ENDPOINTS.CONFIG);
-    return response.data.enabledGateways;
+    const config = await this.getPaymentConfig();
+    return config.enabledGateways;
   }
 
   /**
@@ -163,6 +183,30 @@ class PaymentService {
   /**
    * Parse Paymob callback parameters from URL
    */
+  parseDodoCallback(searchParams: URLSearchParams): {
+    success: boolean;
+    transactionId?: string;
+    orderId?: string;
+    status?: string;
+    error?: string;
+  } {
+    const status = searchParams.get('status') || undefined;
+    const paymentId = searchParams.get('payment_id') || undefined;
+    const success =
+      status === 'succeeded' || status === 'active';
+    const error = !success
+      ? (searchParams.get('error') || `Payment status: ${status || 'unknown'}`)
+      : undefined;
+
+    return {
+      success,
+      transactionId: paymentId,
+      orderId: paymentId,
+      status,
+      error,
+    };
+  }
+
   parsePaymobCallback(searchParams: URLSearchParams): {
     success: boolean;
     transactionId?: string;

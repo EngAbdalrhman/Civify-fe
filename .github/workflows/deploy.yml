@@ -55,6 +55,9 @@ jobs:
           secrets: |
             SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
 
+      # SSR DNS is handled in-app by src/lib/ssr-dispatcher.ts — no Dokploy env needed.
+      # See docs/BLOG_DEPLOY.md
+
       # 5. Trigger Dokploy to Pull and Deploy
       - name: Trigger Dokploy Deployment
         run: |
