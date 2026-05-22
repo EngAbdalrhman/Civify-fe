@@ -56,7 +56,7 @@ export function WatermarkBrandingSection() {
         usePlatformWatermark: settings.usePlatformWatermark,
       });
       setSettings(updated);
-      toast.success("Branding settings saved");
+      // toast.success("Branding settings saved");
     } catch (e) {
       console.error(e);
       toast.error("Failed to save branding settings");
@@ -70,7 +70,7 @@ export function WatermarkBrandingSection() {
       setUploading(true);
       const updated = await watermarkService.uploadUserLogo(file);
       setSettings(updated);
-      toast.success("Custom watermark uploaded");
+      // toast.success("Custom watermark uploaded");
     } catch (e) {
       console.error(e);
       toast.error("Upload failed (PNG, max 500KB)");
@@ -87,7 +87,7 @@ export function WatermarkBrandingSection() {
           <CardDescription>
             Use your own logo on exported PDFs instead of the Civify watermark.
             Stored at{" "}
-            <code className="text-xs">Watermark/your-user-id/logo.png</code>.
+            <code className="text-xs">civify/watermarks/your-user-id/logo.png</code>.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

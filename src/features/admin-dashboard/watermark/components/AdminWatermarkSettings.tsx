@@ -96,7 +96,7 @@ export function AdminWatermarkSettings() {
         <CardTitle>PDF Watermark</CardTitle>
         <CardDescription>
           Platform logo applied to free-tier and guest PDF exports (R2:{" "}
-          <code className="text-xs">Watermark/platform/logo.png</code>).
+          <code className="text-xs">civify/watermarks/platform/logo.png</code>).
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
