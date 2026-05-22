@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { WATERMARK_POSITION_OPTIONS } from "@/features/resume-builder/types/watermark";
 import {
   watermarkService,
   type PlatformWatermarkSettings,
@@ -186,11 +187,11 @@ export function AdminWatermarkSettings() {
                 setSettings({ ...settings, position: e.target.value })
               }
             >
-              <option value="center">Center</option>
-              <option value="bottom-right">Bottom right</option>
-              <option value="bottom-left">Bottom left</option>
-              <option value="top-right">Top right</option>
-              <option value="top-left">Top left</option>
+              {WATERMARK_POSITION_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
             </select>
           </div>
         </div>
