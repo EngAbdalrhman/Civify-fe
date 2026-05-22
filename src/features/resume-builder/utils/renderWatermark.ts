@@ -37,20 +37,22 @@ export function renderWatermarkOverlay(config: WatermarkConfig): string {
 
   const opacity = config.opacity ?? DEFAULT_WATERMARK_OPACITY;
   const scale = config.scale ?? DEFAULT_WATERMARK_SCALE;
-  // Ensure visible on white PDF backgrounds (0.12 alone is often invisible)
-  const effectiveOpacity = Math.max(opacity, 0.18);
   const position = config.position ?? DEFAULT_WATERMARK_POSITION;
   const rotation = config.rotation ?? 0;
   const imageUrl = escapeHtml(config.imageUrl);
 
   const isCenter = position === "center";
-  const transform = isCenter
-    ? `rotate(${rotation}deg)`
-    : `rotate(${rotation}deg)`;
+  // Corner logos need higher opacity/size — 0.12 at top-right is nearly invisible on white PDFs.
+  const effectiveOpacity = isCenter
+    ? Math.max(opacity, 0.18)
+    : Math.max(opacity, 0.28);
+  const cornerScale = Math.max(scale, 0.25);
+
+  const transform = `rotate(${rotation}deg)`;
 
   const imgStyle = isCenter
     ? `max-width: ${scale * 100}%; height: auto; opacity: ${effectiveOpacity}; transform: ${transform};`
-    : `max-width: ${scale * 60}%; height: auto; opacity: ${effectiveOpacity}; transform: ${transform};`;
+    : `max-width: ${cornerScale * 100}%; max-height: 18%; height: auto; opacity: ${effectiveOpacity}; transform: ${transform};`;
 
   return `
     <div id="pdf-watermark-overlay" style="
