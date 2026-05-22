@@ -80,7 +80,7 @@ export function WatermarkBrandingSection() {
   };
 
   return (
-    <PermissionGuard permission="CV.CUSTOM_WATERMARK">
+    <PermissionGuard permissions={["CV.CUSTOM_WATERMARK"]}>
       <Card>
         <CardHeader>
           <CardTitle>Custom PDF watermark</CardTitle>
