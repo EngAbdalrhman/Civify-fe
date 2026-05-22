@@ -1,3 +1,5 @@
+import { installSsrDispatcher } from "@/lib/ssr-dispatcher";
+
 export interface PublicBlogPost {
   id: number;
   title: string;
@@ -22,138 +24,12 @@ export type BlogFetchResult<T> =
   | { ok: true; data: T; failed: false }
   | { ok: false; data: T; failed: true };
 
-import dns from "node:dns";
-import fs from "node:fs";
-import net from "node:net";
-
 const isServer = typeof window === "undefined";
 const DEFAULT_PUBLIC_API_URL = "https://civify.cv/apis";
 const API_PATH = "/apis";
 export const REVALIDATE_SECONDS = 300;
 const FETCH_RETRIES = 3;
 const FETCH_RETRY_DELAY_MS = 250;
-
-let serverDnsConfigured = false;
-
-/**
- * Avoid dns.setServers() by default — it makes Node skip /etc/hosts (Swarm host-add).
- * Only when BLOG_DNS_FORCE=true. Prefer INTERNAL_API_URL=http://<backend-ip>:8077/apis.
- */
-function configureServerDns(): void {
-  if (!isServer || serverDnsConfigured) return;
-  serverDnsConfigured = true;
-
-  if (process.env.BLOG_DNS_FIX === "false") return;
-  if (process.env.BLOG_DNS_FORCE !== "true") return;
-
-  const custom = process.env.BLOG_DNS_SERVERS?.split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-
-  if (custom?.length) {
-    dns.setServers(custom);
-    return;
-  }
-
-  const current = dns.getServers();
-  const broken =
-    current.length === 0 ||
-    (current.length === 1 && current[0] === "127.0.0.1");
-
-  if (broken) {
-    dns.setServers(["127.0.0.11", "1.1.1.1", "8.8.8.8"]);
-  }
-}
-
-/** Read Swarm host-add entries (works when getaddrinfo cannot). */
-function readIpFromEtcHosts(hostname: string): string | undefined {
-  try {
-    const lines = fs.readFileSync("/etc/hosts", "utf8").split("\n");
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith("#")) continue;
-      const parts = trimmed.split(/\s+/);
-      const ip = parts[0];
-      if (parts.slice(1).includes(hostname) && net.isIP(ip)) {
-        return ip;
-      }
-    }
-  } catch {
-    // unreadable / missing
-  }
-  return undefined;
-}
-
-/** Bypass broken Swarm DNS: connect to Traefik/server IP, send correct Host header. */
-function resolveViaIpAndHostHeader(
-  url: string,
-): { url: string; headers: HeadersInit } | null {
-  const parsed = new URL(url);
-  if (net.isIP(parsed.hostname)) {
-    return null;
-  }
-
-  const originalHost = parsed.hostname;
-  const targetIp =
-    process.env.BLOG_SSR_TARGET_IP?.trim() ?? readIpFromEtcHosts(originalHost);
-
-  if (!targetIp) return null;
-
-  parsed.hostname = targetIp;
-  const headers = new Headers();
-  const hostHeader =
-    process.env.BLOG_SSR_HOST_HEADER?.trim() || originalHost;
-  if (parsed.protocol === "https:" || parsed.protocol === "http:") {
-    headers.set("Host", hostHeader);
-  }
-  return { url: parsed.toString(), headers };
-}
-
-/** Resolve hostname via /etc/hosts, env IP override, then getaddrinfo. */
-async function resolveUrlForFetch(
-  url: string,
-): Promise<{ url: string; headers?: HeadersInit }> {
-  const parsed = new URL(url);
-  if (net.isIP(parsed.hostname)) {
-    return { url };
-  }
-
-  const viaHosts = resolveViaIpAndHostHeader(url);
-  if (viaHosts) return viaHosts;
-
-  const originalHost = parsed.hostname;
-
-  try {
-    const { address } = await dns.promises.lookup(originalHost, {
-      family: 4,
-      order: "ipv4first",
-    });
-    parsed.hostname = address;
-    const headers = new Headers();
-    if (parsed.protocol === "https:") {
-      headers.set("Host", originalHost);
-    }
-    return { url: parsed.toString(), headers };
-  } catch (firstError) {
-    const fallback = resolveViaIpAndHostHeader(url);
-    if (fallback) return fallback;
-
-    if (process.env.BLOG_DNS_FORCE === "true") {
-      configureServerDns();
-      const { address } = await dns.promises.lookup(originalHost, {
-        family: 4,
-        order: "ipv4first",
-      });
-      parsed.hostname = address;
-      const headers = new Headers();
-      if (parsed.protocol === "https:") {
-        headers.set("Host", originalHost);
-      }
-      return { url: parsed.toString(), headers };
-    }
-    throw firstError;
-  }
-}
 
 function normalizeUrl(value: string | undefined): string | undefined {
   const trimmed = value?.trim();
@@ -164,62 +40,37 @@ function apiUrlFromFrontendBase(
   baseUrl: string | undefined,
 ): string | undefined {
   const normalizedBaseUrl = normalizeUrl(baseUrl);
-
   if (!normalizedBaseUrl) return undefined;
 
   try {
     const url = new URL(normalizedBaseUrl);
     const pathname = url.pathname.replace(/\/+$/, "");
-
     url.pathname = pathname.endsWith(API_PATH)
       ? pathname
       : `${pathname}${API_PATH}`;
     url.search = "";
     url.hash = "";
-
     return normalizeUrl(url.toString());
   } catch {
     return undefined;
   }
 }
 
-/** Public API base — used by browser and as SSR fallback when SERVER_API_URL is unset. */
 export function getPublicBlogApiBaseUrl(): string {
   const configuredApiUrl = normalizeUrl(process.env.NEXT_PUBLIC_API_URL);
   const derivedApiUrl = apiUrlFromFrontendBase(
     process.env.NEXT_PUBLIC_BASE_URL,
   );
-
   if (configuredApiUrl) return configuredApiUrl;
   if (derivedApiUrl) return derivedApiUrl;
   return DEFAULT_PUBLIC_API_URL;
 }
 
-/** Build internal API URL from host/port/path parts (stable Dokploy alias). */
-function getServerApiBaseUrlFromParts(): string | undefined {
-  const host = process.env.SERVER_API_HOST?.trim();
-  if (!host) return undefined;
-
-  const port = process.env.SERVER_API_PORT?.trim() || "8080";
-  const path = (process.env.SERVER_API_PATH?.trim() || API_PATH).replace(
-    /\/+$/,
-    "",
-  );
-  const pathname = path.startsWith("/") ? path : `/${path}`;
-
-  return `http://${host}:${port}${pathname}`;
-}
-
-/**
- * SSR-only API base. Uses internal Docker URL when set (Dokploy), else public URL.
- * Env precedence: SERVER_API_URL → INTERNAL_API_URL → SERVER_API_HOST:PORT.
- */
 export function getBlogApiBaseUrl(): string {
   if (isServer) {
     const serverApiUrl =
       normalizeUrl(process.env.SERVER_API_URL) ??
-      normalizeUrl(process.env.INTERNAL_API_URL) ??
-      getServerApiBaseUrlFromParts();
+      normalizeUrl(process.env.INTERNAL_API_URL);
     if (serverApiUrl) return serverApiUrl;
   }
   return getPublicBlogApiBaseUrl();
@@ -246,6 +97,10 @@ async function blogFetch(
   path: string,
   init?: RequestInit & { next?: { revalidate?: number } },
 ): Promise<Response> {
+  if (isServer) {
+    await installSsrDispatcher();
+  }
+
   const baseUrl = getBlogApiBaseUrl();
   const url = `${baseUrl}${path}`;
   let lastError: unknown;
@@ -253,16 +108,8 @@ async function blogFetch(
   for (let attempt = 0; attempt < FETCH_RETRIES; attempt++) {
     try {
       const { next: nextInit, ...rest } = init ?? {};
-      const resolved = await resolveUrlForFetch(url);
-      const headers = new Headers(rest.headers);
-      if (resolved.headers) {
-        new Headers(resolved.headers).forEach((value, key) => {
-          headers.set(key, value);
-        });
-      }
-      return await fetch(resolved.url, {
+      return await fetch(url, {
         ...rest,
-        headers,
         next: { revalidate: REVALIDATE_SECONDS, ...nextInit },
       });
     } catch (error) {
@@ -332,9 +179,6 @@ export const blogService = {
     }
   },
 
-  /**
-   * Featured posts with explicit fetch-failure signal (homepage).
-   */
   async getFeaturedPostsSafe(): Promise<BlogFetchResult<PublicBlogPost[]>> {
     try {
       const data = await this.getFeaturedPosts();

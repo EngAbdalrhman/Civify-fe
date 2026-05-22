@@ -15,14 +15,13 @@ COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml* ./
 RUN pnpm install --frozen-lockfile
 
 # -----------------------------------------------------------------------------
-# 3. Builder Stage (ARGS ADDED HERE)
+# 3. Builder Stage
 # -----------------------------------------------------------------------------
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# --- Build Args & Envs ---
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_BASE_URL
 ARG NEXT_PUBLIC_GA_MEASUREMENT_ID
@@ -37,12 +36,10 @@ ENV NEXT_PUBLIC_CLARITY_PROJECT_ID=$NEXT_PUBLIC_CLARITY_PROJECT_ID
 ENV NEXT_PUBLIC_SENTRY_DSN=$NEXT_PUBLIC_SENTRY_DSN
 ENV NEXT_PUBLIC_ADS_ENABLED=$NEXT_PUBLIC_ADS_ENABLED
 ENV NEXT_TELEMETRY_DISABLED=$NEXT_TELEMETRY_DISABLED
-# ------------------------------
 ENV IS_BUILD="true"
 
 RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
-    export SENTRY_AUTH_TOKEN=$(cat /run/secrets/SENTRY_AUTH_TOKEN) && \
-    node -e "const u=(process.env.NEXT_PUBLIC_API_URL||'https://civify.cv/apis')+'/v1/blogs';fetch(u).then(r=>{if(!r.ok)console.warn('WARN: blog API',r.status,'during build');}).catch(e=>console.warn('WARN: blog API unreachable during build:',e.message))" && \
+    export SENTRY_AUTH_TOKEN=$(cat /run/secrets/SENTRY_AUTH_TOKEN 2>/dev/null || echo "") && \
     pnpm run build
 
 # -----------------------------------------------------------------------------
@@ -53,21 +50,17 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-# Prefer IPv4 DNS resolution (mitigates EAI_AGAIN in Docker Swarm)
 ENV NODE_OPTIONS="--dns-result-order=ipv4first"
 
-# Ensure /etc/hosts is consulted by getaddrinfo (debian:slim ships without nsswitch.conf,
-# so Swarm host-add / extra_hosts entries are otherwise ignored → EAI_AGAIN).
+# Make getaddrinfo consult /etc/hosts even if Swarm host-add is in effect
 RUN echo "hosts: files dns" > /etc/nsswitch.conf
 
-# Inject build args as ENVs for runtime
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_BASE_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
-# INTERNAL_API_URL: set only in Dokploy (frontend service env), NOT in GitHub — see docs/BLOG_DEPLOY.md
 
-# Install Chromium and required dependencies for Puppeteer
+# Install Chromium + fonts for Puppeteer
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
        ca-certificates \
@@ -87,38 +80,24 @@ RUN apt-get update \
        libasound2 \
     && rm -rf /var/lib/apt/lists/*
 
-# Set Puppeteer environment variables
 ENV PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium"
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-# Create non-root user (nextjs in nodejs group)
-RUN addgroup --system --gid 1001 nodejs \
-    && adduser --system --uid 1001 --ingroup nodejs --no-create-home nextjs
-
-# Create writable directories for Chromium crash handler, user data, and XDG dirs
 RUN mkdir -p /tmp/chromium-crashes /tmp/chromium-data /tmp/.chromium \
-    && chown -R nextjs:nodejs /tmp/chromium-crashes /tmp/chromium-data /tmp/.chromium
+    && chmod -R 777 /tmp/chromium-crashes /tmp/chromium-data /tmp/.chromium
 
-# Set XDG directories so chrome_crashpad_handler can find a writable database path
 ENV XDG_CONFIG_HOME=/tmp/.chromium
 ENV XDG_CACHE_HOME=/tmp/.chromium
 
-# Copy built application
 COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
-    && chown nextjs:nodejs /app
-
-# Entrypoint starts as root (chmod /etc/hosts), then drops to nextjs via runuser
-USER root
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 
 EXPOSE 3000
 
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Entrypoint runs as root briefly to chmod /etc/hosts, then exec node (standalone server)
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+# Run as root inside container. The SSR dispatcher bypasses DNS via undici
+# (see src/lib/ssr-dispatcher.ts), so /etc/hosts permissions are irrelevant.
+CMD ["node", "server.js"]
