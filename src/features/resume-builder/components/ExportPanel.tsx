@@ -159,46 +159,46 @@ export function ExportPanel({
         />
       </div>
 
-      <Card className="border-dashed bg-muted/30 hidden lg:block">
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-start gap-3 min-w-0">
-              <div className="p-2 rounded-lg bg-primary/10 shrink-0">
-                <Shield className="h-5 w-5 text-primary" />
-              </div>
-              <div className="space-y-1 min-w-0">
-                <CardTitle className="text-base leading-snug">
-                  {tMask("exportTitle")}
-                </CardTitle>
-                <CardDescription className="text-xs leading-relaxed">
-                  {tMask("exportDescription")}
-                </CardDescription>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 shrink-0 pt-0.5">
-              <Switch
-                id="export-mask-pii"
-                checked={maskPII}
-                onCheckedChange={onMaskPIIChange}
-                aria-label={tMask("toggleLabel")}
-              />
-            </div>
-          </div>
-          {maskPII && (
-            <div className="pt-2 flex flex-wrap gap-1.5">
-              <Badge variant="secondary" className="text-xs font-normal">
-                {tMask("activeBadge")}
-              </Badge>
-              <p className="w-full text-xs text-muted-foreground mt-1">
-                {tMask("fieldsHint")}
-              </p>
-            </div>
-          )}
-          <Label htmlFor="export-mask-pii" className="sr-only">
-            {tMask("toggleLabel")}
-          </Label>
-        </CardHeader>
-      </Card>
+      {/*<Card className="border-dashed bg-muted/30 hidden lg:block">*/}
+      {/*  <CardHeader className="pb-3">*/}
+      {/*    <div className="flex items-start justify-between gap-3">*/}
+      {/*      <div className="flex items-start gap-3 min-w-0">*/}
+      {/*        <div className="p-2 rounded-lg bg-primary/10 shrink-0">*/}
+      {/*          <Shield className="h-5 w-5 text-primary" />*/}
+      {/*        </div>*/}
+      {/*        <div className="space-y-1 min-w-0">*/}
+      {/*          <CardTitle className="text-base leading-snug">*/}
+      {/*            {tMask("exportTitle")}*/}
+      {/*          </CardTitle>*/}
+      {/*          <CardDescription className="text-xs leading-relaxed">*/}
+      {/*            {tMask("exportDescription")}*/}
+      {/*          </CardDescription>*/}
+      {/*        </div>*/}
+      {/*      </div>*/}
+      {/*      <div className="flex items-center gap-2 shrink-0 pt-0.5">*/}
+      {/*        <Switch*/}
+      {/*          id="export-mask-pii"*/}
+      {/*          checked={maskPII}*/}
+      {/*          onCheckedChange={onMaskPIIChange}*/}
+      {/*          aria-label={tMask("toggleLabel")}*/}
+      {/*        />*/}
+      {/*      </div>*/}
+      {/*    </div>*/}
+      {/*    {maskPII && (*/}
+      {/*      <div className="pt-2 flex flex-wrap gap-1.5">*/}
+      {/*        <Badge variant="secondary" className="text-xs font-normal">*/}
+      {/*          {tMask("activeBadge")}*/}
+      {/*        </Badge>*/}
+      {/*        <p className="w-full text-xs text-muted-foreground mt-1">*/}
+      {/*          {tMask("fieldsHint")}*/}
+      {/*        </p>*/}
+      {/*      </div>*/}
+      {/*    )}*/}
+      {/*    <Label htmlFor="export-mask-pii" className="sr-only">*/}
+      {/*      {tMask("toggleLabel")}*/}
+      {/*    </Label>*/}
+      {/*  </CardHeader>*/}
+      {/*</Card>*/}
 
       <div className="grid gap-4">
         <Card
