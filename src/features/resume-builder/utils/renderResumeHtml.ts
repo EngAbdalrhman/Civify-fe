@@ -94,6 +94,18 @@ const DEFAULT_PAGE_MARGINS: PageMargins = {
   left: 40,
 };
 
+function resolvePageMargins(
+  partial: { top?: number; bottom?: number; left?: number; right?: number } | undefined,
+  defaults: PageMargins,
+): PageMargins {
+  return {
+    top: partial?.top ?? defaults.top,
+    right: partial?.right ?? defaults.right,
+    bottom: partial?.bottom ?? defaults.bottom,
+    left: partial?.left ?? defaults.left,
+  };
+}
+
 /** Convert CSS px (96dpi) to mm for @page rules. */
 function pxToMm(px: number): string {
   const mm = (px * 25.4) / 96;
@@ -248,12 +260,12 @@ function renderClassicTemplate(data: ResumeData, color: string, watermark?: Wate
   );
 
   const compactClass = metadata?.compactMode ? "1.2" : "1.6";
-  const margins = metadata?.margins || {
+  const margins = resolvePageMargins(metadata?.margins, {
     top: 40,
     bottom: 40,
     left: 40,
     right: 40,
-  };
+  });
   const spacingLevel = metadata?.spacingLevel ?? 3;
   const sectionMargin = spacingLevel * 8; // e.g. 24px
   const itemGap = spacingLevel * 4; // e.g. 12px
@@ -493,12 +505,12 @@ function renderModernTemplate(data: ResumeData, color: string, watermark?: Water
   );
 
   const compactClass = metadata?.compactMode ? "1.2" : "1.6";
-  const margins = metadata?.margins || {
+  const margins = resolvePageMargins(metadata?.margins, {
     top: 32,
     bottom: 32,
     left: 32,
     right: 32,
-  };
+  });
   const spacingLevel = metadata?.spacingLevel ?? 3;
   const sectionMargin = spacingLevel * 8; // e.g. 24px
   const itemGap = spacingLevel * 4; // e.g. 16px
@@ -761,12 +773,12 @@ function renderCreativeTemplate(data: ResumeData, color: string, watermark?: Wat
   );
 
   const compactClass = metadata?.compactMode ? "1.2" : "1.6";
-  const margins = metadata?.margins || {
+  const margins = resolvePageMargins(metadata?.margins, {
     top: 32,
     bottom: 32,
     left: 32,
     right: 32,
-  };
+  });
   const spacingLevel = metadata?.spacingLevel ?? 3;
   const sectionMargin = spacingLevel * 8; // e.g. 24px
   const itemGap = spacingLevel * 6; // e.g. 18px
@@ -1023,12 +1035,12 @@ function renderExecutiveTemplate(data: ResumeData, color: string, watermark?: Wa
   );
 
   const compactClass = metadata?.compactMode ? "1.2" : "1.6";
-  const margins = metadata?.margins || {
+  const margins = resolvePageMargins(metadata?.margins, {
     top: 48,
     bottom: 48,
     left: 48,
     right: 48,
-  };
+  });
   const spacingLevel = metadata?.spacingLevel ?? 3;
   const sectionMargin = spacingLevel * 10;
   const itemGap = spacingLevel * 5;
@@ -1209,12 +1221,12 @@ function renderMinimalTemplate(data: ResumeData, color: string, watermark?: Wate
   );
 
   const compactClass = metadata?.compactMode ? "1.25" : "1.7";
-  const margins = metadata?.margins || {
+  const margins = resolvePageMargins(metadata?.margins, {
     top: 40,
     bottom: 40,
     left: 56,
     right: 56,
-  };
+  });
   const spacingLevel = metadata?.spacingLevel ?? 3;
   const sectionMargin = spacingLevel * 10;
   const itemGap = spacingLevel * 5;
