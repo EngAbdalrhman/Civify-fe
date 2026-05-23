@@ -9,8 +9,6 @@ import { OnboardingProvider, TourProvider } from "@/features/onboarding";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import { usePermissions } from "@/hooks/use-permissions";
-
 export default function UserDashboardLayout({
   children,
 }: {
@@ -25,8 +23,6 @@ export default function UserDashboardLayout({
   const [isSidebarCollapsed, setIsSidebarCollapsed] =
     useState(isResumeBuilderPage);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-
-  const { permissions, isLoading, refetch } = usePermissions();
 
   // Update sidebar state when navigating to/from resume builder
   useEffect(() => {
@@ -45,22 +41,13 @@ export default function UserDashboardLayout({
     const handleAuthChange = () => {
       const token = getAccessToken();
       setIsAuthenticated(!!token);
-      if (token) {
-        refetch();
-      }
     };
     window.addEventListener("auth-state-changed", handleAuthChange);
-    return () =>
+    window.addEventListener("civify:session-updated", handleAuthChange);
+    return () => {
       window.removeEventListener("auth-state-changed", handleAuthChange);
-  }, []);
-
-  // Ensure permissions are fetched if navigating from auth
-  useEffect(() => {
-    const token = getAccessToken();
-    if (token && permissions.length === 0 && !isLoading) {
-      refetch();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      window.removeEventListener("civify:session-updated", handleAuthChange);
+    };
   }, []);
 
   // Close mobile sidebar on route change

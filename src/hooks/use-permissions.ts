@@ -1,10 +1,16 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/providers/query-provider";
 import apiClient from "@/api/client";
 import { getAccessToken } from "@/utils/cookies";
+import {
+  clearCachedPermissions,
+  readCachedPermissions,
+  writeCachedPermissions,
+} from "@/utils/permissionsCache";
+
 interface PermissionsResponse {
   permissions: string[];
   encryptedPermissions: string;
@@ -19,42 +25,48 @@ interface PermissionContextType {
   hasPermission: (permission: string) => boolean;
   hasAnyPermission: (permissions: string[]) => boolean;
   hasAllPermissions: (permissions: string[]) => boolean;
-  refetch: () => Promise<any>;
+  refetch: () => Promise<unknown>;
   clearPermissions: () => void;
 }
 
-export const usePermissions = (): PermissionContextType => {
-  // Re-fetch permissions when token is refreshed
-  useEffect(() => {
-    const handleAuthChange = () => {
-      queryClient.invalidateQueries({ queryKey: ["permissions"] });
-    };
-    window.addEventListener("auth-state-changed", handleAuthChange);
-    return () =>
-      window.removeEventListener("auth-state-changed", handleAuthChange);
-  }, []);
+function getInitialPermissionsData():
+  | { permissions: string[]; groupName: string | null }
+  | undefined {
+  const token = getAccessToken();
+  if (!token) return undefined;
+  const cached = readCachedPermissions(token);
+  if (!cached) return undefined;
+  return cached;
+}
 
+export const usePermissions = (): PermissionContextType => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["permissions"],
     queryFn: async () => {
       const response =
         await apiClient.get<PermissionsResponse>("/auth/permissions");
-      return response.data;
+      const result = {
+        permissions: response.data?.permissions || [],
+        groupName: response.data?.groupName || null,
+      };
+      const token = getAccessToken();
+      if (token) {
+        writeCachedPermissions(token, result);
+      }
+      return result;
     },
     enabled: !!getAccessToken(),
-    retry: false, // Don't retry on auth failures — let the refresh flow handle it
-    select: (data) => ({
-      permissions: data?.permissions || [],
-      groupName: data?.groupName || null,
-    }),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchOnWindowFocus: true,
+    retry: false,
+    placeholderData: () => getInitialPermissionsData() ?? undefined,
+    staleTime: 15 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   const permissions = data?.permissions || [];
-  const groupName = data?.groupName || null;
+  const groupName = data?.groupName ?? null;
 
   const clearPermissions = useCallback(() => {
+    clearCachedPermissions();
     queryClient.setQueryData(["permissions"], {
       permissions: [],
       groupName: null,
@@ -95,13 +107,11 @@ export const usePermissions = (): PermissionContextType => {
   };
 };
 
-// Shorthand hook for single permission check
 export const useHasPermission = (permission: string): boolean => {
   const { hasPermission } = usePermissions();
   return hasPermission(permission);
 };
 
-// Shorthand hook for any permission check
 export const useHasAnyPermission = (permissions: string[]): boolean => {
   const { hasAnyPermission } = usePermissions();
   return hasAnyPermission(permissions);

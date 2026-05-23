@@ -3,6 +3,8 @@
  * This provides a centralized way to manage cookies across the application
  */
 
+import { clearCachedPermissions } from "@/utils/permissionsCache";
+
 const ACCESS_TOKEN_COOKIE_NAME = "accessToken";
 const REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
 
@@ -142,6 +144,7 @@ export const isAuthenticated = (): boolean => {
 export const clearAuthTokens = (): void => {
   deleteAccessToken();
   deleteRefreshToken();
+  clearCachedPermissions();
 };
 
 // Export cookie names for reference

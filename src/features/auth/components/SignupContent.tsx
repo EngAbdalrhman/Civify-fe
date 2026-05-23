@@ -5,14 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Link, useRouter } from "@/i18n/routing";
 import { SubmitHandler } from "react-hook-form";
 import { useSignup, SignupSchemaType } from "@/features/auth/hooks";
-import { usePermissions } from "@/hooks/use-permissions";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 export default function SignupContent() {
   const t = useTranslations("auth");
   const router = useRouter();
-  const { refetch } = usePermissions();
   const [isRedirecting, setIsRedirecting] = useState(false);
   const searchParams = useSearchParams();
   const refCode = searchParams.get("ref");
@@ -36,17 +34,11 @@ export default function SignupContent() {
   }, [refCode, form]);
 
   useEffect(() => {
-    const handleSignupSuccess = async () => {
-      if (isSignupSuccess && !isRedirecting) {
-        setIsRedirecting(true);
-        // Fetch permissions before redirecting to ensure side menu is populated
-        await refetch();
-        router.push("/app");
-      }
-    };
-
-    handleSignupSuccess();
-  }, [isSignupSuccess, isRedirecting, refetch, router]);
+    if (isSignupSuccess && !isRedirecting) {
+      setIsRedirecting(true);
+      router.push("/app");
+    }
+  }, [isSignupSuccess, isRedirecting, router]);
 
   const saveReferralForOAuth = () => {
     const code = form.getValues("referralCode");
