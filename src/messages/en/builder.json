@@ -56,6 +56,8 @@
   },
   "mask": {
     "toggleLabel": "Mask personal info",
+    "toggleShort": "Mask",
+    "mobileHint": "Preview masking here; export uses the same setting in the Export tab.",
     "exportTitle": "Privacy-safe export",
     "exportDescription": "Hide your name, contact details, photo, and links in the downloaded file. Your saved resume is never changed.",
     "activeBadge": "Masking on",
