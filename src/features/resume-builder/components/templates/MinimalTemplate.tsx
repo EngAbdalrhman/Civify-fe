@@ -260,10 +260,11 @@ export function MinimalTemplate({ data, color }: TemplateProps) {
         return (
           <section
             key={section.id}
+            className="cv-section"
             style={{ marginBottom: `${sectionMargin}px` }}
           >
             <h2
-              className="text-[11px] font-semibold uppercase tracking-[0.12em] mb-2.5"
+              className="cv-section-title text-[11px] font-semibold uppercase tracking-[0.12em] mb-2.5 break-after-avoid"
               style={{ color }}
             >
               {section.title}
@@ -275,9 +276,9 @@ export function MinimalTemplate({ data, color }: TemplateProps) {
             ) : shouldUseSimple(section) ? (
               renderSimple(section)
             ) : (
-              <div className="flex flex-col" style={{ gap: `${itemGap}px` }}>
+              <div className="cv-items flex flex-col" style={{ gap: `${itemGap}px` }}>
                 {items.map((item: any) => (
-                  <div key={item.id}>
+                  <div key={item.id} className="cv-entry break-inside-avoid">
                     <div className="flex justify-between items-baseline">
                       <span className="text-sm font-medium">
                         {item.title}

@@ -265,10 +265,11 @@ export function ExecutiveTemplate({ data, color }: TemplateProps) {
         return (
           <section
             key={section.id}
+            className="cv-section"
             style={{ marginBottom: `${sectionMargin}px` }}
           >
             <h2
-              className="text-sm font-bold uppercase tracking-[0.08em] pb-1.5 mb-2.5 border-b border-gray-300"
+              className="cv-section-title text-sm font-bold uppercase tracking-[0.08em] pb-1.5 mb-2.5 border-b border-gray-300 break-after-avoid"
               style={{ color }}
             >
               {section.title}
@@ -280,9 +281,9 @@ export function ExecutiveTemplate({ data, color }: TemplateProps) {
             ) : shouldUseSimple(section) ? (
               renderSimple(section)
             ) : (
-              <div className="flex flex-col" style={{ gap: `${itemGap}px` }}>
+              <div className="cv-items flex flex-col" style={{ gap: `${itemGap}px` }}>
                 {items.map((item: any) => (
-                  <div key={item.id}>
+                  <div key={item.id} className="cv-entry break-inside-avoid">
                     <div className="flex justify-between items-baseline">
                       <div>
                         <span className="text-[15px] font-semibold">

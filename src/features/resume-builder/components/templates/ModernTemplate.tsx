@@ -36,7 +36,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
   const isRtl = direction === 'rtl';
 
   const renderSectionItem = (item: any) => (
-    <div key={item.id} className="mb-4 break-inside-avoid">
+    <div key={item.id} className="cv-entry mb-4 break-inside-avoid">
        <div className="flex justify-between items-baseline">
         <h4 className="font-bold text-gray-800">{item.title}</h4>
         <span className="text-sm text-gray-600 italic">
@@ -214,8 +214,8 @@ export function ModernTemplate({ data, color }: TemplateProps) {
 
       {/* Dynamic Sections */}
       {visibleSections.map(section => (
-        <section key={section.id} style={{ marginBottom: `${sectionMargin}px` }}>
-          <h3 className="text-xs font-bold uppercase tracking-wider mb-4 border-b pb-1" style={{ color, borderColor: color + '40' }}>
+        <section key={section.id} className="cv-section" style={{ marginBottom: `${sectionMargin}px` }}>
+          <h3 className="cv-section-title text-xs font-bold uppercase tracking-wider mb-4 border-b pb-1 break-after-avoid" style={{ color, borderColor: color + '40' }}>
             {section.title}
           </h3>
           
@@ -226,7 +226,7 @@ export function ModernTemplate({ data, color }: TemplateProps) {
           ) : shouldUseSimpleColumns(section) ? (
             renderSimpleCourses(section)
           ) : (
-            <div className="flex flex-col" style={{ gap: `${itemGap}px` }}>
+            <div className="cv-items flex flex-col" style={{ gap: `${itemGap}px` }}>
               {section.items.filter((i: any) => i.visible !== false).map(renderSectionItem)}
             </div>
           )}
