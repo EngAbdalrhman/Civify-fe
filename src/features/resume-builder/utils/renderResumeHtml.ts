@@ -80,12 +80,33 @@ function escapeHtml(text: string): string {
 // Base HTML Template
 // ============================================================================
 
+type PageMargins = {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+};
+
+const DEFAULT_PAGE_MARGINS: PageMargins = {
+  top: 40,
+  right: 40,
+  bottom: 40,
+  left: 40,
+};
+
+/** Convert CSS px (96dpi) to mm for @page rules. */
+function pxToMm(px: number): string {
+  const mm = (px * 25.4) / 96;
+  return `${Math.max(4, mm).toFixed(2)}mm`;
+}
+
 function wrapInHtmlDocument(
   content: string,
   direction: "ltr" | "rtl",
   bodyFontFamily: string = "Inter",
   headingFontFamily: string = "Inter",
   watermark?: WatermarkConfig,
+  pageMargins: PageMargins = DEFAULT_PAGE_MARGINS,
 ): string {
   // ── Google Fonts registry ──
   const googleFontsMap: Record<string, string> = {
@@ -155,7 +176,7 @@ function wrapInHtmlDocument(
     }
     @page {
       size: A4;
-      margin: 0;
+      margin: ${pxToMm(pageMargins.top)} ${pxToMm(pageMargins.right)} ${pxToMm(pageMargins.bottom)} ${pxToMm(pageMargins.left)};
     }
     .cv-entry {
       break-inside: avoid;
@@ -345,7 +366,7 @@ function renderClassicTemplate(data: ResumeData, color: string, watermark?: Wate
   };
 
   const content = `
-    <div style="padding: ${margins.top}px ${margins.right}px ${margins.bottom}px ${margins.left}px; min-height: 100%; background-color: white; color: #111827; line-height: ${compactClass};">
+    <div class="cv-page-root" style="min-height: 100%; background-color: white; color: #111827; line-height: ${compactClass};">
       <header style="text-align: center; margin-bottom: ${sectionMargin}px; border-bottom: 4px double #d1d5db; padding-bottom: 24px;">
         <h1 style="font-size: 30px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.05em; color: #111827;">
           ${escapeHtml(personalInfo.fullName)}
@@ -432,6 +453,7 @@ function renderClassicTemplate(data: ResumeData, color: string, watermark?: Wate
     bodyFontFamily,
     headingFontFamily,
     watermark,
+    margins,
   );
 }
 
@@ -597,7 +619,7 @@ function renderModernTemplate(data: ResumeData, color: string, watermark?: Water
   const globeIcon = `<svg style="width: 12px; height: 12px; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`;
 
   const content = `
-    <div style="padding: ${margins.top}px ${margins.right}px ${margins.bottom}px ${margins.left}px; min-height: 100%; background-color: white; color: #111827;">
+    <div class="cv-page-root" style="min-height: 100%; background-color: white; color: #111827;">
       <!-- Header -->
       <header style="border-bottom: 2px solid ${color}; padding-bottom: 24px; margin-bottom: ${sectionMargin}px;">
         <h1 style="font-size: 36px; font-weight: 700; text-transform: uppercase; letter-spacing: -0.025em; margin-bottom: 8px; color: ${color};">
@@ -683,6 +705,7 @@ function renderModernTemplate(data: ResumeData, color: string, watermark?: Water
     bodyFontFamily,
     headingFontFamily,
     watermark,
+    margins,
   );
 }
 
@@ -858,7 +881,7 @@ function renderCreativeTemplate(data: ResumeData, color: string, watermark?: Wat
   const content = `
     <div style="display: flex; min-height: 100%; background-color: white; line-height: ${compactClass};">
       <!-- Left Sidebar -->
-      <aside style="width: 30%; background-color: ${color}; color: white; padding: ${margins.top}px 24px ${margins.bottom}px ${margins.left}px; display: flex; flex-direction: column; gap: ${sectionMargin}px;">
+      <aside class="cv-page-root" style="width: 30%; background-color: ${color}; color: white; padding: 0 24px 0 0; display: flex; flex-direction: column; gap: ${sectionMargin}px;">
         <div style="text-align: center;">
           ${
             personalInfo.picture
@@ -904,7 +927,7 @@ function renderCreativeTemplate(data: ResumeData, color: string, watermark?: Wat
       </aside>
 
       <!-- Main Content -->
-      <main style="flex: 1; padding: ${margins.top}px ${margins.right}px ${margins.bottom}px 32px; color: #1f2937;">
+      <main class="cv-page-root" style="flex: 1; padding: 0 0 0 32px; color: #1f2937;">
         ${
           personalInfo.summary
             ? `
@@ -966,6 +989,7 @@ function renderCreativeTemplate(data: ResumeData, color: string, watermark?: Wat
     bodyFontFamily,
     headingFontFamily,
     watermark,
+    margins,
   );
 }
 
@@ -1070,7 +1094,7 @@ function renderExecutiveTemplate(data: ResumeData, color: string, watermark?: Wa
   };
 
   const content = `
-    <div style="padding:${margins.top}px ${margins.right}px ${margins.bottom}px ${margins.left}px;min-height:100%;background:white;color:#1a1a1a;line-height:${compactClass};">
+    <div class="cv-page-root" style="min-height:100%;background:white;color:#1a1a1a;line-height:${compactClass};">
       <!-- Executive Header -->
       <header style="margin-bottom:${sectionMargin}px;border-bottom:3px solid ${color};padding-bottom:20px;">
         <h1 style="font-size:32px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:${color};margin-bottom:6px;">
@@ -1145,7 +1169,14 @@ function renderExecutiveTemplate(data: ResumeData, color: string, watermark?: Wa
   const bodyFont = metadata?.bodyFontFamily || metadata?.fontFamily || "Inter";
   const headingFont =
     metadata?.headingFontFamily || metadata?.fontFamily || "Inter";
-  return wrapInHtmlDocument(content, direction, bodyFont, headingFont, watermark);
+  return wrapInHtmlDocument(
+    content,
+    direction,
+    bodyFont,
+    headingFont,
+    watermark,
+    margins,
+  );
 }
 
 // ============================================================================
@@ -1247,7 +1278,7 @@ function renderMinimalTemplate(data: ResumeData, color: string, watermark?: Wate
   };
 
   const content = `
-    <div style="padding:${margins.top}px ${margins.right}px ${margins.bottom}px ${margins.left}px;min-height:100%;background:white;color:#1f2937;line-height:${compactClass};">
+    <div class="cv-page-root" style="min-height:100%;background:white;color:#1f2937;line-height:${compactClass};">
       <!-- Minimal Header -->
       <header style="margin-bottom:${sectionMargin + 8}px;">
         <h1 style="font-size:28px;font-weight:300;letter-spacing:0.06em;text-transform:uppercase;color:#111827;margin-bottom:8px;">
@@ -1316,7 +1347,14 @@ function renderMinimalTemplate(data: ResumeData, color: string, watermark?: Wate
   const bodyFont = metadata?.bodyFontFamily || metadata?.fontFamily || "Inter";
   const headingFont =
     metadata?.headingFontFamily || metadata?.fontFamily || "Inter";
-  return wrapInHtmlDocument(content, direction, bodyFont, headingFont, watermark);
+  return wrapInHtmlDocument(
+    content,
+    direction,
+    bodyFont,
+    headingFont,
+    watermark,
+    margins,
+  );
 }
 
 // ============================================================================
