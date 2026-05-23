@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { getAccessToken } from "@/utils/cookies";
 import { OnboardingProvider, TourProvider } from "@/features/onboarding";
+import { NotificationStreamProvider } from "@/providers/NotificationStreamProvider";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
@@ -61,6 +62,7 @@ export default function UserDashboardLayout({
 
   return (
     <OnboardingProvider>
+      <NotificationStreamProvider>
       <TourProvider>
         <div className="flex min-h-screen bg-background">
         <AppSidebar
@@ -127,6 +129,7 @@ export default function UserDashboardLayout({
         </div>
       </div>
       </TourProvider>
+      </NotificationStreamProvider>
     </OnboardingProvider>
   );
 }

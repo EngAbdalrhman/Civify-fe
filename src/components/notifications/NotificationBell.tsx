@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Bell, X, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -9,22 +9,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { getAccessToken } from "@/utils/cookies";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   useUnreadNotificationsCount,
   useNotificationsList,
   useMarkNotificationAsRead,
   useMarkAllNotificationsAsRead,
-  Notification,
 } from "@/hooks/useNotifications";
-
-// Module-level singleton: survives React 18 StrictMode unmount/remount cycle.
-// A ref would be reset during cleanup, allowing a second connection on remount.
-let activeEventSource: EventSource | null = null;
+import { useNotificationStream } from "@/providers/NotificationStreamProvider";
 
 export function NotificationBell() {
-  const queryClient = useQueryClient();
+  const { isConnected } = useNotificationStream();
   const { data: unreadCount = 0 } = useUnreadNotificationsCount();
   const { data: notifications = [] } = useNotificationsList();
 
@@ -32,71 +26,6 @@ export function NotificationBell() {
   const { mutate: markAllAsReadMutate } = useMarkAllNotificationsAsRead();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
-
-  // Connect to SSE stream — single connection guaranteed by module-level guard
-  useEffect(() => {
-    const token = getAccessToken();
-    if (!token) return;
-
-    // If there's already an active connection (StrictMode remount), skip entirely
-    if (activeEventSource && activeEventSource.readyState !== EventSource.CLOSED) {
-      setIsConnected(true);
-      return;
-    }
-
-    const baseUrl =
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8077/apis";
-
-    const eventSource = new EventSource(`${baseUrl}/v1/notifications/stream`, {
-      withCredentials: true,
-    });
-
-    activeEventSource = eventSource;
-
-    eventSource.onopen = () => {
-      setIsConnected(true);
-      console.log("[SSE] Connected to notifications stream");
-    };
-
-    eventSource.addEventListener("notification", (event) => {
-      try {
-        const notification: Notification = JSON.parse(event.data);
-
-        // Optimistically update the list caching
-        queryClient.setQueryData<Notification[]>(
-          ["notifications", "list"],
-          (oldData) => {
-            const newData = oldData
-              ? [notification, ...oldData].slice(0, 20)
-              : [notification];
-            return newData;
-          },
-        );
-
-        // Optimistically update the unread count
-        queryClient.setQueryData<number>(
-          ["notifications", "unreadCount"],
-          (oldCount) => {
-            return (oldCount || 0) + 1;
-          },
-        );
-      } catch (err) {
-        console.error("[SSE] Failed to parse notification:", err);
-      }
-    });
-
-    eventSource.onerror = (error) => {
-      console.error("[SSE] Connection error:", error);
-      setIsConnected(false);
-    };
-
-    return () => {
-      eventSource.close();
-      activeEventSource = null;
-      setIsConnected(false);
-    };
-  }, [queryClient]);
 
   const markAsRead = (id: number) => {
     markAsReadMutate(id);
@@ -122,7 +51,6 @@ export function NotificationBell() {
   };
 
   const formatTime = (timestamp: string) => {
-    // Backend returns UTC time without 'Z' suffix, so we append it
     const utcTimestamp = timestamp.endsWith("Z") ? timestamp : timestamp + "Z";
     const date = new Date(utcTimestamp);
     const now = new Date();
@@ -150,7 +78,7 @@ export function NotificationBell() {
               {unreadCount > 9 ? "9+" : unreadCount}
             </Badge>
           )}
-          {unreadCount > 0 && (
+          {isConnected && unreadCount > 0 && (
             <span className="absolute bottom-0 right-0 w-2 h-2 bg-green-500 rounded-full" />
           )}
         </Button>
