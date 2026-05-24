@@ -57,7 +57,7 @@ export function HeroSection() {
             {t("subtitle")}
             <br />
             <span className="font-semibold text-foreground">
-              {t("matchScore")} {t("interviews")}
+              {t("subtitleHighlight")}
             </span>
           </p>
 
@@ -107,26 +107,34 @@ export function HeroSection() {
             {/* <div className="h-8 w-px bg-border hidden sm:block" /> */}
 
             <div className="text-center sm:text-left">
-              <p className="text-2xl font-bold text-foreground">92%</p>
+              <p className="text-2xl font-bold text-foreground">
+                {t("trustAtsValue")}
+              </p>
               <p className="text-sm text-muted-foreground">
-                Average match score
+                {t("trustAtsLabel")}
               </p>
             </div>
 
             <div className="h-8 w-px bg-border hidden sm:block" />
 
             <div className="text-center sm:text-left">
-              <p className="text-2xl font-bold text-foreground">3x</p>
-              <p className="text-sm text-muted-foreground">More interviews</p>
+              <p className="text-2xl font-bold text-foreground">
+                {t("trustStepsValue")}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {t("trustStepsLabel")}
+              </p>
             </div>
 
             <div className="h-8 w-px bg-border hidden sm:block" />
 
             <div className="text-center sm:text-left">
               <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
-                🇪🇬
+                {t("trustArabicValue")}
               </p>
-              <p className="text-sm text-muted-foreground">Arabic OCR</p>
+              <p className="text-sm text-muted-foreground">
+                {t("trustArabicLabel")}
+              </p>
             </div>
           </div>
         </div>

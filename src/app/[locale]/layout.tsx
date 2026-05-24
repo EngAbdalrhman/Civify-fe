@@ -150,13 +150,7 @@ export default async function LocaleLayout({
         },
       ],
       description:
-        "AI-powered resume builder and CV tailoring platform with ATS optimization, match scoring, and full Arabic support. Upload your CV and job description to get a tailored, ATS-friendly resume instantly.",
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: "4.8",
-        ratingCount: "1250",
-        bestRating: "5",
-      },
+        "AI-powered resume builder and CV tailoring platform with ATS score insights, keyword matching, Arabic + RTL support, and PDF/DOCX export.",
       featureList: [
         "AI Resume Generation",
         "CV Tailoring for Job Descriptions",

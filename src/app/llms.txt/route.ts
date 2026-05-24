@@ -7,27 +7,26 @@ export async function GET() {
 
   const content = `# Civify
 
-> AI-powered resume builder and CV tailoring platform with ATS optimization, match scoring, and full Arabic support.
+> AI-powered resume builder and CV tailoring platform with ATS score insights, keyword matching, and Arabic + RTL support.
 
-Civify helps job seekers create, tailor, and optimize resumes for specific job descriptions using AI. It provides ATS (Applicant Tracking System) compatibility scoring, keyword analysis, and professional PDF export. Supports English and Arabic with RTL layout.
+Civify helps job seekers upload a CV, review parsed data, tailor content to a job description, and export with ATS scoring feedback. Supports English and Arabic with RTL layouts and Arabic OCR for scanned uploads.
 
-Key terms: AI resume builder, CV tailoring, ATS score checker, resume match score, Arabic resume builder, resume optimization, job description analyzer, ATS-friendly CV, resume keyword optimizer.
+Key terms: AI resume builder, CV tailoring, ATS score checker, resume match score, Arabic resume builder, resume optimization, job description analyzer, ATS-friendly CV, resume keyword matching.
 
 ## Key Features
-- AI Resume Builder: Generate professional resumes from scratch using AI
-- CV Tailoring: Upload your CV + job description to get an optimized, tailored version
-- ATS Score Checker: Real-time Applicant Tracking System compatibility scoring against job descriptions
-- Resume Match Score: Percentage-based match analysis with actionable improvement suggestions
-- Arabic Support: Full RTL layout with Arabic OCR and AI-powered content generation in Arabic
-- Professional Templates: ATS-optimized, recruiter-approved resume templates
-- Chrome Extension: Tailor your CV directly from LinkedIn job listings
-- PDF Export: High-quality, print-ready resume downloads
-- Privacy-First: Enterprise-grade encryption, GDPR-compliant data handling
-- Resume Builder: Drag-and-drop section editor with real-time preview
+- CV Upload & Review: Upload a resume, review parsed sections, then tailor
+- CV Tailoring: Optimize your CV against a pasted job description
+- ATS Score Insights: Before/after ATS score with keyword and skills match feedback
+- Job Matches: Structured job-description analysis and fit insights (separate workflow)
+- Arabic Support: Arabic UI, RTL layouts, Arabic OCR, and bilingual resume workflows
+- Resume Templates: Five ATS-friendly styles (Modern, Classic, Creative, Executive, Minimal)
+- Chrome Extension: Tailor faster from LinkedIn job pages
+- PDF/DOCX Export: Download tailored resumes from upload flow or builder
+- Resume Masking: Hide personal info in preview/export when sharing
 
 ## Pricing
 - Free Plan: Basic resume building with limited AI generations
-- Pro Plan: Unlimited AI tailoring, advanced ATS scoring, priority support
+- Pro Plan: Expanded AI tailoring, exports, and premium features
 - [Pricing Details](${baseUrl}/en/plans): Full comparison of plans and features
 
 ## Docs
@@ -39,12 +38,12 @@ Key terms: AI resume builder, CV tailoring, ATS score checker, resume match scor
 ## Pages
 - [Home](${baseUrl}/en): Main landing page with features overview
 - [Pricing Plans](${baseUrl}/en/plans): Subscription plans and pricing
-- [Chrome Extension](${baseUrl}/en/extension): Browser extension for LinkedIn integration
+- [Chrome Extension](${baseUrl}/en/extension): Browser extension for LinkedIn job pages
 - [Blog](${baseUrl}/en/blog): Career resources, resume writing guides, and job search tips
 - [Cancellation Policy](${baseUrl}/en/policy/cancellation): Subscription cancellation details
 
 ## Optional
-- [Arabic Home](${baseUrl}/ar): Arabic version of the platform (full RTL support)
+- [Arabic Home](${baseUrl}/ar): Arabic version of the platform (RTL support)
 - [Arabic Pricing](${baseUrl}/ar/plans): Arabic pricing page
 - [Arabic Blog](${baseUrl}/ar/blog): Arabic blog and career resources
 `;
@@ -57,4 +56,3 @@ Key terms: AI resume builder, CV tailoring, ATS score checker, resume match scor
     },
   });
 }
-

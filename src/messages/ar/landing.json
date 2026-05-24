@@ -9,8 +9,13 @@
 
     "ctaFree": "جرب مجاناً",
     "badge": "دعم العربية + RTL",
-    "matchScore": "درجة ATS",
-    "interviews": "مقابلات أكثر"
+    "subtitleHighlight": "درجة ATS، مطابقة الكلمات المفتاحية، وسير ذاتية جاهزة بالعربية في مسار واحد.",
+    "trustAtsValue": "درجة ATS",
+    "trustAtsLabel": "تظهر قبل التصدير",
+    "trustStepsValue": "4 خطوات",
+    "trustStepsLabel": "من الرفع إلى التخصيص",
+    "trustArabicValue": "العربية",
+    "trustArabicLabel": "دعم RTL + OCR"
   },
   "howItWorks": {
     "title": "كيف يعمل Civify",
@@ -80,7 +85,7 @@
     "title": "منشئ سيرة ذاتية متقدم",
     "titleAccent": "محسن بالذكاء الاصطناعي",
     "description": "ابنِ، عدل، وأتقن سيرتك الذاتية بأدواتنا الحديثة. تغييرات فورية، معاينات لحظية، واقتراحات ذكية.",
-    "badge": "دعم كامل للغة العربية",
+    "badge": "دعم العربية + RTL",
     "cta": "افتح المنشئ",
     "features": {
       "preview": {
@@ -163,90 +168,85 @@
       },
       "q8": {
         "question": "هل يمكن لـ Civify بناء سيرة ذاتية بالعربية؟",
-        "answer": "نعم. Civify هو واحد من عدد قليل من منشئي السير الذاتية بالذكاء الاصطناعي مع دعم كامل للغة العربية، بما في ذلك تخطيط RTL (من اليمين إلى اليسار)، وتقنية OCR العربية لتحليل المستندات، وإنشاء المحتوى المدعوم بالذكاء الاصطناعي بالعربية. كما يدعم السير الذاتية ثنائية اللغة."
+        "answer": "نعم. يدعم Civify واجهة عربية، وتخطيط RTL للسيرة الذاتية، وOCR عربي للملفات الممسوحة، وترجمة/تخصيص بالذكاء الاصطناعي بالعربية، وسير ذاتية ثنائية اللغة."
       }
     },
     "stillQuestions": "هل لديك أسئلة أخرى؟",
     "contactSupportTeam": "تواصل مع فريق الدعم"
   },
   "integrations": {
-    "title": "تكامل سلس",
-    "subtitle": "تواصل مع منصاتك وأدواتك المفضلة",
+    "title": "التصدير وسير العمل",
+    "subtitle": "استخدم Civify مع الأدوات التي تعتمد عليها أثناء التقديم للوظائف",
     "items": {
       "linkedin": {
         "name": "LinkedIn",
-        "description": "استورد بيانات ملفك الشخصي فوراً"
+        "description": "سجّل الدخول عبر LinkedIn وخصّص أسرع من صفحات الوظائف عبر إضافة Chrome"
       },
       "google-docs": {
-        "name": "Google Docs",
-        "description": "تصدير وتعديل في Google Docs"
+        "name": "تصدير PDF",
+        "description": "حمّل سيرة PDF جاهزة للطباعة من التخصيص أو المنشئ"
       },
       "word": {
         "name": "Microsoft Word",
-        "description": "تحميل بصيغة .docx"
+        "description": "صدّر السيرة المخصصة بصيغة .docx قابلة للتعديل"
       },
       "indeed": {
-        "name": "Indeed",
-        "description": "تحسين لطلبات التقديم على Indeed"
+        "name": "لوحات الوظائف",
+        "description": "الصق أوصاف الوظائف من Indeed وGlassdoor وغيرها"
       },
       "glassdoor": {
-        "name": "Glassdoor",
-        "description": "تخصيص لإعلانات Glassdoor"
+        "name": "مطابقة الوظائف",
+        "description": "احفظ الأهداف وحلّل الملاءمة عبر رؤى مطابقة منظمة"
       },
       "google-drive": {
-        "name": "Google Drive",
-        "description": "حفظ مباشرة إلى Drive"
+        "name": "ملفاتك",
+        "description": "ارفع سيرتك الحالية واحتفظ بالنسخ المصدرة في تخزينك الخاص"
       }
     }
   },
   "templates": {
     "title": "قوالب سيرة ذاتية احترافية",
-    "subtitle": "اختر من مجموعتنا من القوالب المحسنة لأنظمة ATS والمصممة لكل صناعة",
+    "subtitle": "اختر أنماط قوالب محسنة لـ ATS مع تخطيط واضح وسهل القراءة",
     "badge": "متوافق مع ATS",
     "note": {
-      "bold": "جميع القوالب متوافقة 100% مع ATS",
-      "text": "— محسنة لاجتياز أنظمة تتبع المتقدمين"
+      "bold": "خمسة أنماط بصرية متوافقة مع ATS",
+      "text": "— تخطيطات نظيفة لسهولة القراءة ومسح الكلمات المفتاحية"
     },
     "items": {
-      "ats-clean": {
-        "name": "Clean ATS",
-        "category": "احترافي",
-        "description": "تنسيق بسيط وقابل للمسح محسن لأنظمة تتبع المتقدمين"
-      },
-      "professional": {
-        "name": "Professional",
-        "category": "أعمال",
-        "description": "تصميم أنيق مثالي للشركات والصناعات التقليدية"
-      },
-      "minimalist": {
-        "name": "Minimalist",
-        "category": "عصري",
-        "description": "تصميم نظيف للغاية مع استخدام متطور للمساحة البيضاء"
-      },
       "modern": {
-        "name": "Modern",
-        "category": "إبداعي",
-        "description": "تصميم معاصر بعناصر هندسية وطباعة جريئة"
+        "name": "حديث",
+        "category": "متوازن",
+        "description": "تخطيط معاصر مع تسلسل بصري واضح ولون مميز"
       },
-      "technical": {
-        "name": "Technical",
-        "category": "تقني",
-        "description": "مخصص للمطورين مع مصفوفة مهارات وتخطيط بنمط GitHub"
+      "classic": {
+        "name": "كلاسيكي",
+        "category": "تقليدي",
+        "description": "رأسية مركزية وأقسام منظمة بأسلوب كلاسيكي"
+      },
+      "minimal": {
+        "name": "بسيط",
+        "category": "نظيف",
+        "description": "خطوط بسيطة ومساحات بيضاء مريحة"
+      },
+      "executive": {
+        "name": "تنفيذي",
+        "category": "احترافي",
+        "description": "عناوين قوية وتباعد مناسب للأدوار القيادية"
       },
       "creative": {
-        "name": "Creative",
-        "category": "تصميم",
-        "description": "تخطيط فني للمصممين والمحترفين المبدعين"
+        "name": "إبداعي",
+        "category": "جريء",
+        "description": "تخطيط بشريط جانبي ولون مميز لتأثير بصري أوضح"
       }
     }
   },
   "testimonials": {
     "title": "قصص نجاح",
-    "subtitle": "انضم إلى آلاف المحترفين الذين حصلوا على وظائف أحلامهم مع Civify",
+    "subtitle": "مستخدمون مبكرون يحسّنون جاهزيتهم للمقابلات عبر سير مخصصة ومتوافقة مع ATS",
     "stats": {
-      "users": { "value": "+50,000", "label": "مستخدم سعيد" },
-      "rating": { "value": "4.9/5", "label": "متوسط التقييم" },
-      "reviews": { "value": "+2,000", "label": "مراجعة 5 نجوم" }
+      "users": { "value": "تجريبي", "label": "وصول مبكر" },
+      "rating": { "value": "ATS", "label": "رؤى الدرجة" },
+      "reviews": { "value": "AR/EN", "label": "دعم ثنائي اللغة" }
     },
     "items": {
       "t1": {
@@ -275,8 +275,8 @@
     }
   },
   "roles": {
-    "title": "مخصص لدورك",
-    "subtitle": "تحسين خاص بالصناعة لكل مهنة",
+    "title": "أمثلة تخصيص حسب الدور",
+    "subtitle": "استخدم أمثلة كلمات مهنية لتوجيه التخصيص حسب هدفك الوظيفي",
     "create": "إنشاء سيرة ذاتية لـ {role}",
     "sections": {
       "keywords": "كلمات رئيسية محسنة",

@@ -9,8 +9,13 @@
 
     "ctaFree": "Try for Free",
     "badge": "Arabic + RTL Support",
-    "matchScore": "ATS Score",
-    "interviews": "More Interviews"
+    "subtitleHighlight": "ATS scoring, keyword matching, and Arabic-ready resumes in one workflow.",
+    "trustAtsValue": "ATS Score",
+    "trustAtsLabel": "Shown before export",
+    "trustStepsValue": "4 Steps",
+    "trustStepsLabel": "Upload to tailored CV",
+    "trustArabicValue": "Arabic",
+    "trustArabicLabel": "RTL + OCR support"
   },
   "howItWorks": {
     "title": "How Civify Works",
@@ -79,8 +84,8 @@
   "resumeBuilder": {
     "title": "Advanced Resume Builder",
     "titleAccent": "AI Enhanced",
-    "description": "Build, edit, and perfect your resume with our state-of-the-art tools. Instant changes, real-time previews, and smart suggestions.",
-    "badge": "Full Arabic Support",
+    "description": "Build, edit, and perfect your resume with live preview, design controls, and AI-assisted content improvements.",
+    "badge": "Arabic + RTL Support",
     "cta": "Open Builder",
     "features": {
       "preview": {
@@ -163,39 +168,39 @@
       },
       "q8": {
         "question": "Can Civify build a resume in Arabic?",
-        "answer": "Yes. Civify is one of the few AI resume builders with full Arabic language support, including RTL (right-to-left) layout, Arabic OCR for document parsing, and AI-powered content generation in Arabic. It supports bilingual resumes as well."
+        "answer": "Yes. Civify supports Arabic UI, RTL resume layouts, Arabic OCR for scanned uploads, AI translation/tailoring in Arabic, and bilingual resume workflows."
       }
     },
     "stillQuestions": "Still have questions?",
     "contactSupportTeam": "Contact Support Team"
   },
   "integrations": {
-    "title": "Seamless Integration",
-    "subtitle": "Connects with your favorite platforms and tools",
+    "title": "Export & Workflow",
+    "subtitle": "Use Civify with the tools you already rely on during applications",
     "items": {
       "linkedin": {
         "name": "LinkedIn",
-        "description": "Import profile data instantly"
+        "description": "Sign in with LinkedIn and tailor faster from job pages with our Chrome extension"
       },
       "google-docs": {
-        "name": "Google Docs",
-        "description": "Export and edit in Google Docs"
+        "name": "PDF Export",
+        "description": "Download print-ready PDF resumes from upload or the builder"
       },
       "word": {
         "name": "Microsoft Word",
-        "description": "Download as .docx format"
+        "description": "Export tailored resumes as editable .docx files"
       },
       "indeed": {
-        "name": "Indeed",
-        "description": "Optimize for Indeed applications"
+        "name": "Job Boards",
+        "description": "Paste job descriptions from Indeed, Glassdoor, and other boards"
       },
       "glassdoor": {
-        "name": "Glassdoor",
-        "description": "Tailor for Glassdoor listings"
+        "name": "Job Matches",
+        "description": "Save targets and analyze fit with structured job-match insights"
       },
       "google-drive": {
-        "name": "Google Drive",
-        "description": "Save directly to Drive"
+        "name": "Your Files",
+        "description": "Upload existing CVs and keep exported copies in your own storage"
       }
     }
   },
@@ -204,49 +209,44 @@
     "subtitle": "Choose from ATS-optimized template styles designed to stay clean, readable, and recruiter-friendly",
     "badge": "ATS-Friendly",
     "note": {
-      "bold": "All templates are 100% ATS-compliant",
-      "text": "— optimized to pass Applicant Tracking Systems"
+      "bold": "Five ATS-friendly visual styles",
+      "text": "— clean layouts designed for readability and keyword scanning"
     },
     "items": {
-      "ats-clean": {
-        "name": "Clean ATS",
-        "category": "Professional",
-        "description": "Simple, scannable format optimized for Applicant Tracking Systems"
-      },
-      "professional": {
-        "name": "Professional",
-        "category": "Business",
-        "description": "Elegant design perfect for corporate and traditional industries"
-      },
-      "minimalist": {
-        "name": "Minimalist",
-        "category": "Modern",
-        "description": "Ultra-clean design with sophisticated use of whitespace"
-      },
       "modern": {
         "name": "Modern",
-        "category": "Creative",
-        "description": "Contemporary design with geometric elements and bold typography"
+        "category": "Balanced",
+        "description": "Contemporary layout with clear hierarchy and accent color"
       },
-      "technical": {
-        "name": "Technical",
-        "category": "Tech",
-        "description": "Tailored for developers with skills matrix and GitHub-style layout"
+      "classic": {
+        "name": "Classic",
+        "category": "Traditional",
+        "description": "Timeless centered header and structured sections"
+      },
+      "minimal": {
+        "name": "Minimal",
+        "category": "Clean",
+        "description": "Ultra-clean typography with generous whitespace"
+      },
+      "executive": {
+        "name": "Executive",
+        "category": "Premium",
+        "description": "Strong headings and polished spacing for senior roles"
       },
       "creative": {
         "name": "Creative",
-        "category": "Design",
-        "description": "Artistic layout for designers and creative professionals"
+        "category": "Bold",
+        "description": "Sidebar layout with color accent for visual impact"
       }
     }
   },
   "testimonials": {
     "title": "Success Stories",
-    "subtitle": "Join thousands of professionals who landed their dream jobs with Civify",
+    "subtitle": "Early users improving interview readiness with tailored, ATS-focused resumes",
     "stats": {
-      "users": { "value": "50,000+", "label": "Happy Users" },
-      "rating": { "value": "4.9/5", "label": "Average Rating" },
-      "reviews": { "value": "2,000+", "label": "5-Star Reviews" }
+      "users": { "value": "Beta", "label": "Early Access" },
+      "rating": { "value": "ATS", "label": "Score Insights" },
+      "reviews": { "value": "AR/EN", "label": "Bilingual Support" }
     },
     "items": {
       "t1": {
@@ -275,8 +275,8 @@
     }
   },
   "roles": {
-    "title": "Tailored to Your Role",
-    "subtitle": "Industry-specific optimization for every career path",
+    "title": "Role-Aware Tailoring Examples",
+    "subtitle": "Use industry keyword examples to guide tailoring for your target role",
     "create": "Create {role} Resume",
     "sections": {
       "keywords": "Optimized Keywords",
