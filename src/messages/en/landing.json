@@ -8,13 +8,13 @@
     "ctaPrimary": "Build Your First Resume",
 
     "ctaFree": "Try for Free",
-    "badge": "Full Arabic Support!",
-    "matchScore": "92%",
+    "badge": "Arabic + RTL Support",
+    "matchScore": "ATS Score",
     "interviews": "More Interviews"
   },
   "howItWorks": {
     "title": "How Civify Works",
-    "subtitle": "From upload to download in 4 simple steps",
+    "subtitle": "From upload to export in 4 practical steps",
     "steps": {
       "step1": {
         "title": "Upload Your Resume",
@@ -22,18 +22,18 @@
         "cta": "Upload Now"
       },
       "step2": {
-        "title": "Paste Job Description",
-        "description": "Copy and paste the job description or select a job category",
+        "title": "Review Parsed Resume Data",
+        "description": "Check and edit your personal info, skills, and experience before tailoring",
         "cta": "Try It"
       },
       "step3": {
-        "title": "AI Analysis",
-        "description": "Civify analyzes ATS keywords and role requirements instantly",
+        "title": "Paste Job Description & Tailor",
+        "description": "Add a target job description and let AI optimize your CV for ATS keyword matching",
         "cta": "See It Work"
       },
       "step4": {
         "title": "Download Optimized CV",
-        "description": "Get your polished, tailored resume with optimization score",
+        "description": "Download your tailored resume with ATS score and keyword gap insights",
         "cta": "Get Started"
       }
     }
@@ -44,31 +44,31 @@
     "items": {
       "parser": {
         "title": "AI Job Description Parser",
-        "description": "Extracts required skills and keywords to match job listings better"
+        "description": "Analyzes job descriptions to highlight relevant skills and keywords for better matching"
       },
       "ats": {
         "title": "ATS Optimization Engine",
-        "description": "Ensures formatting and keyword density meet ATS standards for maximum visibility"
+        "description": "Improves ATS compatibility with cleaner formatting and stronger keyword matching"
       },
       "templates": {
-        "title": "Role-Based Resume Templates",
-        "description": "Developer, Designer, Data Analyst, HR, Marketing, Sales, and other niche templates"
+        "title": "Professional Resume Templates",
+        "description": "Choose from five ATS-friendly styles: Modern, Classic, Creative, Executive, and Minimal"
       },
       "aiRewrite": {
         "title": "AI Achievement Rewrite",
-        "description": "Transforms simple tasks into measurable impact statements that wow recruiters"
+        "description": "Rewrites experience bullets during tailoring with stronger action verbs and clearer impact"
       },
       "skills": {
         "title": "Skill Gap Suggestions",
-        "description": "Surfaces missing skills and recommends additions based on job requirements"
+        "description": "Shows missing keywords and optional skill-gap roadmap suggestions based on your target role"
       },
       "arabic": {
-        "title": "Full Arabic Support 🇸🇦",
-        "description": "Native RTL support, Arabic OCR for scanned docs, and dual-language resume generation"
+        "title": "Arabic Support 🇸🇦",
+        "description": "Arabic UI, native RTL layouts, Arabic OCR for scanned files, and bilingual resume support"
       },
       "score": {
-        "title": "Real-Time Score Indicator",
-        "description": "Shows your resume match score before download so you know exactly where you stand"
+        "title": "Score Before Download",
+        "description": "See ATS score, keyword match, and missing keywords on the results step before export"
       },
       "privacy": {
         "title": "Resume Masking & Privacy",
@@ -155,7 +155,7 @@
       },
       "q6": {
         "question": "What is the best AI tool for tailoring resumes to job descriptions?",
-        "answer": "Civify is an AI-powered resume tailoring tool that analyzes your CV against specific job descriptions. It uses machine learning to identify missing keywords, optimize your experience descriptions, and provide an ATS compatibility score. Users report a 92% average match rate after optimization."
+        "answer": "Civify is an AI-powered resume tailoring tool that analyzes your CV against specific job descriptions. It highlights missing keywords, improves experience descriptions, and provides an ATS compatibility score so you can iterate before exporting."
       },
       "q7": {
         "question": "How does Civify's ATS score checker work?",
@@ -201,7 +201,7 @@
   },
   "templates": {
     "title": "Professional Resume Templates",
-    "subtitle": "Choose from our collection of ATS-optimized templates designed for every industry",
+    "subtitle": "Choose from ATS-optimized template styles designed to stay clean, readable, and recruiter-friendly",
     "badge": "ATS-Friendly",
     "note": {
       "bold": "All templates are 100% ATS-compliant",
@@ -262,10 +262,10 @@
         "metric": "Landed Dream Job"
       },
       "t3": {
-        "quote": "My resume match score went from 45% to 92%. The skill gap suggestions were incredibly helpful.",
+        "quote": "My resume match score improved a lot after tailoring, and the keyword gap suggestions were incredibly helpful.",
         "role": "Data Analyst",
         "company": "Amazon",
-        "metric": "92% Match Score"
+        "metric": "Improved Match Score"
       },
       "t4": {
         "quote": "Finally, a resume tool that understands what recruiters actually look for. Worth every penny!",
@@ -380,7 +380,7 @@
     },
     "after": {
       "badge": "✨ After",
-      "score": "Match Score: 92%",
+      "score": "Match Score: 84%",
       "items": {
         "item1": "<strong1>Led</strong1> cross-functional team of 8 to deliver <strong2>15+ projects</strong2> on schedule, increasing client satisfaction by <strong3>35%</strong3> through improved stakeholder communication",
         "item2": "<strong1>Implemented</strong1> customer feedback loop that raised NPS from 42 to <strong2>78</strong2>, resulting in a <strong3>25% increase</strong3> in retention",
@@ -398,7 +398,7 @@
   "ctaSection": {
     "title": "Stop Sending Resumes into the Void",
     "subtitle": "Join the beta and be among the first to experience AI-native resume optimization.",
-    "highlight": "Full Arabic Support. 92% Match Rate. Free to Start.",
+    "highlight": "Arabic + RTL support. ATS scoring insights. Free to start.",
     "cta": "Build My Resume Now",
     "trust": "Free to Start"
   },
