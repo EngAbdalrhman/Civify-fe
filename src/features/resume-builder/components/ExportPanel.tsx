@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { FileText, FileType, Loader2 } from "lucide-react";
+import { FileText, FileType, Loader2, Shield } from "lucide-react";
 import {
   exportToPdfPuppeteer,
   exportToDocx,
@@ -28,25 +28,37 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Crown } from "lucide-react";
 import Link from "next/link";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 
 import enTranslations from "@/messages/en";
 import arTranslations from "@/messages/ar";
+
+import { useTranslations } from "next-intl";
+import { useMyActiveSubscription, usePlans } from "@/features/plans/hooks/useSubscription";
+import {
+  applyResumeMask,
+  getMaskedExportFilename,
+} from "../utils/maskPersonalInfo";
 
 interface ExportPanelProps {
   data: ResumeData;
   isGuest?: boolean;
   onAuthGate?: () => void;
+  maskPII: boolean;
+  onMaskPIIChange: (value: boolean) => void;
 }
-
-import { useTranslations } from "next-intl";
-import { useMyActiveSubscription, usePlans } from "@/features/plans/hooks/useSubscription";
 
 export function ExportPanel({
   data,
   isGuest = false,
   onAuthGate,
+  maskPII,
+  onMaskPIIChange,
 }: ExportPanelProps) {
   const t = useTranslations("builder.exportPanel");
+  const tMask = useTranslations("builder.mask");
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -58,8 +70,18 @@ export function ExportPanel({
   const showWatermarkNote =
     isGuest || activePlan?.watermark === true;
 
+  const exportData = applyResumeMask(data, maskPII);
+
   const getTranslations = () => {
     return data.metadata?.language === "ar" ? arTranslations : enTranslations;
+  };
+
+  const getExportFilename = () => {
+    if (maskPII) {
+      return getMaskedExportFilename();
+    }
+    const base = data.personalInfo.fullName?.trim() || "Resume";
+    return `${base.replace(/\s+/g, "_")}_CV`;
   };
 
   const handlePdfExport = async () => {
@@ -73,17 +95,15 @@ export function ExportPanel({
     try {
       const template = (data.metadata?.templateId || "modern") as TemplateType;
       const color = data.metadata?.primaryColor || "#000000";
-      const filename = `${data.personalInfo.fullName.replace(/\s+/g, "_")}_CV`;
 
-      await exportToPdfPuppeteer(data, {
-        filename,
+      await exportToPdfPuppeteer(exportData, {
+        filename: getExportFilename(),
         template,
         color,
       });
-      // toast.success("PDF Downloaded");
     } catch (e) {
       console.error(e);
-      toast.error("Failed to export PDF");
+      toast.error(t("errors.pdfFailed"));
     } finally {
       setIsExportingPdf(false);
     }
@@ -105,15 +125,10 @@ export function ExportPanel({
     setIsExportingDocx(true);
     try {
       const translations = getTranslations();
-      await exportToDocx(
-        data,
-        `${data.personalInfo.fullName.replace(/\s+/g, "_")}_CV`,
-        translations,
-      );
-      // toast.success("DOCX Downloaded");
+      await exportToDocx(exportData, getExportFilename(), translations);
     } catch (e) {
       console.error(e);
-      toast.error("Failed to export DOCX");
+      toast.error(t("errors.docxFailed"));
     } finally {
       setIsExportingDocx(false);
     }
@@ -127,6 +142,63 @@ export function ExportPanel({
         <h3 className="text-lg font-semibold">{t("title")}</h3>
         <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
       </div>
+
+      <div className="flex lg:hidden items-center justify-between gap-3 rounded-lg border border-dashed bg-muted/30 px-3 py-2.5">
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium leading-tight">{tMask("exportTitle")}</p>
+          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+            {tMask("exportDescription")}
+          </p>
+        </div>
+        <Switch
+          id="export-mask-pii-mobile"
+          checked={maskPII}
+          onCheckedChange={onMaskPIIChange}
+          aria-label={tMask("toggleLabel")}
+          className="shrink-0"
+        />
+      </div>
+
+      {/*<Card className="border-dashed bg-muted/30 hidden lg:block">*/}
+      {/*  <CardHeader className="pb-3">*/}
+      {/*    <div className="flex items-start justify-between gap-3">*/}
+      {/*      <div className="flex items-start gap-3 min-w-0">*/}
+      {/*        <div className="p-2 rounded-lg bg-primary/10 shrink-0">*/}
+      {/*          <Shield className="h-5 w-5 text-primary" />*/}
+      {/*        </div>*/}
+      {/*        <div className="space-y-1 min-w-0">*/}
+      {/*          <CardTitle className="text-base leading-snug">*/}
+      {/*            {tMask("exportTitle")}*/}
+      {/*          </CardTitle>*/}
+      {/*          <CardDescription className="text-xs leading-relaxed">*/}
+      {/*            {tMask("exportDescription")}*/}
+      {/*          </CardDescription>*/}
+      {/*        </div>*/}
+      {/*      </div>*/}
+      {/*      <div className="flex items-center gap-2 shrink-0 pt-0.5">*/}
+      {/*        <Switch*/}
+      {/*          id="export-mask-pii"*/}
+      {/*          checked={maskPII}*/}
+      {/*          onCheckedChange={onMaskPIIChange}*/}
+      {/*          aria-label={tMask("toggleLabel")}*/}
+      {/*        />*/}
+      {/*      </div>*/}
+      {/*    </div>*/}
+      {/*    {maskPII && (*/}
+      {/*      <div className="pt-2 flex flex-wrap gap-1.5">*/}
+      {/*        <Badge variant="secondary" className="text-xs font-normal">*/}
+      {/*          {tMask("activeBadge")}*/}
+      {/*        </Badge>*/}
+      {/*        <p className="w-full text-xs text-muted-foreground mt-1">*/}
+      {/*          {tMask("fieldsHint")}*/}
+      {/*        </p>*/}
+      {/*      </div>*/}
+      {/*    )}*/}
+      {/*    <Label htmlFor="export-mask-pii" className="sr-only">*/}
+      {/*      {tMask("toggleLabel")}*/}
+      {/*    </Label>*/}
+      {/*  </CardHeader>*/}
+      {/*</Card>*/}
 
       <div className="grid gap-4">
         <Card
@@ -145,14 +217,23 @@ export function ExportPanel({
                 <FileType className="h-6 w-6 text-red-600 dark:text-red-400" />
               )}
             </div>
-            <div className="space-y-1">
-              <CardTitle className="text-base">
-                {isExportingPdf ? t("pdf.exporting") : t("pdf.title")}
-              </CardTitle>
-              <CardDescription>{t("pdf.description")}</CardDescription>
+            <div className="space-y-1 flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <CardTitle className="text-base">
+                  {isExportingPdf ? t("pdf.exporting") : t("pdf.title")}
+                </CardTitle>
+                {maskPII && (
+                  <Badge variant="outline" className="text-xs font-normal">
+                    {tMask("maskedExport")}
+                  </Badge>
+                )}
+              </div>
+              <CardDescription>
+                {maskPII ? tMask("pdfMaskedDescription") : t("pdf.description")}
+              </CardDescription>
               {showWatermarkNote && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  Exports include a Civify watermark. Upgrade to remove it.
+                  {t("watermarkNote")}
                 </p>
               )}
             </div>
@@ -175,21 +256,29 @@ export function ExportPanel({
                 <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               )}
             </div>
-            <div className="space-y-1">
-              <CardTitle className="text-base">
-                {isExportingDocx ? t("docx.exporting") : t("docx.title")}
-              </CardTitle>
-              <CardDescription>{t("docx.description")}</CardDescription>
+            <div className="space-y-1 flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <CardTitle className="text-base">
+                  {isExportingDocx ? t("docx.exporting") : t("docx.title")}
+                </CardTitle>
+                {maskPII && (
+                  <Badge variant="outline" className="text-xs font-normal">
+                    {tMask("maskedExport")}
+                  </Badge>
+                )}
+              </div>
+              <CardDescription>
+                {maskPII ? tMask("docxMaskedDescription") : t("docx.description")}
+              </CardDescription>
             </div>
           </CardHeader>
         </Card>
       </div>
 
       <div className="p-4 bg-muted/50 rounded-lg text-sm text-balance text-muted-foreground text-center">
-        {t("tip")}
+        {maskPII ? tMask("exportTip") : t("tip")}
       </div>
 
-      {/* Upgrade Plan Modal */}
       <AlertDialog open={showUpgradeModal} onOpenChange={setShowUpgradeModal}>
         <AlertDialogContent className="sm:max-w-md">
           <AlertDialogHeader>

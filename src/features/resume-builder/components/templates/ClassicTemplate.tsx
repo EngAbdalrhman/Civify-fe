@@ -193,8 +193,8 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
        )}
 
        {visibleSections.map(section => (
-         <section key={section.id} style={{ marginBottom: `${sectionMargin}px` }}>
-           <h3 className="text-lg font-bold uppercase border-b border-gray-800 mb-4 flex items-center">
+         <section key={section.id} className="cv-section" style={{ marginBottom: `${sectionMargin}px` }}>
+           <h3 className="cv-section-title text-lg font-bold uppercase border-b border-gray-800 mb-4 flex items-center break-after-avoid">
              <span className="bg-gray-800 text-white px-2 py-0.5 text-sm mr-2" style={{ backgroundColor: color }}>
                 {section.title.charAt(0)}
              </span>
@@ -208,9 +208,9 @@ export function ClassicTemplate({ data, color }: TemplateProps) {
            ) : shouldUseSimpleColumns(section) ? (
              renderSimpleCourses(section)
            ) : (
-             <div className="space-y-4">
+             <div className="cv-items space-y-4">
                {section.items.filter((i: any) => i.visible !== false).map((item: any) => (
-                 <div key={item.id}>
+                 <div key={item.id} className="cv-entry break-inside-avoid">
                    <div className="flex justify-between font-bold text-gray-800 text-sm">
                      <span>{item.title}</span>
                      <span>{item.date}</span>

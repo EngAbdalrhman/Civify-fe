@@ -65,10 +65,6 @@ export function IntegrationsSection() {
                   {/* Description */}
                   <p className="text-sm text-muted-foreground">{t(`items.${key}.description`)}</p>
 
-                  {/* Connect button on hover */}
-                  <div className="mt-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                    <span className="text-sm font-semibold text-primary">Connect →</span>
-                  </div>
                 </CardContent>
               </Card>
             );

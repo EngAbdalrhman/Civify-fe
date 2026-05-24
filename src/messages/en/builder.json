@@ -47,7 +47,26 @@
       "cancel": "Cancel",
       "upgrade": "View Plans"
     },
-    "tip": "Tip: Review your resume in the preview panel before downloading to ensure everything looks perfect."
+    "tip": "Tip: Review your resume in the preview panel before downloading to ensure everything looks perfect.",
+    "watermarkNote": "Exports include a Civify watermark. Upgrade to remove it.",
+    "errors": {
+      "pdfFailed": "Failed to export PDF",
+      "docxFailed": "Failed to export DOCX"
+    }
+  },
+  "mask": {
+    "toggleLabel": "Mask personal info",
+    "toggleShort": "Mask",
+    "mobileHint": "Preview masking here; export uses the same setting in the Export tab.",
+    "exportTitle": "Privacy-safe export",
+    "exportDescription": "Hide your name, contact details, photo, and links in the downloaded file. Your saved resume is never changed.",
+    "activeBadge": "Masking on",
+    "previewActive": "Masked",
+    "maskedExport": "Masked",
+    "fieldsHint": "Name, email, phone, location, photo, and profile links are replaced with placeholders.",
+    "pdfMaskedDescription": "PDF without identifiable contact details — ideal for blind applications.",
+    "docxMaskedDescription": "Word file without identifiable contact details — editable after download.",
+    "exportTip": "You're exporting a masked copy. Toggle masking off in the preview or here to download your full resume."
   },
   "toasts": {
     "enterTitle": "Please enter a title for your resume",

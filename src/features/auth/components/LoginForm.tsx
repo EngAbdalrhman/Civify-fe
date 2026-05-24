@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Link, useRouter } from "@/i18n/routing";
 import { useLogin, LoginSchemaType, useVerifyOtp } from "@/features/auth/hooks";
 import { SubmitHandler } from "react-hook-form";
-import { usePermissions } from "@/hooks/use-permissions";
 import { useEffect, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -15,7 +14,6 @@ const OAUTH_RETURN_TO_KEY = "civify_oauth_returnTo";
 export default function LoginForm() {
   const t = useTranslations("auth");
   const router = useRouter();
-  const { refetch } = usePermissions();
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -72,34 +70,20 @@ export default function LoginForm() {
     login(data);
   };
 
-  // Handle redirect after successful login - fetch permissions first
+  // Redirect after successful login (permissions load via session-updated event)
   useEffect(() => {
-    const handleLoginSuccess = async () => {
-      if ((isLoginSuccess && !requires2FA) || isVerifySuccess) {
-        if (isRedirecting) return; // Prevent double redirect
-        setIsRedirecting(true);
-
-        // Fetch permissions before redirecting
-        const result = await refetch();
-        const perms = result.data?.permissions;
-        // Optional: Log if permissions are empty to help debugging
-        if (!perms || perms.length === 0) {
-          console.warn(
-            "Login successful but no permissions returned immediately.",
-          );
-        }
-        router.push(returnTo || "/app");
-      }
-    };
-
-    handleLoginSuccess();
+    if ((isLoginSuccess && !requires2FA) || isVerifySuccess) {
+      if (isRedirecting) return;
+      setIsRedirecting(true);
+      router.push(returnTo || "/app");
+    }
   }, [
     isLoginSuccess,
     requires2FA,
     isVerifySuccess,
-    refetch,
     router,
     isRedirecting,
+    returnTo,
   ]);
 
   const handleGoogleLogin = () => {

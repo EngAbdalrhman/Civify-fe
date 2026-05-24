@@ -4,6 +4,7 @@ import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { setAccessToken } from "@/utils/cookies";
+import { dispatchSessionUpdated } from "@/utils/session-events";
 import apiClient from "@/api/client";
 
 const OAUTH_RETURN_TO_KEY = "civify_oauth_returnTo";
@@ -22,6 +23,7 @@ function AuthCallbackContent() {
     if (accessToken) {
       // Store token in cookie using centralized utility
       setAccessToken(accessToken);
+      dispatchSessionUpdated();
 
       // Check and apply pending referral code from OAuth signup
       const pendingReferral = localStorage.getItem("civify_pending_referral");

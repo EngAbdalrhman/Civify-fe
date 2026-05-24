@@ -56,6 +56,10 @@ interface EditorSidebarProps {
 
     // Preferences
     autoSaveEnabled?: boolean;
+
+    // PII masking (preview + export)
+    maskPII: boolean;
+    onMaskPIIChange: (value: boolean) => void;
 }
 
 export function EditorSidebar({
@@ -80,6 +84,8 @@ export function EditorSidebar({
     isTranslating,
     onTranslateClick,
     autoSaveEnabled = true,
+    maskPII,
+    onMaskPIIChange,
 }: EditorSidebarProps) {
     const t = useTranslations("builder");
     const { hasAnyPermission } = usePermissions();
@@ -230,6 +236,8 @@ export function EditorSidebar({
                                 data={resumeData}
                                 isGuest={isGuest}
                                 onAuthGate={onAuthGate}
+                                maskPII={maskPII}
+                                onMaskPIIChange={onMaskPIIChange}
                             />
                         </TabsContent>
                     </div>

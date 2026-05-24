@@ -888,6 +888,36 @@ export default function UploadPage() {
                     placeholder={t("placeholders.jobTitle")}
                   />
                 </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label>{t("personalInfo.address")}</Label>
+                  <Input
+                    value={resumeData.personalInfo.address || ""}
+                    onChange={(e) =>
+                      updatePersonalInfo("address", e.target.value)
+                    }
+                    placeholder={t("personalInfo.placeholders.address")}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t("personalInfo.city")}</Label>
+                  <Input
+                    value={resumeData.personalInfo.city || ""}
+                    onChange={(e) =>
+                      updatePersonalInfo("city", e.target.value)
+                    }
+                    placeholder={t("personalInfo.placeholders.city")}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t("personalInfo.country")}</Label>
+                  <Input
+                    value={resumeData.personalInfo.country || ""}
+                    onChange={(e) =>
+                      updatePersonalInfo("country", e.target.value)
+                    }
+                    placeholder={t("personalInfo.placeholders.country")}
+                  />
+                </div>
               </div>
               <div className="space-y-2">
                 <Label>{t("personalInfo.summary")}</Label>

@@ -8,13 +8,18 @@
     "ctaPrimary": "Build Your First Resume",
 
     "ctaFree": "Try for Free",
-    "badge": "Full Arabic Support!",
-    "matchScore": "92%",
-    "interviews": "More Interviews"
+    "badge": "Arabic + RTL Support",
+    "subtitleHighlight": "ATS scoring, keyword matching, and Arabic-ready resumes in one workflow.",
+    "trustAtsValue": "ATS Score",
+    "trustAtsLabel": "Shown before export",
+    "trustStepsValue": "4 Steps",
+    "trustStepsLabel": "Upload to tailored CV",
+    "trustArabicValue": "Arabic",
+    "trustArabicLabel": "RTL + OCR support"
   },
   "howItWorks": {
     "title": "How Civify Works",
-    "subtitle": "From upload to download in 4 simple steps",
+    "subtitle": "From upload to export in 4 practical steps",
     "steps": {
       "step1": {
         "title": "Upload Your Resume",
@@ -22,18 +27,18 @@
         "cta": "Upload Now"
       },
       "step2": {
-        "title": "Paste Job Description",
-        "description": "Copy and paste the job description or select a job category",
+        "title": "Review Parsed Resume Data",
+        "description": "Check and edit your personal info, skills, and experience before tailoring",
         "cta": "Try It"
       },
       "step3": {
-        "title": "AI Analysis",
-        "description": "Civify analyzes ATS keywords and role requirements instantly",
+        "title": "Paste Job Description & Tailor",
+        "description": "Add a target job description and let AI optimize your CV for ATS keyword matching",
         "cta": "See It Work"
       },
       "step4": {
         "title": "Download Optimized CV",
-        "description": "Get your polished, tailored resume with optimization score",
+        "description": "Download your tailored resume with ATS score and keyword gap insights",
         "cta": "Get Started"
       }
     }
@@ -44,31 +49,31 @@
     "items": {
       "parser": {
         "title": "AI Job Description Parser",
-        "description": "Extracts required skills and keywords to match job listings better"
+        "description": "Analyzes job descriptions to highlight relevant skills and keywords for better matching"
       },
       "ats": {
         "title": "ATS Optimization Engine",
-        "description": "Ensures formatting and keyword density meet ATS standards for maximum visibility"
+        "description": "Improves ATS compatibility with cleaner formatting and stronger keyword matching"
       },
       "templates": {
-        "title": "Role-Based Resume Templates",
-        "description": "Developer, Designer, Data Analyst, HR, Marketing, Sales, and other niche templates"
+        "title": "Professional Resume Templates",
+        "description": "Choose from five ATS-friendly styles: Modern, Classic, Creative, Executive, and Minimal"
       },
       "aiRewrite": {
         "title": "AI Achievement Rewrite",
-        "description": "Transforms simple tasks into measurable impact statements that wow recruiters"
+        "description": "Rewrites experience bullets during tailoring with stronger action verbs and clearer impact"
       },
       "skills": {
         "title": "Skill Gap Suggestions",
-        "description": "Surfaces missing skills and recommends additions based on job requirements"
+        "description": "Shows missing keywords and optional skill-gap roadmap suggestions based on your target role"
       },
       "arabic": {
-        "title": "Full Arabic Support 🇸🇦",
-        "description": "Native RTL support, Arabic OCR for scanned docs, and dual-language resume generation"
+        "title": "Arabic Support 🇸🇦",
+        "description": "Arabic UI, native RTL layouts, Arabic OCR for scanned files, and bilingual resume support"
       },
       "score": {
-        "title": "Real-Time Score Indicator",
-        "description": "Shows your resume match score before download so you know exactly where you stand"
+        "title": "Score Before Download",
+        "description": "See ATS score, keyword match, and missing keywords on the results step before export"
       },
       "privacy": {
         "title": "Resume Masking & Privacy",
@@ -79,8 +84,8 @@
   "resumeBuilder": {
     "title": "Advanced Resume Builder",
     "titleAccent": "AI Enhanced",
-    "description": "Build, edit, and perfect your resume with our state-of-the-art tools. Instant changes, real-time previews, and smart suggestions.",
-    "badge": "Full Arabic Support",
+    "description": "Build, edit, and perfect your resume with live preview, design controls, and AI-assisted content improvements.",
+    "badge": "Arabic + RTL Support",
     "cta": "Open Builder",
     "features": {
       "preview": {
@@ -155,7 +160,7 @@
       },
       "q6": {
         "question": "What is the best AI tool for tailoring resumes to job descriptions?",
-        "answer": "Civify is an AI-powered resume tailoring tool that analyzes your CV against specific job descriptions. It uses machine learning to identify missing keywords, optimize your experience descriptions, and provide an ATS compatibility score. Users report a 92% average match rate after optimization."
+        "answer": "Civify is an AI-powered resume tailoring tool that analyzes your CV against specific job descriptions. It highlights missing keywords, improves experience descriptions, and provides an ATS compatibility score so you can iterate before exporting."
       },
       "q7": {
         "question": "How does Civify's ATS score checker work?",
@@ -163,90 +168,85 @@
       },
       "q8": {
         "question": "Can Civify build a resume in Arabic?",
-        "answer": "Yes. Civify is one of the few AI resume builders with full Arabic language support, including RTL (right-to-left) layout, Arabic OCR for document parsing, and AI-powered content generation in Arabic. It supports bilingual resumes as well."
+        "answer": "Yes. Civify supports Arabic UI, RTL resume layouts, Arabic OCR for scanned uploads, AI translation/tailoring in Arabic, and bilingual resume workflows."
       }
     },
     "stillQuestions": "Still have questions?",
     "contactSupportTeam": "Contact Support Team"
   },
   "integrations": {
-    "title": "Seamless Integration",
-    "subtitle": "Connects with your favorite platforms and tools",
+    "title": "Export & Workflow",
+    "subtitle": "Use Civify with the tools you already rely on during applications",
     "items": {
       "linkedin": {
         "name": "LinkedIn",
-        "description": "Import profile data instantly"
+        "description": "Sign in with LinkedIn and tailor faster from job pages with our Chrome extension"
       },
       "google-docs": {
-        "name": "Google Docs",
-        "description": "Export and edit in Google Docs"
+        "name": "PDF Export",
+        "description": "Download print-ready PDF resumes from upload or the builder"
       },
       "word": {
         "name": "Microsoft Word",
-        "description": "Download as .docx format"
+        "description": "Export tailored resumes as editable .docx files"
       },
       "indeed": {
-        "name": "Indeed",
-        "description": "Optimize for Indeed applications"
+        "name": "Job Boards",
+        "description": "Paste job descriptions from Indeed, Glassdoor, and other boards"
       },
       "glassdoor": {
-        "name": "Glassdoor",
-        "description": "Tailor for Glassdoor listings"
+        "name": "Job Matches",
+        "description": "Save targets and analyze fit with structured job-match insights"
       },
       "google-drive": {
-        "name": "Google Drive",
-        "description": "Save directly to Drive"
+        "name": "Your Files",
+        "description": "Upload existing CVs and keep exported copies in your own storage"
       }
     }
   },
   "templates": {
     "title": "Professional Resume Templates",
-    "subtitle": "Choose from our collection of ATS-optimized templates designed for every industry",
+    "subtitle": "Choose from ATS-optimized template styles designed to stay clean, readable, and recruiter-friendly",
     "badge": "ATS-Friendly",
     "note": {
-      "bold": "All templates are 100% ATS-compliant",
-      "text": "— optimized to pass Applicant Tracking Systems"
+      "bold": "Five ATS-friendly visual styles",
+      "text": "— clean layouts designed for readability and keyword scanning"
     },
     "items": {
-      "ats-clean": {
-        "name": "Clean ATS",
-        "category": "Professional",
-        "description": "Simple, scannable format optimized for Applicant Tracking Systems"
-      },
-      "professional": {
-        "name": "Professional",
-        "category": "Business",
-        "description": "Elegant design perfect for corporate and traditional industries"
-      },
-      "minimalist": {
-        "name": "Minimalist",
-        "category": "Modern",
-        "description": "Ultra-clean design with sophisticated use of whitespace"
-      },
       "modern": {
         "name": "Modern",
-        "category": "Creative",
-        "description": "Contemporary design with geometric elements and bold typography"
+        "category": "Balanced",
+        "description": "Contemporary layout with clear hierarchy and accent color"
       },
-      "technical": {
-        "name": "Technical",
-        "category": "Tech",
-        "description": "Tailored for developers with skills matrix and GitHub-style layout"
+      "classic": {
+        "name": "Classic",
+        "category": "Traditional",
+        "description": "Timeless centered header and structured sections"
+      },
+      "minimal": {
+        "name": "Minimal",
+        "category": "Clean",
+        "description": "Ultra-clean typography with generous whitespace"
+      },
+      "executive": {
+        "name": "Executive",
+        "category": "Premium",
+        "description": "Strong headings and polished spacing for senior roles"
       },
       "creative": {
         "name": "Creative",
-        "category": "Design",
-        "description": "Artistic layout for designers and creative professionals"
+        "category": "Bold",
+        "description": "Sidebar layout with color accent for visual impact"
       }
     }
   },
   "testimonials": {
     "title": "Success Stories",
-    "subtitle": "Join thousands of professionals who landed their dream jobs with Civify",
+    "subtitle": "Early users improving interview readiness with tailored, ATS-focused resumes",
     "stats": {
-      "users": { "value": "50,000+", "label": "Happy Users" },
-      "rating": { "value": "4.9/5", "label": "Average Rating" },
-      "reviews": { "value": "2,000+", "label": "5-Star Reviews" }
+      "users": { "value": "Beta", "label": "Early Access" },
+      "rating": { "value": "ATS", "label": "Score Insights" },
+      "reviews": { "value": "AR/EN", "label": "Bilingual Support" }
     },
     "items": {
       "t1": {
@@ -262,10 +262,10 @@
         "metric": "Landed Dream Job"
       },
       "t3": {
-        "quote": "My resume match score went from 45% to 92%. The skill gap suggestions were incredibly helpful.",
+        "quote": "My resume match score improved a lot after tailoring, and the keyword gap suggestions were incredibly helpful.",
         "role": "Data Analyst",
         "company": "Amazon",
-        "metric": "92% Match Score"
+        "metric": "Improved Match Score"
       },
       "t4": {
         "quote": "Finally, a resume tool that understands what recruiters actually look for. Worth every penny!",
@@ -275,8 +275,8 @@
     }
   },
   "roles": {
-    "title": "Tailored to Your Role",
-    "subtitle": "Industry-specific optimization for every career path",
+    "title": "Role-Aware Tailoring Examples",
+    "subtitle": "Use industry keyword examples to guide tailoring for your target role",
     "create": "Create {role} Resume",
     "sections": {
       "keywords": "Optimized Keywords",
@@ -380,7 +380,7 @@
     },
     "after": {
       "badge": "✨ After",
-      "score": "Match Score: 92%",
+      "score": "Match Score: 84%",
       "items": {
         "item1": "<strong1>Led</strong1> cross-functional team of 8 to deliver <strong2>15+ projects</strong2> on schedule, increasing client satisfaction by <strong3>35%</strong3> through improved stakeholder communication",
         "item2": "<strong1>Implemented</strong1> customer feedback loop that raised NPS from 42 to <strong2>78</strong2>, resulting in a <strong3>25% increase</strong3> in retention",
@@ -398,7 +398,7 @@
   "ctaSection": {
     "title": "Stop Sending Resumes into the Void",
     "subtitle": "Join the beta and be among the first to experience AI-native resume optimization.",
-    "highlight": "Full Arabic Support. 92% Match Rate. Free to Start.",
+    "highlight": "Arabic + RTL support. ATS scoring insights. Free to start.",
     "cta": "Build My Resume Now",
     "trust": "Free to Start"
   },

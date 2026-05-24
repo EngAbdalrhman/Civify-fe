@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { ResumeData } from "@/features/upload-cv/types";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
@@ -47,6 +47,7 @@ export function ResumeBuilder({
   isGuest: isGuestProp = false,
 }: ResumeBuilderProps) {
   const previewContainerRef = useRef<HTMLDivElement>(null);
+  const [maskPII, setMaskPII] = useState(false);
   const t = useTranslations("builder");
   const tTour = useTranslations("tour");
 
@@ -76,6 +77,11 @@ export function ResumeBuilder({
     }
   };
 
+  const handleReset = () => {
+    setMaskPII(false);
+    builder.handleReset();
+  };
+
   return (
     <>
       <div className="flex flex-col lg:flex-row h-screen overflow-hidden bg-background relative">
@@ -98,7 +104,7 @@ export function ResumeBuilder({
           mobileView={builder.mobileView}
           isSaving={builder.isSaving}
           onSaveClick={builder.handleSaveClick}
-          onResetClick={builder.handleReset}
+          onResetClick={handleReset}
           saveStatus={builder.saveStatus}
           lastSavedAt={builder.lastSavedAt}
           isUploading={upload.isUploading}
@@ -112,6 +118,8 @@ export function ResumeBuilder({
           isTranslating={translation.isTranslating}
           onTranslateClick={() => translation.setShowTranslateDialog(true)}
           autoSaveEnabled={builder.autoSaveEnabled}
+          maskPII={maskPII}
+          onMaskPIIChange={setMaskPII}
         />
 
         {/* Right Area - Live Preview */}
@@ -121,6 +129,8 @@ export function ResumeBuilder({
           onFullScreenToggle={handleFullScreenToggle}
           mobileView={builder.mobileView}
           previewContainerRef={previewContainerRef}
+          maskPII={maskPII}
+          onMaskPIIChange={setMaskPII}
         />
       </div>
 

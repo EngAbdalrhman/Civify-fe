@@ -15,14 +15,12 @@ import { Loader2, CheckCircle, ArrowRight, Home, Sparkles } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { paymentService } from "@/services/payment.service";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/use-auth";
+import { dispatchSessionUpdated } from "@/utils/session-events";
 
 function PaymentSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("payment.success");
-  const { refetch } = useAuth();
-
   const [verifying, setVerifying] = useState(true);
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,9 +68,7 @@ function PaymentSuccessContent() {
 
       if (result.verified) {
         setVerified(true);
-        // toast.success(t("verifiedToast"));
-        // Refresh permissions/group to update UI (e.g. remove "Free Plan" badge)
-        await refetch();
+        dispatchSessionUpdated();
       } else {
         throw new Error(result.message || "Payment verification failed");
       }

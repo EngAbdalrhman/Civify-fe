@@ -28,6 +28,7 @@ import {
   type PriceCalculationResponse,
 } from "@/services/admin.service";
 import type { SubscriptionPlan } from "@/features/plans/types";
+import { dispatchSessionUpdated } from "@/utils/session-events";
 import { toast } from "sonner";
 
 function CheckoutContent() {
@@ -207,6 +208,20 @@ function CheckoutContent() {
         paymentMethod,
         paymentMethod === "WALLET" ? walletPhone : undefined,
       );
+
+      const amount = response.amount != null ? Number(response.amount) : NaN;
+      const isFreeActivation =
+        response.subscriptionId != null &&
+        (amount === 0 ||
+          response.paymentUrl === "/app/" ||
+          !response.paymentUrl);
+
+      if (isFreeActivation) {
+        dispatchSessionUpdated();
+        toast.success("Subscription activated successfully!");
+        router.push("/app");
+        return;
+      }
 
       if (response.paymentUrl) {
         window.location.href = response.paymentUrl;

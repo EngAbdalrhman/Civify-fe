@@ -4,6 +4,7 @@ import {
   setAccessToken,
   clearAuthTokens,
 } from "@/utils/cookies";
+import { dispatchSessionUpdated } from "@/utils/session-events";
 
 // Constants
 const MAX_REFRESH_RETRIES = 3;
@@ -70,6 +71,7 @@ const clearAuthAndRedirect = () => {
 
     // Clear all auth tokens using centralized utility
     clearAuthTokens();
+    window.dispatchEvent(new Event("civify:auth-cleared"));
 
     // Reset refresh retry count
     refreshRetryCount = 0;
@@ -147,11 +149,7 @@ const attemptTokenRefresh = async (): Promise<string> => {
 
     // Set the new access token using centralized utility
     setAccessToken(accessToken);
-
-    // Notify React components that auth state has changed
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new Event("auth-state-changed"));
-    }
+    dispatchSessionUpdated();
 
     // Reset retry count on success
     refreshRetryCount = 0;
@@ -296,6 +294,7 @@ const processResponse = async <T>(
 
   // Extract access token from response body (login responses)
   // and store it using centralized utility
+  let tokenStored = false;
   if (
     data &&
     typeof data === "object" &&
@@ -303,6 +302,7 @@ const processResponse = async <T>(
     typeof window !== "undefined"
   ) {
     setAccessToken((data as { accessToken: string }).accessToken);
+    tokenStored = true;
   }
 
   // Also check Authorization header (legacy support)
@@ -312,6 +312,11 @@ const processResponse = async <T>(
       ? authHeader.substring(7)
       : authHeader;
     setAccessToken(token);
+    tokenStored = true;
+  }
+
+  if (tokenStored) {
+    dispatchSessionUpdated();
   }
 
   return {

@@ -1,6 +1,7 @@
 "use client";
 
 import { OnboardingProvider } from "@/features/onboarding";
+import { NotificationStreamProvider } from "@/providers/NotificationStreamProvider";
 
 import { useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/routing";
@@ -95,6 +96,7 @@ export default function AdminDashboardLayout({
 
   return (
     <OnboardingProvider>
+      <NotificationStreamProvider>
       <div className="flex min-h-screen bg-background">
         {/* Mobile Overlay Backdrop */}
         {isMobileOpen && (
@@ -215,6 +217,7 @@ export default function AdminDashboardLayout({
           </main>
         </div>
       </div>
+      </NotificationStreamProvider>
     </OnboardingProvider>
   );
 }

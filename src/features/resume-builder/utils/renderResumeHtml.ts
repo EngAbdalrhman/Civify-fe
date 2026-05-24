@@ -80,12 +80,45 @@ function escapeHtml(text: string): string {
 // Base HTML Template
 // ============================================================================
 
+type PageMargins = {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+};
+
+const DEFAULT_PAGE_MARGINS: PageMargins = {
+  top: 40,
+  right: 40,
+  bottom: 40,
+  left: 40,
+};
+
+function resolvePageMargins(
+  partial: { top?: number; bottom?: number; left?: number; right?: number } | undefined,
+  defaults: PageMargins,
+): PageMargins {
+  return {
+    top: partial?.top ?? defaults.top,
+    right: partial?.right ?? defaults.right,
+    bottom: partial?.bottom ?? defaults.bottom,
+    left: partial?.left ?? defaults.left,
+  };
+}
+
+/** Convert CSS px (96dpi) to mm for @page rules. */
+function pxToMm(px: number): string {
+  const mm = (px * 25.4) / 96;
+  return `${Math.max(4, mm).toFixed(2)}mm`;
+}
+
 function wrapInHtmlDocument(
   content: string,
   direction: "ltr" | "rtl",
   bodyFontFamily: string = "Inter",
   headingFontFamily: string = "Inter",
   watermark?: WatermarkConfig,
+  pageMargins: PageMargins = DEFAULT_PAGE_MARGINS,
 ): string {
   // ── Google Fonts registry ──
   const googleFontsMap: Record<string, string> = {
@@ -153,6 +186,34 @@ function wrapInHtmlDocument(
     a:hover {
       text-decoration: underline;
     }
+    @page {
+      size: A4;
+      margin: ${pxToMm(pageMargins.top)} ${pxToMm(pageMargins.right)} ${pxToMm(pageMargins.bottom)} ${pxToMm(pageMargins.left)};
+    }
+    .cv-entry {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .cv-section-title {
+      break-after: avoid;
+      page-break-after: avoid;
+      orphans: 3;
+      widows: 3;
+    }
+    .cv-section {
+      break-inside: auto;
+      page-break-inside: auto;
+    }
+    .cv-section-title + .cv-items > *:first-child {
+      break-before: avoid;
+      page-break-before: avoid;
+    }
+    @media print {
+      body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
   </style>
 </head>
 <body>
@@ -199,12 +260,12 @@ function renderClassicTemplate(data: ResumeData, color: string, watermark?: Wate
   );
 
   const compactClass = metadata?.compactMode ? "1.2" : "1.6";
-  const margins = metadata?.margins || {
+  const margins = resolvePageMargins(metadata?.margins, {
     top: 40,
     bottom: 40,
     left: 40,
     right: 40,
-  };
+  });
   const spacingLevel = metadata?.spacingLevel ?? 3;
   const sectionMargin = spacingLevel * 8; // e.g. 24px
   const itemGap = spacingLevel * 4; // e.g. 12px
@@ -317,7 +378,7 @@ function renderClassicTemplate(data: ResumeData, color: string, watermark?: Wate
   };
 
   const content = `
-    <div style="padding: ${margins.top}px ${margins.right}px ${margins.bottom}px ${margins.left}px; min-height: 100%; background-color: white; color: #111827; line-height: ${compactClass};">
+    <div class="cv-page-root" style="min-height: 100%; background-color: white; color: #111827; line-height: ${compactClass};">
       <header style="text-align: center; margin-bottom: ${sectionMargin}px; border-bottom: 4px double #d1d5db; padding-bottom: 24px;">
         <h1 style="font-size: 30px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.05em; color: #111827;">
           ${escapeHtml(personalInfo.fullName)}
@@ -349,8 +410,8 @@ function renderClassicTemplate(data: ResumeData, color: string, watermark?: Wate
       ${visibleSections
         .map(
           (section) => `
-        <section style="margin-bottom: ${sectionMargin}px;">
-          <h3 style="font-size: 18px; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #1f2937; margin-bottom: 16px; display: flex; align-items: center;">
+        <section class="cv-section" style="margin-bottom: ${sectionMargin}px;">
+          <h3 class="cv-section-title" style="font-size: 18px; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #1f2937; margin-bottom: 16px; display: flex; align-items: center;">
             <span style="background-color: ${color}; color: white; padding: 2px 8px; font-size: 14px; margin-right: 8px;">
               ${section.title.charAt(0)}
             </span>
@@ -365,12 +426,12 @@ function renderClassicTemplate(data: ResumeData, color: string, watermark?: Wate
                 : shouldUseSimpleColumns(section)
                   ? renderSimpleCourses(section)
                   : `
-              <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div class="cv-items" style="display: flex; flex-direction: column; gap: 16px;">
                 ${section.items
                   .filter((i) => i.visible !== false)
                   .map(
                     (item) => `
-                  <div>
+                  <div class="cv-entry">
                     <div style="display: flex; justify-content: space-between; font-weight: 700; color: #1f2937; font-size: 14px;">
                       <span>${escapeHtml(item.title)}</span>
                       <span>${escapeHtml(item.date || "")}</span>
@@ -404,6 +465,7 @@ function renderClassicTemplate(data: ResumeData, color: string, watermark?: Wate
     bodyFontFamily,
     headingFontFamily,
     watermark,
+    margins,
   );
 }
 
@@ -443,12 +505,12 @@ function renderModernTemplate(data: ResumeData, color: string, watermark?: Water
   );
 
   const compactClass = metadata?.compactMode ? "1.2" : "1.6";
-  const margins = metadata?.margins || {
+  const margins = resolvePageMargins(metadata?.margins, {
     top: 32,
     bottom: 32,
     left: 32,
     right: 32,
-  };
+  });
   const spacingLevel = metadata?.spacingLevel ?? 3;
   const sectionMargin = spacingLevel * 8; // e.g. 24px
   const itemGap = spacingLevel * 4; // e.g. 16px
@@ -569,7 +631,7 @@ function renderModernTemplate(data: ResumeData, color: string, watermark?: Water
   const globeIcon = `<svg style="width: 12px; height: 12px; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`;
 
   const content = `
-    <div style="padding: ${margins.top}px ${margins.right}px ${margins.bottom}px ${margins.left}px; min-height: 100%; background-color: white; color: #111827;">
+    <div class="cv-page-root" style="min-height: 100%; background-color: white; color: #111827;">
       <!-- Header -->
       <header style="border-bottom: 2px solid ${color}; padding-bottom: 24px; margin-bottom: ${sectionMargin}px;">
         <h1 style="font-size: 36px; font-weight: 700; text-transform: uppercase; letter-spacing: -0.025em; margin-bottom: 8px; color: ${color};">
@@ -604,8 +666,8 @@ function renderModernTemplate(data: ResumeData, color: string, watermark?: Water
       ${visibleSections
         .map(
           (section) => `
-        <section style="margin-bottom: ${sectionMargin}px;">
-          <h3 style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; border-bottom: 1px solid ${color}40; padding-bottom: 4px; color: ${color};">
+        <section class="cv-section" style="margin-bottom: ${sectionMargin}px;">
+          <h3 class="cv-section-title" style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; border-bottom: 1px solid ${color}40; padding-bottom: 4px; color: ${color};">
             ${escapeHtml(section.title)}
           </h3>
           
@@ -617,12 +679,12 @@ function renderModernTemplate(data: ResumeData, color: string, watermark?: Water
                 : shouldUseSimpleColumns(section)
                   ? renderSimpleCourses(section)
                   : `
-              <div style="display: flex; flex-direction: column; gap: ${itemGap}px;">
+              <div class="cv-items" style="display: flex; flex-direction: column; gap: ${itemGap}px;">
                 ${section.items
                   .filter((i) => i.visible !== false)
                   .map(
                     (item) => `
-                  <div style="page-break-inside: avoid;">
+                  <div class="cv-entry">
                     <div style="display: flex; justify-content: space-between; align-items: baseline;">
                       <h4 style="font-weight: 700; color: #1f2937;">${escapeHtml(item.title)}</h4>
                       <span style="font-size: 14px; color: #4b5563; font-style: italic;">
@@ -655,6 +717,7 @@ function renderModernTemplate(data: ResumeData, color: string, watermark?: Water
     bodyFontFamily,
     headingFontFamily,
     watermark,
+    margins,
   );
 }
 
@@ -710,12 +773,12 @@ function renderCreativeTemplate(data: ResumeData, color: string, watermark?: Wat
   );
 
   const compactClass = metadata?.compactMode ? "1.2" : "1.6";
-  const margins = metadata?.margins || {
+  const margins = resolvePageMargins(metadata?.margins, {
     top: 32,
     bottom: 32,
     left: 32,
     right: 32,
-  };
+  });
   const spacingLevel = metadata?.spacingLevel ?? 3;
   const sectionMargin = spacingLevel * 8; // e.g. 24px
   const itemGap = spacingLevel * 6; // e.g. 18px
@@ -830,7 +893,7 @@ function renderCreativeTemplate(data: ResumeData, color: string, watermark?: Wat
   const content = `
     <div style="display: flex; min-height: 100%; background-color: white; line-height: ${compactClass};">
       <!-- Left Sidebar -->
-      <aside style="width: 30%; background-color: ${color}; color: white; padding: ${margins.top}px 24px ${margins.bottom}px ${margins.left}px; display: flex; flex-direction: column; gap: ${sectionMargin}px;">
+      <aside class="cv-page-root" style="width: 30%; background-color: ${color}; color: white; padding: 0 24px 0 0; display: flex; flex-direction: column; gap: ${sectionMargin}px;">
         <div style="text-align: center;">
           ${
             personalInfo.picture
@@ -876,7 +939,7 @@ function renderCreativeTemplate(data: ResumeData, color: string, watermark?: Wat
       </aside>
 
       <!-- Main Content -->
-      <main style="flex: 1; padding: ${margins.top}px ${margins.right}px ${margins.bottom}px 32px; color: #1f2937;">
+      <main class="cv-page-root" style="flex: 1; padding: 0 0 0 32px; color: #1f2937;">
         ${
           personalInfo.summary
             ? `
@@ -891,8 +954,8 @@ function renderCreativeTemplate(data: ResumeData, color: string, watermark?: Wat
         ${otherSections
           .map(
             (section) => `
-          <section style="margin-bottom: ${sectionMargin}px;">
-            <h2 style="font-size: 20px; font-weight: 700; text-transform: uppercase; margin-bottom: 16px; color: #111827; border-bottom: 2px solid ${color}; padding-bottom: 4px;">
+          <section class="cv-section" style="margin-bottom: ${sectionMargin}px;">
+            <h2 class="cv-section-title" style="font-size: 20px; font-weight: 700; text-transform: uppercase; margin-bottom: 16px; color: #111827; border-bottom: 2px solid ${color}; padding-bottom: 4px;">
               ${escapeHtml(section.title)}
             </h2>
             
@@ -900,12 +963,12 @@ function renderCreativeTemplate(data: ResumeData, color: string, watermark?: Wat
               shouldUseSimpleColumns(section)
                 ? renderSimpleCourses(section)
                 : `
-              <div style="display: flex; flex-direction: column; gap: ${itemGap}px;">
+              <div class="cv-items" style="display: flex; flex-direction: column; gap: ${itemGap}px;">
                 ${section.items
                   .filter((i) => i.visible !== false)
                   .map(
                     (item) => `
-                  <div style="position: relative; padding-left: 16px; border-left: 2px solid #e5e7eb;">
+                  <div class="cv-entry" style="position: relative; padding-left: 16px; border-left: 2px solid #e5e7eb;">
                     <div style="position: absolute; left: -5px; top: 6px; width: 8px; height: 8px; border-radius: 50%; background-color: ${color};"></div>
                     <h3 style="font-weight: 700; color: #1f2937; font-size: 18px;">${escapeHtml(item.subtitle || "")}</h3>
                     <div style="font-size: 14px; font-weight: 600; color: #4b5563; margin-bottom: 4px;">${escapeHtml(item.title)}</div>
@@ -938,6 +1001,7 @@ function renderCreativeTemplate(data: ResumeData, color: string, watermark?: Wat
     bodyFontFamily,
     headingFontFamily,
     watermark,
+    margins,
   );
 }
 
@@ -971,12 +1035,12 @@ function renderExecutiveTemplate(data: ResumeData, color: string, watermark?: Wa
   );
 
   const compactClass = metadata?.compactMode ? "1.2" : "1.6";
-  const margins = metadata?.margins || {
+  const margins = resolvePageMargins(metadata?.margins, {
     top: 48,
     bottom: 48,
     left: 48,
     right: 48,
-  };
+  });
   const spacingLevel = metadata?.spacingLevel ?? 3;
   const sectionMargin = spacingLevel * 10;
   const itemGap = spacingLevel * 5;
@@ -1042,7 +1106,7 @@ function renderExecutiveTemplate(data: ResumeData, color: string, watermark?: Wa
   };
 
   const content = `
-    <div style="padding:${margins.top}px ${margins.right}px ${margins.bottom}px ${margins.left}px;min-height:100%;background:white;color:#1a1a1a;line-height:${compactClass};">
+    <div class="cv-page-root" style="min-height:100%;background:white;color:#1a1a1a;line-height:${compactClass};">
       <!-- Executive Header -->
       <header style="margin-bottom:${sectionMargin}px;border-bottom:3px solid ${color};padding-bottom:20px;">
         <h1 style="font-size:32px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:${color};margin-bottom:6px;">
@@ -1077,8 +1141,8 @@ function renderExecutiveTemplate(data: ResumeData, color: string, watermark?: Wa
           const items = section.items.filter((i) => i.visible !== false);
           if (items.length === 0) return "";
           return `
-          <section style="margin-bottom:${sectionMargin}px;">
-            <h2 style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:${color};border-bottom:1px solid #d1d5db;padding-bottom:6px;margin-bottom:10px;">
+          <section class="cv-section" style="margin-bottom:${sectionMargin}px;">
+            <h2 class="cv-section-title" style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:${color};border-bottom:1px solid #d1d5db;padding-bottom:6px;margin-bottom:10px;">
               ${escapeHtml(section.title)}
             </h2>
             ${
@@ -1088,11 +1152,11 @@ function renderExecutiveTemplate(data: ResumeData, color: string, watermark?: Wa
                   ? renderLanguagesExec(section)
                   : shouldUseSimple(section)
                     ? renderSimpleCols(section)
-                    : `<div style="display:flex;flex-direction:column;gap:${itemGap}px;">
+                    : `<div class="cv-items" style="display:flex;flex-direction:column;gap:${itemGap}px;">
                   ${items
                     .map(
                       (item) => `
-                    <div>
+                    <div class="cv-entry">
                       <div style="display:flex;justify-content:space-between;align-items:baseline;">
                         <div>
                           <span style="font-size:15px;font-weight:600;">${escapeHtml(item.title)}</span>
@@ -1117,7 +1181,14 @@ function renderExecutiveTemplate(data: ResumeData, color: string, watermark?: Wa
   const bodyFont = metadata?.bodyFontFamily || metadata?.fontFamily || "Inter";
   const headingFont =
     metadata?.headingFontFamily || metadata?.fontFamily || "Inter";
-  return wrapInHtmlDocument(content, direction, bodyFont, headingFont, watermark);
+  return wrapInHtmlDocument(
+    content,
+    direction,
+    bodyFont,
+    headingFont,
+    watermark,
+    margins,
+  );
 }
 
 // ============================================================================
@@ -1150,12 +1221,12 @@ function renderMinimalTemplate(data: ResumeData, color: string, watermark?: Wate
   );
 
   const compactClass = metadata?.compactMode ? "1.25" : "1.7";
-  const margins = metadata?.margins || {
+  const margins = resolvePageMargins(metadata?.margins, {
     top: 40,
     bottom: 40,
     left: 56,
     right: 56,
-  };
+  });
   const spacingLevel = metadata?.spacingLevel ?? 3;
   const sectionMargin = spacingLevel * 10;
   const itemGap = spacingLevel * 5;
@@ -1219,7 +1290,7 @@ function renderMinimalTemplate(data: ResumeData, color: string, watermark?: Wate
   };
 
   const content = `
-    <div style="padding:${margins.top}px ${margins.right}px ${margins.bottom}px ${margins.left}px;min-height:100%;background:white;color:#1f2937;line-height:${compactClass};">
+    <div class="cv-page-root" style="min-height:100%;background:white;color:#1f2937;line-height:${compactClass};">
       <!-- Minimal Header -->
       <header style="margin-bottom:${sectionMargin + 8}px;">
         <h1 style="font-size:28px;font-weight:300;letter-spacing:0.06em;text-transform:uppercase;color:#111827;margin-bottom:8px;">
@@ -1251,8 +1322,8 @@ function renderMinimalTemplate(data: ResumeData, color: string, watermark?: Wate
           const items = section.items.filter((i) => i.visible !== false);
           if (items.length === 0) return "";
           return `
-          <section style="margin-bottom:${sectionMargin}px;">
-            <h2 style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:${color};margin-bottom:10px;">
+          <section class="cv-section" style="margin-bottom:${sectionMargin}px;">
+            <h2 class="cv-section-title" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:${color};margin-bottom:10px;">
               ${escapeHtml(section.title)}
             </h2>
             ${
@@ -1262,11 +1333,11 @@ function renderMinimalTemplate(data: ResumeData, color: string, watermark?: Wate
                   ? renderLanguagesMin(section)
                   : shouldUseSimple(section)
                     ? renderSimpleCols(section)
-                    : `<div style="display:flex;flex-direction:column;gap:${itemGap}px;">
+                    : `<div class="cv-items" style="display:flex;flex-direction:column;gap:${itemGap}px;">
                   ${items
                     .map(
                       (item) => `
-                    <div>
+                    <div class="cv-entry">
                       <div style="display:flex;justify-content:space-between;align-items:baseline;">
                         <span style="font-size:14px;font-weight:500;">${escapeHtml(item.title)}${item.subtitle ? `<span style="font-weight:400;color:#6b7280;"> — ${escapeHtml(item.subtitle)}</span>` : ""}</span>
                         ${item.date || item.location ? `<span style="font-size:11px;color:#9ca3af;">${escapeHtml([item.date, item.location].filter(Boolean).join(" · "))}</span>` : ""}
@@ -1288,7 +1359,14 @@ function renderMinimalTemplate(data: ResumeData, color: string, watermark?: Wate
   const bodyFont = metadata?.bodyFontFamily || metadata?.fontFamily || "Inter";
   const headingFont =
     metadata?.headingFontFamily || metadata?.fontFamily || "Inter";
-  return wrapInHtmlDocument(content, direction, bodyFont, headingFont, watermark);
+  return wrapInHtmlDocument(
+    content,
+    direction,
+    bodyFont,
+    headingFont,
+    watermark,
+    margins,
+  );
 }
 
 // ============================================================================

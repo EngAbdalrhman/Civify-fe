@@ -211,17 +211,17 @@ export function CreativeTemplate({ data, color }: TemplateProps) {
          )}
 
          {otherSections.map(section => (
-           <section key={section.id} style={{ marginBottom: `${sectionMargin}px` }}>
-             <h2 className="text-xl font-bold uppercase mb-4 text-gray-900 border-b-2 pb-1" style={{ borderColor: color }}>
+           <section key={section.id} className="cv-section" style={{ marginBottom: `${sectionMargin}px` }}>
+             <h2 className="cv-section-title text-xl font-bold uppercase mb-4 text-gray-900 border-b-2 pb-1 break-after-avoid" style={{ borderColor: color }}>
                {section.title}
              </h2>
              
              {shouldUseSimpleColumns(section) ? (
                renderSimpleCourses(section)
              ) : (
-               <div className="flex flex-col" style={{ gap: `${itemGap}px` }}>
+               <div className="cv-items flex flex-col" style={{ gap: `${itemGap}px` }}>
                   {section.items.filter((i: any) => i.visible !== false).map((item: any) => (
-                     <div key={item.id} className="relative pl-4 border-l-2 border-gray-200">
+                     <div key={item.id} className="cv-entry break-inside-avoid relative pl-4 border-l-2 border-gray-200">
                         <div className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full" style={{ backgroundColor: color }}></div>
                         <h3 className="font-bold text-gray-800 text-lg">{item.subtitle}</h3>
                         <div className="text-sm font-semibold text-gray-600 mb-1">{item.title}</div>

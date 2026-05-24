@@ -14,7 +14,7 @@ import { useTranslations } from "next-intl";
 
 export function TemplatesSection() {
   const t = useTranslations('landing.templates');
-  const templateKeys = ['ats-clean', 'professional', 'minimalist', 'modern', 'technical', 'creative'];
+  const templateKeys = ['modern', 'classic', 'minimal', 'executive', 'creative'];
 
   return (
     <section className="bg-gradient-to-b from-blue-50/30 to-background py-20 dark:from-gray-900 dark:to-background md:py-32">
