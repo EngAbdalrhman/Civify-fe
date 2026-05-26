@@ -55,27 +55,31 @@ export function DashboardNavbar() {
     };
   }, []);
 
-  // Date Logic
-  const getFormattedDate = () => {
+  const [formattedDate, setFormattedDate] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!mounted) return;
     const now = new Date();
     if (locale === "ar") {
-      return new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura", {
+      setFormattedDate(
+        new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }).format(now),
+      );
+      return;
+    }
+    setFormattedDate(
+      new Intl.DateTimeFormat(locale, {
         weekday: "long",
         year: "numeric",
         month: "long",
         day: "numeric",
-      }).format(now);
-    }
-
-    return new Intl.DateTimeFormat(locale, {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }).format(now);
-  };
-
-  const formattedDate = getFormattedDate();
+      }).format(now),
+    );
+  }, [mounted, locale]);
   const displayName = userProfile?.firstName || userProfile?.username || "User";
   const email = userProfile?.email || "";
   const initials = displayName
@@ -97,7 +101,9 @@ export function DashboardNavbar() {
               </span>
             )}
           </div>
-          <div>{formattedDate}</div>
+          <div suppressHydrationWarning>
+            {formattedDate ?? "\u00a0"}
+          </div>
         </div>
       </div>
 

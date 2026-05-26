@@ -4,7 +4,11 @@
     "nextStep": "Next",
     "prevStep": "Back",
     "doneButton": "Done",
-    "help": "Tour Help"
+    "help": "Tour Help",
+    "promptTitle": "New to Civify?",
+    "promptDescription": "Take a quick tour to learn how this page works. You can replay it anytime from the Tour button.",
+    "promptStart": "Start tour",
+    "promptDismiss": "Not now"
   },
   "upload": {
     "step1": {

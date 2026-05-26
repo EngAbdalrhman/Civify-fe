@@ -279,10 +279,17 @@ export default function HelpPage() {
   }, [searchQuery, helpSections, t]);
 
   const scrollToSection = (sectionId: string) => {
-    const el = sectionsRef.current[sectionId];
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    const scrollToEl = (node: HTMLElement | null | undefined) => {
+      if (!node) return false;
+      node.scrollIntoView({ behavior: "smooth", block: "start" });
+      return true;
+    };
+
+    if (scrollToEl(sectionsRef.current[sectionId])) return;
+
+    requestAnimationFrame(() => {
+      scrollToEl(sectionsRef.current[sectionId]);
+    });
   };
 
   const renderTourActions = (article: HelpArticle) => {
@@ -442,7 +449,7 @@ export default function HelpPage() {
             ref={(el) => {
               sectionsRef.current[section.id] = el;
             }}
-            className="overflow-hidden border-2 hover:shadow-lg transition-all"
+            className="scroll-mt-24 overflow-hidden border-2 hover:shadow-lg transition-all"
           >
             <CardHeader className="pb-4">
               <div className="flex items-start gap-4">

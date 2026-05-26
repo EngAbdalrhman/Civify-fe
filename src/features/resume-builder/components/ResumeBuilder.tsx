@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { ResumeData } from "@/features/upload-cv/types";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
@@ -15,7 +15,7 @@ import { EditorSidebar } from "./EditorSidebar";
 import { PreviewPanel } from "./PreviewPanel";
 import { TranslateDialog } from "./TranslateDialog";
 import {
-  useTourAutoStart,
+  TourWelcomePrompt,
   getResumeBuilderTourSteps,
 } from "@/features/onboarding";
 import { SaveDialog } from "./SaveDialog";
@@ -66,7 +66,10 @@ export function ResumeBuilder({
     builder.handleTranslateComplete
   );
 
-  useTourAutoStart("resume-builder", getResumeBuilderTourSteps(tTour));
+  const resumeBuilderTourSteps = useMemo(
+    () => getResumeBuilderTourSteps(tTour),
+    [tTour],
+  );
 
   const handleFullScreenToggle = async () => {
     try {
@@ -84,6 +87,11 @@ export function ResumeBuilder({
 
   return (
     <>
+      <TourWelcomePrompt
+        pageId="resume-builder"
+        steps={resumeBuilderTourSteps}
+        className="absolute top-2 left-2 right-2 z-30 mx-2 lg:mx-4"
+      />
       <div className="flex flex-col lg:flex-row h-screen overflow-hidden bg-background relative">
         {/* Mobile View Toggle */}
         <MobileViewToggle
