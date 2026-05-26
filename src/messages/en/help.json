@@ -4,6 +4,30 @@
   "searchPlaceholder": "Search help articles...",
   "noResults": "No articles found matching your search",
   "noResultsHint": "Try different keywords or browse the categories below",
+  "quickActions": {
+    "quickStart": "Quick Start",
+    "quickStartDesc": "Get started in 5 minutes",
+    "featuresGuide": "Features Guide",
+    "featuresGuideDesc": "Explore all tools & features",
+    "accountSecurity": "Account & Security",
+    "accountSecurityDesc": "Manage your settings",
+    "interactiveTours": "Interactive Tours",
+    "interactiveToursDesc": "Step-by-step product walkthroughs",
+    "clearSearch": "Clear Search",
+    "goTo": "Go to {label}",
+    "watchTour": "Watch interactive tour"
+  },
+  "tutorials": {
+    "title": "Interactive Tours",
+    "desc": "Step-by-step walkthroughs of Civify features",
+    "resumeBuilder": "Resume Builder Tour",
+    "resumeBuilderBody": "A guided walkthrough of the Resume Builder: templates, live preview, design controls, masking, and export. Best for first-time users who want to see every feature in context.",
+    "tailorResume": "Tailor Resume Tour",
+    "tailorResumeBody": "Full tailoring flow walkthrough — upload, review parsed data, match to a job description, and export. This tour will be available soon.",
+    "tryTour": "Try the tour",
+    "comingSoon": "Coming soon",
+    "loadError": "Tour is still loading. Please try again in a moment."
+  },
   "gettingStarted": {
     "title": "Getting Started",
     "desc": "Learn the basics of uploading and tailoring your CV",

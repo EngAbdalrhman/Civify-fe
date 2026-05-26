@@ -14,6 +14,7 @@ import extension from "./extension.json";
 import footer from "./footer.json";
 import help from "./help.json";
 import landing from "./landing.json";
+import listingBadges from "./listing-badges.json";
 import metadata from "./metadata.json";
 import nav from "./nav.json";
 import notFound from "./notFound.json";
@@ -48,6 +49,7 @@ export default {
   footer,
   help,
   landing,
+  listingBadges,
   metadata,
   nav,
   notFound,

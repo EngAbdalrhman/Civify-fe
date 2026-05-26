@@ -46,6 +46,14 @@
     "twitterTitle": "Contact Us - Civify",
     "twitterDescription": "Get in touch with the Civify team. We're here to help."
   },
+  "listingBadges": {
+    "title": "Listing Badges - Civify",
+    "description": "Official Product Hunt and Kick Product embed badges for Civify. Copy HTML snippets for your website.",
+    "ogTitle": "Listing Badges - Civify",
+    "ogDescription": "Official directory listing badges for Civify.",
+    "twitterTitle": "Listing Badges - Civify",
+    "twitterDescription": "Official directory listing badges for Civify."
+  },
   "api-docs": {
     "title": "API Documentation - Civify",
     "description": "Explore Civify's API documentation. Integrate our powerful resume parsing and generation capabilities into your applications.",

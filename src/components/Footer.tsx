@@ -95,6 +95,14 @@ export function Footer() {
               </li>
               <li>
                 <Link
+                  href="/listing-badges"
+                  className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
+                >
+                  {t("company.listingBadges")}
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/policy"
                   className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
                 >

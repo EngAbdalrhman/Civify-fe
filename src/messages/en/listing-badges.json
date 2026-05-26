@@ -1,0 +1,10 @@
+{
+  "title": "Listing Badges",
+  "subtitle": "Official embed badges for directories where Civify is listed. Preview each badge and copy the HTML for your website or footer.",
+  "copyEmbed": "Copy embed code",
+  "copied": "Copied",
+  "copySuccess": "Embed code copied to clipboard",
+  "copyError": "Could not copy to clipboard",
+  "openListing": "Open listing",
+  "hint": "Paste the embed HTML on your site to show where Civify is featured. If a directory provides an updated badge, update src/config/listing-badges.ts."
+}

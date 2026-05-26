@@ -46,6 +46,14 @@
     "twitterTitle": "اتصل بنا - Civify",
     "twitterDescription": "تواصل مع فريق Civify. نحن هنا للمساعدة."
   },
+  "listingBadges": {
+    "title": "شارات القوائم - Civify",
+    "description": "شارات التضمين الرسمية من Product Hunt و Kick Product لـ Civify. انسخ أكواد HTML لموقعك.",
+    "ogTitle": "شارات القوائم - Civify",
+    "ogDescription": "شارات القوائم الرسمية لـ Civify.",
+    "twitterTitle": "شارات القوائم - Civify",
+    "twitterDescription": "شارات القوائم الرسمية لـ Civify."
+  },
   "api-docs": {
     "title": "وثائق API - Civify",
     "description": "استكشف وثائق API الخاصة بـ Civify. ادمج قدراتنا القوية في تحليل وإنشاء السير الذاتية في تطبيقاتك.",

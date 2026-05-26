@@ -13,9 +13,9 @@ import {
   Shield,
   Search,
   Sparkles,
-  ChevronRight,
   ArrowRight,
   SearchX,
+  PlayCircle,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -26,6 +26,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { SupademoScript, useSupademo } from "@/features/supademo";
+import {
+  SUPADEMO_RESUME_BUILDER_ID,
+  SUPADEMO_TAILOR_ID,
+  isSupademoTailorTourAvailable,
+} from "@/features/supademo/config";
 
 interface HelpArticle {
   id: string;
@@ -33,6 +39,8 @@ interface HelpArticle {
   bodyKey: string;
   keywordsKey?: string;
   href: string;
+  tourDemoId?: string;
+  tourDisabled?: boolean;
 }
 
 interface HelpSection {
@@ -48,10 +56,38 @@ interface HelpSection {
 
 export default function HelpPage() {
   const t = useTranslations("help");
+  const { openDemo } = useSupademo();
   const [searchQuery, setSearchQuery] = useState("");
   const sectionsRef = useRef<Record<string, HTMLDivElement | null>>({});
+  const tailorTourAvailable = isSupademoTailorTourAvailable();
 
   const helpSections: HelpSection[] = [
+    {
+      id: "tutorials",
+      icon: PlayCircle,
+      titleKey: "tutorials.title",
+      descKey: "tutorials.desc",
+      color: "from-violet-500 to-purple-500",
+      bgColor: "bg-violet-500/10",
+      iconColor: "text-violet-500",
+      articles: [
+        {
+          id: "resumeBuilderTour",
+          labelKey: "tutorials.resumeBuilder",
+          bodyKey: "tutorials.resumeBuilderBody",
+          href: "#",
+          tourDemoId: SUPADEMO_RESUME_BUILDER_ID,
+        },
+        {
+          id: "tailorResumeTour",
+          labelKey: "tutorials.tailorResume",
+          bodyKey: "tutorials.tailorResumeBody",
+          href: "#",
+          tourDemoId: tailorTourAvailable ? SUPADEMO_TAILOR_ID : undefined,
+          tourDisabled: !tailorTourAvailable,
+        },
+      ],
+    },
     {
       id: "gettingStarted",
       icon: FileText,
@@ -67,6 +103,7 @@ export default function HelpPage() {
           bodyKey: "gettingStarted.createFirstCvBody",
           keywordsKey: "gettingStarted.createFirstCvKeywords",
           href: "/app/resume-builder",
+          tourDemoId: SUPADEMO_RESUME_BUILDER_ID,
         },
         {
           id: "tailorFirstCv",
@@ -74,6 +111,8 @@ export default function HelpPage() {
           bodyKey: "gettingStarted.tailorFirstCvBody",
           keywordsKey: "gettingStarted.tailorFirstCvKeywords",
           href: "/app/upload",
+          tourDemoId: tailorTourAvailable ? SUPADEMO_TAILOR_ID : undefined,
+          tourDisabled: !tailorTourAvailable,
         },
         {
           id: "howTailoringWorks",
@@ -126,6 +165,7 @@ export default function HelpPage() {
           bodyKey: "features.resumeBuilderBody",
           keywordsKey: "features.resumeBuilderKeywords",
           href: "/app/resume-builder",
+          tourDemoId: SUPADEMO_RESUME_BUILDER_ID,
         },
         {
           id: "chromeExtension",
@@ -209,7 +249,6 @@ export default function HelpPage() {
     },
   ];
 
-  // Filter sections and articles based on search query
   const filteredSections = useMemo(() => {
     if (!searchQuery.trim()) return helpSections;
 
@@ -246,10 +285,41 @@ export default function HelpPage() {
     }
   };
 
+  const renderTourActions = (article: HelpArticle) => {
+    if (!article.tourDemoId && !article.tourDisabled) return null;
+
+    if (article.tourDisabled) {
+      return (
+        <Button type="button" variant="outline" size="sm" disabled>
+          <PlayCircle className="h-3.5 w-3.5 ltr:mr-1.5 rtl:ml-1.5" />
+          {t("tutorials.comingSoon")}
+        </Button>
+      );
+    }
+
+    if (article.tourDemoId) {
+      return (
+        <Button
+          type="button"
+          variant="default"
+          size="sm"
+          onClick={() => openDemo(article.tourDemoId!)}
+        >
+          <PlayCircle className="h-3.5 w-3.5 ltr:mr-1.5 rtl:ml-1.5" />
+          {t("tutorials.tryTour")}
+        </Button>
+      );
+    }
+
+    return null;
+  };
+
   const hasResults = filteredSections.length > 0;
 
   return (
     <div className="space-y-10">
+      <SupademoScript />
+
       {/* Hero Header */}
       <div className="text-center py-8 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 -z-10" />
@@ -261,7 +331,6 @@ export default function HelpPage() {
           {t("subtitle")}
         </p>
 
-        {/* Search Bar */}
         <div className="max-w-md mx-auto mt-8 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground rtl:left-auto rtl:right-3" />
           <Input
@@ -272,6 +341,7 @@ export default function HelpPage() {
           />
           {searchQuery && (
             <button
+              type="button"
               onClick={() => setSearchQuery("")}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors rtl:right-auto rtl:left-3"
             >
@@ -281,9 +351,24 @@ export default function HelpPage() {
         </div>
       </div>
 
-      {/* Quick Actions — hide when searching */}
       {!searchQuery && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card
+            className="border-2 hover:border-primary/50 transition-all group cursor-pointer"
+            onClick={() => scrollToSection("tutorials")}
+          >
+            <CardContent className="pt-6 text-center">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-violet-500/10 mb-3 group-hover:scale-110 transition-transform">
+                <PlayCircle className="h-6 w-6 text-violet-500" />
+              </div>
+              <h3 className="font-semibold mb-1">
+                {t("quickActions.interactiveTours")}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {t("quickActions.interactiveToursDesc")}
+              </p>
+            </CardContent>
+          </Card>
           <Card
             className="border-2 hover:border-primary/50 transition-all group cursor-pointer"
             onClick={() => scrollToSection("gettingStarted")}
@@ -292,9 +377,11 @@ export default function HelpPage() {
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/10 mb-3 group-hover:scale-110 transition-transform">
                 <Zap className="h-6 w-6 text-amber-500" />
               </div>
-              <h3 className="font-semibold mb-1">Quick Start</h3>
+              <h3 className="font-semibold mb-1">
+                {t("quickActions.quickStart")}
+              </h3>
               <p className="text-sm text-muted-foreground">
-                Get started in 5 minutes
+                {t("quickActions.quickStartDesc")}
               </p>
             </CardContent>
           </Card>
@@ -306,9 +393,11 @@ export default function HelpPage() {
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-500/10 mb-3 group-hover:scale-110 transition-transform">
                 <Sparkles className="h-6 w-6 text-green-500" />
               </div>
-              <h3 className="font-semibold mb-1">Features Guide</h3>
+              <h3 className="font-semibold mb-1">
+                {t("quickActions.featuresGuide")}
+              </h3>
               <p className="text-sm text-muted-foreground">
-                Explore all tools & features
+                {t("quickActions.featuresGuideDesc")}
               </p>
             </CardContent>
           </Card>
@@ -320,16 +409,17 @@ export default function HelpPage() {
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/10 mb-3 group-hover:scale-110 transition-transform">
                 <Shield className="h-6 w-6 text-blue-500" />
               </div>
-              <h3 className="font-semibold mb-1">Account & Security</h3>
+              <h3 className="font-semibold mb-1">
+                {t("quickActions.accountSecurity")}
+              </h3>
               <p className="text-sm text-muted-foreground">
-                Manage your settings
+                {t("quickActions.accountSecurityDesc")}
               </p>
             </CardContent>
           </Card>
         </div>
       )}
 
-      {/* No Results */}
       {!hasResults && searchQuery && (
         <div className="text-center py-16">
           <SearchX className="h-16 w-16 mx-auto text-muted-foreground/40 mb-4" />
@@ -340,12 +430,11 @@ export default function HelpPage() {
             className="mt-4"
             onClick={() => setSearchQuery("")}
           >
-            Clear Search
+            {t("quickActions.clearSearch")}
           </Button>
         </div>
       )}
 
-      {/* Help Sections Grid */}
       <div className="grid md:grid-cols-2 gap-6">
         {filteredSections.map((section) => (
           <Card
@@ -384,15 +473,45 @@ export default function HelpPage() {
                         <p className="text-sm text-muted-foreground leading-relaxed">
                           {t(article.bodyKey)}
                         </p>
-                        {article.href !== "#" && (
-                          <Link
-                            href={article.href}
-                            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-                          >
-                            Go to {t(article.labelKey)}
-                            <ArrowRight className="h-3.5 w-3.5" />
-                          </Link>
-                        )}
+                        <div className="flex flex-wrap gap-2">
+                          {article.href === "#" && renderTourActions(article)}
+                          {article.href !== "#" && (
+                            <Link
+                              href={article.href}
+                              className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+                            >
+                              {t("quickActions.goTo", {
+                                label: t(article.labelKey),
+                              })}
+                              <ArrowRight className="h-3.5 w-3.5" />
+                            </Link>
+                          )}
+                          {article.href !== "#" &&
+                            article.tourDemoId &&
+                            !article.tourDisabled && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => openDemo(article.tourDemoId!)}
+                              >
+                                <PlayCircle className="h-3.5 w-3.5 ltr:mr-1.5 rtl:ml-1.5" />
+                                {t("quickActions.watchTour")}
+                              </Button>
+                            )}
+                          {article.href !== "#" &&
+                            article.tourDisabled && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                disabled
+                              >
+                                <PlayCircle className="h-3.5 w-3.5 ltr:mr-1.5 rtl:ml-1.5" />
+                                {t("tutorials.comingSoon")}
+                              </Button>
+                            )}
+                        </div>
                       </div>
                     </AccordionContent>
                   </AccordionItem>
@@ -403,7 +522,6 @@ export default function HelpPage() {
         ))}
       </div>
 
-      {/* Contact Section */}
       <Card className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border-primary/20 overflow-hidden">
         <CardContent className="py-10">
           <div className="text-center space-y-6">
