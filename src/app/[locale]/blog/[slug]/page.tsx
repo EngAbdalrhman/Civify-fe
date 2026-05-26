@@ -7,6 +7,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, Clock, Calendar, User } from "lucide-react";
 import Image from "next/image";
 import sanitizeHtml from "sanitize-html";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
@@ -93,10 +94,7 @@ export default async function BlogPostPage({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       <div className="container mx-auto max-w-4xl py-12 md:py-16 space-y-8">
         <Link
           href={`/${locale}/blog`}
@@ -158,7 +156,8 @@ export default async function BlogPostPage({
           {/* The prose classes are from @tailwindcss/typography. 
               We assume the content might be HTML provided from the admin dashboard.
               If it doesn't have Tailwind Typography plugin installed, standard classes can be used. */}
-          <div 
+          <div
+            translate="no"
             className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-primary"
             dangerouslySetInnerHTML={{ 
               __html: sanitizeHtml(post.content, {

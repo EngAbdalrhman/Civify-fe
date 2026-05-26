@@ -80,6 +80,10 @@ export function useTourWelcomePrompt({
   }, [pageId]);
 
   const start = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
     setVisible(false);
     startTour(pageId, stepsRef.current);
   }, [pageId, startTour]);

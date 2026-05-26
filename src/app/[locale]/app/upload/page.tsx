@@ -657,7 +657,7 @@ export default function UploadPage() {
           variant="outline" 
           size="sm" 
           onClick={handleStartTour} 
-          className="text-muted-foreground hover:text-foreground hidden sm:flex shrink-0"
+          className="text-muted-foreground hover:text-foreground flex shrink-0"
         >
           <HelpCircle className="w-4 h-4 ltr:mr-2 rtl:ml-2" />
           {tTour("common.help") || "Tour"}

@@ -14,6 +14,7 @@ import {getTranslations, setRequestLocale} from "next-intl/server";
 import {routing} from "@/i18n/routing";
 import {notFound} from "next/navigation";
 import {Metadata} from "next";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 type Props = {
   params: { locale: string };
@@ -95,10 +96,7 @@ export default async function ExtensionPage({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-      />
+      <JsonLd data={faqJsonLd} />
       <ExtensionHeroSection />
       <ExtensionTutorialVideoSection />
       <ProblemSolutionSection />

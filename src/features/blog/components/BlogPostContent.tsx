@@ -94,6 +94,7 @@ export default function BlogPostContent({ post, locale }: BlogPostContentProps) 
 
           {/* Body */}
           <div
+            translate="no"
             className="prose prose-neutral max-w-none dark:prose-invert prose-headings:font-bold prose-a:text-primary prose-img:rounded-lg"
             // Content comes from our own backend — safe to render as HTML
             // eslint-disable-next-line react/no-danger
