@@ -1,4 +1,4 @@
-import ListingBadgesContent from "@/features/listing-badges/components/ListingBadgesContent";
+import ListedOnContent from "@/features/listed-on/components/ListedOnContent";
 import { getTranslations } from "next-intl/server";
 import { Metadata } from "next";
 
@@ -10,32 +10,32 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({
     locale,
-    namespace: "metadata.listingBadges",
+    namespace: "metadata.listedOn",
   });
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://civify.cv";
 
   return {
     title: t("title"),
     description: t("description"),
+    robots: {
+      index: false,
+      follow: false,
+    },
     openGraph: {
       title: t("ogTitle"),
       description: t("ogDescription"),
-      url: `${baseUrl}/${locale}/listing-badges`,
-    },
-    twitter: {
-      title: t("twitterTitle"),
-      description: t("twitterDescription"),
+      url: `${baseUrl}/${locale}/listed-on`,
     },
     alternates: {
-      canonical: `/${locale}/listing-badges`,
+      canonical: `/${locale}/listed-on`,
       languages: {
-        en: "/en/listing-badges",
-        ar: "/ar/listing-badges",
+        en: "/en/listed-on",
+        ar: "/ar/listed-on",
       },
     },
   };
 }
 
-export default function ListingBadgesPage() {
-  return <ListingBadgesContent />;
+export default function ListedOnPage() {
+  return <ListedOnContent />;
 }
