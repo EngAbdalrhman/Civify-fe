@@ -664,13 +664,11 @@ export default function UploadPage() {
         </Button>
       </div>
 
-      {currentStep === 1 && (
-        <TourWelcomePrompt
-          pageId="upload"
-          steps={uploadTourSteps}
-          enabled={currentStep === 1}
-        />
-      )}
+      <TourWelcomePrompt
+        pageId="upload"
+        steps={uploadTourSteps}
+        enabled={currentStep === 1}
+      />
 
       {/* Stepper */}
       <div data-tour="upload-stepper" className="flex items-center justify-center mb-8 overflow-x-auto pb-2">

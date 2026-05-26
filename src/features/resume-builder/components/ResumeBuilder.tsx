@@ -90,7 +90,6 @@ export function ResumeBuilder({
       <TourWelcomePrompt
         pageId="resume-builder"
         steps={resumeBuilderTourSteps}
-        className="absolute top-2 left-2 right-2 z-30 mx-2 lg:mx-4"
       />
       <div className="flex flex-col lg:flex-row h-screen overflow-hidden bg-background relative">
         {/* Mobile View Toggle */}

@@ -16,7 +16,7 @@ interface UseTourWelcomePromptOptions {
   pageId: string;
   steps: DriveStep[];
   enabled?: boolean;
-  /** Delay before showing the banner (ms) */
+  /** Delay before showing the modal (ms) */
   delay?: number;
 }
 
@@ -29,6 +29,7 @@ export function useTourWelcomePrompt({
   const { startTour, isTourCompleted, isReady } = useTour();
   const [visible, setVisible] = useState(false);
   const stepsRef = useRef(steps);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   stepsRef.current = steps;
 
   useEffect(() => {
@@ -43,24 +44,38 @@ export function useTourWelcomePrompt({
     if (isTourCompleted(pageId)) return;
 
     if (typeof window !== "undefined") {
-      if (sessionStorage.getItem(getPromptSkippedKey(pageId)) === "1") {
+      if (localStorage.getItem(getPromptSkippedKey(pageId)) === "1") {
         return;
       }
     }
 
-    const timer = setTimeout(() => {
+    timerRef.current = setTimeout(() => {
+      if (typeof window !== "undefined") {
+        if (localStorage.getItem(getPromptSkippedKey(pageId)) === "1") {
+          return;
+        }
+      }
       if (!isTourCompleted(pageId)) {
         setVisible(true);
       }
     }, delay);
 
-    return () => clearTimeout(timer);
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
   }, [pageId, enabled, delay, isReady, isTourCompleted]);
 
   const dismiss = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
     setVisible(false);
     if (typeof window !== "undefined") {
-      sessionStorage.setItem(getPromptSkippedKey(pageId), "1");
+      localStorage.setItem(getPromptSkippedKey(pageId), "1");
     }
   }, [pageId]);
 

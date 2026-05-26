@@ -2,9 +2,16 @@
 
 import type { DriveStep } from "driver.js";
 import { useTranslations } from "next-intl";
-import { Sparkles, X } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useTourWelcomePrompt } from "../hooks/useTourWelcomePrompt";
 
 interface TourWelcomePromptProps {
@@ -12,7 +19,6 @@ interface TourWelcomePromptProps {
   steps: DriveStep[];
   enabled?: boolean;
   delay?: number;
-  className?: string;
 }
 
 export function TourWelcomePrompt({
@@ -20,7 +26,6 @@ export function TourWelcomePrompt({
   steps,
   enabled = true,
   delay,
-  className,
 }: TourWelcomePromptProps) {
   const t = useTranslations("tour.common");
   const { visible, start, dismiss } = useTourWelcomePrompt({
@@ -30,51 +35,36 @@ export function TourWelcomePrompt({
     delay,
   });
 
-  if (!visible) return null;
+  const handleOpenChange = (open: boolean) => {
+    if (!open) dismiss();
+  };
 
   return (
-    <div
-      role="dialog"
-      aria-labelledby={`tour-prompt-title-${pageId}`}
-      className={cn(
-        "flex flex-col gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between",
-        className,
-      )}
-    >
-      <div className="flex gap-3 min-w-0">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
-          <Sparkles className="h-5 w-5 text-primary" aria-hidden />
-        </div>
-        <div className="min-w-0">
-          <p
-            id={`tour-prompt-title-${pageId}`}
-            className="font-medium text-foreground"
-          >
-            {t("promptTitle")}
-          </p>
-          <p className="text-sm text-muted-foreground mt-0.5">
+    <Dialog open={visible} onOpenChange={handleOpenChange}>
+      <DialogContent className="sm:max-w-md" showCloseButton>
+        <DialogHeader className="items-center text-center sm:items-center sm:text-center">
+          <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+            <Sparkles className="h-6 w-6 text-primary" aria-hidden />
+          </div>
+          <DialogTitle>{t("promptTitle")}</DialogTitle>
+          <DialogDescription className="text-center">
             {t("promptDescription")}
-          </p>
-        </div>
-      </div>
-      <div className="flex items-center gap-2 shrink-0">
-        <Button type="button" size="sm" onClick={start}>
-          {t("promptStart")}
-        </Button>
-        <Button type="button" size="sm" variant="ghost" onClick={dismiss}>
-          {t("promptDismiss")}
-        </Button>
-        <Button
-          type="button"
-          size="icon"
-          variant="ghost"
-          className="h-8 w-8 sm:hidden"
-          onClick={dismiss}
-          aria-label={t("promptDismiss")}
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
-    </div>
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex-col gap-2 sm:flex-col sm:space-x-0">
+          <Button type="button" className="w-full" onClick={start}>
+            {t("promptStart")}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full"
+            onClick={dismiss}
+          >
+            {t("promptDismiss")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
