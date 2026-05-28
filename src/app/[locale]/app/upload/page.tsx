@@ -76,11 +76,12 @@ import {
     getUploadStep3TourSteps,
     getUploadStep4TourSteps,
     getUploadTourSteps,
-    useTourAutoStart,
+    TourWelcomePrompt,
     useTour,
 } from "@/features/onboarding";
 import {ensureUniqueSectionItemIds} from "@/features/resume-builder/utils/normalizeResumeIds";
 import {usePreviewScale} from "@/features/resume-builder/hooks/usePreviewScale";
+import {RouteErrorBoundary} from "@/components/RouteErrorBoundary";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -91,6 +92,8 @@ export default function UploadPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cvPreviewRef = useRef<HTMLDivElement>(null);
   const previewContainerRef = useRef<HTMLDivElement>(null);
+  /** Prevents duplicate uploadCv calls (iOS Safari can fire change twice). */
+  const isUploadInFlightRef = useRef(false);
 
   // State
   const [currentStep, setCurrentStep] = useState(1);
@@ -129,39 +132,49 @@ export default function UploadPage() {
   // Tour
   const { startTour } = useTour();
 
+  const uploadTourSteps = useMemo(() => getUploadTourSteps(tTour), [tTour]);
+  const uploadStep2TourSteps = useMemo(
+    () => getUploadStep2TourSteps(tTour),
+    [tTour],
+  );
+  const uploadStep3TourSteps = useMemo(
+    () => getUploadStep3TourSteps(tTour),
+    [tTour],
+  );
+  const uploadStep4TourSteps = useMemo(
+    () =>
+      getUploadStep4TourSteps(tTour, {
+        hasCoverLetter: !!tailorResponse?.coverLetter,
+        hasInterviewPrep: !!tailorResponse?.interviewPrep?.questions?.length,
+        hasRoadmap: !!tailorResponse?.roadmap?.steps?.length,
+      }),
+    [
+      tTour,
+      tailorResponse?.coverLetter,
+      tailorResponse?.interviewPrep?.questions?.length,
+      tailorResponse?.roadmap?.steps?.length,
+    ],
+  );
+
   // Responsive preview scaling for Step 4 (matches Resume Builder)
   const { scale: previewScale, scaledHeight: previewScaledHeight } = usePreviewScale({
     containerRef: previewContainerRef,
     enabled: currentStep === 4,
   });
 
-  useTourAutoStart("upload", getUploadTourSteps(tTour), { enabled: currentStep === 1 });
-  useTourAutoStart("upload-step2", getUploadStep2TourSteps(tTour), {
-    enabled: currentStep === 2 && !!resumeData,
-  });
-  useTourAutoStart("upload-step3", getUploadStep3TourSteps(tTour), {
-    enabled: currentStep === 3,
-  });
-  useTourAutoStart(
-    "upload-step4",
-    getUploadStep4TourSteps(tTour, {
-      hasCoverLetter: !!tailorResponse?.coverLetter,
-      hasInterviewPrep: !!tailorResponse?.interviewPrep?.questions?.length,
-      hasRoadmap: !!tailorResponse?.roadmap?.steps?.length,
-    }),
-    { enabled: currentStep === 4 && !!tailorResponse },
-  );
-
   const handleStartTour = useCallback(() => {
-    if (currentStep === 1) startTour("upload", getUploadTourSteps(tTour));
-    else if (currentStep === 2) startTour("upload-step2", getUploadStep2TourSteps(tTour));
-    else if (currentStep === 3) startTour("upload-step3", getUploadStep3TourSteps(tTour));
-    else if (currentStep === 4) startTour("upload-step4", getUploadStep4TourSteps(tTour, {
-      hasCoverLetter: !!tailorResponse?.coverLetter,
-      hasInterviewPrep: !!tailorResponse?.interviewPrep?.questions?.length,
-      hasRoadmap: !!tailorResponse?.roadmap?.steps?.length,
-    }));
-  }, [currentStep, startTour, tTour, tailorResponse]);
+    if (currentStep === 1) startTour("upload", uploadTourSteps);
+    else if (currentStep === 2) startTour("upload-step2", uploadStep2TourSteps);
+    else if (currentStep === 3) startTour("upload-step3", uploadStep3TourSteps);
+    else if (currentStep === 4) startTour("upload-step4", uploadStep4TourSteps);
+  }, [
+    currentStep,
+    startTour,
+    uploadTourSteps,
+    uploadStep2TourSteps,
+    uploadStep3TourSteps,
+    uploadStep4TourSteps,
+  ]);
 
   // Handlers
   const handleUploadClick = useCallback(() => {
@@ -173,10 +186,9 @@ export default function UploadPage() {
     fileInputRef.current?.click();
   }, []);
 
-  const handleFileSelect = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (!file) return;
+  const processUploadFile = useCallback(
+    (file: File) => {
+      if (isUploadInFlightRef.current || isUploading) return;
 
       const validTypes = [
         "application/pdf",
@@ -192,6 +204,7 @@ export default function UploadPage() {
         return;
       }
 
+      isUploadInFlightRef.current = true;
       uploadCv(file, {
         onSuccess: (data) => {
           if (data.resumeData) {
@@ -201,17 +214,33 @@ export default function UploadPage() {
             toast.error(t("errors.parseFailed"));
           }
         },
-        onError: (error: any) => {
+        onError: (error: unknown) => {
+          const err = error as { errorCode?: string; message?: string };
           if (
-            error?.errorCode === "TOKEN_LIMIT_EXCEEDED" ||
-            error?.message === "TOKEN_LIMIT_EXCEEDED"
+            err?.errorCode === "TOKEN_LIMIT_EXCEEDED" ||
+            err?.message === "TOKEN_LIMIT_EXCEEDED"
           ) {
             setShowTokenLimitModal(true);
           }
         },
+        onSettled: () => {
+          isUploadInFlightRef.current = false;
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
+        },
       });
     },
-    [uploadCv, router, t],
+    [uploadCv, isUploading, t],
+  );
+
+  const handleFileSelect = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      processUploadFile(file);
+    },
+    [processUploadFile],
   );
 
   // Drag and drop handlers
@@ -248,40 +277,9 @@ export default function UploadPage() {
         return;
       }
 
-      const validTypes = [
-        "application/pdf",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      ];
-      if (!validTypes.includes(file.type)) {
-        toast.error(t("errors.invalidFileType"));
-        return;
-      }
-
-      if (file.size > MAX_FILE_SIZE) {
-        toast.error(t("errors.FILE_TOO_LARGE"));
-        return;
-      }
-
-      uploadCv(file, {
-        onSuccess: (data) => {
-          if (data.resumeData) {
-            setResumeData(data.resumeData);
-            setCurrentStep(2);
-          } else {
-            toast.error(t("errors.parseFailed"));
-          }
-        },
-        onError: (error: any) => {
-          if (
-            error?.errorCode === "TOKEN_LIMIT_EXCEEDED" ||
-            error?.message === "TOKEN_LIMIT_EXCEEDED"
-          ) {
-            setShowTokenLimitModal(true);
-          }
-        },
-      });
+      processUploadFile(file);
     },
-    [uploadCv, router, t],
+    [processUploadFile],
   );
 
   const handleManualEntry = useCallback(() => {
@@ -647,6 +645,7 @@ export default function UploadPage() {
   };
 
   return (
+    <RouteErrorBoundary routeName="Upload">
     <div className="max-w-7xl mx-auto space-y-6 pb-12">
       {/* Header */}
       <div data-tour="upload-header" className="flex items-start justify-between gap-4">
@@ -658,12 +657,18 @@ export default function UploadPage() {
           variant="outline" 
           size="sm" 
           onClick={handleStartTour} 
-          className="text-muted-foreground hover:text-foreground hidden sm:flex shrink-0"
+          className="text-muted-foreground hover:text-foreground flex shrink-0"
         >
           <HelpCircle className="w-4 h-4 ltr:mr-2 rtl:ml-2" />
           {tTour("common.help") || "Tour"}
         </Button>
       </div>
+
+      <TourWelcomePrompt
+        pageId="upload"
+        steps={uploadTourSteps}
+        enabled={currentStep === 1}
+      />
 
       {/* Stepper */}
       <div data-tour="upload-stepper" className="flex items-center justify-center mb-8 overflow-x-auto pb-2">
@@ -1747,5 +1752,6 @@ export default function UploadPage() {
         returnTo="/app/upload"
       />
     </div>
+    </RouteErrorBoundary>
   );
 }

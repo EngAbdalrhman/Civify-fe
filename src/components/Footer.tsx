@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { newsletterService } from "@/services/newsletter.service";
 import { toast } from "sonner";
 
@@ -15,6 +15,11 @@ export function Footer() {
   const tSubscription = useTranslations("subscription.policy");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [copyrightYear, setCopyrightYear] = useState<number | null>(null);
+
+  useEffect(() => {
+    setCopyrightYear(new Date().getFullYear());
+  }, []);
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -252,8 +257,10 @@ export function Footer() {
               height={32}
               className="object-contain"
             />
-            <span className="text-sm text-gray-600">
-              {t("copyright", { year: new Date().getFullYear() })}
+            <span className="text-sm text-gray-600" suppressHydrationWarning>
+              {copyrightYear !== null
+                ? t("copyright", { year: copyrightYear })
+                : t("copyright", { year: "" })}
             </span>
           </div>
         </div>

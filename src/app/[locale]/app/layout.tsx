@@ -64,7 +64,7 @@ export default function UserDashboardLayout({
     <OnboardingProvider>
       <NotificationStreamProvider>
       <TourProvider>
-        <div className="flex min-h-screen bg-background">
+        <div className="flex min-h-screen bg-background" translate="no">
         <AppSidebar
           isMobileOpen={isMobileOpen}
           setIsMobileOpen={setIsMobileOpen}

@@ -4,7 +4,11 @@
     "nextStep": "التالي",
     "prevStep": "السابق",
     "doneButton": "إنهاء",
-    "help": "جولة إرشادية"
+    "help": "جولة إرشادية",
+    "promptTitle": "جديد على Civify؟",
+    "promptDescription": "خذ جولة سريعة لتتعلم كيفية استخدام هذه الصفحة. يمكنك إعادة الجولة في أي وقت من زر الجولة الإرشادية.",
+    "promptStart": "بدء الجولة",
+    "promptDismiss": "ليس الآن"
   },
   "upload": {
     "step1": {

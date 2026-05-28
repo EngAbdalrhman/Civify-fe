@@ -12,6 +12,21 @@ import { getAccessToken } from "@/utils/cookies";
 
 const TOUR_COMPLETED_KEY = "civify_tour_completed";
 
+function cleanupTourDomArtifacts() {
+  if (typeof document === "undefined") return;
+
+  document.querySelectorAll("[data-tour]").forEach((el) => {
+    const node = el as HTMLElement;
+    node.style.removeProperty("position");
+    node.style.removeProperty("z-index");
+    node.classList.remove("driver-active-element");
+  });
+
+  document.querySelectorAll(".overflow-hidden").forEach((el) => {
+    el.scrollTop = 0;
+  });
+}
+
 interface TourContextValue {
   completedTours: Record<string, boolean>;
   startTour: (pageId: string, steps: DriveStep[]) => void;
@@ -28,8 +43,7 @@ export function TourProvider({ children }: { children: ReactNode }) {
   const [completedTours, setCompletedTours] = useState<Record<string, boolean>>({});
   const [isClient, setIsClient] = useState(false);
   const [isReady, setIsReady] = useState(false);
-  
-  // We can use the common translations for next/prev/done buttons
+
   const t = useTranslations("tour.common");
 
   const { data: userProfile } = useUserProfile();
@@ -46,10 +60,8 @@ export function TourProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Sync with backend / local storage
   useEffect(() => {
     if (!userProfile) {
-      // If no access token, mark ready immediately (guest user)
       if (typeof window !== "undefined" && !getAccessToken()) {
         setIsReady(true);
       }
@@ -58,14 +70,13 @@ export function TourProvider({ children }: { children: ReactNode }) {
     try {
       if (userProfile.completedTours) {
         setCompletedTours(JSON.parse(userProfile.completedTours));
-        // Backend is source-of-truth; clear local storage
         localStorage.removeItem(TOUR_COMPLETED_KEY);
       } else {
         const stored = localStorage.getItem(TOUR_COMPLETED_KEY);
         if (stored) {
           setCompletedTours(JSON.parse(stored));
-          // Migrate to backend
-          apiClient.put("/v1/users/me/onboarding-status", { completedTours: stored })
+          apiClient
+            .put("/v1/users/me/onboarding-status", { completedTours: stored })
             .then(() => localStorage.removeItem(TOUR_COMPLETED_KEY))
             .catch(() => null);
         }
@@ -87,111 +98,108 @@ export function TourProvider({ children }: { children: ReactNode }) {
         console.error("Failed to sync tour status to backend", e);
       }
     } else if (typeof window !== "undefined") {
-      // Only use localStorage for guests (not authenticated)
       localStorage.setItem(TOUR_COMPLETED_KEY, JSON.stringify(newTours));
     }
   }, []);
 
-  const completeTour = useCallback((pageId: string) => {
-    setCompletedTours(prev => {
-      const updated = { ...prev, [pageId]: true };
-      saveTours(updated);
-      return updated;
-    });
-  }, [saveTours]);
+  const completeTour = useCallback(
+    (pageId: string) => {
+      setCompletedTours((prev) => {
+        const updated = { ...prev, [pageId]: true };
+        saveTours(updated);
+        return updated;
+      });
+    },
+    [saveTours],
+  );
 
-  const startTour = useCallback((pageId: string, steps: DriveStep[]) => {
-    if (!isClient) return;
+  const startTour = useCallback(
+    (pageId: string, steps: DriveStep[]) => {
+      if (!isClient) return;
 
-    // Disabled on mobile view
-    // if (typeof window !== 'undefined' && window.innerWidth < 768) {
-    //   return;
-    // }
+      const nextText = t("nextStep") || "Next";
+      const prevText = t("prevStep") || "Back";
+      const doneText = t("doneButton") || "Done";
 
-    // Use translation keys with fallback
-    const nextText = t("nextStep") || "Next";
-    const prevText = t("prevStep") || "Back";
-    const doneText = t("doneButton") || "Done";
+      let didFinish = false;
+      const finishOnce = () => {
+        if (didFinish) return;
+        didFinish = true;
+        cleanupTourDomArtifacts();
+        if (typeof window !== "undefined") {
+          window.scrollTo(0, 0);
+        }
+        completeTour(pageId);
+      };
 
-    const originalScrollIntoView = window.HTMLElement.prototype.scrollIntoView;
-    window.HTMLElement.prototype.scrollIntoView = function() {};
-
-    const tourDriver = driver({
-      showProgress: true,
-      allowClose: true,
-      smoothScroll: false,
-      popoverClass: "civify-tour",
-      steps: steps.map(step => ({
+      const tourDriver = driver({
+        showProgress: true,
+        allowClose: true,
+        smoothScroll: false,
+        popoverClass: "civify-tour",
+        steps: steps.map((step) => ({
           ...step,
           popover: {
-              ...step.popover,
-              showButtons: ['next', 'previous', 'close'],
+            ...step.popover,
+            showButtons: ["next", "previous", "close"],
+          },
+        })),
+        nextBtnText: nextText,
+        prevBtnText: prevText,
+        doneBtnText: doneText,
+        progressText: "{{current}} / {{total}}",
+        onHighlighted: (element?: Element) => {
+          if (element) {
+            (element as HTMLElement).style.removeProperty("position");
+            (element as HTMLElement).style.removeProperty("z-index");
           }
-      })),
-      nextBtnText: nextText,
-      prevBtnText: prevText,
-      doneBtnText: doneText,
-      progressText: '{{current}} / {{total}}',
-      onHighlighted: (element?: Element) => {
-        if (element) {
-          (element as HTMLElement).style.removeProperty('position');
-          (element as HTMLElement).style.removeProperty('z-index');
-        }
-        
-        // Failsafe: force scroll top back to 0 on main layout containers
-        document.querySelectorAll('.overflow-hidden').forEach(el => {
-          el.scrollTop = 0;
-        });
-      },
-      onDeselected: (element?: Element) => {
-        if (element) {
-          (element as HTMLElement).style.removeProperty('position');
-          (element as HTMLElement).style.removeProperty('z-index');
-        }
-      },
-      onDestroyed: () => {
-        completeTour(pageId);
-        
-        // Restore scrollIntoView
-        window.HTMLElement.prototype.scrollIntoView = originalScrollIntoView;
-        
-        document.querySelectorAll('[data-tour]').forEach(el => {
-          (el as HTMLElement).style.removeProperty('position');
-          (el as HTMLElement).style.removeProperty('z-index');
-          (el as HTMLElement).classList.remove('driver-active-element');
-        });
-        
-        document.querySelectorAll('.overflow-hidden').forEach(el => {
-          el.scrollTop = 0;
-        });
-        window.scrollTo(0, 0);
-      },
-    });
+        },
+        onDeselected: (element?: Element) => {
+          if (element) {
+            (element as HTMLElement).style.removeProperty("position");
+            (element as HTMLElement).style.removeProperty("z-index");
+          }
+        },
+        onDestroyed: finishOnce,
+      });
 
-    // Wrapped in try catch to handle cases where elements might not be available
-    try {
+      try {
         tourDriver.drive();
-    } catch (e) {
+      } catch (e) {
         console.warn("Could not start driver.js tour (element not found?):", e);
-    }
-  }, [isClient, completeTour, t]);
+        try {
+          tourDriver.destroy();
+        } catch {
+          /* already torn down */
+        }
+        finishOnce();
+      }
+    },
+    [isClient, completeTour, t],
+  );
 
-  const resetTour = useCallback((pageId: string) => {
-    setCompletedTours(prev => {
-      const updated = { ...prev };
-      delete updated[pageId];
-      saveTours(updated);
-      return updated;
-    });
-  }, [saveTours]);
+  const resetTour = useCallback(
+    (pageId: string) => {
+      setCompletedTours((prev) => {
+        const updated = { ...prev };
+        delete updated[pageId];
+        saveTours(updated);
+        return updated;
+      });
+    },
+    [saveTours],
+  );
 
   const resetAllTours = useCallback(() => {
     saveTours({});
   }, [saveTours]);
 
-  const isTourCompleted = useCallback((pageId: string) => {
-    return !!completedTours[pageId];
-  }, [completedTours]);
+  const isTourCompleted = useCallback(
+    (pageId: string) => {
+      return !!completedTours[pageId];
+    },
+    [completedTours],
+  );
 
   return (
     <TourContext.Provider

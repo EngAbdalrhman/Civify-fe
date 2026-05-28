@@ -15,15 +15,20 @@ import LayoutWrapper from "@/components/LayoutWrapper";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import "../globals.css";
 import ServiceWorkerRegister from "@/components/pwa/ServiceWorkerRegister";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
+  preload: true,
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
+  preload: false,
 });
 
 type Props = {
@@ -209,13 +214,7 @@ export default async function LocaleLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        {jsonLd.map((item, index) => (
-          <script
-            key={index}
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
-          />
-        ))}
+        <JsonLd data={jsonLd} />
         <ServiceWorkerRegister />
         <ThemeProvider>
           <QueryProvider>
