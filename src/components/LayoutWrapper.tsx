@@ -20,7 +20,7 @@ export default function LayoutWrapper({
   return (
     <div className={`flex flex-col min-h-screen w-full ${overflowClass}`}>
       {!isDashboard && <Navbar />}
-      <main className="flex-1" translate={isDashboard ? undefined : "no"}>
+      <main className="flex-1" {...(!isDashboard ? { translate: "no" } : {})}>
         {children}
       </main>
       <Toaster />
