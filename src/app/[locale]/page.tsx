@@ -1,23 +1,18 @@
 import {
-  HeroSection,
-  HowItWorksSection,
-  FeaturesSection,
-  BeforeAfterSection,
-  // TemplatesSection,
-  RolePersonalizationSection,
-  // TestimonialsSection,
-  PricingSection,
-  FAQSection,
-  // IntegrationsSection,
-  BlogPreviewSection,
-  CTASection,
-  ResumeBuilderSection,
+    BlogPreviewSection,
+    CTASection,
+    FAQSection,
+    FeaturesSection,
+    HeroSection,
+    HowItWorksSection,
+    PricingSection,
+    ResumeBuilderSection,
 } from "@/features/home-page/components";
-import { getTranslations, setRequestLocale } from "next-intl/server";
-import { routing } from "@/i18n/routing";
-import { notFound } from "next/navigation";
-import { Metadata } from "next";
-import { JsonLd } from "@/components/seo/JsonLd";
+import {getTranslations, setRequestLocale} from "next-intl/server";
+import {routing} from "@/i18n/routing";
+import {notFound} from "next/navigation";
+import {Metadata} from "next";
+import {JsonLd} from "@/components/seo/JsonLd";
 
 type Props = {
   params: { locale: string };
@@ -115,9 +110,9 @@ const Homepage = async ({
       <HowItWorksSection />
       <ResumeBuilderSection />
       <FeaturesSection />
-      <BeforeAfterSection />
+      {/*<BeforeAfterSection />*/}
       {/* <TemplatesSection /> */}
-      <RolePersonalizationSection />
+      {/*<RolePersonalizationSection />*/}
       {/* <TestimonialsSection /> */}
       <PricingSection />
       <FAQSection />
