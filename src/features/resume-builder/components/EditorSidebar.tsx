@@ -3,7 +3,7 @@
 import {RefObject} from "react";
 import {Button} from "@/components/ui/button";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {Download, FileText, Languages, Loader2, Palette, RotateCcw, Save, Target, Upload, BarChart3} from "lucide-react";
+import {Download, FileText, Languages, Loader2, Palette, RotateCcw, Save, Target, Upload} from "lucide-react";
 import {useTranslations} from "next-intl";
 import {ResumeData} from "@/features/upload-cv/types";
 import {EditorPanel} from "./EditorPanel";
@@ -42,10 +42,6 @@ interface EditorSidebarProps {
     onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
     onUploadClick: () => void;
 
-    // ATS Score
-    isCalculatingScore: boolean;
-    onCalculateScore: () => void;
-
     // Guest mode
     isGuest?: boolean;
     onAuthGate?: () => void;
@@ -77,8 +73,6 @@ export function EditorSidebar({
     fileInputRef,
     onFileUpload,
     onUploadClick,
-    isCalculatingScore,
-    onCalculateScore,
     isGuest = false,
     onAuthGate,
     isTranslating,
@@ -129,19 +123,6 @@ export function EditorSidebar({
                             )}
                         </Button>
 
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={isGuest && onAuthGate ? onAuthGate : onCalculateScore}
-                            disabled={isCalculatingScore}
-                            title="ATS Score"
-                        >
-                            {isCalculatingScore ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                                <BarChart3 className="h-4 w-4" />
-                            )}
-                        </Button>
                         {canTranslate && (
                             <Button
                                 variant="ghost"

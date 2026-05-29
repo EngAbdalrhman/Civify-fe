@@ -20,7 +20,6 @@ import {
 } from "@/features/onboarding";
 import { SaveDialog } from "./SaveDialog";
 import { AuthGateDialog } from "./AuthGateDialog";
-import { AtsScoreDialog } from "./AtsScoreDialog";
 
 import {
   AlertDialog,
@@ -119,8 +118,6 @@ export function ResumeBuilder({
           fileInputRef={upload.fileInputRef}
           onFileUpload={upload.handleFileUpload}
           onUploadClick={upload.triggerFileUpload}
-          isCalculatingScore={builder.isCalculatingScore}
-          onCalculateScore={builder.handleCalculateScore}
           isGuest={builder.isGuest}
           onAuthGate={builder.handleAuthGatedAction}
           isTranslating={translation.isTranslating}
@@ -195,28 +192,6 @@ export function ResumeBuilder({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      <AtsScoreDialog
-        open={builder.showScoreDialog}
-        onOpenChange={builder.setShowScoreDialog}
-        score={builder.atsScore}
-        isLoading={builder.isCalculatingScore}
-        onApplyAtsTemplate={() => {
-          builder.setResumeData({
-            ...builder.resumeData,
-            metadata: {
-              ...builder.resumeData.metadata,
-              templateId: "ats",
-              skillsDisplayStyle: "tags",
-              languagesDisplayStyle: "level",
-              fontFamily: "Arial",
-              bodyFontFamily: "Arial",
-              headingFontFamily: "Georgia",
-            },
-          });
-          builder.setShowScoreDialog(false);
-        }}
-      />
 
       {/* Translate Dialog */}
       <TranslateDialog

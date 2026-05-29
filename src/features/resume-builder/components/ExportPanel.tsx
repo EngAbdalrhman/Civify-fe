@@ -62,8 +62,6 @@ export function ExportPanel({
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [atsSafeExport, setAtsSafeExport] = useState(false);
-
   const canExportDocx = useHasPermission("CV.EXPORT.DOCX");
   const { data: activeSubscription } = useMyActiveSubscription();
   const { data: plans } = usePlans();
@@ -71,24 +69,7 @@ export function ExportPanel({
   const showWatermarkNote =
     isGuest || activePlan?.watermark === true;
 
-  const buildExportData = (): ResumeData => {
-    let payload = applyResumeMask(data, maskPII);
-    if (atsSafeExport) {
-      payload = {
-        ...payload,
-        metadata: {
-          ...payload.metadata,
-          templateId: "ats",
-          skillsDisplayStyle: "tags",
-          languagesDisplayStyle: "level",
-          fontFamily: "Arial",
-          bodyFontFamily: "Arial",
-          headingFontFamily: "Georgia",
-        },
-      };
-    }
-    return payload;
-  };
+  const exportData = applyResumeMask(data, maskPII);
 
   const getTranslations = () => {
     return data.metadata?.language === "ar" ? arTranslations : enTranslations;
@@ -111,13 +92,10 @@ export function ExportPanel({
 
     setIsExportingPdf(true);
     try {
-      const exportPayload = buildExportData();
-      const template = (
-        atsSafeExport ? "ats" : exportPayload.metadata?.templateId || "modern"
-      ) as TemplateType;
-      const color = exportPayload.metadata?.primaryColor || "#000000";
+      const template = (exportData.metadata?.templateId || "modern") as TemplateType;
+      const color = exportData.metadata?.primaryColor || "#000000";
 
-      await exportToPdfPuppeteer(exportPayload, {
+      await exportToPdfPuppeteer(exportData, {
         filename: getExportFilename(),
         template,
         color,
@@ -146,7 +124,7 @@ export function ExportPanel({
     setIsExportingDocx(true);
     try {
       const translations = getTranslations();
-      await exportToDocx(buildExportData(), getExportFilename(), translations);
+      await exportToDocx(exportData, getExportFilename(), translations);
     } catch (e) {
       console.error(e);
       toast.error(t("errors.docxFailed"));
@@ -220,23 +198,6 @@ export function ExportPanel({
       {/*    </Label>*/}
       {/*  </CardHeader>*/}
       {/*</Card>*/}
-
-      <div className="flex items-center justify-between gap-3 rounded-lg border bg-muted/20 px-3 py-2.5">
-        <div className="min-w-0 flex-1">
-          <Label htmlFor="ats-safe-export" className="text-sm font-medium">
-            ATS-safe export
-          </Label>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Single-column layout, text-only skills — best for Workday, Greenhouse, and similar ATS.
-          </p>
-        </div>
-        <Switch
-          id="ats-safe-export"
-          checked={atsSafeExport}
-          onCheckedChange={setAtsSafeExport}
-          className="shrink-0"
-        />
-      </div>
 
       <div className="grid gap-4">
         <Card

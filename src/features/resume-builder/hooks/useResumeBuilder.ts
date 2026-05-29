@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { ResumeData, AtsScore } from "@/features/upload-cv/types";
+import { ResumeData } from "@/features/upload-cv/types";
 import { ResumeService } from "@/services/resume.service";
 import { useGuestResumeStorage } from "./useGuestResumeStorage";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
@@ -41,12 +41,6 @@ interface UseResumeBuilderReturn {
   showAuthGate: boolean;
   setShowAuthGate: (show: boolean) => void;
 
-  // ATS Score
-  showScoreDialog: boolean;
-  setShowScoreDialog: (show: boolean) => void;
-  atsScore: AtsScore | null;
-  isCalculatingScore: boolean;
-
   // Refs
   originalDataRef: React.RefObject<ResumeData>;
 
@@ -54,7 +48,6 @@ interface UseResumeBuilderReturn {
   handleSaveClick: () => void;
   handleSaveConfirm: () => Promise<void>;
   handleReset: () => void;
-  handleCalculateScore: () => Promise<void>;
   handleResumeDataUpdate: (data: ResumeData) => void;
   handleAuthGatedAction: () => void;
   handleTranslateComplete: (translatedData: ResumeData, saveMode: 'new' | 'replace', targetLang: string) => Promise<void>;
@@ -87,11 +80,6 @@ export function useResumeBuilder({
   // Save status (autosave)
   const [saveStatus, setSaveStatus] = useState<BuilderSaveStatus>("idle");
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
-
-  // ATS Score state
-  const [showScoreDialog, setShowScoreDialog] = useState(false);
-  const [atsScore, setAtsScore] = useState<AtsScore | null>(null);
-  const [isCalculatingScore, setIsCalculatingScore] = useState(false);
 
   const router = useRouter();
   const originalDataRef = useRef<ResumeData>(initialData);
@@ -259,23 +247,6 @@ export function useResumeBuilder({
     // toast.info(t("toasts.resetInfo"));
   };
 
-  const handleCalculateScore = async () => {
-    setShowScoreDialog(true);
-    setIsCalculatingScore(true);
-    setAtsScore(null);
-
-    try {
-      const score = await ResumeService.calculateScore(resumeData);
-      setAtsScore(score);
-    } catch (error) {
-      console.error("Score calculation error:", error);
-      toast.error("Failed to calculate ATS score");
-      setShowScoreDialog(false);
-    } finally {
-      setIsCalculatingScore(false);
-    }
-  };
-
   const handleResumeDataUpdate = (data: ResumeData) => {
     setResumeData(data);
     originalDataRef.current = data;
@@ -347,12 +318,6 @@ export function useResumeBuilder({
     showAuthGate,
     setShowAuthGate,
 
-    // ATS Score
-    showScoreDialog,
-    setShowScoreDialog,
-    atsScore,
-    isCalculatingScore,
-
     // Refs
     originalDataRef,
 
@@ -360,7 +325,6 @@ export function useResumeBuilder({
     handleSaveClick,
     handleSaveConfirm,
     handleReset,
-    handleCalculateScore,
     handleResumeDataUpdate,
     handleAuthGatedAction,
     handleTranslateComplete,

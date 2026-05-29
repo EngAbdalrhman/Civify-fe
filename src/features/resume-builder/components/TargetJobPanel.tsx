@@ -18,6 +18,7 @@ import { useTranslations } from "next-intl";
 import { ResumeData } from "@/features/upload-cv/types";
 import { jobMatchService, JobMatchResult } from "../services/job-match.service";
 import { CvTailorResponse } from "@/features/upload-cv/types";
+import { AtsScoreDetails } from "./AtsScoreDetails";
 
 interface TargetJobPanelProps {
   data: ResumeData;
@@ -157,6 +158,10 @@ export function TargetJobPanel({ data, onChange }: TargetJobPanelProps) {
             </div>
           </div>
 
+          {result.atsScore && (
+            <AtsScoreDetails score={result.atsScore} />
+          )}
+
           {result.parsedJd && (
             <div className="space-y-2">
               <h4 className="font-semibold px-1">
@@ -277,6 +282,10 @@ export function TargetJobPanel({ data, onChange }: TargetJobPanelProps) {
                     <div className="text-xs text-primary uppercase mt-1">{t("targetJob.afterScore")}</div>
                   </div>
                 </div>
+
+                {tailorResult.atsScore && (
+                  <AtsScoreDetails score={tailorResult.atsScore} />
+                )}
 
                 {tailorResult.validationWarnings && tailorResult.validationWarnings.length > 0 && (
                   <div className="bg-amber-500/10 text-amber-700 border border-amber-500/20 p-3 rounded-lg text-sm">
