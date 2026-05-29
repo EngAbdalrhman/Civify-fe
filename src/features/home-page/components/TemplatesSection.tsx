@@ -44,9 +44,9 @@ export function TemplatesSection() {
                 >
                   <Card className="group overflow-hidden border-2 transition-all duration-300 hover:border-primary hover:shadow-xl hover:shadow-primary/10">
                     <CardContent className="p-0">
-                      <div className="relative aspect-[3/4] overflow-hidden">
+                      <div className="relative h-[300px] sm:h-[340px] overflow-hidden border-b border-border/50">
                         <TemplatePreviewCard templateId={key} />
-                        <Badge className="absolute right-4 top-4 z-10 bg-green-600 hover:bg-green-700">
+                        <Badge className="absolute right-3 top-3 z-10 border-0 bg-green-600 shadow-md hover:bg-green-700">
                           ✓ {t("badge")}
                         </Badge>
                       </div>

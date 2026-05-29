@@ -198,19 +198,16 @@
       }
     },
     "tryTailor": "ابدأ التخصيص",
-    "workflowTitle": "التصدير وسير العمل",
+    "workflowTitle": "يتكامل مع سير عملك",
+    "workflowNote": "تصدير PDF وWord متاح في خطوة النتائج بعد التخصيص وفي منشئ السيرة — دون إعداد إضافي.",
     "workflow": {
       "linkedin": {
         "title": "LinkedIn وChrome",
         "description": "سجّل الدخول عبر LinkedIn وخصّص أسرع من صفحات الوظائف عبر الإضافة"
       },
-      "pdf": {
-        "title": "تصدير PDF",
-        "description": "حمّل سيرة PDF جاهزة للطباعة من التخصيص أو المنشئ"
-      },
-      "docx": {
-        "title": "تصدير Word",
-        "description": "صدّر السيرة المخصصة بصيغة .docx قابلة للتعديل"
+      "translate": {
+        "title": "ترجمة بالذكاء الاصطناعي",
+        "description": "ترجم سيرتك بين الإنجليزية والعربية مع الحفاظ على تخطيط RTL في المنشئ"
       },
       "jobMatches": {
         "title": "مطابقة الوظائف",

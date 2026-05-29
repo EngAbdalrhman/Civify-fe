@@ -4,8 +4,7 @@ import {
   Mail,
   MessageSquare,
   Map,
-  FileText,
-  FileDown,
+  Languages,
   Linkedin,
   Briefcase,
   ArrowRight,
@@ -22,21 +21,19 @@ const OUTPUT_ICONS = {
   roadmap: Map,
 };
 
-const WORKFLOW_KEYS = ["linkedin", "pdf", "docx", "jobMatches"] as const;
+const WORKFLOW_KEYS = ["linkedin", "translate", "jobMatches"] as const;
 const WORKFLOW_ICONS = {
   linkedin: Linkedin,
-  pdf: FileText,
-  docx: FileDown,
+  translate: Languages,
   jobMatches: Briefcase,
 };
 
 const WORKFLOW_HREFS: Record<
   (typeof WORKFLOW_KEYS)[number],
-  "/app/upload" | "/chrome-extension" | "/app/job-matches"
+  "/chrome-extension" | "/app/resume-builder" | "/app/job-matches"
 > = {
   linkedin: "/chrome-extension",
-  pdf: "/app/upload",
-  docx: "/app/upload",
+  translate: "/app/resume-builder",
   jobMatches: "/app/job-matches",
 };
 
@@ -119,10 +116,13 @@ export function ApplicationOutputsSection() {
         </div>
 
         <div className="mx-auto max-w-5xl">
-          <h3 className="mb-8 text-center text-xl font-semibold">
+          <h3 className="mb-3 text-center text-xl font-semibold">
             {t("workflowTitle")}
           </h3>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <p className="mb-8 text-center text-sm text-muted-foreground max-w-2xl mx-auto">
+            {t("workflowNote")}
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {WORKFLOW_KEYS.map((key) => {
               const Icon = WORKFLOW_ICONS[key];
               const href = WORKFLOW_HREFS[key];
