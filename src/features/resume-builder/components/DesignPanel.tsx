@@ -151,6 +151,9 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
     });
   };
 
+  const isAtsTemplate = metadata.templateId === "ats";
+  const columnCountOptions = isAtsTemplate ? [1, 2, 3] : [1, 2, 3, 4];
+
   const columnEligibleSections = data.sections.filter((section) => {
     if (section.visible === false) return false;
     // Sections with specialized renderers are never eligible for simple columns
@@ -558,16 +561,25 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
               <Label className="text-sm font-semibold">
                 {t("sectionColumns.title") || "Section Columns"}
               </Label>
+              {isAtsTemplate && (
+                <p className="text-xs text-muted-foreground">
+                  ATS template supports up to 3 columns per list section (page stays single-column).
+                </p>
+              )}
               <div className="space-y-3">
                 {columnEligibleSections.map((section) => {
-                  const currentCols = metadata.sectionColumns?.[section.id] || 3;
+                  const defaultCols = isAtsTemplate ? 2 : 3;
+                  const currentCols = Math.min(
+                    metadata.sectionColumns?.[section.id] || defaultCols,
+                    columnCountOptions[columnCountOptions.length - 1],
+                  );
                   return (
                     <div key={section.id} className="flex items-center justify-between">
                       <Label className="text-sm border-0 font-medium truncate pr-4">
                         {section.title}
                       </Label>
                       <div className="flex gap-1 shrink-0">
-                        {[1, 2, 3, 4].map((n) => (
+                        {columnCountOptions.map((n) => (
                           <button
                             key={n}
                             className={`

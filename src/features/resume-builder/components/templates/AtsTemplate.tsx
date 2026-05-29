@@ -75,7 +75,7 @@ export function AtsTemplate({ data, color }: TemplateProps) {
     );
   };
 
-  const shouldUseSimple = (section: (typeof sections)[0]) => {
+  const shouldUseSimpleColumns = (section: (typeof sections)[0]) => {
     if (section.visible === false) return false;
     if (
       ["experience", "education", "skills", "languages", "projects"].includes(
@@ -90,14 +90,34 @@ export function AtsTemplate({ data, color }: TemplateProps) {
     return true;
   };
 
-  const renderSimple = (section: (typeof sections)[0]) => {
+  /** List sections (certifications, custom) — respects Design tab column count (max 3 for ATS). */
+  const renderSimpleColumns = (section: (typeof sections)[0]) => {
     const items = section.items.filter((i) => i.visible !== false);
+    const rawCols = metadata?.sectionColumns?.[section.id] ?? 2;
+    const columnCount = Math.min(Math.max(1, rawCols), 3);
+    const itemsPerColumn = Math.ceil(items.length / columnCount);
+    const columns: (typeof items)[] = [];
+    for (let i = 0; i < columnCount; i++) {
+      columns.push(
+        items.slice(i * itemsPerColumn, (i + 1) * itemsPerColumn),
+      );
+    }
+
     return (
-      <ul className="list-disc list-inside text-[13px] text-gray-700 space-y-0.5">
-        {items.map((item) => (
-          <li key={item.id}>{item.title}</li>
+      <div
+        className="grid gap-x-6 gap-y-1 text-[13px] text-gray-700"
+        style={{
+          gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`,
+        }}
+      >
+        {columns.map((column, colIdx) => (
+          <ul key={colIdx} className="list-disc list-inside space-y-0.5">
+            {column.map((item) => (
+              <li key={item.id}>{item.title}</li>
+            ))}
+          </ul>
         ))}
-      </ul>
+      </div>
     );
   };
 
@@ -196,8 +216,8 @@ export function AtsTemplate({ data, color }: TemplateProps) {
               renderSkills(section)
             ) : section.type === "languages" ? (
               renderLanguages(section)
-            ) : shouldUseSimple(section) ? (
-              renderSimple(section)
+            ) : shouldUseSimpleColumns(section) ? (
+              renderSimpleColumns(section)
             ) : (
               <div
                 className="flex flex-col"

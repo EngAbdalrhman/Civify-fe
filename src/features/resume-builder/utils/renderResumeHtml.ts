@@ -1387,13 +1387,14 @@ function renderAtsTemplate(
     fontFamily: "Arial",
     bodyFontFamily: "Arial",
     headingFontFamily: "Georgia",
-    sectionColumns: {},
   };
-  for (const s of atsData.sections || []) {
-    if (!atsData.metadata!.sectionColumns) {
-      atsData.metadata!.sectionColumns = {};
+  // Preserve sectionColumns from Design tab; cap each eligible section at 3 for ATS PDF
+  if (atsData.metadata?.sectionColumns) {
+    const capped: Record<string, number> = {};
+    for (const [id, cols] of Object.entries(atsData.metadata.sectionColumns)) {
+      capped[id] = Math.min(Math.max(1, cols), 3);
     }
-    atsData.metadata!.sectionColumns[s.id] = 1;
+    atsData.metadata.sectionColumns = capped;
   }
   return renderMinimalTemplate(atsData, color || "#111827", watermark);
 }
