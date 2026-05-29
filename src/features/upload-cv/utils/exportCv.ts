@@ -7,7 +7,8 @@ export type TemplateType =
   | "classic"
   | "creative"
   | "executive"
-  | "minimal";
+  | "minimal"
+  | "ats";
 
 /**
  * Export the CV to PDF using Puppeteer (server-side rendering)

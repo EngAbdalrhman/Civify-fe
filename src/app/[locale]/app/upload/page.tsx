@@ -1461,8 +1461,31 @@ export default function UploadPage() {
                         <p className="text-muted-foreground">Skills</p>
                         <p className="font-semibold">{tailorResponse.atsScore.skillsMatch}%</p>
                       </div>
+                      {tailorResponse.atsScore.formatScore != null && (
+                        <div>
+                          <p className="text-muted-foreground">Format</p>
+                          <p className="font-semibold">{tailorResponse.atsScore.formatScore}%</p>
+                        </div>
+                      )}
+                      {tailorResponse.atsScore.atsReadiness && (
+                        <div>
+                          <p className="text-muted-foreground">ATS readiness</p>
+                          <p className="font-semibold capitalize">{tailorResponse.atsScore.atsReadiness}</p>
+                        </div>
+                      )}
                     </div>
                   </div>
+
+                  {tailorResponse.atsScore.formatIssues && tailorResponse.atsScore.formatIssues.length > 0 && (
+                    <div className="rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-3 text-sm">
+                      <p className="font-medium text-amber-900 dark:text-amber-200 mb-1">Format notes for ATS</p>
+                      <ul className="space-y-1 text-amber-800 dark:text-amber-300/90">
+                        {tailorResponse.atsScore.formatIssues.slice(0, 3).map((issue, i) => (
+                          <li key={i}>{issue.message}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                   {tailorResponse.atsScore.missingKeywords && tailorResponse.atsScore.missingKeywords.length > 0 && (
                     <div>

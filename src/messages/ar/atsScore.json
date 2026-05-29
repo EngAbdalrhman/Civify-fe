@@ -1,11 +1,24 @@
 {
   "title": "نقاط ATS العامة",
-  "description": "تحليل سيرتك الذاتية وفقاً لأفضل الممارسات للتوافق مع أنظمة ATS.",
+  "description": "تحليل سيرتك الذاتية وفقاً لأفضل ممارسات ATS وأنظمة التوظيف الشائعة.",
   "analyzing": "جاري تحليل سيرتك الذاتية...",
   "overallCompatibility": "التوافق العام مع ATS",
   "contentQuality": "جودة المحتوى",
-  "skillsPresentation": "عرض المهارات",
+  "keywordMatch": "الكلمات المفتاحية والمقاييس",
+  "structureScore": "الهيكل والمهارات",
+  "formatScore": "توافق التنسيق",
+  "parseabilityScore": "قابلية الاستخراج",
+  "atsReadiness": "جاهزية التنسيق",
+  "readiness": {
+    "excellent": "ممتاز — مناسب لمعظم أنظمة ATS",
+    "good": "جيد — تحسينات طفيفة موصى بها",
+    "caution": "حذر — قد تفوت بعض الأنظمة محتوى",
+    "poor": "ضعيف — استخدم قالب ATS المحسّن"
+  },
+  "recommendedTemplate": "القالب الموصى به",
+  "applyAtsTemplate": "استخدام قالب ATS المحسّن",
   "areasToImprove": "مجالات للتحسين",
+  "formatIssues": "مشاكل التنسيق",
   "suggestions": "الاقتراحات",
   "close": "إغلاق",
   "noScore": "لا توجد نتيجة متاحة"

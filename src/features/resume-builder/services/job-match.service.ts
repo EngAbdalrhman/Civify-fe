@@ -1,5 +1,5 @@
 import apiClient from '@/api/client';
-import { ResumeData } from "@/features/upload-cv/types";
+import { AtsScore, ResumeData } from "@/features/upload-cv/types";
 
 export interface JobMatchRequest {
     resumeData: ResumeData;
@@ -24,14 +24,6 @@ export interface JobMatchSuggestion {
     action: string;
     reason: string;
     priority: "HIGH" | "MEDIUM" | "LOW";
-}
-
-export interface AtsScore {
-    overall: number;
-    keywordMatch: number;
-    skillsMatch: number;
-    missingKeywords: string[];
-    suggestions: string[];
 }
 
 export interface JobMatchResult {

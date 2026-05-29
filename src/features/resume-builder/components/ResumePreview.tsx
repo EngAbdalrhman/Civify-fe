@@ -6,6 +6,7 @@ import { ClassicTemplate } from "./templates/ClassicTemplate";
 import { CreativeTemplate } from "./templates/CreativeTemplate";
 import { ExecutiveTemplate } from "./templates/ExecutiveTemplate";
 import { MinimalTemplate } from "./templates/MinimalTemplate";
+import { AtsTemplate } from "./templates/AtsTemplate";
 
 interface ResumePreviewProps {
   data: ResumeData;
@@ -32,6 +33,8 @@ export function ResumePreview({ data }: ResumePreviewProps) {
         return <ExecutiveTemplate data={data} color={primaryColor} />;
       case "minimal":
         return <MinimalTemplate data={data} color={primaryColor} />;
+      case "ats":
+        return <AtsTemplate data={data} color={primaryColor} />;
       default:
         return <ModernTemplate data={data} color={primaryColor} />;
     }

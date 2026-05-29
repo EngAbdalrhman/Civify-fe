@@ -88,12 +88,27 @@ export interface CvParseResponse {
   processingTimeMs?: number;
 }
 
+export type AtsReadiness = 'excellent' | 'good' | 'caution' | 'poor';
+
+export interface AtsFormatIssue {
+  code: string;
+  severity: 'INFO' | 'WARNING' | 'CRITICAL';
+  message: string;
+  fixHint?: string;
+}
+
 export interface AtsScore {
   overall: number;
   keywordMatch: number;
   skillsMatch: number;
+  contentScore?: number;
+  formatScore?: number;
+  parseabilityScore?: number;
   missingKeywords?: string[];
   suggestions?: string[];
+  formatIssues?: AtsFormatIssue[];
+  atsReadiness?: AtsReadiness;
+  recommendedTemplateId?: string;
 }
 
 export interface InterviewQuestion {

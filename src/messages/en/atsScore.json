@@ -1,11 +1,24 @@
 {
   "title": "Overall ATS Score",
-  "description": "Analysis of your resume against ATS best practices.",
+  "description": "Analysis of your resume against ATS best practices and common recruiter systems.",
   "analyzing": "Analyzing your resume...",
   "overallCompatibility": "Overall Compatibility",
   "contentQuality": "Content Quality",
-  "skillsPresentation": "Skills Presentation",
+  "keywordMatch": "Keywords & Metrics",
+  "structureScore": "Structure & Skills",
+  "formatScore": "Format Compatibility",
+  "parseabilityScore": "Parseability",
+  "atsReadiness": "Format readiness",
+  "readiness": {
+    "excellent": "Excellent — safe for most corporate ATS",
+    "good": "Good — minor format tweaks recommended",
+    "caution": "Caution — some parsers may miss content",
+    "poor": "Poor — switch to ATS Optimized template"
+  },
+  "recommendedTemplate": "Recommended template",
+  "applyAtsTemplate": "Use ATS Optimized template",
   "areasToImprove": "Areas to Improve",
+  "formatIssues": "Format issues",
   "suggestions": "Suggestions",
   "close": "Close",
   "noScore": "No score available"

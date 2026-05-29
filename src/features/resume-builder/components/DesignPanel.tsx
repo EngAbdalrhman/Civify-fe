@@ -29,7 +29,23 @@ interface DesignPanelProps {
   onChange: (data: ResumeData) => void;
 }
 
+const TEMPLATE_ATS_BADGE: Record<string, "excellent" | "good" | "caution" | "poor"> = {
+  ats: "excellent",
+  minimal: "good",
+  classic: "good",
+  modern: "caution",
+  executive: "caution",
+  creative: "poor",
+};
+
 const TEMPLATES = [
+  {
+    id: "ats",
+    category: "ats",
+    accent: "#111827",
+    preview: ["linear", "text", "plain"],
+    atsRecommended: true,
+  },
   {
     id: "modern",
     category: "balanced",
@@ -218,6 +234,15 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
                           template.category,
                         )}
                       </span>
+                      {"atsRecommended" in template && template.atsRecommended ? (
+                        <span className="rounded-full bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300 px-2 py-0.5 text-[10px] font-semibold">
+                          Best for ATS
+                        </span>
+                      ) : TEMPLATE_ATS_BADGE[template.id] === "poor" ? (
+                        <span className="rounded-full bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200 px-2 py-0.5 text-[10px] font-semibold">
+                          ATS caution
+                        </span>
+                      ) : null}
                     </div>
                     <div className="text-sm text-muted-foreground">
                       {tr(

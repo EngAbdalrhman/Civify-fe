@@ -1373,12 +1373,38 @@ function renderMinimalTemplate(data: ResumeData, color: string, watermark?: Wate
 // Main Export Function
 // ============================================================================
 
+function renderAtsTemplate(
+  data: ResumeData,
+  color: string,
+  watermark?: WatermarkConfig,
+): string {
+  const atsData: ResumeData = JSON.parse(JSON.stringify(data)) as ResumeData;
+  atsData.metadata = {
+    ...atsData.metadata,
+    templateId: "ats",
+    skillsDisplayStyle: "tags",
+    languagesDisplayStyle: "level",
+    fontFamily: "Arial",
+    bodyFontFamily: "Arial",
+    headingFontFamily: "Georgia",
+    sectionColumns: {},
+  };
+  for (const s of atsData.sections || []) {
+    if (!atsData.metadata!.sectionColumns) {
+      atsData.metadata!.sectionColumns = {};
+    }
+    atsData.metadata!.sectionColumns[s.id] = 1;
+  }
+  return renderMinimalTemplate(atsData, color || "#111827", watermark);
+}
+
 export type TemplateType =
   | "modern"
   | "classic"
   | "creative"
   | "executive"
-  | "minimal";
+  | "minimal"
+  | "ats";
 
 export function renderResumeHtml(
   data: ResumeData,
@@ -1387,6 +1413,8 @@ export function renderResumeHtml(
   watermark?: WatermarkConfig,
 ): string {
   switch (template) {
+    case "ats":
+      return renderAtsTemplate(data, color, watermark);
     case "classic":
       return renderClassicTemplate(data, color, watermark);
     case "executive":
