@@ -1,4 +1,5 @@
 import {
+    ApplicationOutputsSection,
     BlogPreviewSection,
     CTASection,
     FAQSection,
@@ -7,6 +8,7 @@ import {
     HowItWorksSection,
     PricingSection,
     ResumeBuilderSection,
+    TemplatesSection,
 } from "@/features/home-page/components";
 import {getTranslations, setRequestLocale} from "next-intl/server";
 import {routing} from "@/i18n/routing";
@@ -110,13 +112,10 @@ const Homepage = async ({
       <HowItWorksSection />
       <ResumeBuilderSection />
       <FeaturesSection />
-      {/*<BeforeAfterSection />*/}
-      {/* <TemplatesSection /> */}
-      {/*<RolePersonalizationSection />*/}
-      {/* <TestimonialsSection /> */}
+      <TemplatesSection />
       <PricingSection />
       <FAQSection />
-      {/* <IntegrationsSection /> */}
+      <ApplicationOutputsSection />
       <BlogPreviewSection />
       <CTASection />
     </>

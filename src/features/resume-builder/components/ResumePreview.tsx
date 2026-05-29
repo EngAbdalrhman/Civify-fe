@@ -10,9 +10,11 @@ import { AtsTemplate } from "./templates/AtsTemplate";
 
 interface ResumePreviewProps {
   data: ResumeData;
+  /** Omit fixed id when multiple previews render on one page (e.g. landing carousel). */
+  omitContentId?: boolean;
 }
 
-export function ResumePreview({ data }: ResumePreviewProps) {
+export function ResumePreview({ data, omitContentId }: ResumePreviewProps) {
   const { metadata } = data;
   const templateId = metadata?.templateId || "modern";
   const bodyFont = metadata?.bodyFontFamily || metadata?.fontFamily || "Inter";
@@ -49,7 +51,7 @@ export function ResumePreview({ data }: ResumePreviewProps) {
           "--heading-font": `"${headingFont}", sans-serif`,
         } as React.CSSProperties
       }
-      id="resume-preview-content"
+      {...(!omitContentId ? { id: "resume-preview-content" } : {})}
     >
       {renderTemplate()}
     </div>
