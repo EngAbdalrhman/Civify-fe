@@ -1,2 +1,1 @@
-// Upload CV feature exports
-export {};
+export { UploadReviewEditor } from "./UploadReviewEditor";

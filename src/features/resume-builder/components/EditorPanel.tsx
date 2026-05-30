@@ -73,11 +73,22 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { cn } from "@/lib/utils";
 
 interface EditorPanelProps {
   data: ResumeData;
   onChange: (data: ResumeData) => void;
+  /** `upload` applies richer card/accordion styling for the upload review step */
+  variant?: "default" | "upload";
 }
+
+const accordionItemClass = (variant: EditorPanelProps["variant"]) =>
+  cn(
+    "border rounded-xl shadow-sm overflow-hidden mb-3",
+    variant === "upload"
+      ? "border-border/60 bg-card dark:bg-zinc-900/50 dark:border-zinc-700/50"
+      : "border-border/60 bg-card",
+  );
 
 // Icon mapping for section types
 const sectionIcons: Record<string, React.ReactNode> = {
@@ -107,12 +118,14 @@ function SortableSection({
   onRename,
   onDelete,
   onToggleVisibility,
+  accordionClassName,
 }: {
   section: ResumeSection;
   children: React.ReactNode;
   onRename: (id: string, newTitle: string) => void;
   onDelete: (id: string) => void;
   onToggleVisibility: (id: string) => void;
+  accordionClassName?: string;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(section.title);
@@ -141,8 +154,8 @@ function SortableSection({
 
   return (
     <div ref={setNodeRef} style={style}>
-      <AccordionItem value={section.id}>
-        <AccordionTrigger className="hover:no-underline px-2">
+      <AccordionItem value={section.id} className={accordionClassName}>
+        <AccordionTrigger className="hover:no-underline px-4 py-3">
           <div className="flex items-center gap-2 w-full">
             <div
               {...attributes}
@@ -235,13 +248,14 @@ function SortableSection({
             </div>
           </div>
         </AccordionTrigger>
-        <AccordionContent className="px-2 pt-2">{children}</AccordionContent>
+        <AccordionContent className="px-4 pb-4 pt-1">{children}</AccordionContent>
       </AccordionItem>
     </div>
   );
 }
 
-export function EditorPanel({ data, onChange }: EditorPanelProps) {
+export function EditorPanel({ data, onChange, variant = "default" }: EditorPanelProps) {
+  const sectionAccordionClass = accordionItemClass(variant);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newSectionName, setNewSectionName] = useState("");
   const [newSectionType, setNewSectionType] = useState<string>("custom");
@@ -393,17 +407,17 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
         type="single"
         collapsible
         defaultValue="personal"
-        className="w-full"
+        className={cn("w-full", variant === "upload" && "space-y-1")}
       >
         {/* Personal Information - Always first */}
-        <AccordionItem value="personal">
-          <AccordionTrigger className="hover:no-underline px-2">
+        <AccordionItem value="personal" className={sectionAccordionClass}>
+          <AccordionTrigger className="hover:no-underline px-4 py-3">
             <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-primary" />
               <span>{t("sections.personal")}</span>
             </div>
           </AccordionTrigger>
-          <AccordionContent className="px-2 pt-2">
+          <AccordionContent className="px-4 pb-4 pt-1">
             <PersonalInfoForm
               data={data.personalInfo}
               onChange={updatePersonalInfo}
@@ -429,6 +443,7 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
                 onRename={renameSection}
                 onDelete={deleteSection}
                 onToggleVisibility={toggleSectionVisibility}
+                accordionClassName={sectionAccordionClass}
               >
                 {renderSectionContent(section)}
               </SortableSection>
@@ -440,7 +455,11 @@ export function EditorPanel({ data, onChange }: EditorPanelProps) {
       {/* Add Section Button */}
       <Button
         variant="outline"
-        className="w-full mt-4 gap-2"
+        className={cn(
+          "w-full mt-4 gap-2 border-dashed",
+          variant === "upload" &&
+            "dark:border-zinc-700 dark:bg-zinc-900/40 dark:hover:bg-zinc-800/60",
+        )}
         onClick={() => setShowAddDialog(true)}
       >
         <Plus className="h-4 w-4" />
