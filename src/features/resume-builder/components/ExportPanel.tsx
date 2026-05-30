@@ -48,6 +48,12 @@ interface ExportPanelProps {
   onAuthGate?: () => void;
   maskPII: boolean;
   onMaskPIIChange: (value: boolean) => void;
+  /** Hide mask toggle when parent already controls masking (e.g. upload preview) */
+  hideMaskToggle?: boolean;
+  /** `embedded` — compact layout for upload/tailor sidebar */
+  variant?: "default" | "embedded";
+  /** Appended to export base name, e.g. `_tailored` */
+  filenameSuffix?: string;
 }
 
 export function ExportPanel({
@@ -56,6 +62,9 @@ export function ExportPanel({
   onAuthGate,
   maskPII,
   onMaskPIIChange,
+  hideMaskToggle = false,
+  variant = "default",
+  filenameSuffix = "_CV",
 }: ExportPanelProps) {
   const t = useTranslations("builder.exportPanel");
   const tMask = useTranslations("builder.mask");
@@ -80,8 +89,10 @@ export function ExportPanel({
       return getMaskedExportFilename();
     }
     const base = data.personalInfo.fullName?.trim() || "Resume";
-    return `${base.replace(/\s+/g, "_")}_CV`;
+    return `${base.replace(/\s+/g, "_")}${filenameSuffix}`;
   };
+
+  const isEmbedded = variant === "embedded";
 
   const handlePdfExport = async () => {
     if (isGuest && onAuthGate) {
@@ -136,12 +147,15 @@ export function ExportPanel({
   const isExporting = isExportingPdf || isExportingDocx;
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <h3 className="text-lg font-semibold">{t("title")}</h3>
-        <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
-      </div>
+    <div className={isEmbedded ? "space-y-3" : "space-y-6"}>
+      {!isEmbedded && (
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold">{t("title")}</h3>
+          <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
+        </div>
+      )}
 
+      {!hideMaskToggle && (
       <div className="flex lg:hidden items-center justify-between gap-3 rounded-lg border border-dashed bg-muted/30 px-3 py-2.5">
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium leading-tight">{tMask("exportTitle")}</p>
@@ -157,6 +171,7 @@ export function ExportPanel({
           className="shrink-0"
         />
       </div>
+      )}
 
       {/*<Card className="border-dashed bg-muted/30 hidden lg:block">*/}
       {/*  <CardHeader className="pb-3">*/}
@@ -274,9 +289,11 @@ export function ExportPanel({
         </Card>
       </div>
 
-      <div className="p-4 bg-muted/50 rounded-lg text-sm text-balance text-muted-foreground text-center">
-        {maskPII ? tMask("exportTip") : t("tip")}
-      </div>
+      {!isEmbedded && (
+        <div className="p-4 bg-muted/50 rounded-lg text-sm text-balance text-muted-foreground text-center">
+          {maskPII ? tMask("exportTip") : t("tip")}
+        </div>
+      )}
 
       <AlertDialog open={showUpgradeModal} onOpenChange={setShowUpgradeModal}>
         <AlertDialogContent className="sm:max-w-md">

@@ -53,7 +53,9 @@ import {
 } from "@/features/upload-cv/types";
 import { UploadReviewEditor } from "@/features/upload-cv/components";
 import { normalizeUploadResumeData } from "@/features/upload-cv/utils/normalizeUploadSections";
-import {exportToDocx, exportToPdfPuppeteer, type TemplateType,} from "@/features/upload-cv/utils/exportCv";
+import {type TemplateType} from "@/features/upload-cv/utils/exportCv";
+import {ExportPanel} from "@/features/resume-builder/components/ExportPanel";
+import {applyResumeMask} from "@/features/resume-builder/utils/maskPersonalInfo";
 import {useRouter} from "next/navigation";
 import {ResumeService, ResumeSummary} from "@/services/resume.service";
 import {JobApplicationService} from "@/services/job-application.service";
@@ -100,8 +102,6 @@ export default function UploadPage() {
     useState(false);
   const [includeRoadmap, setIncludeRoadmap] = useState(false);
   const [maskPII, setMaskPII] = useState(false);
-  const [isExportingPdf, setIsExportingPdf] = useState(false);
-  const [isExportingDocx, setIsExportingDocx] = useState(false);
   const [showTokenLimitModal, setShowTokenLimitModal] = useState(false);
   const [jobDescriptionError, setJobDescriptionError] = useState("");
   const [isSavingResume, setIsSavingResume] = useState(false);
@@ -322,46 +322,6 @@ export default function UploadPage() {
     },
     [t],
   );
-
-  // Download handlers
-  const handleDownloadPdf = async () => {
-    if (!tailorResponse?.tailoredCv) return;
-
-    setIsExportingPdf(true);
-    try {
-      const filename = `${tailorResponse.tailoredCv.personalInfo.fullName || "cv"}_tailored`;
-
-      const template = (tailorResponse.tailoredCv.metadata?.templateId ||
-        "modern") as TemplateType;
-      const color = tailorResponse.tailoredCv.metadata?.primaryColor || "#000000";
-
-      await exportToPdfPuppeteer(tailorResponse.tailoredCv, {
-        filename,
-        template,
-        color,
-      });
-    } catch (error) {
-      console.error("PDF export failed:", error);
-      toast.error(t("errors.exportPdfFailed"));
-    } finally {
-      setIsExportingPdf(false);
-    }
-  };
-
-  const handleDownloadDocx = useCallback(async () => {
-    if (!tailorResponse) return;
-
-    setIsExportingDocx(true);
-    try {
-      const filename = `${tailorResponse.tailoredCv.personalInfo.fullName || "cv"}_tailored`;
-      await exportToDocx(tailorResponse.tailoredCv, filename);
-    } catch (error) {
-      console.error("DOCX export failed:", error);
-      toast.error(t("errors.exportDocxFailed"));
-    } finally {
-      setIsExportingDocx(false);
-    }
-  }, [tailorResponse]);
 
   const handleSaveToResumes = useCallback(async () => {
     if (!tailorResponse?.tailoredCv) return;
@@ -907,16 +867,15 @@ export default function UploadPage() {
                     {t("upload.cvReadyDesc")}
                   </p>
 
-                  <div className="space-y-2">
-                    <Button className="w-full" size="sm" onClick={handleDownloadPdf} disabled={isExportingPdf || isExportingDocx}>
-                      <Download className="mr-2 h-4 w-4" />
-                      {isExportingPdf ? t("upload.exporting") : t("upload.downloadPdf")}
-                    </Button>
-                    <Button variant="outline" className="w-full" size="sm" onClick={handleDownloadDocx} disabled={isExportingPdf || isExportingDocx}>
-                      <Download className="mr-2 h-4 w-4" />
-                      {isExportingDocx ? t("upload.exporting") : t("upload.downloadDocx")}
-                    </Button>
-                  </div>
+                  <ExportPanel
+                    data={tailorResponse.tailoredCv}
+                    maskPII={maskPII}
+                    onMaskPIIChange={setMaskPII}
+                    hideMaskToggle
+                    variant="embedded"
+                    filenameSuffix="_tailored"
+                    onAuthGate={() => setShowAuthGate(true)}
+                  />
 
                   <Separator className="my-3" />
 
@@ -1058,20 +1017,7 @@ export default function UploadPage() {
                     >
                       <div ref={cvPreviewRef}>
                         <ResumePreview
-                          data={{
-                            ...tailorResponse.tailoredCv,
-                            personalInfo: maskPII
-                              ? {
-                                  ...tailorResponse.tailoredCv.personalInfo,
-                                  fullName: "••••••••",
-                                  email: tailorResponse.tailoredCv.personalInfo.email ? "••••••••@••••.•••" : "",
-                                  phone: tailorResponse.tailoredCv.personalInfo.phone ? "•••••••••••" : "",
-                                  linkedin: tailorResponse.tailoredCv.personalInfo.linkedin ? "••••••••" : "",
-                                  github: tailorResponse.tailoredCv.personalInfo.github ? "••••••••" : "",
-                                  website: tailorResponse.tailoredCv.personalInfo.website ? "••••••••" : "",
-                                }
-                              : tailorResponse.tailoredCv.personalInfo,
-                          }}
+                          data={applyResumeMask(tailorResponse.tailoredCv, maskPII)}
                         />
                       </div>
                     </div>
