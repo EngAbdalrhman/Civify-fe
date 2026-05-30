@@ -859,14 +859,6 @@ export default function UploadPage() {
             <div className="lg:col-span-1 space-y-4">
               <Card data-tour="upload-step4-downloads">
                 <CardContent className="pt-6 space-y-4">
-                  <div className="flex items-center gap-2 text-green-600">
-                    <CheckCircle2 className="h-5 w-5" />
-                    <span className="font-semibold">{t("upload.cvGenerated")}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {t("upload.cvReadyDesc")}
-                  </p>
-
                   <ExportPanel
                     data={tailorResponse.tailoredCv}
                     maskPII={maskPII}
@@ -896,7 +888,7 @@ export default function UploadPage() {
                 <CardContent className="space-y-2">
                   <Button variant="ghost" className="w-full justify-start" size="sm" onClick={handleEditInResumeBuilder} disabled={isSavingResume}>
                     <Edit2 className="mr-2 h-4 w-4" />{" "}
-                    {isSavingResume ? t("upload.saving") : t("upload.editSections")}
+                    {isSavingResume ? t("upload.saving") : t("upload.modifyInBuilder")}
                   </Button>
                   <Button variant="ghost" className="w-full justify-start" size="sm" onClick={() => setCurrentStep(3)}>
                     <RefreshCw className="mr-2 h-4 w-4" />{" "}
