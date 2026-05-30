@@ -51,6 +51,8 @@ jobs:
             NEXT_PUBLIC_CLARITY_PROJECT_ID=${{ vars.NEXT_PUBLIC_CLARITY_PROJECT_ID }}
             NEXT_PUBLIC_SENTRY_DSN=${{ vars.NEXT_PUBLIC_SENTRY_DSN }}
             NEXT_PUBLIC_ADS_ENABLED=${{ vars.NEXT_PUBLIC_ADS_ENABLED }}
+            NEXT_PUBLIC_SUPADEMO_RESUME_BUILDER_ID=${{ vars.NEXT_PUBLIC_SUPADEMO_RESUME_BUILDER_ID }}
+            NEXT_PUBLIC_SUPADEMO_TAILOR_ID=${{ vars.NEXT_PUBLIC_SUPADEMO_TAILOR_ID }}
             NEXT_TELEMETRY_DISABLED=${{ vars.NEXT_TELEMETRY_DISABLED }}
           # Source maps: create the token at https://de.sentry.io (org civify-2g), not sentry.io (US).
           secrets: |
