@@ -10,35 +10,45 @@ export const TEMPLATE_ATS_TIER: Record<string, TemplateAtsTier> = {
   creative: "poor",
 };
 
+/** i18n key under design.template.atsTier.* (caution → moderate, poor → low) */
+export function getTemplateAtsTierKey(templateId: string): TemplateAtsTier {
+  return TEMPLATE_ATS_TIER[templateId] ?? "caution";
+}
+
+export function getTemplateAtsTierLabelKey(tier: TemplateAtsTier): string {
+  if (tier === "caution") return "moderate";
+  if (tier === "poor") return "low";
+  return tier;
+}
+
+/** Subtle pill styles — outline + low saturation for dark mode */
+export function getTemplateAtsPillClassName(tier: TemplateAtsTier): string {
+  switch (tier) {
+    case "excellent":
+      return "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400";
+    case "good":
+      return "border-emerald-500/20 bg-muted/50 text-emerald-800/90 dark:text-emerald-300/90";
+    case "caution":
+      return "border-amber-500/25 bg-amber-500/10 text-amber-800 dark:text-amber-300/90";
+    case "poor":
+      return "border-orange-500/25 bg-orange-500/10 text-orange-800 dark:text-orange-300/90";
+  }
+}
+
+/** @deprecated Use getTemplateAtsTierKey + getTemplateAtsPillClassName in UI */
 export function getTemplateAtsBadge(templateId: string): {
   label: string;
   className: string;
 } {
-  const tier = TEMPLATE_ATS_TIER[templateId] ?? "caution";
-  switch (tier) {
-    case "excellent":
-      return {
-        label: "ATS: Excellent",
-        className:
-          "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
-      };
-    case "good":
-      return {
-        label: "ATS: Good",
-        className:
-          "bg-emerald-50 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
-      };
-    case "caution":
-      return {
-        label: "ATS: Moderate",
-        className:
-          "bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200",
-      };
-    case "poor":
-      return {
-        label: "ATS: Low",
-        className:
-          "bg-orange-100 text-orange-900 dark:bg-orange-900/40 dark:text-orange-200",
-      };
-  }
+  const tier = getTemplateAtsTierKey(templateId);
+  const labels: Record<TemplateAtsTier, string> = {
+    excellent: "Excellent",
+    good: "Good",
+    caution: "Moderate",
+    poor: "Low",
+  };
+  return {
+    label: labels[tier],
+    className: getTemplateAtsPillClassName(tier),
+  };
 }

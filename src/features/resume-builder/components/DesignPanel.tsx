@@ -23,7 +23,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { getTemplateAtsBadge } from "../utils/templateAtsLabels";
+import { TemplateAtsPill } from "./TemplateAtsPill";
 
 interface DesignPanelProps {
   data: ResumeData;
@@ -209,42 +209,36 @@ export function DesignPanel({ data, onChange }: DesignPanelProps) {
                 onClick={() => updateMetadata("templateId", template.id)}
               >
                 <div className="grid gap-4 md:grid-cols-[1.1fr_0.9fr]">
-                  <div className="space-y-2 p-4">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="h-3 w-3 rounded-full"
-                        style={{ backgroundColor: template.accent }}
-                      />
-                      <div className="font-medium">
-                        {tr(
-                          `template.${template.id}.name`,
-                          template.id.charAt(0).toUpperCase() +
-                            template.id.slice(1),
-                        )}
+                  <div className="space-y-2.5 p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <div
+                          className="h-3 w-3 shrink-0 rounded-full"
+                          style={{ backgroundColor: template.accent }}
+                        />
+                        <div className="font-medium leading-tight">
+                          {tr(
+                            `template.${template.id}.name`,
+                            template.id.charAt(0).toUpperCase() +
+                              template.id.slice(1),
+                          )}
+                        </div>
                       </div>
-                      <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      <TemplateAtsPill templateId={template.id} />
+                    </div>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 ps-5">
+                      <span className="rounded-md border border-border/60 bg-muted/40 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
                         {tr(
                           `template.categories.${template.category}`,
                           template.category,
                         )}
                       </span>
-                      {(() => {
-                        const atsBadge = getTemplateAtsBadge(template.id);
-                        return (
-                          <span
-                            className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${atsBadge.className}`}
-                            title="How well this layout parses in typical ATS systems"
-                          >
-                            {atsBadge.label}
-                          </span>
-                        );
-                      })()}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {tr(
-                        `template.${template.id}.description`,
-                        "Template preview",
-                      )}
+                      <span className="text-sm text-muted-foreground">
+                        {tr(
+                          `template.${template.id}.description`,
+                          "Template preview",
+                        )}
+                      </span>
                     </div>
                   </div>
                   {/* Mini preview thumbnail */}
