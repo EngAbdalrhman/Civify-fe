@@ -7,6 +7,7 @@ import { useLogin, LoginSchemaType, useVerifyOtp } from "@/features/auth/hooks";
 import { SubmitHandler } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 const REMEMBER_ME_KEY = "civify_remember_identifier";
 const OAUTH_RETURN_TO_KEY = "civify_oauth_returnTo";
@@ -127,10 +128,11 @@ export default function LoginForm() {
 
           <div className="rounded-lg border p-6 space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">
+              <Label htmlFor="login-otp" className="text-sm font-medium">
                 {t("verificationCode") || "Verification Code"}
-              </label>
+              </Label>
               <input
+                id="login-otp"
                 type="text"
                 value={otpCode}
                 onChange={(e) => setOtpCode(e.target.value)}
@@ -138,6 +140,8 @@ export default function LoginForm() {
                 placeholder="000000"
                 maxLength={6}
                 autoFocus
+                autoComplete="one-time-code"
+                inputMode="numeric"
               />
               <p className="text-xs text-muted-foreground text-center">
                 {t("enterOtpCode") || "Enter the 6-digit code from your email"}
@@ -194,9 +198,9 @@ export default function LoginForm() {
                 />
               </svg>
               <div className="flex-1">
-                <h3 className="text-sm font-semibold text-yellow-800 dark:text-yellow-400">
+                <p className="text-sm font-semibold text-yellow-800 dark:text-yellow-400">
                   Email Not Verified
-                </h3>
+                </p>
                 <p className="text-sm text-yellow-700 mt-1 dark:text-yellow-300">
                   Please check your inbox for the verification email. Didn't
                   receive it?
@@ -221,16 +225,18 @@ export default function LoginForm() {
           className="rounded-lg border p-6 space-y-4"
         >
           <div className="space-y-2">
-            <label className="text-sm font-medium">
+            <Label htmlFor="login-identifier" className="text-sm font-medium">
               {t("identifier") || "Email or Username"}
-            </label>
+            </Label>
             <input
+              id="login-identifier"
               type="text"
               {...register("identifier")}
               className="w-full rounded-md border px-3 py-2 bg-background"
               placeholder={
                 t("identifierPlaceholder") || "your@email.com or username"
               }
+              autoComplete="username"
             />
             {errors.identifier && (
               <p className="text-error text-xs mt-1">
@@ -240,12 +246,16 @@ export default function LoginForm() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">{t("password")}</label>
+            <Label htmlFor="login-password" className="text-sm font-medium">
+              {t("password")}
+            </Label>
             <input
+              id="login-password"
               type="password"
               {...register("password")}
               className="w-full rounded-md border px-3 py-2 bg-background"
               placeholder="••••••••"
+              autoComplete="current-password"
             />
             {errors.password && (
               <p className="text-error text-xs mt-1">
@@ -255,13 +265,16 @@ export default function LoginForm() {
           </div>
 
           <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <div className="flex items-center gap-2">
               <Checkbox
+                id="login-remember"
                 checked={rememberMe}
                 onCheckedChange={(checked) => setRememberMe(checked === true)}
               />
-              {t("rememberMe")}
-            </label>
+              <Label htmlFor="login-remember" className="text-sm cursor-pointer">
+                {t("rememberMe")}
+              </Label>
+            </div>
             <Link
               href="/forgot-password"
               className="text-sm text-primary hover:underline"

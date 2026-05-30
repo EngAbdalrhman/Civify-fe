@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Link, useRouter } from "@/i18n/routing";
 import { SubmitHandler } from "react-hook-form";
 import { useSignup, SignupSchemaType } from "@/features/auth/hooks";
@@ -76,12 +77,16 @@ export default function SignupContent() {
           className="rounded-lg border p-6 space-y-4"
         >
           <div className="space-y-2">
-            <label className="text-sm font-medium">{t("name") || "Name"}</label>
+            <Label htmlFor="signup-name" className="text-sm font-medium">
+              {t("name") || "Name"}
+            </Label>
             <input
+              id="signup-name"
               type="text"
               {...register("name")}
               className="w-full rounded-md border px-3 py-2"
               placeholder={t("namePlaceholder") || "John Doe"}
+              autoComplete="name"
             />
             {errors.name && (
               <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
@@ -89,12 +94,16 @@ export default function SignupContent() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">{t("username")}</label>
+            <Label htmlFor="signup-username" className="text-sm font-medium">
+              {t("username")}
+            </Label>
             <input
+              id="signup-username"
               type="text"
               {...register("username")}
               className="w-full rounded-md border px-3 py-2"
               placeholder={t("username")}
+              autoComplete="username"
             />
             {errors.username && (
               <p className="text-red-500 text-xs mt-1">
@@ -104,12 +113,16 @@ export default function SignupContent() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">{t("email")}</label>
+            <Label htmlFor="signup-email" className="text-sm font-medium">
+              {t("email")}
+            </Label>
             <input
+              id="signup-email"
               type="email"
               {...register("email")}
               className="w-full rounded-md border px-3 py-2"
               placeholder="your@email.com"
+              autoComplete="email"
             />
             {errors.email && (
               <p className="text-red-500 text-xs mt-1">
@@ -119,12 +132,16 @@ export default function SignupContent() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">{t("password")}</label>
+            <Label htmlFor="signup-password" className="text-sm font-medium">
+              {t("password")}
+            </Label>
             <input
+              id="signup-password"
               type="password"
               {...register("password")}
               className="w-full rounded-md border px-3 py-2"
               placeholder="••••••••"
+              autoComplete="new-password"
             />
             {errors.password && (
               <p className="text-red-500 text-xs mt-1">
@@ -134,14 +151,16 @@ export default function SignupContent() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">
+            <Label htmlFor="signup-confirm-password" className="text-sm font-medium">
               {t("confirmPassword")}
-            </label>
+            </Label>
             <input
+              id="signup-confirm-password"
               type="password"
               {...register("confirmPassword")}
               className="w-full rounded-md border px-3 py-2"
               placeholder="••••••••"
+              autoComplete="new-password"
             />
             {errors.confirmPassword && (
               <p className="text-red-500 text-xs mt-1">
@@ -151,8 +170,11 @@ export default function SignupContent() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">{t("referralCode") || "Referral Code (Optional)"}</label>
+            <Label htmlFor="signup-referral" className="text-sm font-medium">
+              {t("referralCode") || "Referral Code (Optional)"}
+            </Label>
             <input
+              id="signup-referral"
               type="text"
               {...register("referralCode")}
               className="w-full rounded-md border px-3 py-2 uppercase"
@@ -160,13 +182,14 @@ export default function SignupContent() {
             />
           </div>
 
-          <label className="flex items-center gap-2 text-sm cursor-pointer">
+          <div className="flex items-start gap-2">
             <input
+              id="signup-terms"
               type="checkbox"
               required
-              className="rounded border-gray-300 text-primary focus:ring-primary"
+              className="mt-0.5 rounded border-gray-300 text-primary focus:ring-primary"
             />
-            <span>
+            <Label htmlFor="signup-terms" className="text-sm cursor-pointer leading-snug">
               {t.rich("terms", {
                 terms: (chunks) => (
                   <Link
@@ -185,8 +208,8 @@ export default function SignupContent() {
                   </Link>
                 ),
               })}
-            </span>
-          </label>
+            </Label>
+          </div>
 
           <Button className="w-full" disabled={isSignupPending}>
             {t("signup")}

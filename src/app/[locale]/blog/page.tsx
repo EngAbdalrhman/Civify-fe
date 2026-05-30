@@ -79,9 +79,9 @@ export default async function BlogIndexPage({
                 </div>
               )}
               <div className="p-6 flex flex-col flex-1">
-                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                <h2 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors line-clamp-2">
                   {post.title}
-                </h3>
+                </h2>
                 <p className="text-muted-foreground line-clamp-3 mb-4 flex-1">
                   {post.metaDescription}
                 </p>

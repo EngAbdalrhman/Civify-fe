@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
 import { newsletterService } from "@/services/newsletter.service";
 import { toast } from "sonner";
@@ -45,9 +46,9 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {/* Product Section */}
           <div>
-            <h3 className="font-semibold text-gray-900 mb-3 text-sm">
+            <p className="font-semibold text-gray-900 mb-3 text-sm">
               {t("product.title")}
-            </h3>
+            </p>
             <ul className="space-y-2">
               <li>
                 <Link
@@ -78,9 +79,9 @@ export function Footer() {
 
           {/* Company Section */}
           <div>
-            <h3 className="font-semibold text-gray-900 mb-3 text-sm">
+            <p className="font-semibold text-gray-900 mb-3 text-sm">
               {t("company.title")}
-            </h3>
+            </p>
             <ul className="space-y-2">
               <li>
                 <Link
@@ -127,23 +128,29 @@ export function Footer() {
 
           {/* Newsletter Section */}
           <div>
-            <h3 className="font-semibold text-gray-900 mb-3 text-sm">
+            <p className="font-semibold text-gray-900 mb-3 text-sm">
               {t("newsletter.title")}
-            </h3>
-            <p className="text-xs text-gray-600 mb-3">
+            </p>
+            <p id="footer-newsletter-desc" className="text-xs text-gray-600 mb-3">
               {t("newsletter.description")}
             </p>
             <form
               onSubmit={handleNewsletterSubmit}
               className="flex flex-col gap-2"
             >
+              <Label htmlFor="footer-newsletter-email" className="sr-only">
+                {t("newsletter.placeholder")}
+              </Label>
               <Input
+                id="footer-newsletter-email"
                 type="email"
                 placeholder={t("newsletter.placeholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="h-8 text-xs"
+                aria-describedby="footer-newsletter-desc"
+                autoComplete="email"
               />
               <Button
                 type="submit"

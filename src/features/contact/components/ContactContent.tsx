@@ -72,9 +72,9 @@ export default function ContactContent() {
               <div className="flex items-start space-x-4">
                 <MapPin className="w-6 h-6 text-primary flex-shrink-0" />
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">
+                  <h2 className="font-semibold text-foreground mb-1 text-base">
                     {t("info.address")}
-                  </h3>
+                  </h2>
                   <p className="text-sm text-muted-foreground">Cairo, Egypt</p>
                 </div>
               </div>
@@ -82,9 +82,9 @@ export default function ContactContent() {
               <div className="flex items-start space-x-4">
                 <Mail className="w-6 h-6 text-primary flex-shrink-0" />
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">
+                  <h2 className="font-semibold text-foreground mb-1 text-base">
                     {t("info.email")}
-                  </h3>
+                  </h2>
                   <p className="text-sm text-muted-foreground">
                     support@civify.com
                   </p>
@@ -94,9 +94,9 @@ export default function ContactContent() {
               <div className="flex items-start space-x-4">
                 <Phone className="w-6 h-6 text-primary flex-shrink-0" />
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">
+                  <h2 className="font-semibold text-foreground mb-1 text-base">
                     {t("info.phone")}
-                  </h3>
+                  </h2>
                   <p className="text-sm text-muted-foreground">
                     +20 01108992027
                   </p>
@@ -121,19 +121,43 @@ export default function ContactContent() {
                   type="hidden"
                   name="xnQsjsdp"
                   value="edbsn2e154c5c86be9ce8f4b23d5d0c28f6b1"
+                  tabIndex={-1}
+                  aria-hidden="true"
                 />
                 <input
                   type="hidden"
                   name="xmIwtLD"
                   value="edbsn4c64b6b33a28e1868c82c07130fb7aa37f8930026275a13a01f00b7be4dbed61"
+                  tabIndex={-1}
+                  aria-hidden="true"
                 />
-                <input type="hidden" name="xJdfEaS" value="" />
-                <input type="hidden" name="actionType" value="Q2FzZXM=" />
-                <input type="hidden" id="property(module)" value="Cases" />
+                <input
+                  type="hidden"
+                  name="xJdfEaS"
+                  value=""
+                  tabIndex={-1}
+                  aria-hidden="true"
+                />
+                <input
+                  type="hidden"
+                  name="actionType"
+                  value="Q2FzZXM="
+                  tabIndex={-1}
+                  aria-hidden="true"
+                />
+                <input
+                  type="hidden"
+                  name="property(module)"
+                  value="Cases"
+                  tabIndex={-1}
+                  aria-hidden="true"
+                />
                 <input
                   type="hidden"
                   name="returnURL"
                   value="https://civify.cv"
+                  tabIndex={-1}
+                  aria-hidden="true"
                 />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
