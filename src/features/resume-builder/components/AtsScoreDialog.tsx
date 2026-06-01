@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, CheckCircle2, Target, Loader2 } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Target, Loader2, LayoutTemplate } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 
@@ -18,6 +18,7 @@ interface AtsScoreDialogProps {
   onOpenChange: (open: boolean) => void;
   score: AtsScore | null;
   isLoading: boolean;
+  onApplyAtsTemplate?: () => void;
 }
 
 function getScoreColor(score: number): string {
@@ -32,8 +33,18 @@ function getScoreBarColor(score: number): string {
   return 'bg-red-500';
 }
 
-export function AtsScoreDialog({ open, onOpenChange, score, isLoading }: AtsScoreDialogProps) {
+export function AtsScoreDialog({
+  open,
+  onOpenChange,
+  score,
+  isLoading,
+  onApplyAtsTemplate,
+}: AtsScoreDialogProps) {
   const t = useTranslations('atsScore');
+
+  const contentScore = score?.contentScore ?? score?.keywordMatch ?? 0;
+  const formatScore = score?.formatScore;
+  const parseScore = score?.parseabilityScore;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -55,35 +66,74 @@ export function AtsScoreDialog({ open, onOpenChange, score, isLoading }: AtsScor
           </div>
         ) : score ? (
           <div className="space-y-6 py-4">
-            {/* Main Score */}
             <div className="text-center space-y-2">
               <div className={cn("text-6xl font-bold", getScoreColor(score.overall))}>
                 {score.overall}%
               </div>
               <p className="text-muted-foreground">{t('overallCompatibility')}</p>
+              {score.atsReadiness && (
+                <p className="text-sm text-muted-foreground">
+                  {t('atsReadiness')}: {t(`readiness.${score.atsReadiness}`)}
+                </p>
+              )}
             </div>
 
-            {/* Progress Bar */}
             <div className="w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
               <div
                 className={cn("h-full rounded-full transition-all duration-500", getScoreBarColor(score.overall))}
-                style={{ width: `${score.overall}%` }}
+                style={{ width: `${Math.min(100, Math.max(0, score.overall))}%` }}
               />
             </div>
 
-            {/* Score Breakdown */}
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-2 gap-3 text-sm">
               <div className="p-3 bg-muted/50 rounded-lg">
                 <p className="text-muted-foreground">{t('contentQuality')}</p>
-                <p className="font-semibold text-lg">{score.keywordMatch}%</p>
+                <p className="font-semibold text-lg">{contentScore}%</p>
               </div>
               <div className="p-3 bg-muted/50 rounded-lg">
-                <p className="text-muted-foreground">{t('skillsPresentation')}</p>
+                <p className="text-muted-foreground">{t('structureScore')}</p>
                 <p className="font-semibold text-lg">{score.skillsMatch}%</p>
               </div>
+              {formatScore != null && (
+                <div className="p-3 bg-muted/50 rounded-lg">
+                  <p className="text-muted-foreground">{t('formatScore')}</p>
+                  <p className="font-semibold text-lg">{formatScore}%</p>
+                </div>
+              )}
+              {parseScore != null && (
+                <div className="p-3 bg-muted/50 rounded-lg">
+                  <p className="text-muted-foreground">{t('parseabilityScore')}</p>
+                  <p className="font-semibold text-lg">{parseScore}%</p>
+                </div>
+              )}
             </div>
 
-            {/* Missing Elements */}
+            {score.recommendedTemplateId && score.recommendedTemplateId !== 'ats' && onApplyAtsTemplate && (
+              <Button variant="outline" className="w-full gap-2" onClick={onApplyAtsTemplate}>
+                <LayoutTemplate className="h-4 w-4" />
+                {t('applyAtsTemplate')}
+              </Button>
+            )}
+
+            {score.formatIssues && score.formatIssues.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="font-medium flex items-center gap-2 text-amber-600">
+                  <AlertCircle className="h-4 w-4" />
+                  {t('formatIssues')}
+                </h4>
+                <ul className="text-sm space-y-2">
+                  {score.formatIssues.slice(0, 5).map((issue, idx) => (
+                    <li key={idx} className="text-muted-foreground">
+                      <span className="font-medium text-foreground">{issue.message}</span>
+                      {issue.fixHint && (
+                        <span className="block text-xs mt-0.5">{issue.fixHint}</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {score.missingKeywords && score.missingKeywords.length > 0 && (
               <div className="space-y-2">
                 <h4 className="font-medium flex items-center gap-2 text-amber-600">
@@ -101,7 +151,6 @@ export function AtsScoreDialog({ open, onOpenChange, score, isLoading }: AtsScor
               </div>
             )}
 
-            {/* Suggestions */}
             {score.suggestions && score.suggestions.length > 0 && (
               <div className="space-y-2">
                 <h4 className="font-medium flex items-center gap-2 text-green-600">
@@ -132,4 +181,3 @@ export function AtsScoreDialog({ open, onOpenChange, score, isLoading }: AtsScor
     </Dialog>
   );
 }
-

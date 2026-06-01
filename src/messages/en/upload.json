@@ -34,6 +34,7 @@
     "cvReadyDesc": "Your AI-enhanced CV is ready. Review the result or regenerate if needed.",
     "refineResult": "Refine Result",
     "editSections": "Edit Sections",
+    "modifyInBuilder": "Modify in Builder",
     "regenerateVariant": "Regenerate Variant",
     "atsMatchScore": "ATS Match Score",
     "before": "Before",

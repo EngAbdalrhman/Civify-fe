@@ -174,6 +174,48 @@
     "stillQuestions": "Still have questions?",
     "contactSupportTeam": "Contact Support Team"
   },
+  "applicationOutputs": {
+    "title": "More Than a Tailored Resume",
+    "subtitle": "After you tailor to a job description, Civify can generate extras to support your full application",
+    "outputs": {
+      "coverLetter": {
+        "title": "Cover Letter",
+        "description": "AI-written letter body with a professional header built from your contact details and the target company",
+        "previewLine1": "Dear Hiring Manager,",
+        "previewLine2": "I am excited to apply for the Software Engineer role..."
+      },
+      "interview": {
+        "title": "Interview Prep",
+        "description": "Role-specific practice questions with hints so you can prepare before the first call",
+        "previewQ1": "Tell me about a time you improved system performance.",
+        "previewQ2": "How do you prioritize work when requirements change?"
+      },
+      "roadmap": {
+        "title": "Skill Gap Roadmap",
+        "description": "Optional learning steps based on keywords missing from your CV versus the job description",
+        "previewStep1": "Week 1–2: Deepen cloud deployment basics",
+        "previewStep2": "Week 3–4: Practice system design scenarios"
+      }
+    },
+    "tryTailor": "Start tailoring",
+    "workflowTitle": "Works with your workflow",
+    "workflowNote": "PDF and Word export are available on the tailor results step and in the resume builder — no extra setup required.",
+    "workflow": {
+      "linkedin": {
+        "title": "LinkedIn & Chrome",
+        "description": "Sign in with LinkedIn and tailor faster from job pages with our extension"
+      },
+      "translate": {
+        "title": "AI Translate",
+        "description": "Translate your resume between English and Arabic with RTL layout preserved in the builder"
+      },
+      "jobMatches": {
+        "title": "Job Matches",
+        "description": "Save targets and review structured fit insights for roles you track"
+      }
+    },
+    "learnMore": "Learn more"
+  },
   "integrations": {
     "title": "Export & Workflow",
     "subtitle": "Use Civify with the tools you already rely on during applications",
@@ -208,6 +250,7 @@
     "title": "Professional Resume Templates",
     "subtitle": "Choose from ATS-optimized template styles designed to stay clean, readable, and recruiter-friendly",
     "badge": "ATS-Friendly",
+    "openBuilder": "Open in builder",
     "note": {
       "bold": "Five ATS-friendly visual styles",
       "text": "— clean layouts designed for readability and keyword scanning"

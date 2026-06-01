@@ -1,6 +1,22 @@
 {
   "template": {
     "title": "Template",
+    "atsParseabilityHint": "How well this layout parses in typical applicant tracking systems",
+    "atsTier": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "moderate": "Moderate",
+      "low": "Low"
+    },
+    "categories": {
+      "ats": "ATS",
+      "balanced": "Balanced",
+      "traditional": "Traditional",
+      "bold": "Bold",
+      "premium": "Premium",
+      "clean": "Clean"
+    },
+    "ats": { "name": "ATS", "description": "Optimized for applicant tracking systems" },
     "modern": { "name": "Modern", "description": "Clean and professional" },
     "classic": { "name": "Classic", "description": "Timeless and traditional" },
     "creative": { "name": "Creative", "description": "Bold and standout" },

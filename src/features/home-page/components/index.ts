@@ -8,6 +8,7 @@ export { TestimonialsSection } from "./TestimonialsSection";
 export { PricingSection } from "./PricingSection";
 export { FAQSection } from "./FAQSection";
 export { IntegrationsSection } from "./IntegrationsSection";
+export { ApplicationOutputsSection } from "./ApplicationOutputsSection";
 export { BlogPreviewSection } from "./BlogPreviewSection";
 export { CTASection } from "./CTASection";
 export * from "./ResumeBuilderSection";

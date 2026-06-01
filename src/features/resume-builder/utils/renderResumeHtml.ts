@@ -1373,12 +1373,39 @@ function renderMinimalTemplate(data: ResumeData, color: string, watermark?: Wate
 // Main Export Function
 // ============================================================================
 
+function renderAtsTemplate(
+  data: ResumeData,
+  color: string,
+  watermark?: WatermarkConfig,
+): string {
+  const atsData: ResumeData = JSON.parse(JSON.stringify(data)) as ResumeData;
+  atsData.metadata = {
+    ...atsData.metadata,
+    templateId: "ats",
+    skillsDisplayStyle: "tags",
+    languagesDisplayStyle: "level",
+    fontFamily: "Arial",
+    bodyFontFamily: "Arial",
+    headingFontFamily: "Georgia",
+  };
+  // Preserve sectionColumns from Design tab; cap each eligible section at 3 for ATS PDF
+  if (atsData.metadata?.sectionColumns) {
+    const capped: Record<string, number> = {};
+    for (const [id, cols] of Object.entries(atsData.metadata.sectionColumns)) {
+      capped[id] = Math.min(Math.max(1, cols), 3);
+    }
+    atsData.metadata.sectionColumns = capped;
+  }
+  return renderMinimalTemplate(atsData, color || "#111827", watermark);
+}
+
 export type TemplateType =
   | "modern"
   | "classic"
   | "creative"
   | "executive"
-  | "minimal";
+  | "minimal"
+  | "ats";
 
 export function renderResumeHtml(
   data: ResumeData,
@@ -1387,6 +1414,8 @@ export function renderResumeHtml(
   watermark?: WatermarkConfig,
 ): string {
   switch (template) {
+    case "ats":
+      return renderAtsTemplate(data, color, watermark);
     case "classic":
       return renderClassicTemplate(data, color, watermark);
     case "executive":

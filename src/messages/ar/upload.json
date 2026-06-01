@@ -34,6 +34,7 @@
     "cvReadyDesc": "سيرتك الذاتية المحسنة بالذكاء الاصطناعي جاهزة. راجع النتيجة أو أعد التوليد إذا لزم الأمر.",
     "refineResult": "تحسين النتيجة",
     "editSections": "تعديل الأقسام",
+    "modifyInBuilder": "تعديل في المنشئ",
     "regenerateVariant": "إعادة توليد نسخة أخرى",
     "atsMatchScore": "درجة توافق ATS",
     "before": "قبل",

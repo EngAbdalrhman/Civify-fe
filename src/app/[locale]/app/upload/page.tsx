@@ -14,23 +14,14 @@ import {
     FileEdit,
     FileText,
     FolderOpen,
-    Github,
-    Globe,
     HelpCircle,
-    Linkedin,
     Loader2,
-    Mail,
     Map,
-    MapPin,
     MessageSquare,
-    Phone,
-    Plus,
     RefreshCw,
     Save,
     Sparkles,
-    Trash2,
     UploadCloud,
-    X,
     Zap,
 } from "lucide-react";
 import {Button} from "@/components/ui/button";
@@ -39,11 +30,9 @@ import {Textarea} from "@/components/ui/textarea";
 import {Label} from "@/components/ui/label";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
 import {Separator} from "@/components/ui/separator";
-import {Accordion, AccordionContent, AccordionItem, AccordionTrigger,} from "@/components/ui/accordion";
 import {Switch} from "@/components/ui/switch";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,} from "@/components/ui/dropdown-menu";
 import {
     AlertDialog,
     AlertDialogCancel,
@@ -61,15 +50,19 @@ import {
     type CvTailorResponse,
     emptyResumeData,
     type ResumeData,
-    type ResumeSection,
 } from "@/features/upload-cv/types";
-import {exportToDocx, exportToPdfPuppeteer, type TemplateType,} from "@/features/upload-cv/utils/exportCv";
+import { UploadReviewEditor } from "@/features/upload-cv/components";
+import { normalizeUploadResumeData } from "@/features/upload-cv/utils/normalizeUploadSections";
+import {type TemplateType} from "@/features/upload-cv/utils/exportCv";
+import {ExportPanel} from "@/features/resume-builder/components/ExportPanel";
+import {applyResumeMask} from "@/features/resume-builder/utils/maskPersonalInfo";
 import {useRouter} from "next/navigation";
 import {ResumeService, ResumeSummary} from "@/services/resume.service";
 import {JobApplicationService} from "@/services/job-application.service";
 import {getAccessToken} from "@/utils/cookies";
 import {AuthGateDialog} from "@/features/resume-builder/components/AuthGateDialog";
 import {ResumePreview} from "@/features/resume-builder/components/ResumePreview";
+import {AtsScoreDetails} from "@/features/resume-builder/components/AtsScoreDetails";
 // import { AdBanner } from "@/components/ads/AdBanner";
 import {
     getUploadStep2TourSteps,
@@ -109,8 +102,6 @@ export default function UploadPage() {
     useState(false);
   const [includeRoadmap, setIncludeRoadmap] = useState(false);
   const [maskPII, setMaskPII] = useState(false);
-  const [isExportingPdf, setIsExportingPdf] = useState(false);
-  const [isExportingDocx, setIsExportingDocx] = useState(false);
   const [showTokenLimitModal, setShowTokenLimitModal] = useState(false);
   const [jobDescriptionError, setJobDescriptionError] = useState("");
   const [isSavingResume, setIsSavingResume] = useState(false);
@@ -208,7 +199,7 @@ export default function UploadPage() {
       uploadCv(file, {
         onSuccess: (data) => {
           if (data.resumeData) {
-            setResumeData(data.resumeData);
+            setResumeData(normalizeUploadResumeData(data.resumeData));
             setCurrentStep(2);
           } else {
             toast.error(t("errors.parseFailed"));
@@ -289,7 +280,7 @@ export default function UploadPage() {
       return;
     }
 
-    setResumeData(emptyResumeData);
+    setResumeData(normalizeUploadResumeData(emptyResumeData));
     setCurrentStep(2);
   }, []);
 
@@ -319,7 +310,7 @@ export default function UploadPage() {
       try {
         const fullResume = await ResumeService.getById(resume.id);
         if (fullResume.data) {
-          setResumeData(fullResume.data);
+          setResumeData(normalizeUploadResumeData(fullResume.data));
           setCurrentStep(2);
         } else {
           toast.error(t("selectResume.loadError") || "Resume data not found");
@@ -331,46 +322,6 @@ export default function UploadPage() {
     },
     [t],
   );
-
-  // Download handlers
-  const handleDownloadPdf = async () => {
-    if (!tailorResponse?.tailoredCv) return;
-
-    setIsExportingPdf(true);
-    try {
-      const filename = `${tailorResponse.tailoredCv.personalInfo.fullName || "cv"}_tailored`;
-
-      const template = (tailorResponse.tailoredCv.metadata?.templateId ||
-        "modern") as TemplateType;
-      const color = tailorResponse.tailoredCv.metadata?.primaryColor || "#000000";
-
-      await exportToPdfPuppeteer(tailorResponse.tailoredCv, {
-        filename,
-        template,
-        color,
-      });
-    } catch (error) {
-      console.error("PDF export failed:", error);
-      toast.error(t("errors.exportPdfFailed"));
-    } finally {
-      setIsExportingPdf(false);
-    }
-  };
-
-  const handleDownloadDocx = useCallback(async () => {
-    if (!tailorResponse) return;
-
-    setIsExportingDocx(true);
-    try {
-      const filename = `${tailorResponse.tailoredCv.personalInfo.fullName || "cv"}_tailored`;
-      await exportToDocx(tailorResponse.tailoredCv, filename);
-    } catch (error) {
-      console.error("DOCX export failed:", error);
-      toast.error(t("errors.exportDocxFailed"));
-    } finally {
-      setIsExportingDocx(false);
-    }
-  }, [tailorResponse]);
 
   const handleSaveToResumes = useCallback(async () => {
     if (!tailorResponse?.tailoredCv) return;
@@ -498,123 +449,11 @@ export default function UploadPage() {
     }
   }, [jdUrl, t]);
 
-  const updatePersonalInfo = useCallback((field: string, value: string) => {
-    setResumeData((prev) =>
-      prev
-        ? {
-            ...prev,
-            personalInfo: { ...prev.personalInfo, [field]: value },
-          }
-        : null,
-    );
-  }, []);
-
-  const addSectionItem = useCallback((sectionId: string) => {
-    setResumeData((prev) => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        sections: prev.sections.map((section) =>
-          section.id === sectionId
-            ? {
-                ...section,
-                items: [
-                  ...section.items,
-                  {
-                    id: `item-${Date.now()}`,
-                    title: "",
-                    subtitle: "",
-                    date: "",
-                    description: "",
-                    tags: [],
-                  },
-                ],
-              }
-            : section,
-        ),
-      };
-    });
-  }, []);
-
-  const updateSectionItem = useCallback(
-    (
-      sectionId: string,
-      itemId: string,
-      field: string,
-      value: string | string[],
-    ) => {
-      setResumeData((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          sections: prev.sections.map((section) =>
-            section.id === sectionId
-              ? {
-                  ...section,
-                  items: section.items.map((item) =>
-                    item.id === itemId ? { ...item, [field]: value } : item,
-                  ),
-                }
-              : section,
-          ),
-        };
-      });
-    },
-    [],
-  );
-
-  const removeSectionItem = useCallback((sectionId: string, itemId: string) => {
-    setResumeData((prev) => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        sections: prev.sections.map((section) =>
-          section.id === sectionId
-            ? {
-                ...section,
-                items: section.items.filter((item) => item.id !== itemId),
-              }
-            : section,
-        ),
-      };
-    });
-  }, []);
-
-  const addSection = useCallback(
-    (type: ResumeSection["type"], title: string) => {
-      setResumeData((prev) => {
-        if (!prev) return null;
-        const newSection: ResumeSection = {
-          id: `section-${Date.now()}`,
-          title,
-          type,
-          items: [],
-          order: prev.sections.length,
-          isVisible: true,
-        };
-        return {
-          ...prev,
-          sections: [...prev.sections, newSection],
-        };
-      });
-    },
-    [],
-  );
-
   const isResumeValid = useCallback(() => {
     if (!resumeData) return false;
     const { personalInfo } = resumeData;
     return !!(personalInfo.fullName && personalInfo.email);
   }, [resumeData]);
-
-  const getSectionType = (
-    section: ResumeSection,
-  ): "skills" | "languages" | "default" => {
-    const type = section.type.toLowerCase();
-    if (type === "skills") return "skills";
-    if (type === "languages") return "languages";
-    return "default";
-  };
 
   const hasAdditionalFeatures = useMemo(() => {
     if (!tailorResponse) return false;
@@ -844,293 +683,12 @@ export default function UploadPage() {
       {/* Step 2: Review/Edit Data */}
       {currentStep === 2 && resumeData && (
         <div className="space-y-6 max-w-3xl mx-auto">
-          {/* Personal Info */}
-          <Card data-tour="upload-step2-personal-info">
-            <CardHeader>
-              <CardTitle>{t("personalInfo.title")}</CardTitle>
-              <CardDescription>{t("personalInfo.subtitle")}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>{t("personalInfo.fullName")} *</Label>
-                  <Input
-                    value={resumeData.personalInfo.fullName}
-                    onChange={(e) =>
-                      updatePersonalInfo("fullName", e.target.value)
-                    }
-                    placeholder={t("placeholders.fullName")}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>{t("personalInfo.email")} *</Label>
-                  <Input
-                    type="email"
-                    value={resumeData.personalInfo.email}
-                    onChange={(e) =>
-                      updatePersonalInfo("email", e.target.value)
-                    }
-                    placeholder={t("placeholders.email")}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>{t("personalInfo.phone")}</Label>
-                  <Input
-                    value={resumeData.personalInfo.phone || ""}
-                    onChange={(e) =>
-                      updatePersonalInfo("phone", e.target.value)
-                    }
-                    placeholder={t("placeholders.phone")}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>{t("personalInfo.jobTitle")}</Label>
-                  <Input
-                    value={resumeData.personalInfo.jobTitle || ""}
-                    onChange={(e) =>
-                      updatePersonalInfo("jobTitle", e.target.value)
-                    }
-                    placeholder={t("placeholders.jobTitle")}
-                  />
-                </div>
-                <div className="space-y-2 sm:col-span-2">
-                  <Label>{t("personalInfo.address")}</Label>
-                  <Input
-                    value={resumeData.personalInfo.address || ""}
-                    onChange={(e) =>
-                      updatePersonalInfo("address", e.target.value)
-                    }
-                    placeholder={t("personalInfo.placeholders.address")}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>{t("personalInfo.city")}</Label>
-                  <Input
-                    value={resumeData.personalInfo.city || ""}
-                    onChange={(e) =>
-                      updatePersonalInfo("city", e.target.value)
-                    }
-                    placeholder={t("personalInfo.placeholders.city")}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>{t("personalInfo.country")}</Label>
-                  <Input
-                    value={resumeData.personalInfo.country || ""}
-                    onChange={(e) =>
-                      updatePersonalInfo("country", e.target.value)
-                    }
-                    placeholder={t("personalInfo.placeholders.country")}
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>{t("personalInfo.summary")}</Label>
-                <Textarea
-                  value={resumeData.personalInfo.summary || ""}
-                  onChange={(e) =>
-                    updatePersonalInfo("summary", e.target.value)
-                  }
-                  placeholder={t("personalInfo.summaryPlaceholder")}
-                  rows={3}
-                />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label>{t("personalInfo.linkedin")}</Label>
-                  <Input
-                    value={resumeData.personalInfo.linkedin || ""}
-                    onChange={(e) =>
-                      updatePersonalInfo("linkedin", e.target.value)
-                    }
-                    placeholder={t("placeholders.linkedin")}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>{t("personalInfo.github")}</Label>
-                  <Input
-                    value={resumeData.personalInfo.github || ""}
-                    onChange={(e) =>
-                      updatePersonalInfo("github", e.target.value)
-                    }
-                    placeholder={t("placeholders.github")}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>{t("personalInfo.website")}</Label>
-                  <Input
-                    value={resumeData.personalInfo.website || ""}
-                    onChange={(e) =>
-                      updatePersonalInfo("website", e.target.value)
-                    }
-                    placeholder={t("placeholders.website")}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Dynamic Sections */}
-          <Accordion
-            data-tour="upload-step2-sections"
-            type="single"
-            collapsible
-            defaultValue={resumeData.sections[0]?.id}
-            className="space-y-3"
-          >
-          {resumeData.sections.map((section) => {
-            const sectionType = getSectionType(section);
-
-            // Skills Section: Consolidated single-block editing
-            if (sectionType === "skills") {
-              const allSkills = section.items
-                .map((item) => item.title)
-                .filter(Boolean);
-
-              return (
-                <AccordionItem key={section.id} value={section.id} className="border rounded-lg">
-                  <AccordionTrigger className="px-6 py-4 hover:no-underline">
-                    <span className="capitalize font-semibold">{section.title}</span>
-                  </AccordionTrigger>
-                  <AccordionContent className="px-6 pb-4">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>{t("sections.skillsInput")}</Label>
-                      <Textarea
-                        value={allSkills.join(", ")}
-                        onChange={(e) => {
-                          const newSkills = e.target.value
-                            .split(",")
-                            .map((s) => s.trim())
-                            .filter(Boolean);
-                          setResumeData((prev) => {
-                            if (!prev) return null;
-                            return {
-                              ...prev,
-                              sections: prev.sections.map((s) =>
-                                s.id === section.id
-                                  ? {
-                                      ...s,
-                                      items: newSkills.map((skill, idx) => ({
-                                        id: `skill-${idx}`,
-                                        title: skill,
-                                        subtitle: "",
-                                        date: "",
-                                        description: "",
-                                        location: "",
-                                        tags: [],
-                                        isVisible: true,
-                                      })),
-                                    }
-                                  : s,
-                              ),
-                            };
-                          });
-                        }}
-                        placeholder="Java, Spring Boot, Angular, TypeScript, React..."
-                        rows={3}
-                      />
-                    </div>
-                  </div>
-                  </AccordionContent>
-                </AccordionItem>
-              );
-            }
-
-            // Other sections: Normal item-by-item rendering
-            return (
-              <AccordionItem key={section.id} value={section.id} className="border rounded-lg">
-                <AccordionTrigger className="px-6 py-4 hover:no-underline">
-                  <div className="flex items-center justify-between w-full pr-2">
-                    <span className="capitalize font-semibold">{section.title}</span>
-                    <span className="text-xs text-muted-foreground font-normal">{section.items.length} {section.items.length === 1 ? 'item' : 'items'}</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="px-6 pb-4">
-                <div className="space-y-4">
-                  <div className="flex justify-end">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => { e.stopPropagation(); addSectionItem(section.id); }}
-                    >
-                      <Plus className="h-4 w-4 mr-1" /> Add
-                    </Button>
-                  </div>
-                  {section.items.map((item) => (
-                    <div
-                      key={item.id}
-                      className="border rounded-lg p-4 space-y-3 relative"
-                    >
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="absolute top-2 right-2 h-6 w-6 text-destructive"
-                        onClick={() => removeSectionItem(section.id, item.id)}
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-
-                      {sectionType === "languages" ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <Input
-                            value={item.title}
-                            onChange={(e) =>
-                              updateSectionItem(section.id, item.id, "title", e.target.value)
-                            }
-                            placeholder="Language (e.g., English)"
-                          />
-                          <Input
-                            value={item.subtitle || ""}
-                            onChange={(e) =>
-                              updateSectionItem(section.id, item.id, "subtitle", e.target.value)
-                            }
-                            placeholder="Level (e.g., Native, Fluent)"
-                          />
-                        </div>
-                      ) : (
-                        <>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <Input
-                              value={item.title}
-                              onChange={(e) =>
-                                updateSectionItem(section.id, item.id, "title", e.target.value)
-                              }
-                              placeholder="Title"
-                            />
-                            <Input
-                              value={item.subtitle || ""}
-                              onChange={(e) =>
-                                updateSectionItem(section.id, item.id, "subtitle", e.target.value)
-                              }
-                              placeholder="Subtitle"
-                            />
-                          </div>
-                          <Input
-                            value={item.date || ""}
-                            onChange={(e) =>
-                              updateSectionItem(section.id, item.id, "date", e.target.value)
-                            }
-                            placeholder="Date"
-                          />
-                          <Textarea
-                            value={item.description || ""}
-                            onChange={(e) =>
-                              updateSectionItem(section.id, item.id, "description", e.target.value)
-                            }
-                            placeholder="Description"
-                            rows={2}
-                          />
-                        </>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                </AccordionContent>
-              </AccordionItem>
-            );
-          })}
-          </Accordion>
+          <div data-tour="upload-step2-personal-info">
+            <UploadReviewEditor
+              data={resumeData}
+              onChange={setResumeData}
+            />
+          </div>
 
           <div
             data-tour="upload-step2-actions"
@@ -1140,47 +698,13 @@ export default function UploadPage() {
               <ArrowLeft className="mr-2 h-4 w-4" /> {t("actions.back")}
             </Button>
 
-            <div className="flex gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Plus className="h-4 w-4 mr-1" />
-                    {t("actions.addSection")}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  {[
-                    { type: "experience", title: t("sections.experience"), match: ["experience", "professional experience"] },
-                    { type: "education", title: t("sections.education"), match: ["education"] },
-                    { type: "projects", title: t("sections.projects"), match: ["project"] },
-                    { type: "skills", title: t("sections.skills"), match: ["skill", "competenc"] },
-                    { type: "languages", title: t("sections.languages"), match: ["language"] },
-                    { type: "certifications", title: t("sections.certifications"), match: ["course", "certif"] },
-                    { type: "custom", title: t("sections.interests"), match: ["interest", "hobby"] },
-                    { type: "custom", title: t("sections.activities"), match: ["activit", "volunteer"] },
-                  ]
-                    .filter((s) => !resumeData.sections.some((existing) => s.match.some((m) => existing.title.toLowerCase().includes(m))))
-                    .map((s) => (
-                      <DropdownMenuItem
-                        key={s.title}
-                        onClick={() => addSection(s.type as ResumeSection["type"], s.title.toUpperCase())}
-                        className="cursor-pointer"
-                      >
-                        <Plus className="h-4 w-4 mr-2 text-muted-foreground" />
-                        {s.title}
-                      </DropdownMenuItem>
-                    ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <Button
-                onClick={() => setCurrentStep(3)}
-                disabled={!isResumeValid()}
-              >
-                {t("upload.generateTailoredCv")}{" "}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
+            <Button
+              onClick={() => setCurrentStep(3)}
+              disabled={!isResumeValid()}
+            >
+              {t("upload.generateTailoredCv")}{" "}
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
           </div>
         </div>
       )}
@@ -1335,24 +859,15 @@ export default function UploadPage() {
             <div className="lg:col-span-1 space-y-4">
               <Card data-tour="upload-step4-downloads">
                 <CardContent className="pt-6 space-y-4">
-                  <div className="flex items-center gap-2 text-green-600">
-                    <CheckCircle2 className="h-5 w-5" />
-                    <span className="font-semibold">{t("upload.cvGenerated")}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {t("upload.cvReadyDesc")}
-                  </p>
-
-                  <div className="space-y-2">
-                    <Button className="w-full" size="sm" onClick={handleDownloadPdf} disabled={isExportingPdf || isExportingDocx}>
-                      <Download className="mr-2 h-4 w-4" />
-                      {isExportingPdf ? t("upload.exporting") : t("upload.downloadPdf")}
-                    </Button>
-                    <Button variant="outline" className="w-full" size="sm" onClick={handleDownloadDocx} disabled={isExportingPdf || isExportingDocx}>
-                      <Download className="mr-2 h-4 w-4" />
-                      {isExportingDocx ? t("upload.exporting") : t("upload.downloadDocx")}
-                    </Button>
-                  </div>
+                  <ExportPanel
+                    data={tailorResponse.tailoredCv}
+                    maskPII={maskPII}
+                    onMaskPIIChange={setMaskPII}
+                    hideMaskToggle
+                    variant="embedded"
+                    filenameSuffix="_tailored"
+                    onAuthGate={() => setShowAuthGate(true)}
+                  />
 
                   <Separator className="my-3" />
 
@@ -1373,7 +888,7 @@ export default function UploadPage() {
                 <CardContent className="space-y-2">
                   <Button variant="ghost" className="w-full justify-start" size="sm" onClick={handleEditInResumeBuilder} disabled={isSavingResume}>
                     <Edit2 className="mr-2 h-4 w-4" />{" "}
-                    {isSavingResume ? t("upload.saving") : t("upload.editSections")}
+                    {isSavingResume ? t("upload.saving") : t("upload.modifyInBuilder")}
                   </Button>
                   <Button variant="ghost" className="w-full justify-start" size="sm" onClick={() => setCurrentStep(3)}>
                     <RefreshCw className="mr-2 h-4 w-4" />{" "}
@@ -1452,16 +967,7 @@ export default function UploadPage() {
                         style={{ width: `${tailorResponse.atsScore.overall}%` }}
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-2 mt-3 text-sm">
-                      <div>
-                        <p className="text-muted-foreground">Keywords</p>
-                        <p className="font-semibold">{tailorResponse.atsScore.keywordMatch}%</p>
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground">Skills</p>
-                        <p className="font-semibold">{tailorResponse.atsScore.skillsMatch}%</p>
-                      </div>
-                    </div>
+                    <AtsScoreDetails score={tailorResponse.atsScore} className="mt-3" />
                   </div>
 
                   {tailorResponse.atsScore.missingKeywords && tailorResponse.atsScore.missingKeywords.length > 0 && (
@@ -1503,20 +1009,7 @@ export default function UploadPage() {
                     >
                       <div ref={cvPreviewRef}>
                         <ResumePreview
-                          data={{
-                            ...tailorResponse.tailoredCv,
-                            personalInfo: maskPII
-                              ? {
-                                  ...tailorResponse.tailoredCv.personalInfo,
-                                  fullName: "••••••••",
-                                  email: tailorResponse.tailoredCv.personalInfo.email ? "••••••••@••••.•••" : "",
-                                  phone: tailorResponse.tailoredCv.personalInfo.phone ? "•••••••••••" : "",
-                                  linkedin: tailorResponse.tailoredCv.personalInfo.linkedin ? "••••••••" : "",
-                                  github: tailorResponse.tailoredCv.personalInfo.github ? "••••••••" : "",
-                                  website: tailorResponse.tailoredCv.personalInfo.website ? "••••••••" : "",
-                                }
-                              : tailorResponse.tailoredCv.personalInfo,
-                          }}
+                          data={applyResumeMask(tailorResponse.tailoredCv, maskPII)}
                         />
                       </div>
                     </div>

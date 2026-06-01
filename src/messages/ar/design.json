@@ -1,6 +1,22 @@
 {
   "template": {
     "title": "القالب",
+    "atsParseabilityHint": "مدى توافق هذا التخطيط مع أنظمة تتبع المتقدمين الشائعة",
+    "atsTier": {
+      "excellent": "ممتاز",
+      "good": "جيد",
+      "moderate": "متوسط",
+      "low": "منخفض"
+    },
+    "categories": {
+      "ats": "ATS",
+      "balanced": "متوازن",
+      "traditional": "تقليدي",
+      "bold": "جريء",
+      "premium": "مميز",
+      "clean": "نظيف"
+    },
+    "ats": { "name": "ATS", "description": "محسّن لأنظمة تتبع المتقدمين" },
     "modern": { "name": "حديث", "description": "نظيف واحترافي" },
     "classic": { "name": "كلاسيكي", "description": "خالد وتقليدي" },
     "creative": { "name": "إبداعي", "description": "جريء ومتميز" },

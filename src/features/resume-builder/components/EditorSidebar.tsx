@@ -42,10 +42,6 @@ interface EditorSidebarProps {
     onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
     onUploadClick: () => void;
 
-    // ATS Score
-    isCalculatingScore: boolean;
-    onCalculateScore: () => void;
-
     // Guest mode
     isGuest?: boolean;
     onAuthGate?: () => void;
@@ -77,8 +73,6 @@ export function EditorSidebar({
     fileInputRef,
     onFileUpload,
     onUploadClick,
-    isCalculatingScore,
-    onCalculateScore,
     isGuest = false,
     onAuthGate,
     isTranslating,

@@ -118,8 +118,6 @@ export function ResumeBuilder({
           fileInputRef={upload.fileInputRef}
           onFileUpload={upload.handleFileUpload}
           onUploadClick={upload.triggerFileUpload}
-          isCalculatingScore={builder.isCalculatingScore}
-          onCalculateScore={builder.handleCalculateScore}
           isGuest={builder.isGuest}
           onAuthGate={builder.handleAuthGatedAction}
           isTranslating={translation.isTranslating}
