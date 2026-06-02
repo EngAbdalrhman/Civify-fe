@@ -7,6 +7,7 @@ import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import type { BlogPost } from "@/types/blog";
+import { prepareBlogHtml } from "@/lib/blog/sanitizeBlogHtml";
 
 interface BlogPostContentProps {
   post: BlogPost;
@@ -98,7 +99,7 @@ export default function BlogPostContent({ post, locale }: BlogPostContentProps) 
             className="prose prose-neutral max-w-none dark:prose-invert prose-headings:font-bold prose-a:text-primary prose-img:rounded-lg"
             // Content comes from our own backend — safe to render as HTML
             // eslint-disable-next-line react/no-danger
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: prepareBlogHtml(post.content) }}
           />
         </article>
 
