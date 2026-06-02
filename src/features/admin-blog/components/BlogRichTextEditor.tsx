@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useMemo, useRef, type ReactNode } from "react";
 import Image from "@tiptap/extension-image";
-import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -25,8 +24,6 @@ import { cn } from "@/lib/utils";
 export interface BlogRichTextEditorProps {
   value: string;
   onChange: (html: string) => void;
-  /** Remount when switching posts so loaded HTML replaces editor data. */
-  editorKey: string;
 }
 
 function ToolbarButton({
@@ -58,61 +55,65 @@ function ToolbarButton({
   );
 }
 
-export function BlogRichTextEditor({
-  value,
-  onChange,
-  editorKey,
-}: BlogRichTextEditorProps) {
-  const editor = useEditor(
-    {
-      immediatelyRender: false,
-      extensions: [
-        StarterKit.configure({
-          heading: { levels: [2, 3] },
-        }),
-        Link.configure({
+/** True when TipTap HTML has no meaningful text (e.g. empty `<p></p>`). */
+export function isBlogEditorContentEmpty(html: string): boolean {
+  const text = html
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .trim();
+  return text.length === 0;
+}
+
+export function BlogRichTextEditor({ value, onChange }: BlogRichTextEditorProps) {
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+
+  const extensions = useMemo(
+    () => [
+      StarterKit.configure({
+        heading: { levels: [2, 3] },
+        link: {
           openOnClick: false,
           HTMLAttributes: {
             rel: "noopener noreferrer",
           },
-        }),
-        Image.configure({
-          allowBase64: false,
-          inline: true,
-        }),
-        Placeholder.configure({
-          placeholder: "Write your article…",
-        }),
-      ],
-      content: value,
-      editorProps: {
-        attributes: {
-          class:
-            "prose prose-sm dark:prose-invert max-w-none min-h-[280px] px-4 py-3 focus:outline-none",
         },
-      },
-      onUpdate: ({ editor: ed }) => {
-        onChange(ed.getHTML());
-      },
-    },
-    [editorKey],
+      }),
+      Image.configure({
+        allowBase64: false,
+        inline: true,
+      }),
+      Placeholder.configure({
+        placeholder: "Write your article…",
+      }),
+    ],
+    [],
   );
 
-  useEffect(() => {
-    if (!editor) return;
-    const current = editor.getHTML();
-    if (value !== current) {
-      editor.commands.setContent(value || "<p></p>", { emitUpdate: false });
-    }
-  }, [editor, value, editorKey]);
+  const editor = useEditor({
+    immediatelyRender: false,
+    extensions,
+    content: value || "<p></p>",
+    editorProps: {
+      attributes: {
+        class:
+          "prose prose-sm dark:prose-invert max-w-none min-h-[280px] px-4 py-3 focus:outline-none",
+      },
+    },
+    onUpdate: ({ editor: ed }) => {
+      if (ed.isDestroyed) return;
+      onChangeRef.current(ed.getHTML());
+    },
+  });
 
-  if (!editor) {
+  if (!editor || editor.isDestroyed) {
     return (
       <div className="min-h-[300px] animate-pulse rounded-md border bg-muted/30" />
     );
   }
 
   const setLink = () => {
+    if (editor.isDestroyed) return;
     const previous = editor.getAttributes("link").href as string | undefined;
     const url = window.prompt("Link URL", previous ?? "https://");
     if (url === null) return;
@@ -124,6 +125,7 @@ export function BlogRichTextEditor({
   };
 
   const insertImageByUrl = () => {
+    if (editor.isDestroyed) return;
     const url = window.prompt(
       "Image URL (must be https:// — not uploaded to the server)",
       "https://",
@@ -136,20 +138,23 @@ export function BlogRichTextEditor({
     editor.chain().focus().setImage({ src: url.trim() }).run();
   };
 
+  const canUndo = !editor.isDestroyed && editor.can().undo();
+  const canRedo = !editor.isDestroyed && editor.can().redo();
+
   return (
     <div className="overflow-hidden rounded-md border bg-background">
       <div className="flex flex-wrap gap-0.5 border-b bg-muted/30 p-1">
         <ToolbarButton
           title="Undo"
           onClick={() => editor.chain().focus().undo().run()}
-          disabled={!editor.can().undo()}
+          disabled={!canUndo}
         >
           <Undo2 className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
           title="Redo"
           onClick={() => editor.chain().focus().redo().run()}
-          disabled={!editor.can().redo()}
+          disabled={!canRedo}
         >
           <Redo2 className="h-4 w-4" />
         </ToolbarButton>

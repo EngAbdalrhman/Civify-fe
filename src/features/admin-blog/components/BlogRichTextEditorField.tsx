@@ -23,20 +23,21 @@ export interface BlogRichTextEditorFieldProps {
   label?: string;
   value: string;
   onChange: (html: string) => void;
-  editorKey: string;
+  /** Stable id per post — remounts editor when switching create/edit. */
+  editorInstanceKey: string;
 }
 
 export function BlogRichTextEditorField({
   label = "Content",
   value,
   onChange,
-  editorKey,
+  editorInstanceKey,
 }: BlogRichTextEditorFieldProps) {
   return (
     <div className="space-y-2">
       <Label>{label} *</Label>
       <BlogRichTextEditor
-        editorKey={editorKey}
+        key={editorInstanceKey}
         value={value}
         onChange={onChange}
       />

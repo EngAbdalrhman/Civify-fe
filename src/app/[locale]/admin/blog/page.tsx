@@ -26,6 +26,7 @@ import { Plus, Edit2, Trash2, Loader2, BookOpen, Eye, Star } from "lucide-react"
 import apiClient from "@/api/client";
 import { normalizeBlogHtml } from "@/lib/blog/normalizeBlogHtml";
 import { BlogRichTextEditorField } from "@/features/admin-blog/components/BlogRichTextEditorField";
+import { isBlogEditorContentEmpty } from "@/features/admin-blog/components/BlogRichTextEditor";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -159,7 +160,10 @@ export default function AdminBlogPage() {
   const handleSave = async () => {
     if (!form.title.trim()) { toast.error("Title is required"); return; }
     if (!form.slug.trim()) { toast.error("Slug is required"); return; }
-    if (!form.content.trim()) { toast.error("Content is required"); return; }
+    if (isBlogEditorContentEmpty(form.content)) {
+      toast.error("Content is required");
+      return;
+    }
 
     setIsSaving(true);
     try {
@@ -415,7 +419,7 @@ export default function AdminBlogPage() {
               </div>
 
               <BlogRichTextEditorField
-                editorKey={`${editingPost?.id ?? "new"}-${isDialogOpen}`}
+                editorInstanceKey={String(editingPost?.id ?? "new")}
                 value={form.content}
                 onChange={(content) => setForm((prev) => ({ ...prev, content }))}
               />
@@ -506,10 +510,14 @@ export default function AdminBlogPage() {
           )}
 
           <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsDialogOpen(false)}
+            >
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={isSaving}>
+            <Button type="button" onClick={handleSave} disabled={isSaving}>
               {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {editingPost ? "Save Changes" : "Create Post"}
             </Button>
