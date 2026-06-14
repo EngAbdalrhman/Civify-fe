@@ -24,6 +24,9 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Plus, Edit2, Trash2, Loader2, BookOpen, Eye, Star } from "lucide-react";
 import apiClient from "@/api/client";
+import { normalizeBlogHtml } from "@/lib/blog/normalizeBlogHtml";
+import { BlogRichTextEditorField } from "@/features/admin-blog/components/BlogRichTextEditorField";
+import { isBlogEditorContentEmpty } from "@/features/admin-blog/components/BlogRichTextEditor";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -127,7 +130,7 @@ export default function AdminBlogPage() {
       setForm({
         title: fullPost.title,
         slug: fullPost.slug,
-        content: fullPost.content ?? "",
+        content: normalizeBlogHtml(fullPost.content ?? ""),
         metaDescription: fullPost.metaDescription ?? "",
         metaKeywords: fullPost.metaKeywords ?? "",
         coverImageUrl: fullPost.coverImageUrl ?? "",
@@ -157,15 +160,22 @@ export default function AdminBlogPage() {
   const handleSave = async () => {
     if (!form.title.trim()) { toast.error("Title is required"); return; }
     if (!form.slug.trim()) { toast.error("Slug is required"); return; }
-    if (!form.content.trim()) { toast.error("Content is required"); return; }
+    if (isBlogEditorContentEmpty(form.content)) {
+      toast.error("Content is required");
+      return;
+    }
 
     setIsSaving(true);
     try {
+      const payload = {
+        ...form,
+        content: normalizeBlogHtml(form.content),
+      };
       if (editingPost) {
-        await apiClient.put(`/v1/admin/blogs/${editingPost.id}`, form);
+        await apiClient.put(`/v1/admin/blogs/${editingPost.id}`, payload);
         toast.success("Post updated");
       } else {
-        await apiClient.post("/v1/admin/blogs/", form);
+        await apiClient.post("/v1/admin/blogs/", payload);
         toast.success("Post created");
       }
       setIsDialogOpen(false);
@@ -408,20 +418,11 @@ export default function AdminBlogPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="content">Content (HTML) *</Label>
-                <Textarea
-                  id="content"
-                  value={form.content}
-                  onChange={(e) => setForm({ ...form, content: e.target.value })}
-                  placeholder="<h2>Introduction</h2><p>Your article content here...</p>"
-                  rows={12}
-                  className="font-mono text-sm"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Accepts HTML. Use &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;strong&gt;, &lt;a&gt; etc.
-                </p>
-              </div>
+              <BlogRichTextEditorField
+                editorInstanceKey={String(editingPost?.id ?? "new")}
+                value={form.content}
+                onChange={(content) => setForm((prev) => ({ ...prev, content }))}
+              />
 
               <div className="space-y-2">
                 <Label htmlFor="coverImage">Cover Image URL</Label>
@@ -509,10 +510,14 @@ export default function AdminBlogPage() {
           )}
 
           <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsDialogOpen(false)}
+            >
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={isSaving}>
+            <Button type="button" onClick={handleSave} disabled={isSaving}>
               {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {editingPost ? "Save Changes" : "Create Post"}
             </Button>

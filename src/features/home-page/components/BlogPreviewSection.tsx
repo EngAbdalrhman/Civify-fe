@@ -67,52 +67,54 @@ function BlogPreviewCard({
   readMoreLabel: string;
 }) {
   return (
-    <Card className="group overflow-hidden border-2 transition-all duration-300 hover:border-primary hover:shadow-xl hover:shadow-primary/10">
-      <CardContent className="p-0">
-        <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-800 dark:to-purple-900/20">
-          {post.coverImageUrl ? (
-            <Image
-              src={post.coverImageUrl}
-              alt={post.title}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, 33vw"
-            />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-4xl">📝</span>
-            </div>
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-        </div>
+    <Link
+      href={`/blog/${post.slug}`}
+      className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+    >
+      <Card className="group h-full overflow-hidden border-2 transition-all duration-300 hover:border-primary hover:shadow-xl hover:shadow-primary/10">
+        <CardContent className="p-0">
+          <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-800 dark:to-purple-900/20">
+            {post.coverImageUrl ? (
+              <Image
+                src={post.coverImageUrl}
+                alt={post.title}
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                sizes="(max-width: 768px) 100vw, 33vw"
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-4xl">📝</span>
+              </div>
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+          </div>
 
-        <div className="p-6">
-          {post.readingTime && (
-            <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
-              <Clock className="h-4 w-4" />
-              <span>{post.readingTime}</span>
-            </div>
-          )}
+          <div className="p-6">
+            {post.readingTime && (
+              <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
+                <Clock className="h-4 w-4" />
+                <span>{post.readingTime}</span>
+              </div>
+            )}
 
-          <h3 className="mb-3 line-clamp-2 text-xl font-bold transition-colors group-hover:text-primary">
-            {post.title}
-          </h3>
+            <h3 className="mb-3 line-clamp-2 text-xl font-bold transition-colors group-hover:text-primary">
+              {post.title}
+            </h3>
 
-          {post.metaDescription && (
-            <p className="mb-4 line-clamp-3 text-sm text-muted-foreground">
-              {post.metaDescription}
-            </p>
-          )}
+            {post.metaDescription && (
+              <p className="mb-4 line-clamp-3 text-sm text-muted-foreground">
+                {post.metaDescription}
+              </p>
+            )}
 
-          <Link
-            href={`/blog/${post.slug}`}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
-          >
-            {readMoreLabel}
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
-        </div>
-      </CardContent>
-    </Card>
+            <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary group-hover:underline">
+              {readMoreLabel}
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
   );
 }

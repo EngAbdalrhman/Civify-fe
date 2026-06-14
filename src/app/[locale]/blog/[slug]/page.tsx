@@ -6,8 +6,8 @@ import { blogService } from "@/services/blog.service";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Clock, Calendar, User } from "lucide-react";
 import Image from "next/image";
-import sanitizeHtml from "sanitize-html";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { prepareBlogHtml } from "@/lib/blog/sanitizeBlogHtml";
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
@@ -159,15 +159,7 @@ export default async function BlogPostPage({
           <div
             translate="no"
             className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-primary"
-            dangerouslySetInnerHTML={{ 
-              __html: sanitizeHtml(post.content, {
-                allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'h1', 'h2', 'span']),
-                allowedAttributes: {
-                  ...sanitizeHtml.defaults.allowedAttributes,
-                  '*': ['style', 'class']
-                }
-              }) 
-            }}
+            dangerouslySetInnerHTML={{ __html: prepareBlogHtml(post.content) }}
           />
         </article>
 
