@@ -31,6 +31,7 @@ Key terms: AI resume builder, CV tailoring, ATS score checker, resume match scor
 
 ## Docs
 - [API Documentation](${baseUrl}/en/api-docs): REST API for resume parsing and generation
+- [MCP Server Documentation](${baseUrl}/en/mcp-docs): Official Model Context Protocol integration for AI agents (Claude, Cursor, OpenCode)
 - [Privacy Policy](${baseUrl}/en/policy): Data handling and privacy practices
 - [Terms of Service](${baseUrl}/en/terms): Usage terms and conditions
 - [Contact Support](${baseUrl}/en/contact): Support and inquiries

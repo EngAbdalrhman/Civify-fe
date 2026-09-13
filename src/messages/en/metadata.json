@@ -60,6 +60,14 @@
     "twitterTitle": "API Documentation - Civify",
     "twitterDescription": "Explore Civify's API documentation. Integrate our powerful capabilities."
   },
+  "mcp-docs": {
+    "title": "Model Context Protocol (MCP) Documentation - Civify",
+    "description": "Connect AI agents (Claude Desktop, Cursor, OpenCode) directly to Civify for automated CV parsing, ATS scoring, resume tailoring, and job tracking.",
+    "ogTitle": "Model Context Protocol (MCP) Server - Civify",
+    "ogDescription": "Empower your AI agents with Civify's 17-tool career suite. Official Model Context Protocol integration.",
+    "twitterTitle": "Civify MCP Server Documentation",
+    "twitterDescription": "Official Model Context Protocol server for Civify AI Career Platform."
+  },
   "plans": {
     "title": "Pricing Plans - Civify",
     "description": "Choose the right plan for your career goals. Explore Civify's free and premium options for AI resume building.",

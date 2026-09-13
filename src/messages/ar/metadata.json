@@ -60,6 +60,14 @@
     "twitterTitle": "وثائق API - Civify",
     "twitterDescription": "استكشف وثائق API الخاصة بـ Civify."
   },
+  "mcp-docs": {
+    "title": "توثيق بروتوكول سياق النموذج (MCP) - Civify",
+    "description": "اربط وكلاء الذكاء الاصطناعي (Claude Desktop، Cursor، OpenCode) مباشرة بـ Civify لتحليل السير الذاتية، فحص ATS، تخصيص السير، وتتبع الوظائف تلقائياً.",
+    "ogTitle": "سيرفر MCP الرسمي - Civify",
+    "ogDescription": "امنح وكلاء الذكاء الاصطناعي قدرات متقدمة عبر 17 أداة وظيفية من Civify.",
+    "twitterTitle": "توثيق Civify MCP",
+    "twitterDescription": "سيرفر Model Context Protocol الرسمي لمنصة Civify المهنية."
+  },
   "plans": {
     "title": "خطط الأسعار - Civify",
     "description": "اختر الخطة المناسبة لأهدافك المهنية. استكشف خيارات Civify المجانية والمدفوعة لبناء السيرة الذاتية بالذكاء الاصطناعي.",
