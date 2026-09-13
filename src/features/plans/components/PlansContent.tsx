@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Check, Loader2 } from "lucide-react";
@@ -15,6 +16,7 @@ import { usePlans } from "@/features/plans/hooks/usePlans";
 import { Badge } from "@/components/ui/badge";
 import { isAuthenticated } from "@/utils/cookies";
 import { usePermissions } from "@/hooks/use-permissions";
+import PayPerCvCard from "./PayPerCvCard";
 
 interface PlansContentProps {
   hideFAQ?: boolean;
@@ -29,6 +31,43 @@ export default function PlansContent({
   const router = useRouter();
   const { displayPlans, isLoading, error, isAnnual, setIsAnnual } = usePlans();
   const { groupName } = usePermissions();
+  const [currency, setCurrency] = useState<"EGP" | "USD">("EGP");
+  const exchangeRate = 50.0;
+
+  const renderPlanPrice = (priceEgp: number, period: string) => {
+    if (priceEgp === 0) {
+      return (
+        <div className="mt-4 flex items-baseline">
+          <span className="text-4xl font-bold tracking-tight">0</span>
+          <span className="ml-1 text-muted-foreground">{currency}/{period}</span>
+        </div>
+      );
+    }
+
+    if (currency === "USD") {
+      const usdVal = (priceEgp / exchangeRate).toFixed(2);
+      return (
+        <div className="mt-4 flex flex-col">
+          <div className="flex items-baseline">
+            <span className="text-4xl font-bold tracking-tight">${usdVal}</span>
+            <span className="ml-1 text-muted-foreground text-sm">USD/{period}</span>
+          </div>
+          <span className="text-xs text-muted-foreground mt-0.5">(≈ {priceEgp} EGP)</span>
+        </div>
+      );
+    }
+
+    const usdEquiv = (priceEgp / exchangeRate).toFixed(2);
+    return (
+      <div className="mt-4 flex flex-col">
+        <div className="flex items-baseline">
+          <span className="text-4xl font-bold tracking-tight">{priceEgp}</span>
+          <span className="ml-1 text-muted-foreground text-sm">EGP/{period}</span>
+        </div>
+        <span className="text-xs text-muted-foreground mt-0.5">(≈ ${usdEquiv} USD)</span>
+      </div>
+    );
+  };
 
   const handlePlanSelect = (ctaLink: string) => {
     // If it's a signup link (free plan), just go there
@@ -82,31 +121,58 @@ export default function PlansContent({
         )}
         <p className="text-xl text-muted-foreground">{t("subtitle")}</p>
 
-        {/* Billing Toggle */}
-        <div className="flex items-center justify-center gap-4 bg-muted/50 p-1 rounded-full inline-flex border mt-8">
-          <button
-            onClick={() => setIsAnnual(false)}
-            className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
-              !isAnnual
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {t("monthly")}
-          </button>
-          <button
-            onClick={() => setIsAnnual(true)}
-            className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
-              isAnnual
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {t("yearly")}{" "}
-            <span className="text-xs text-green-600 font-bold">
-              ({t("save20")})
-            </span>
-          </button>
+        {/* Billing & Currency Controls */}
+        <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
+          {/* Billing Toggle */}
+          <div className="flex items-center justify-center gap-4 bg-muted/50 p-1 rounded-full border">
+            <button
+              onClick={() => setIsAnnual(false)}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                !isAnnual
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t("monthly")}
+            </button>
+            <button
+              onClick={() => setIsAnnual(true)}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
+                isAnnual
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t("yearly")}{" "}
+              <span className="text-xs text-green-600 font-bold">
+                ({t("save20")})
+              </span>
+            </button>
+          </div>
+
+          {/* Currency Switcher */}
+          <div className="flex items-center justify-center gap-1 bg-muted/50 p-1 rounded-full border text-xs">
+            <button
+              onClick={() => setCurrency("EGP")}
+              className={`px-4 py-2 rounded-full font-semibold transition-all ${
+                currency === "EGP"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              🇪🇬 EGP
+            </button>
+            <button
+              onClick={() => setCurrency("USD")}
+              className={`px-4 py-2 rounded-full font-semibold transition-all ${
+                currency === "USD"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              🌐 USD
+            </button>
+          </div>
         </div>
       </div>
 
@@ -145,14 +211,7 @@ export default function PlansContent({
                         <p className="mt-2 text-sm text-muted-foreground">
                           {plan.description}
                         </p>
-                        <div className="mt-4 flex items-baseline">
-                          <span className="text-4xl font-bold tracking-tight">
-                            {plan.price}
-                          </span>
-                          <span className="ml-1 text-muted-foreground">
-                            EGP/{plan.period}
-                          </span>
-                        </div>
+                        {renderPlanPrice(plan.price, plan.period)}
                       </div>
 
                       <ul className="mb-8 flex-1 space-y-4">
@@ -203,14 +262,7 @@ export default function PlansContent({
                 <p className="mt-2 text-sm text-muted-foreground">
                   {plan.description}
                 </p>
-                <div className="mt-4 flex items-baseline">
-                  <span className="text-4xl font-bold tracking-tight">
-                    {plan.price}
-                  </span>
-                  <span className="ml-1 text-muted-foreground">
-                    EGP/{plan.period}
-                  </span>
-                </div>
+                {renderPlanPrice(plan.price, plan.period)}
               </div>
 
               <ul className="mb-8 flex-1 space-y-4">
@@ -234,6 +286,9 @@ export default function PlansContent({
           ))}
         </div>
       )}
+
+      {/* Pay-Per-CV One-Time Option */}
+      <PayPerCvCard userCurrency={currency} />
 
       {/* FAQ Section */}
       {!hideFAQ && (

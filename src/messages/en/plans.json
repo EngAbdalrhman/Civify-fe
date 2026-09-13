@@ -29,5 +29,15 @@
   "pricesNote": "Prices in EGP. Local taxes may apply.",
   "termsOfService": "Terms of Service",
   "privacyPolicy": "Privacy Policy",
-  "contactSupport": "Contact Support"
+  "contactSupport": "Contact Support",
+  "payPerCv": {
+    "badge": "One-Time Unlock",
+    "noSub": "No Monthly Subscription",
+    "title": "Single CV Pass",
+    "subtitle": "Only need 1 or 2 targeted resumes? Pay once for 30 days of full access. Unlimited edits, watermark removal, and PDF + editable Word (DOCX) export.",
+    "watermarkFree": "Watermark Removed",
+    "docxExport": "Word (.docx) & PDF",
+    "duration": "30-Day Unlimited Edits",
+    "cta": "Unlock Single CV"
+  }
 }

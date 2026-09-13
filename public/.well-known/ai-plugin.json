@@ -1,0 +1,19 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "Civify Resume AI",
+  "name_for_model": "civify_resume_ai",
+  "description_for_human": "AI CV builder, ATS scoring, and resume tailoring against job postings.",
+  "description_for_model": "Plugin to parse resumes, calculate ATS compatibility, tailor experience bullets to job descriptions, redact PII, and track applications.",
+  "auth": {
+    "type": "service_http",
+    "authorization_type": "custom",
+    "custom_auth_header": "X-API-KEY"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://civify.cv/civify-docs-api"
+  },
+  "logo_url": "https://civify.cv/civify-logo-simple.png",
+  "contact_email": "support@civify.cv",
+  "legal_info_url": "https://civify.cv/terms"
+}
