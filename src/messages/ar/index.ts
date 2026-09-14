@@ -31,8 +31,10 @@ import upload from "./upload.json";
 import zohoExtension from "./zoho-extension.json";
 import extensionsHub from "./extensions-hub.json";
 import tour from "./tour.json";
+import mcpDocs from "./mcp-docs.json";
 
 export default {
+  "mcp-docs": mcpDocs,
   admin,
   apiKeys,
   blog,

@@ -61,12 +61,13 @@
     "twitterDescription": "Explore Civify's API documentation. Integrate our powerful capabilities."
   },
   "mcp-docs": {
-    "title": "Model Context Protocol (MCP) Documentation - Civify",
-    "description": "Connect AI agents (Claude Desktop, Cursor, OpenCode) directly to Civify for automated CV parsing, ATS scoring, resume tailoring, and job tracking.",
-    "ogTitle": "Model Context Protocol (MCP) Server - Civify",
-    "ogDescription": "Empower your AI agents with Civify's 17-tool career suite. Official Model Context Protocol integration.",
-    "twitterTitle": "Civify MCP Server Documentation",
-    "twitterDescription": "Official Model Context Protocol server for Civify AI Career Platform."
+    "title": "Model Context Protocol (MCP) Server Documentation - Civify",
+    "description": "Connect AI agents (Claude Desktop, Cursor, OpenCode) directly to Civify for automated CV parsing, ATS scoring, resume tailoring, and job tracking with 17 specialized tools.",
+    "keywords": "Model Context Protocol, MCP server, @civify/mcp-server, Claude Desktop MCP, Cursor MCP, Windsurf MCP, OpenCode MCP, AI resume tailor, ATS score checker MCP, resume parser API, career ops agent, job application tracker, AI agent career tools, resume automation, CV builder API, MENA resume AI, remote developer career tools",
+    "ogTitle": "Model Context Protocol (MCP) Server - Civify AI Career Platform",
+    "ogDescription": "Empower your AI coding agents with Civify's 17-tool career suite. Autonomous CV parsing, ATS scoring, bullet tailoring, and Kanban tracking.",
+    "twitterTitle": "Civify MCP Server Documentation — AI Career Tools for Agents",
+    "twitterDescription": "Official Model Context Protocol server for Civify. 17 automated tools for Claude Desktop, Cursor, and autonomous agents."
   },
   "plans": {
     "title": "Pricing Plans - Civify",

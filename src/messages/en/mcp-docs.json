@@ -1,0 +1,60 @@
+{
+  "title": "Model Context Protocol (MCP) Server",
+  "subtitle": "Connect AI coding agents and LLMs directly to Civify's AI resume parsing, tailoring, ATS scoring, and job tracking platform.",
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know about integrating Civify with AI agents, Cursor, and Claude Desktop.",
+    "items": {
+      "q1": {
+        "question": "What is the Civify Model Context Protocol (MCP) Server?",
+        "answer": "The Civify MCP Server implements Anthropic's open Model Context Protocol standard (JSON-RPC 2.0). It exposes 17 specialized career tools—including PDF/DOCX resume parsing, AI bullet tailoring, 0–100 ATS scoring, PII redaction, and job application Kanban tracking—directly to AI agents in Claude Desktop, Cursor, OpenCode, and Windsurf."
+      },
+      "q2": {
+        "question": "How do I install and configure Civify in Claude Desktop or Cursor?",
+        "answer": "You can connect in seconds using either Remote SSE (zero-install at https://mcp.civify.cv/sse) or Local Command via npx (@civify/mcp-server). Simply add the server block to your claude_desktop_config.json or project .cursor/mcp.json as shown in the connection tabs above."
+      },
+      "q3": {
+        "question": "Does Civify MCP support Arabic resumes, RTL layouts, and Arabic OCR?",
+        "answer": "Yes! Civify is natively bilingual. The MCP server fully parses Arabic resume documents (PDF, DOCX, scanned images via Arabic OCR) and can generate RTL-formatted tailored resumes with specialized typography and localized keyword optimization for Egypt, Saudi Arabia, and GCC job markets."
+      },
+      "q4": {
+        "question": "Is an API key required to start using the MCP server?",
+        "answer": "No static API key is required to get started. Public tools like job scraping and pricing work with zero authentication. For personalized resume tailoring, you can either provide an existing developer key (cv-fy-...) or sign in interactively inside your chat using civify_login (with full 2FA support)."
+      },
+      "q5": {
+        "question": "What tools are included in Civify's 17-tool suite?",
+        "answer": "The suite is organized into 4 categories: 1) Auth & Identity (civify_set_api_key, civify_login, civify_verify_2fa, civify_register, civify_get_account, civify_logout); 2) Monetization & Pay-Per-CV (civify_get_pay_per_cv_pricing, civify_purchase_cv_pass, civify_check_cv_entitlement); 3) Resume AI (civify_scrape_job, civify_parse_cv, civify_tailor_cv, civify_score_ats, civify_mask_pii, civify_generate_pdf); and 4) Job Tracker (civify_track_application, civify_list_applications)."
+      },
+      "q6": {
+        "question": "Which job boards can Civify MCP scrape?",
+        "answer": "The civify_scrape_job tool extracts structured job requirements, company names, and qualifications from any public job URL, including LinkedIn, Greenhouse, Lever, Ashby, Wuzzuf, Indeed, and company career portals."
+      },
+      "q7": {
+        "question": "How does regional pricing work for Pay-Per-CV (USD vs EGP/MENA)?",
+        "answer": "Civify automatically applies GeoIP-based pricing. Global users can purchase single CV passes in USD ($2.99) via credit card. Candidates in Egypt and MENA receive regional pricing in EGP (~150 EGP) payable via local debit/credit cards or Egyptian mobile wallets (Vodafone Cash, InstaPay) powered by Paymob and Fawaterak."
+      },
+      "q8": {
+        "question": "What is the difference between local stdio (npx) and hosted remote SSE?",
+        "answer": "Local stdio (npx -y @civify/mcp-server) runs on your local machine via Node.js, making it ideal for desktop agents that need to access local files directly. Remote SSE (https://mcp.civify.cv/sse) runs in the cloud with zero installation, ideal for web agents, mobile apps, or cloud LLMs."
+      }
+    }
+  },
+  "regional": {
+    "title": "Global & MENA Regional Capabilities",
+    "bilingualTitle": "Bilingual AI Engine",
+    "bilingualDesc": "Full support for English and Arabic CVs, including Arabic OCR for scanned documents and RTL template rendering.",
+    "pricingTitle": "Localized GeoIP Pricing",
+    "pricingDesc": "Automatic currency routing: USD for international users, and localized EGP rates with mobile wallet support for MENA.",
+    "privacyTitle": "GDPR & Blind Recruitment",
+    "privacyDesc": "Built-in PII redaction (civify_mask_pii) creates anonymized resumes to eliminate bias and protect candidate privacy."
+  },
+  "compatibility": {
+    "title": "Compatible AI Clients",
+    "claude": "Claude Desktop",
+    "cursor": "Cursor IDE",
+    "windsurf": "Windsurf",
+    "opencode": "OpenCode / CLI",
+    "gemini": "Gemini CLI",
+    "statusVerified": "Verified & Tested"
+  }
+}

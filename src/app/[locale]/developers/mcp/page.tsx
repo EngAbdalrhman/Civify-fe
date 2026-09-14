@@ -17,17 +17,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: t("ogTitle"),
       description: t("ogDescription"),
-      url: `${baseUrl}/${locale}/developers/mcp`,
+      url: `${baseUrl}/${locale}/mcp-docs`,
     },
     twitter: {
       title: t("twitterTitle"),
       description: t("twitterDescription"),
     },
     alternates: {
-      canonical: `/${locale}/developers/mcp`,
+      canonical: `/${locale}/mcp-docs`,
       languages: {
-        en: "/en/developers/mcp",
-        ar: "/ar/developers/mcp",
+        en: "/en/mcp-docs",
+        ar: "/ar/mcp-docs",
       },
     },
   };

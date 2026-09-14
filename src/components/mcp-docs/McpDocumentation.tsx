@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   Card,
   CardContent,
@@ -11,6 +12,12 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import {
   Copy,
   Check,
@@ -23,6 +30,10 @@ import {
   Globe,
   Server,
   ExternalLink,
+  Languages,
+  HelpCircle,
+  CheckCircle2,
+  DollarSign,
 } from "lucide-react";
 
 interface ToolParam {
@@ -270,6 +281,7 @@ const MCP_TOOLS: McpTool[] = [
 ];
 
 export function McpDocumentation() {
+  const t = useTranslations("mcp-docs");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>("all");
 
@@ -604,6 +616,129 @@ export function McpDocumentation() {
             </Card>
           ))}
         </div>
+      </div>
+
+      {/* ─── Regional & Geo Capabilities ─── */}
+      <Card className="border-border/60 shadow-sm bg-gradient-to-br from-background via-background to-primary/5">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Languages className="h-5 w-5 text-primary" />
+            <CardTitle>{t("regional.title")}</CardTitle>
+          </div>
+          <CardDescription>
+            Engineered natively for both Middle East & North Africa (MENA) and Global markets.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid md:grid-cols-3 gap-4 text-sm">
+          <div className="bg-background/80 rounded-lg p-4 border space-y-2">
+            <div className="font-semibold text-foreground flex items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10 text-primary">
+                <Globe className="h-3.5 w-3.5" />
+              </span>
+              {t("regional.bilingualTitle")}
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {t("regional.bilingualDesc")}
+            </p>
+          </div>
+
+          <div className="bg-background/80 rounded-lg p-4 border space-y-2">
+            <div className="font-semibold text-foreground flex items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center rounded-md bg-emerald-500/10 text-emerald-500">
+                <DollarSign className="h-3.5 w-3.5" />
+              </span>
+              {t("regional.pricingTitle")}
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {t("regional.pricingDesc")}
+            </p>
+          </div>
+
+          <div className="bg-background/80 rounded-lg p-4 border space-y-2">
+            <div className="font-semibold text-foreground flex items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center rounded-md bg-amber-500/10 text-amber-500">
+                <Shield className="h-3.5 w-3.5" />
+              </span>
+              {t("regional.privacyTitle")}
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {t("regional.privacyDesc")}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ─── Compatible AI Clients Grid ─── */}
+      <Card className="border-border/60 shadow-sm">
+        <CardHeader className="pb-4">
+          <div className="flex items-center gap-2">
+            <Bot className="h-5 w-5 text-primary" />
+            <CardTitle>{t("compatibility.title")}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+            {[
+              { name: t("compatibility.claude"), tag: "Desktop / Remote SSE" },
+              { name: t("compatibility.cursor"), tag: "IDE stdio / npx" },
+              { name: t("compatibility.windsurf"), tag: "Next-Gen IDE" },
+              { name: t("compatibility.opencode"), tag: "Terminal Agent" },
+              { name: t("compatibility.gemini"), tag: "CLI / LibreChat" },
+            ].map((client) => (
+              <div
+                key={client.name}
+                className="rounded-lg border bg-muted/40 p-3 text-center space-y-1.5"
+              >
+                <div className="font-semibold text-xs text-foreground flex items-center justify-center gap-1">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                  {client.name}
+                </div>
+                <div className="text-[10px] text-muted-foreground">{client.tag}</div>
+                <Badge variant="outline" className="text-[10px] py-0 px-1.5 border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
+                  {t("compatibility.statusVerified")}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ─── Semantic FAQ Section (High-Value for SEO & GEO) ─── */}
+      <div className="space-y-6" id="faq" itemScope itemType="https://schema.org/FAQPage">
+        <div className="text-center md:text-left">
+          <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center justify-center md:justify-start gap-2">
+            <HelpCircle className="h-6 w-6 text-primary" />
+            {t("faq.title")}
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            {t("faq.subtitle")}
+          </p>
+        </div>
+
+        <Accordion type="single" collapsible className="w-full space-y-3">
+          {(["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8"] as const).map((qKey) => (
+            <AccordionItem
+              key={qKey}
+              value={qKey}
+              className="border border-border/60 rounded-lg px-4 data-[state=open]:bg-muted/30"
+              itemScope
+              itemProp="mainEntity"
+              itemType="https://schema.org/Question"
+            >
+              <AccordionTrigger className="text-left hover:no-underline py-4 font-semibold text-foreground text-sm">
+                <span itemProp="name">{t(`faq.items.${qKey}.question`)}</span>
+              </AccordionTrigger>
+              <AccordionContent
+                className="text-xs text-muted-foreground leading-relaxed pb-4 pt-1"
+                itemScope
+                itemProp="acceptedAnswer"
+                itemType="https://schema.org/Answer"
+              >
+                <div itemProp="text">{t(`faq.items.${qKey}.answer`)}</div>
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
       </div>
 
       {/* ─── Registry Badges & Links Footer ─── */}
