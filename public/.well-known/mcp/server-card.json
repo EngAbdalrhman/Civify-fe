@@ -1,0 +1,224 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/server-card.json",
+  "serverInfo": {
+    "name": "Civify MCP Server",
+    "version": "1.2.0",
+    "description": "Official MCP server for Civify AI Career Platform (Resume Parsing, ATS Scoring, Tailoring, PII Masking, Kanban Applications, and Pay-Per-CV)."
+  },
+  "authentication": {
+    "required": false,
+    "description": "Dynamic per-session authentication supported (civify_login, civify_register, or civify_set_api_key)."
+  },
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "apiKey": {
+        "type": "string",
+        "description": "Optional Civify Developer API key (starts with 'cv-fy-'). If omitted, you can authenticate interactively in chat."
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "civify_set_api_key",
+      "description": "Set or switch the active Civify API key for this agent session.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "api_key": { "type": "string", "description": "Civify API key starting with 'cv-fy-'." }
+        },
+        "required": ["api_key"]
+      }
+    },
+    {
+      "name": "civify_login",
+      "description": "Sign in to Civify using email or username and password.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "identifier": { "type": "string", "description": "User's email address or username." },
+          "password": { "type": "string", "description": "Civify account password." }
+        },
+        "required": ["identifier", "password"]
+      }
+    },
+    {
+      "name": "civify_verify_2fa",
+      "description": "Complete two-factor authentication (2FA) by submitting the OTP code sent to email.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "string", "description": "6-digit OTP code received via email." },
+          "username": { "type": "string", "description": "Username or email." }
+        },
+        "required": ["code"]
+      }
+    },
+    {
+      "name": "civify_register",
+      "description": "Register a new Civify user account.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string" },
+          "password": { "type": "string" },
+          "username": { "type": "string" },
+          "referral_code": { "type": "string" }
+        },
+        "required": ["email", "password", "username"]
+      }
+    },
+    {
+      "name": "civify_get_account",
+      "description": "Get current authenticated user account profile, subscription tier, remaining AI token balance, and CV credits.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "api_key": { "type": "string" }
+        }
+      }
+    },
+    {
+      "name": "civify_logout",
+      "description": "Log out and clear active authentication credentials from this session.",
+      "inputSchema": { "type": "object", "properties": {} }
+    },
+    {
+      "name": "civify_get_pay_per_cv_pricing",
+      "description": "Get public localized Pay-Per-CV pricing (USD and EGP regional rates).",
+      "inputSchema": { "type": "object", "properties": {} }
+    },
+    {
+      "name": "civify_purchase_cv_pass",
+      "description": "Initiate checkout for a Pay-Per-CV unlock pass (single CV or 3-pack).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "package_type": { "type": "string", "enum": ["SINGLE", "THREE_PACK"], "default": "SINGLE" },
+          "payment_method": { "type": "string", "enum": ["CARD", "WALLET"], "default": "CARD" },
+          "resume_id": { "type": "string" },
+          "api_key": { "type": "string" }
+        }
+      }
+    },
+    {
+      "name": "civify_check_cv_entitlement",
+      "description": "Check if a specific resume currently has an active 30-day unwatermarked pass.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "resume_id": { "type": "string" },
+          "api_key": { "type": "string" }
+        },
+        "required": ["resume_id"]
+      }
+    },
+    {
+      "name": "civify_scrape_job",
+      "description": "Scrape and extract structured job requirements from a URL (LinkedIn, Greenhouse, Lever, etc.).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": { "type": "string" }
+        },
+        "required": ["url"]
+      }
+    },
+    {
+      "name": "civify_parse_cv",
+      "description": "Parse a resume document (PDF, DOCX, image) into structured JSON schema.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "file_path": { "type": "string" },
+          "file_base64": { "type": "string" },
+          "filename": { "type": "string" },
+          "language": { "type": "string" },
+          "api_key": { "type": "string" }
+        }
+      }
+    },
+    {
+      "name": "civify_tailor_cv",
+      "description": "Tailor a candidate's resume against a target job description using AI.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "job_description": { "type": "string" },
+          "file_path": { "type": "string" },
+          "job_title": { "type": "string" },
+          "company_name": { "type": "string" },
+          "generate_cover_letter": { "type": "boolean" },
+          "api_key": { "type": "string" }
+        },
+        "required": ["job_description"]
+      }
+    },
+    {
+      "name": "civify_score_ats",
+      "description": "Calculate ATS compatibility score (0-100) and section quality audit.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "file_path": { "type": "string" },
+          "resume_data": { "type": "object" },
+          "api_key": { "type": "string" }
+        }
+      }
+    },
+    {
+      "name": "civify_mask_pii",
+      "description": "Sanitize personal identifiable information (name, phone, email, address) and generate anonymized PDF.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "file_path": { "type": "string" },
+          "output_path": { "type": "string" },
+          "api_key": { "type": "string" }
+        }
+      }
+    },
+    {
+      "name": "civify_generate_pdf",
+      "description": "Render high-fidelity PDF from structured resume data using Civify templates.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "resume_data": { "type": "object" },
+          "template": { "type": "string" },
+          "color": { "type": "string" },
+          "output_path": { "type": "string" }
+        },
+        "required": ["resume_data"]
+      }
+    },
+    {
+      "name": "civify_track_application",
+      "description": "Record a job application in the candidate's Civify Kanban board.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "company_name": { "type": "string" },
+          "job_title": { "type": "string" },
+          "job_url": { "type": "string" },
+          "status": { "type": "string", "enum": ["EVALUATED", "APPLIED", "INTERVIEW", "OFFER", "REJECTED"] },
+          "notes": { "type": "string" },
+          "api_key": { "type": "string" }
+        },
+        "required": ["company_name", "job_title"]
+      }
+    },
+    {
+      "name": "civify_list_applications",
+      "description": "List all tracked job applications from the candidate's Civify Kanban board.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "api_key": { "type": "string" }
+        }
+      }
+    }
+  ],
+  "resources": [],
+  "prompts": []
+}

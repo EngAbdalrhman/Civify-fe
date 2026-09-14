@@ -68,6 +68,14 @@ export function Footer() {
               </li>
               <li>
                 <Link
+                  href="/mcp-docs"
+                  className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
+                >
+                  {t("product.mcpDocs")}
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/extension"
                   className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
                 >

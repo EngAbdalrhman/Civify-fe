@@ -7,6 +7,8 @@ type SitemapRoute = {
     | "/"
     | "/plans"
     | "/api-docs"
+    | "/mcp-docs"
+    | "/developers/mcp"
     | "/contact"
     | "/terms"
     | "/policy"
@@ -31,6 +33,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { href: "/", changeFrequency: "weekly", priority: 1 },
     { href: "/plans", changeFrequency: "weekly", priority: 0.9 },
     { href: "/api-docs", changeFrequency: "weekly", priority: 0.8 },
+    { href: "/mcp-docs", changeFrequency: "weekly", priority: 0.8 },
+    { href: "/developers/mcp", changeFrequency: "weekly", priority: 0.5 },
     { href: "/contact", changeFrequency: "monthly", priority: 0.7 },
     { href: "/blog", changeFrequency: "weekly", priority: 0.8 },
     { href: "/terms", changeFrequency: "yearly", priority: 0.3 },
