@@ -11,7 +11,7 @@
   },
   "api": {
     "type": "openapi",
-    "url": "https://civify.cv/civify-docs-api"
+    "url": "https://civify.cv/apis/civify-docs-api"
   },
   "logo_url": "https://civify.cv/civify-logo-simple.png",
   "contact_email": "support@civify.cv",
