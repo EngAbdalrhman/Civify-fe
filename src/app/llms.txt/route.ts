@@ -39,7 +39,8 @@ Key terms: AI resume builder, CV tailoring, ATS score checker, resume match scor
 
 ## Model Context Protocol (MCP) Integration for AI Agents
 Civify provides a production-grade, 17-tool MCP server for autonomous coding and career agents:
-- Remote SSE Endpoint: https://mcp.civify.cv/sse (Zero local installation required)
+- Streamable HTTP Endpoint (Recommended): https://mcp.civify.cv/mcp
+- Legacy SSE Endpoint: https://mcp.civify.cv/sse
 - Local stdio / npm Package: \`npx -y @civify/mcp-server\`
 - Static Server Card (SEP-1649): https://mcp.civify.cv/.well-known/mcp/server-card.json
 - Registry Listings: Smithery, Glama, PulseMCP
@@ -50,7 +51,7 @@ For Claude Desktop (\`claude_desktop_config.json\`):
 {
   "mcpServers": {
     "civify": {
-      "url": "https://mcp.civify.cv/sse"
+      "url": "https://mcp.civify.cv/mcp"
     }
   }
 }

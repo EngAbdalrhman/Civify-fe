@@ -299,7 +299,7 @@ export function McpDocumentation() {
   const claudeRemoteConfig = `{
   "mcpServers": {
     "civify": {
-      "url": "https://mcp.civify.cv/sse"
+      "url": "https://mcp.civify.cv/mcp"
     }
   }
 }`;
@@ -340,7 +340,7 @@ export function McpDocumentation() {
           />
         </a>
         <Badge variant="secondary" className="px-3 py-1 font-mono text-xs">
-          MCP v1.2.0 Official
+          MCP v1.3.0 Official
         </Badge>
         <Badge variant="outline" className="px-3 py-1 text-xs gap-1 border-primary/40 text-primary">
           <Zap className="h-3 w-3" /> 17 Automated Tools
@@ -373,7 +373,7 @@ export function McpDocumentation() {
               <TabsTrigger value="cli">OpenCode / CLI</TabsTrigger>
             </TabsList>
 
-            {/* Claude Remote SSE */}
+            {/* Claude Remote (Streamable HTTP) */}
             <TabsContent value="claude-remote" className="space-y-4">
               <div className="rounded-lg bg-muted/50 p-4 border text-sm space-y-2">
                 <p className="font-semibold flex items-center gap-1.5 text-foreground">
@@ -381,11 +381,11 @@ export function McpDocumentation() {
                   Zero Installation Required
                 </p>
                 <p className="text-muted-foreground text-xs leading-relaxed">
-                  Connects directly to Civify's hosted remote SSE server at{" "}
+                  Connects directly to Civify&apos;s hosted MCP server at{" "}
                   <code className="bg-background px-1.5 py-0.5 rounded border">
-                    https://mcp.civify.cv/sse
+                    https://mcp.civify.cv/mcp
                   </code>
-                  . No Node.js or local package installation needed.
+                  . Uses Streamable HTTP transport (new MCP standard). No Node.js or local package installation needed.
                 </p>
               </div>
 
