@@ -612,6 +612,10 @@
       "outputSchema": {
         "type": "object",
         "properties": {
+          "content": {
+            "type": "string",
+            "description": "Raw scraped job description text content"
+          },
           "title": {
             "type": "string",
             "description": "Extracted job title"
@@ -626,7 +630,7 @@
           },
           "description": {
             "type": "string",
-            "description": "Full cleaned job description text"
+            "description": "Cleaned job description text"
           },
           "requirements": {
             "type": "array",
@@ -642,11 +646,7 @@
             },
             "description": "Extracted day-to-day duties and responsibilities"
           }
-        },
-        "required": [
-          "title",
-          "description"
-        ]
+        }
       },
       "annotations": {
         "title": "Scrape Job Description URL",
@@ -690,6 +690,18 @@
       "outputSchema": {
         "type": "object",
         "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the document was successfully parsed"
+          },
+          "message": {
+            "type": "string",
+            "description": "Diagnostic or status message"
+          },
+          "resumeData": {
+            "type": "object",
+            "description": "Parsed resume sections including contact, experience, education, skills, and projects"
+          },
           "contact": {
             "type": "object",
             "description": "Candidate contact information (name, email, phone, location, links)"
@@ -725,13 +737,12 @@
             "items": {
               "type": "object"
             }
+          },
+          "detectedLanguage": {
+            "type": "string",
+            "description": "Primary detected language code (e.g., 'en', 'ar')"
           }
-        },
-        "required": [
-          "contact",
-          "experience",
-          "skills"
-        ]
+        }
       },
       "annotations": {
         "title": "Parse Resume Document",
@@ -806,7 +817,11 @@
         "properties": {
           "status": {
             "type": "string",
-            "description": "Execution status (SUCCESS)"
+            "description": "Execution status"
+          },
+          "tailoredCv": {
+            "type": "object",
+            "description": "Optimized resume document structure"
           },
           "tailoredResume": {
             "type": "object",
@@ -837,6 +852,10 @@
               }
             }
           },
+          "originalAtsScore": {
+            "type": "object",
+            "description": "Original ATS score before tailoring for comparison"
+          },
           "changes": {
             "type": "array",
             "items": {
@@ -844,14 +863,26 @@
             },
             "description": "Summary list of bullet points and sections tailored"
           },
+          "validationWarnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Validation warnings or alignment notes"
+          },
           "coverLetter": {
             "type": "string",
             "description": "Matching personalized cover letter text if requested"
+          },
+          "interviewPrep": {
+            "type": "object",
+            "description": "Targeted interview preparation questions and talking points"
+          },
+          "roadmap": {
+            "type": "object",
+            "description": "Targeted skill acquisition roadmap"
           }
-        },
-        "required": [
-          "status"
-        ]
+        }
       },
       "annotations": {
         "title": "Tailor Resume to Job Description",
@@ -885,6 +916,18 @@
       "outputSchema": {
         "type": "object",
         "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Operation success status"
+          },
+          "message": {
+            "type": "string",
+            "description": "Status message"
+          },
+          "data": {
+            "type": "object",
+            "description": "ATS score details containing overall, keywordMatch, skillsMatch, missingKeywords, and suggestions"
+          },
           "overall": {
             "type": "number",
             "description": "Overall ATS match score (0-100)"
@@ -911,10 +954,7 @@
             },
             "description": "Actionable recommendations to improve ATS compatibility"
           }
-        },
-        "required": [
-          "overall"
-        ]
+        }
       },
       "annotations": {
         "title": "Score Resume ATS Compatibility",
