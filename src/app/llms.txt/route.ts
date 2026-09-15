@@ -44,6 +44,7 @@ Civify provides a production-grade, 17-tool MCP server for autonomous coding and
 - Local stdio / npm Package: \`npx -y @civify/mcp-server\`
 - Static Server Card (SEP-1649): https://mcp.civify.cv/.well-known/mcp/server-card.json
 - Registry Listings: Smithery, Glama, PulseMCP
+- Chat Agent File Convention: For remote AI agents (ChatGPT, Claude), pass resume content as plain text/markdown via \`resume_text\` or Base64 document bytes via \`file_base64\`. Server file paths are reserved for local CLI usage.
 
 ### Quickstart Configuration
 For Claude Desktop (\`claude_desktop_config.json\`):

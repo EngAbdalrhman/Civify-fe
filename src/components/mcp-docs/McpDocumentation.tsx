@@ -355,7 +355,7 @@ export function McpDocumentation() {
           />
         </a>
         <Badge variant="secondary" className="px-3 py-1 font-mono text-xs">
-          MCP v1.3.2 Official
+          MCP v1.3.3 Official
         </Badge>
         <Badge variant="outline" className="px-3 py-1 text-xs gap-1 border-primary/40 text-primary">
           <Zap className="h-3 w-3" /> 17 Automated Tools

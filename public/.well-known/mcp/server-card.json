@@ -2,7 +2,7 @@
   "": "https://modelcontextprotocol.io/schema/server-card.json",
   "serverInfo": {
     "name": "Civify MCP Server",
-    "version": "1.3.2",
+    "version": "1.3.3",
     "description": "Official MCP server for Civify AI Career Platform (Resume Parsing, ATS Scoring, Tailoring, PII Masking, Kanban Applications, and Pay-Per-CV)."
   },
   "authentication": {
@@ -667,13 +667,13 @@
             "type": "string",
             "description": "Plain text or markdown content of the resume. Easiest option when chatting with an AI agent."
           },
-          "file_path": {
-            "type": "string",
-            "description": "Local file path on the MCP server machine. Do NOT use for remote cloud servers; use 'resume_text' or 'file_base64' instead."
-          },
           "file_base64": {
             "type": "string",
             "description": "Base64 encoded content of the resume document (PDF, DOCX). Recommended for remote/cloud MCP servers."
+          },
+          "server_file_path": {
+            "type": "string",
+            "description": "Local file path on the MCP server machine. For local CLI/stdio usage only. In ChatGPT or Claude, pass 'resume_text' or 'file_base64' instead."
           },
           "filename": {
             "type": "string",
@@ -693,7 +693,7 @@
         "anyOf": [
           { "required": ["resume_text"] },
           { "required": ["file_base64"] },
-          { "required": ["file_path"] }
+          { "required": ["server_file_path"] }
         ]
       },
       "outputSchema": {
@@ -772,17 +772,17 @@
             "type": "string",
             "description": "Plain text or markdown content of the candidate's resume. Easiest option when chatting with an AI agent."
           },
-          "file_path": {
-            "type": "string",
-            "description": "Local file path on the MCP server machine. Do NOT use for remote cloud servers; use 'resume_text' or 'file_base64' instead."
-          },
           "file_base64": {
             "type": "string",
             "description": "Base64 encoded resume file content (PDF, DOCX). Recommended for remote/cloud MCP servers."
           },
+          "server_file_path": {
+            "type": "string",
+            "description": "Local file path on the MCP server machine. For local CLI/stdio usage only. In ChatGPT or Claude, pass 'resume_text' or 'file_base64' instead."
+          },
           "filename": {
             "type": "string",
-            "description": "Filename when providing base64 content.",
+            "description": "Filename when providing base64 content (e.g. 'resume.pdf').",
             "default": "resume.pdf"
           },
           "job_description": {
@@ -827,7 +827,7 @@
         "anyOf": [
           { "required": ["resume_text"] },
           { "required": ["file_base64"] },
-          { "required": ["file_path"] }
+          { "required": ["server_file_path"] }
         ]
       },
       "outputSchema": {
@@ -925,9 +925,9 @@
             "type": "string",
             "description": "Base64 encoded content of the resume document (PDF, DOCX). Recommended for remote/cloud MCP servers."
           },
-          "file_path": {
+          "server_file_path": {
             "type": "string",
-            "description": "Local file path on the MCP server machine. Do NOT use for remote cloud servers; use 'resume_text' or 'file_base64' instead."
+            "description": "Local file path on the MCP server machine. For local CLI/stdio usage only. In ChatGPT or Claude, pass 'resume_text' or 'file_base64' instead."
           },
           "filename": {
             "type": "string",
@@ -946,7 +946,7 @@
         "anyOf": [
           { "required": ["resume_text"] },
           { "required": ["file_base64"] },
-          { "required": ["file_path"] },
+          { "required": ["server_file_path"] },
           { "required": ["resume_data"] }
         ]
       },
@@ -1008,17 +1008,17 @@
       "inputSchema": {
         "type": "object",
         "properties": {
-          "file_path": {
-            "type": "string",
-            "description": "Path to resume file to redact."
-          },
           "file_base64": {
             "type": "string",
-            "description": "Base64 encoded resume file."
+            "description": "Base64 encoded resume file (PDF, DOCX). Recommended for remote/cloud MCP servers."
+          },
+          "server_file_path": {
+            "type": "string",
+            "description": "Local file path on the MCP server machine. For local CLI/stdio usage only. In ChatGPT or Claude, pass 'file_base64' instead."
           },
           "output_path": {
             "type": "string",
-            "description": "Optional destination path to save the masked PDF."
+            "description": "Optional destination path on the server to save the masked PDF."
           },
           "api_key": {
             "type": "string",
