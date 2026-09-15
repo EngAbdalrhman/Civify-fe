@@ -11,7 +11,8 @@ export async function GET() {
 
 ## Official Integrations
 - **Model Context Protocol (MCP)**: \`npx -y @civify/mcp-server\`
-- **Hosted Remote SSE Stream**: \`https://mcp.civify.cv/sse\`
+- **Hosted Streamable HTTP (Recommended)**: \`https://mcp.civify.cv/mcp\`
+- **Hosted Legacy SSE Stream**: \`https://mcp.civify.cv/sse\`
 - **Static Server Card (SEP-1649)**: \`https://mcp.civify.cv/.well-known/mcp/server-card.json\`
 - **Interactive Documentation**: \`${baseUrl}/en/mcp-docs\` (Arabic: \`${baseUrl}/ar/mcp-docs\`)
 - **REST API Base**: \`https://civify.cv/apis\`
@@ -22,8 +23,9 @@ export async function GET() {
 ## Model Context Protocol (MCP) Server Specification
 
 ### Connection Transports
-1. **Remote Server-Sent Events (SSE)**: Hosted at \`https://mcp.civify.cv/sse\` (Multi-tenant, SSL-secured via Dokploy/Traefik).
-2. **Local Standard I/O (stdio)**: Run via Node.js with \`npx -y @civify/mcp-server\`.
+1. **Streamable HTTP (Recommended)**: Hosted at \`https://mcp.civify.cv/mcp\` (New MCP standard, used by Claude Desktop connectors).
+2. **Remote Server-Sent Events (SSE)**: Hosted at \`https://mcp.civify.cv/sse\` (Legacy, for Smithery and older clients).
+3. **Local Standard I/O (stdio)**: Run via Node.js with \`npx -y @civify/mcp-server\`.
 
 ### Dynamic Multi-User Authentication Lifecycle
 No static key required at startup. Sessions authenticate dynamically:

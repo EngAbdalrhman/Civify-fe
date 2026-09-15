@@ -80,8 +80,8 @@ export default async function McpDocsPage({ params }: Props) {
       downloadUrl: "https://www.npmjs.com/package/@civify/mcp-server",
       applicationCategory: "DeveloperApplication",
       applicationSubCategory: "AI Agent Tools",
-      operatingSystem: "Cross-platform (Node.js, Docker, Remote SSE)",
-      softwareVersion: "1.2.0",
+      operatingSystem: "Cross-platform (Node.js, Docker, Streamable HTTP, SSE)",
+      softwareVersion: "1.3.0",
       inLanguage: ["en", "ar"],
       offers: {
         "@type": "Offer",
@@ -96,6 +96,7 @@ export default async function McpDocsPage({ params }: Props) {
           : "Official Model Context Protocol server for Civify AI Career Platform. Enables autonomous AI agents to parse resumes, tailor CVs against job descriptions, score ATS compatibility, redact PII, and track applications.",
       featureList: [
         "17 Automated Career AI Tools",
+        "Streamable HTTP Transport (https://mcp.civify.cv/mcp)",
         "Remote SSE Transport (https://mcp.civify.cv/sse)",
         "Local stdio Transport (npx -y @civify/mcp-server)",
         "Resume Parsing (PDF, DOCX, base64, Arabic OCR)",

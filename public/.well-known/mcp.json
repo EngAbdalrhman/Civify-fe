@@ -1,10 +1,14 @@
 {
   "name": "Civify MCP Server",
-  "version": "1.2.0",
+  "version": "1.3.2",
   "description": "AI resume parsing, ATS scoring, and CV tailoring tools for autonomous agents.",
   "homepage": "https://civify.cv/mcp-docs",
   "serverCard": "https://mcp.civify.cv/.well-known/mcp/server-card.json",
   "transports": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.civify.cv/mcp"
+    },
     {
       "type": "sse",
       "url": "https://mcp.civify.cv/sse"

@@ -145,9 +145,12 @@ const MCP_TOOLS: McpTool[] = [
     authRequired: true,
     samplePrompt: "I want to purchase a single CV pass for resume ID 104829 using card payment.",
     parameters: [
-      { name: "package_type", type: "string", required: false, description: "'SINGLE' or 'THREE_PACK' (default: SINGLE)." },
-      { name: "payment_method", type: "string", required: false, description: "'CARD' or 'WALLET' (default: CARD)." },
+      { name: "product_id", type: "string", required: false, description: "Pay-per-CV product ID (default: PAY_PER_CV_SINGLE)." },
       { name: "resume_id", type: "string", required: false, description: "Target CV ID to bind this entitlement to." },
+      { name: "gateway", type: "string", required: false, description: "Optional payment gateway selection." },
+      { name: "method", type: "string", required: false, description: "'CARD' or 'WALLET' (default: CARD)." },
+      { name: "phone_number", type: "string", required: false, description: "Phone number when the selected gateway requires it." },
+      { name: "promo_code", type: "string", required: false, description: "Optional promotional code." },
       { name: "api_key", type: "string", required: false, description: "Optional API key override." },
     ],
   },
@@ -175,6 +178,7 @@ const MCP_TOOLS: McpTool[] = [
     samplePrompt: "Scrape the job requirements from this URL: https://boards.greenhouse.io/anthropic/jobs/529104.",
     parameters: [
       { name: "url", type: "string", required: true, description: "Public URL of the job description." },
+      { name: "api_key", type: "string", required: false, description: "Optional API key override." },
     ],
   },
   {
@@ -183,10 +187,11 @@ const MCP_TOOLS: McpTool[] = [
     categoryLabel: "Resume AI",
     description: "Parse a PDF, DOCX, or image resume into structured JSON schema (contact, work experience, education, skills).",
     authRequired: true,
-    samplePrompt: "Parse the CV at /Users/me/Documents/resume.pdf into structured JSON format.",
+    samplePrompt: "Parse my attached CV into structured JSON format.",
     parameters: [
-      { name: "file_path", type: "string", required: false, description: "Absolute local path to the CV file." },
-      { name: "file_base64", type: "string", required: false, description: "Base64-encoded CV file content." },
+      { name: "resume_text", type: "string", required: false, description: "Plain-text or Markdown resume content; best for an AI chat." },
+      { name: "file_base64", type: "string", required: false, description: "Base64-encoded PDF or DOCX; best for a remote MCP server." },
+      { name: "file_path", type: "string", required: false, description: "Path on the MCP server machine only; remote servers cannot read your sandbox path." },
       { name: "filename", type: "string", required: false, description: "Original filename with extension (e.g. resume.pdf)." },
       { name: "language", type: "string", required: false, description: "Language hint (e.g. 'en', 'ar')." },
       { name: "api_key", type: "string", required: false, description: "Optional API key override." },
@@ -198,14 +203,19 @@ const MCP_TOOLS: McpTool[] = [
     categoryLabel: "Resume AI",
     description: "Tailor CV bullet points, keywords, and summary against a target job description. Optionally generates cover letter and interview Q&A.",
     authRequired: true,
-    samplePrompt: "Tailor my resume /Users/me/cv.pdf for this job description: 'Seeking Senior Fullstack Engineer with Next.js and Spring Boot...'. Generate a cover letter too.",
+    samplePrompt: "Tailor my attached resume for this job description: 'Seeking Senior Fullstack Engineer with Next.js and Spring Boot...'. Generate a cover letter too.",
     parameters: [
       { name: "job_description", type: "string", required: true, description: "Target job description text or scraped requirements." },
-      { name: "file_path", type: "string", required: false, description: "Local path to candidate CV file." },
+      { name: "resume_text", type: "string", required: false, description: "Plain-text or Markdown resume content; best for an AI chat." },
+      { name: "file_base64", type: "string", required: false, description: "Base64-encoded PDF or DOCX; best for a remote MCP server." },
+      { name: "file_path", type: "string", required: false, description: "Path on the MCP server machine only." },
+      { name: "filename", type: "string", required: false, description: "Original filename when providing Base64 content." },
       { name: "job_title", type: "string", required: false, description: "Target position title." },
       { name: "company_name", type: "string", required: false, description: "Target hiring company." },
+      { name: "language", type: "string", required: false, description: "Language hint (e.g. 'en' or 'ar')." },
       { name: "generate_cover_letter", type: "boolean", required: false, description: "Generate a targeted cover letter (default: false)." },
       { name: "include_interview_questions", type: "boolean", required: false, description: "Generate interview prep Q&A (default: false)." },
+      { name: "include_roadmap", type: "boolean", required: false, description: "Generate a preparation roadmap (default: false)." },
       { name: "api_key", type: "string", required: false, description: "Optional API key override." },
     ],
   },
@@ -215,9 +225,12 @@ const MCP_TOOLS: McpTool[] = [
     categoryLabel: "Resume AI",
     description: "Calculate an ATS compatibility score (0–100) and identify missing keywords, formatting errors, and structure gaps.",
     authRequired: true,
-    samplePrompt: "Calculate the ATS compatibility score for my resume in /docs/resume.pdf.",
+    samplePrompt: "Calculate the ATS compatibility score for my attached resume.",
     parameters: [
-      { name: "file_path", type: "string", required: false, description: "Local path to CV file." },
+      { name: "resume_text", type: "string", required: false, description: "Plain-text or Markdown resume content; best for an AI chat." },
+      { name: "file_base64", type: "string", required: false, description: "Base64-encoded PDF or DOCX; best for a remote MCP server." },
+      { name: "file_path", type: "string", required: false, description: "Path on the MCP server machine only." },
+      { name: "filename", type: "string", required: false, description: "Original filename when providing Base64 content." },
       { name: "resume_data", type: "object", required: false, description: "Structured JSON resume data." },
       { name: "api_key", type: "string", required: false, description: "Optional API key override." },
     ],
@@ -230,7 +243,8 @@ const MCP_TOOLS: McpTool[] = [
     authRequired: true,
     samplePrompt: "Redact all personal contact details from /Users/me/cv.pdf and save the anonymized PDF.",
     parameters: [
-      { name: "file_path", type: "string", required: false, description: "Local path to CV file." },
+      { name: "file_path", type: "string", required: false, description: "Path on the MCP server machine only." },
+      { name: "file_base64", type: "string", required: false, description: "Base64-encoded resume file for a remote MCP server." },
       { name: "output_path", type: "string", required: false, description: "Destination path for masked PDF." },
       { name: "api_key", type: "string", required: false, description: "Optional API key override." },
     ],
@@ -246,6 +260,7 @@ const MCP_TOOLS: McpTool[] = [
       { name: "resume_data", type: "object", required: true, description: "Structured JSON resume data." },
       { name: "template", type: "string", required: false, description: "Template style: 'modern', 'classic', 'minimal' (default: modern)." },
       { name: "color", type: "string", required: false, description: "Primary accent color hex (default: '#000000')." },
+      { name: "filename", type: "string", required: false, description: "Filename for the exported PDF." },
       { name: "output_path", type: "string", required: false, description: "Output filepath for generated PDF." },
     ],
   },
@@ -299,7 +314,7 @@ export function McpDocumentation() {
   const claudeRemoteConfig = `{
   "mcpServers": {
     "civify": {
-      "url": "https://mcp.civify.cv/sse"
+      "url": "https://mcp.civify.cv/mcp"
     }
   }
 }`;
@@ -326,14 +341,27 @@ export function McpDocumentation() {
     <div className="space-y-12">
       {/* ─── Highlights / Badges ─── */}
       <div className="flex flex-wrap items-center justify-center gap-2">
+        <a
+          href="https://smithery.ai/servers/technolabs/civify"
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center hover:opacity-85 transition-opacity"
+          title="Smithery 1-Click Install"
+        >
+          <img
+            src="https://smithery.ai/badge/technolabs/civify"
+            alt="smithery badge"
+            className="h-6"
+          />
+        </a>
         <Badge variant="secondary" className="px-3 py-1 font-mono text-xs">
-          MCP v1.1.0 Official
+          MCP v1.3.2 Official
         </Badge>
         <Badge variant="outline" className="px-3 py-1 text-xs gap-1 border-primary/40 text-primary">
           <Zap className="h-3 w-3" /> 17 Automated Tools
         </Badge>
         <Badge variant="outline" className="px-3 py-1 text-xs gap-1">
-          <Server className="h-3 w-3" /> Remote SSE & Local npm
+          <Server className="h-3 w-3" /> Remote HTTP & Local npm
         </Badge>
         <Badge variant="outline" className="px-3 py-1 text-xs gap-1">
           <Shield className="h-3 w-3" /> Dynamic Multi-User Auth
@@ -354,13 +382,13 @@ export function McpDocumentation() {
         <CardContent>
           <Tabs defaultValue="claude-remote" className="w-full">
             <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-6">
-              <TabsTrigger value="claude-remote">Claude (Remote SSE)</TabsTrigger>
+              <TabsTrigger value="claude-remote">Claude (Remote HTTP)</TabsTrigger>
               <TabsTrigger value="claude-local">Claude (Local npx)</TabsTrigger>
               <TabsTrigger value="cursor">Cursor IDE</TabsTrigger>
               <TabsTrigger value="cli">OpenCode / CLI</TabsTrigger>
             </TabsList>
 
-            {/* Claude Remote SSE */}
+            {/* Claude Remote (Streamable HTTP) */}
             <TabsContent value="claude-remote" className="space-y-4">
               <div className="rounded-lg bg-muted/50 p-4 border text-sm space-y-2">
                 <p className="font-semibold flex items-center gap-1.5 text-foreground">
@@ -368,11 +396,11 @@ export function McpDocumentation() {
                   Zero Installation Required
                 </p>
                 <p className="text-muted-foreground text-xs leading-relaxed">
-                  Connects directly to Civify's hosted remote SSE server at{" "}
+                  Connects directly to Civify&apos;s hosted MCP server at{" "}
                   <code className="bg-background px-1.5 py-0.5 rounded border">
-                    https://mcp.civify.cv/sse
+                    https://mcp.civify.cv/mcp
                   </code>
-                  . No Node.js or local package installation needed.
+                  . Uses Streamable HTTP transport (new MCP standard). No Node.js or local package installation needed.
                 </p>
               </div>
 
@@ -679,7 +707,7 @@ export function McpDocumentation() {
         <CardContent>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
             {[
-              { name: t("compatibility.claude"), tag: "Desktop / Remote SSE" },
+              { name: t("compatibility.claude"), tag: "Desktop / Remote HTTP" },
               { name: t("compatibility.cursor"), tag: "IDE stdio / npx" },
               { name: t("compatibility.windsurf"), tag: "Next-Gen IDE" },
               { name: t("compatibility.opencode"), tag: "Terminal Agent" },
@@ -750,12 +778,17 @@ export function McpDocumentation() {
           </div>
           <div className="flex items-center gap-3">
             <a
-              href="https://smithery.ai"
+              href="https://smithery.ai/servers/technolabs/civify"
               target="_blank"
               rel="noreferrer"
-              className="hover:text-foreground inline-flex items-center gap-1 underline underline-offset-4"
+              className="hover:text-foreground inline-flex items-center gap-1.5 underline underline-offset-4 font-medium"
             >
-              Smithery <ExternalLink className="h-3 w-3" />
+              <img
+                src="https://smithery.ai/badge/technolabs/civify"
+                alt="smithery badge"
+                className="h-4"
+              />
+              <ExternalLink className="h-3 w-3" />
             </a>
             <a
               href="https://glama.ai/mcp/servers"
