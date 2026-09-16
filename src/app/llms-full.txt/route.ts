@@ -63,13 +63,13 @@ No static key required at startup. Sessions authenticate dynamically:
 - **\`civify_scrape_job\`**: Scrape structured requirements from any public job URL (LinkedIn, Greenhouse, Lever, Ashby, Wuzzuf). Public tool, no auth required.
   - Parameters: \`url\` (string, required)
 - **\`civify_parse_cv\`**: Parse PDF, DOCX, or scanned image resume into structured JSON (contact, experience, education, skills). Supports Arabic OCR.
-  - Parameters: \`file_path\` (string, optional), \`file_base64\` (string, optional), \`filename\` (string, optional), \`language\` (string, default: auto)
+  - Parameters: \`resume_text\` (string, plain text/markdown for chat agents), \`file_base64\` (string, Base64 document bytes), \`server_file_path\` (string, local server CLI path), \`filename\` (string, optional), \`language\` (string, default: auto)
 - **\`civify_tailor_cv\`**: Tailor CV bullet points, skills, and summary against a target job description. Optionally generates cover letter and interview Q&A.
-  - Parameters: \`job_description\` (string, required), \`file_path\` (string, optional), \`job_title\` (string, optional), \`company_name\` (string, optional), \`generate_cover_letter\` (boolean, default: false)
+  - Parameters: \`job_description\` (string, required), \`resume_text\` (string, optional), \`file_base64\` (string, optional), \`server_file_path\` (string, optional), \`job_title\` (string, optional), \`company_name\` (string, optional), \`generate_cover_letter\` (boolean, default: false)
 - **\`civify_score_ats\`**: Calculate 0–100 ATS compatibility score, section quality audit, and missing keywords analysis.
-  - Parameters: \`file_path\` (string, optional), \`resume_data\` (object, optional)
+  - Parameters: \`resume_text\` (string, optional), \`file_base64\` (string, optional), \`server_file_path\` (string, optional), \`resume_data\` (object, optional)
 - **\`civify_mask_pii\`**: Redact sensitive PII (name, phone, email, address, photo) and export an anonymized PDF for blind recruitment.
-  - Parameters: \`file_path\` (string, required), \`output_path\` (string, optional)
+  - Parameters: \`file_base64\` (string, optional), \`server_file_path\` (string, optional), \`output_path\` (string, optional)
 - **\`civify_generate_pdf\`**: Render high-fidelity PDF from structured resume data using Civify templates (Modern, Classic, Minimal).
   - Parameters: \`resume_data\` (object, required), \`template\` (string, default: modern), \`color\` (string, default: #000000), \`output_path\` (string, optional)
 

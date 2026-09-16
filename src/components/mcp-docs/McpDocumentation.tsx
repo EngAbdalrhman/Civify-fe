@@ -348,14 +348,12 @@ export function McpDocumentation() {
           className="inline-flex items-center hover:opacity-85 transition-opacity"
           title="Smithery 1-Click Install"
         >
-          <img
-            src="https://smithery.ai/badge/technolabs/civify"
-            alt="smithery badge"
-            className="h-6"
-          />
+          <Badge variant="outline" className="px-3 py-1 text-xs gap-1 border-primary/40 hover:bg-muted font-medium text-foreground">
+            Smithery Verified <ExternalLink className="h-3 w-3 text-primary" />
+          </Badge>
         </a>
         <Badge variant="secondary" className="px-3 py-1 font-mono text-xs">
-          MCP v1.3.2 Official
+          MCP v1.3.3 Official
         </Badge>
         <Badge variant="outline" className="px-3 py-1 text-xs gap-1 border-primary/40 text-primary">
           <Zap className="h-3 w-3" /> 17 Automated Tools
@@ -781,14 +779,9 @@ export function McpDocumentation() {
               href="https://smithery.ai/servers/technolabs/civify"
               target="_blank"
               rel="noreferrer"
-              className="hover:text-foreground inline-flex items-center gap-1.5 underline underline-offset-4 font-medium"
+              className="hover:text-foreground inline-flex items-center gap-1 underline underline-offset-4 font-medium"
             >
-              <img
-                src="https://smithery.ai/badge/technolabs/civify"
-                alt="smithery badge"
-                className="h-4"
-              />
-              <ExternalLink className="h-3 w-3" />
+              Smithery <ExternalLink className="h-3 w-3" />
             </a>
             <a
               href="https://glama.ai/mcp/servers"
