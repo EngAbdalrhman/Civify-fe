@@ -1,7 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { useInView } from "framer-motion";
+import { useNearViewport } from "@/hooks/use-near-viewport";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/routing";
 import {
@@ -16,16 +15,7 @@ import { useTranslations } from "next-intl";
 
 export function ResumeBuilderSection() {
   const t = useTranslations("landing.resumeBuilder");
-  const ref = useRef(null);
-  const videoRef = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const isVideoInView = useInView(videoRef, { once: true, margin: "100px" });
-  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
-
-  // Load video when it comes into view
-  if (isVideoInView && !shouldLoadVideo) {
-    setShouldLoadVideo(true);
-  }
+  const { ref: videoRef, isNear: shouldLoadVideo } = useNearViewport<HTMLDivElement>();
 
   const features = [
     {
@@ -51,13 +41,7 @@ export function ResumeBuilderSection() {
         <div className="flex flex-col lg:flex-row gap-16 items-center">
           {/* Left Content */}
           <div
-            ref={ref}
             className="w-full lg:w-1/2 space-y-8"
-            style={{
-              opacity: isInView ? 1 : 0,
-              transform: isInView ? "none" : "translateX(-50px)",
-              transition: "all 0.8s cubic-bezier(0.17, 0.55, 0.55, 1) 0.1s",
-            }}
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 text-sm font-medium">
               <Sparkles className="w-4 h-4" />
@@ -106,11 +90,6 @@ export function ResumeBuilderSection() {
           {/* Right Content - Video Placeholder */}
           <div
             className="w-full lg:w-1/2"
-            style={{
-              opacity: isInView ? 1 : 0,
-              transform: isInView ? "none" : "translateX(50px)",
-              transition: "all 0.8s cubic-bezier(0.17, 0.55, 0.55, 1) 0.3s",
-            }}
           >
             <div className="relative rounded-2xl overflow-hidden shadow-2xl border bg-background/50 backdrop-blur-sm group">
               {/* Browser Header Decoration */}

@@ -144,7 +144,7 @@ export default function PlansContent({
               }`}
             >
               {t("yearly")}{" "}
-              <span className="text-xs text-green-600 font-bold">
+              <span className="text-xs text-green-700 dark:text-green-400 font-bold">
                 ({t("save20")})
               </span>
             </button>
@@ -216,7 +216,7 @@ export default function PlansContent({
 
                       <ul className="mb-8 flex-1 space-y-4">
                         {plan.features.map((feature, i) => (
-                          <li key={i} className={`flex items-center gap-3 ${!feature.included ? 'opacity-50' : ''}`}>
+                          <li key={i} className="flex items-center gap-3">
                             <Check className={`h-5 w-5 flex-shrink-0 ${feature.included ? 'text-primary' : 'text-muted-foreground opacity-50'}`} />
                             <span className={`text-sm ${!feature.included ? 'line-through text-muted-foreground' : ''}`}>{feature.text}</span>
                           </li>
@@ -267,7 +267,7 @@ export default function PlansContent({
 
               <ul className="mb-8 flex-1 space-y-4">
                 {plan.features.map((feature, i) => (
-                  <li key={i} className={`flex items-center gap-3 ${!feature.included ? 'opacity-50' : ''}`}>
+                  <li key={i} className="flex items-center gap-3">
                     <Check className={`h-5 w-5 flex-shrink-0 ${feature.included ? 'text-primary' : 'text-muted-foreground opacity-50'}`} />
                     <span className={`text-sm ${!feature.included ? 'line-through text-muted-foreground' : ''}`}>{feature.text}</span>
                   </li>

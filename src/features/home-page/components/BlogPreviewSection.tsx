@@ -49,7 +49,7 @@ export async function BlogPreviewSection() {
         <div className="mt-12 text-center">
           <Button asChild variant="outline" size="lg">
             <Link href="/blog">
-              {t("readMore")}
+              {t("viewAll")}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>

@@ -34,6 +34,12 @@ function buildAuthHeaders(request: Request): Headers {
   if (authorization) {
     headers.set("authorization", authorization);
   }
+  const apiKey = request.headers.get("x-api-key");
+  if (apiKey) headers.set("x-api-key", apiKey);
+  for (const name of ["x-request-id", "x-civify-mcp-tool"]) {
+    const value = request.headers.get(name);
+    if (value) headers.set(name, value);
+  }
   return headers;
 }
 
@@ -47,8 +53,7 @@ function isTrustedServerCall(request: Request): boolean {
 /**
  * Watermark resolution rules:
  *  - Trusted server (Civify) + body  → use body verbatim
- *  - Untrusted body                   → no watermark (don't substitute platform logo —
- *                                       would override the user's actual policy)
+ *  - Untrusted body                   → ignore it; resolve the actual account policy
  *  - No body, trusted with X-Pdf-User-Id → fetch policy as that user
  *  - No body, browser session         → fetch policy with cookie/Bearer auth
  *  - No body, no auth                 → platform watermark default
@@ -56,6 +61,7 @@ function isTrustedServerCall(request: Request): boolean {
 export async function resolveWatermarkForRequest(
   request: Request,
   bodyWatermark?: WatermarkConfig,
+  resumeId?: string,
 ): Promise<WatermarkConfig | undefined> {
   const trustedServer = isTrustedServerCall(request);
 
@@ -70,14 +76,11 @@ export async function resolveWatermarkForRequest(
         return bodyWatermark;
       }
       console.warn(
-        "PDF: trusted server body watermark enabled but imageUrl missing — skipping overlay",
+        "PDF: trusted server body watermark enabled but imageUrl missing — resolving policy",
       );
-      return undefined;
+    } else {
+      console.warn("PDF: ignoring untrusted body watermark; resolving account policy");
     }
-    console.error(
-      "PDF: untrusted watermark body received. Set PDF_INTERNAL_SECRET on HICv and Civify to the same value. Skipping watermark to avoid overriding user policy.",
-    );
-    return undefined;
   }
 
   const internalToken = request.headers.get("x-pdf-internal-token");
@@ -97,7 +100,10 @@ export async function resolveWatermarkForRequest(
         policyHeaders.set("x-pdf-user-id", pdfUserId);
       }
 
-      const res = await fetch(`${backendUrl}/v1/pdf/watermark-config`, {
+      const policyPath = policyHeaders.has("x-api-key") ? "/v1/external/cvs/watermark-config" : "/v1/pdf/watermark-config";
+      const policyUrl = new URL(`${backendUrl.replace(/\/$/, "")}${policyPath}`);
+      if (resumeId) policyUrl.searchParams.set("resumeId", resumeId);
+      const res = await fetch(policyUrl, {
         headers: policyHeaders,
         cache: "no-store",
       });

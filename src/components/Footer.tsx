@@ -177,9 +177,9 @@ export function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             {/* Follow Us */}
             <div>
-              <h4 className="font-semibold text-gray-900 mb-2 text-xs">
+              <p className="font-semibold text-gray-900 mb-2 text-xs">
                 {t("followUs")}
-              </h4>
+              </p>
               <div className="flex gap-2">
                 <Link
                   href="https://www.facebook.com/civifyapp7"
@@ -214,9 +214,9 @@ export function Footer() {
 
             {/* Mobile App */}
             {/* <div>
-            <h4 className="font-semibold text-gray-900 mb-2 text-xs">
+            <p className="font-semibold text-gray-900 mb-2 text-xs">
               {t("mobileApp")}
-            </h4>
+            </p>
             <div className="flex gap-2">
               <Link href="#" className="hover:opacity-80 transition-opacity">
                 <div className="flex items-center gap-1.5 bg-gray-900 text-white px-3 py-1.5 rounded-md">

@@ -1,10 +1,7 @@
-"use client";
-
 import { ArrowRight, Globe } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BetaBadge } from "@/components/BetaBadge";
 
 import { useTranslations } from "next-intl";
 
@@ -68,7 +65,7 @@ export function HeroSection() {
               size="lg"
               className="group h-12 px-8 text-base font-semibold"
             >
-              <Link href="/app/upload">
+              <Link href="/app/upload" prefetch={false}>
                 {t("ctaPrimary")}
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>

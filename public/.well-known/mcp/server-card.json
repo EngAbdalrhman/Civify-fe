@@ -384,7 +384,7 @@
     {
       "name": "civify_tailor_cv",
       "title": "Tailor Resume to Job Description",
-      "description": "Tailor a candidate's resume against a target job description using AI. Generates optimized bullet points, highlights matching skills, provides ATS keyword audit, and creates an optional cover letter.",
+      "description": "Tailor a CV to a job and return tailoredCv, ATS feedback, and a finished PDF by default. Prefer resume_data if you already extracted the CV; otherwise send one original document/text input. May consume AI credits. Do not call parse first or automatically repeat tailoring. PDF failure preserves tailoredCv for export-only retry.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -403,7 +403,9 @@
           },
           "job_description": {
             "type": "string",
-            "description": "The full text of the job description to tailor against."
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "Complete target job description."
           },
           "job_title": {
             "type": "string",
@@ -431,6 +433,202 @@
             "type": "boolean",
             "description": "Whether to generate a preparation roadmap.",
             "default": false
+          },
+          "resume_data": {
+            "type": "object",
+            "description": "Civify ResumeData extracted by you or returned by Civify. Preserve all real details; never invent achievements. Use personalInfo for contact/summary and sections[].items for experience, education and skills. No parse call is required when you have this data.",
+            "properties": {
+              "personalInfo": {
+                "type": "object",
+                "properties": {
+                  "fullName": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "email": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "phone": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "address": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "city": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "country": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "summary": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "jobTitle": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "linkedin": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "website": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "github": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              },
+              "sections": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "experience, education, skills, or custom"
+                    },
+                    "visible": {
+                      "type": "boolean"
+                    },
+                    "order": {
+                      "type": "integer"
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "title": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "subtitle": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "date": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "description": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "location": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "tags": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "visible": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "items"
+                  ]
+                }
+              },
+              "metadata": {
+                "type": "object",
+                "description": "Optional renderer settings, such as templateId and primaryColor."
+              }
+            },
+            "required": [
+              "personalInfo",
+              "sections"
+            ]
+          },
+          "template": {
+            "type": "string",
+            "enum": [
+              "modern",
+              "classic",
+              "creative",
+              "executive",
+              "minimal",
+              "ats"
+            ],
+            "default": "modern",
+            "description": "PDF layout."
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^#[0-9a-fA-F]{6}$",
+            "default": "#000000",
+            "description": "PDF accent color in six-digit hex."
+          },
+          "resume_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "Existing Civify resume ID, if known, to apply its export entitlement. Never invent an ID. Account policy applies when omitted."
+          },
+          "export_pdf": {
+            "type": "boolean",
+            "default": true,
+            "description": "Return the finished PDF with tailoring (default true). Set false for analysis only. If export fails, retry civify_generate_pdf with the returned tailoredCv; never repeat tailoring just to obtain a PDF."
           },
           "file": {
             "type": "object",
@@ -476,6 +674,11 @@
           },
           {
             "required": [
+              "resume_data"
+            ]
+          },
+          {
+            "required": [
               "file"
             ]
           },
@@ -496,7 +699,51 @@
       "outputSchema": {
         "type": "object",
         "properties": {
-          "data": {}
+          "data": {
+            "type": "object",
+            "properties": {
+              "tailoredCv": {
+                "type": "object",
+                "description": "Completed canonical resume data. Preserve for editing and export retries."
+              },
+              "document": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "SUCCESS",
+                      "EXPORT_FAILED",
+                      "NOT_REQUESTED"
+                    ]
+                  },
+                  "download_url": {
+                    "type": "string",
+                    "description": "Return this clickable PDF URL promptly."
+                  },
+                  "expires_at": {
+                    "type": "string"
+                  },
+                  "pdf_base64": {
+                    "type": "string"
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "retry_tool": {
+                    "type": "string"
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "Correlation ID for support; not an idempotency key."
+              },
+              "error": {
+                "type": "object"
+              }
+            }
+          }
         },
         "required": [
           "data"
@@ -546,7 +793,169 @@
           },
           "resume_data": {
             "type": "object",
-            "description": "Structured resume JSON data."
+            "description": "Civify ResumeData extracted by you or returned by Civify. Preserve all real details; never invent achievements. Use personalInfo for contact/summary and sections[].items for experience, education and skills. No parse call is required when you have this data.",
+            "properties": {
+              "personalInfo": {
+                "type": "object",
+                "properties": {
+                  "fullName": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "email": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "phone": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "address": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "city": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "country": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "summary": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "jobTitle": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "linkedin": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "website": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "github": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              },
+              "sections": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "experience, education, skills, or custom"
+                    },
+                    "visible": {
+                      "type": "boolean"
+                    },
+                    "order": {
+                      "type": "integer"
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "title": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "subtitle": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "date": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "description": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "location": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "tags": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "visible": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "items"
+                  ]
+                }
+              },
+              "metadata": {
+                "type": "object",
+                "description": "Optional renderer settings, such as templateId and primaryColor."
+              }
+            },
+            "required": [
+              "personalInfo",
+              "sections"
+            ]
           },
           "file": {
             "type": "object",
@@ -760,22 +1169,199 @@
         "properties": {
           "resume_data": {
             "type": "object",
-            "description": "Complete structured resume JSON."
+            "description": "Civify ResumeData extracted by you or returned by Civify. Preserve all real details; never invent achievements. Use personalInfo for contact/summary and sections[].items for experience, education and skills. No parse call is required when you have this data.",
+            "properties": {
+              "personalInfo": {
+                "type": "object",
+                "properties": {
+                  "fullName": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "email": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "phone": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "address": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "city": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "country": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "summary": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "jobTitle": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "linkedin": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "website": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "github": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              },
+              "sections": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "experience, education, skills, or custom"
+                    },
+                    "visible": {
+                      "type": "boolean"
+                    },
+                    "order": {
+                      "type": "integer"
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "title": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "subtitle": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "date": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "description": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "location": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "tags": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "visible": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "items"
+                  ]
+                }
+              },
+              "metadata": {
+                "type": "object",
+                "description": "Optional renderer settings, such as templateId and primaryColor."
+              }
+            },
+            "required": [
+              "personalInfo",
+              "sections"
+            ]
           },
           "template": {
             "type": "string",
-            "description": "Template design: 'modern', 'classic', 'minimal', 'executive'. Default is 'modern'.",
-            "default": "modern"
+            "enum": [
+              "modern",
+              "classic",
+              "creative",
+              "executive",
+              "minimal",
+              "ats"
+            ],
+            "default": "modern",
+            "description": "PDF layout."
           },
           "color": {
             "type": "string",
-            "description": "Primary accent color in hex (e.g. '#2563eb' or '#000000').",
-            "default": "#000000"
+            "pattern": "^#[0-9a-fA-F]{6}$",
+            "default": "#000000",
+            "description": "PDF accent color in six-digit hex."
           },
           "filename": {
             "type": "string",
             "description": "Filename for the exported PDF.",
             "default": "resume"
+          },
+          "resume_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "Existing Civify resume ID, if known, to apply its export entitlement. Never invent an ID. Account policy applies when omitted."
           }
         },
         "required": [

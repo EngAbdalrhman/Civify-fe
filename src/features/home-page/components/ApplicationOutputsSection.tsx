@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Mail,
   MessageSquare,
@@ -140,7 +138,7 @@ export function ApplicationOutputsSection() {
                       {t(`workflow.${key}.description`)}
                     </p>
                     <Button variant="link" size="sm" className="h-auto p-0" asChild>
-                      <Link href={href}>{t("learnMore")}</Link>
+                      <Link href={href}>{t(`workflow.${key}.title`)}</Link>
                     </Button>
                   </CardContent>
                 </Card>

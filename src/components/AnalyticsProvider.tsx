@@ -20,7 +20,7 @@ export function AnalyticsProvider() {
     <>
       {/* Microsoft Clarity */}
       {clarityId && (
-        <Script id="microsoft-clarity" strategy="afterInteractive">
+        <Script id="microsoft-clarity" strategy="lazyOnload">
           {`
             (function(c,l,a,r,i,t,y){
               c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -36,7 +36,7 @@ export function AnalyticsProvider() {
         <>
           <Script
             src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
-            strategy="afterInteractive"
+            strategy="lazyOnload"
           />
           <Script id="google-analytics" strategy="afterInteractive">
             {`

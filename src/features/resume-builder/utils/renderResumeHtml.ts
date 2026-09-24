@@ -67,8 +67,8 @@ function renderLevelBar(level: SkillLevel, color: string): string {
   `;
 }
 
-function escapeHtml(text: string): string {
-  return text
+function escapeHtml(text: string | null | undefined): string {
+  return (text ?? "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -898,7 +898,7 @@ function renderCreativeTemplate(data: ResumeData, color: string, watermark?: Wat
           ${
             personalInfo.picture
               ? `<img src="${personalInfo.picture}" alt="${escapeHtml(personalInfo.fullName)}" style="width: 128px; height: 128px; border-radius: 50%; margin: 0 auto 16px; object-fit: cover; border: 4px solid rgba(255,255,255,0.3); display: block;" />`
-              : `<div style="width: 128px; height: 128px; background-color: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700;">${personalInfo.fullName.charAt(0)}</div>`
+              : `<div style="width: 128px; height: 128px; background-color: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700;">${escapeHtml((personalInfo.fullName ?? "").charAt(0))}</div>`
           }
           <h1 style="font-size: 24px; font-weight: 700; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">
             ${escapeHtml(personalInfo.fullName)}
