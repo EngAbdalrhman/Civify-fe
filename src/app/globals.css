@@ -54,7 +54,7 @@
 
 /* ============================================
    LIGHT THEME (Default)
-   Primary: #3B82F6 (blue – trust & tech)
+   Primary: #2563EB (blue – trust & tech, WCAG AA compliant)
    Background: #FFFFFF (white)
    Text: #1F2937 (dark gray)
    Accent: #2563EB (strong blue)
@@ -75,8 +75,8 @@
   --popover: #FFFFFF;
   --popover-foreground: #1F2937;
   
-  /* Primary - Blue (trust & tech) */
-  --primary: #3B82F6;
+  /* Primary - Blue (trust & tech, WCAG AA 5.18:1 on white) */
+  --primary: #2563EB;
   --primary-foreground: #FFFFFF;
   
   /* Secondary */
@@ -98,7 +98,7 @@
   /* Borders & Inputs */
   --border: #E5E7EB;
   --input: #E5E7EB;
-  --ring: #3B82F6;
+  --ring: #2563EB;
   
   /* Status Colors */
   --success: #10B981;
@@ -109,7 +109,7 @@
   --error-foreground: #FFFFFF;
   
   /* Chart Colors */
-  --chart-1: #3B82F6;
+  --chart-1: #2563EB;
   --chart-2: #10B981;
   --chart-3: #F59E0B;
   --chart-4: #8B5CF6;
@@ -118,12 +118,12 @@
   /* Sidebar */
   --sidebar: #FFFFFF;
   --sidebar-foreground: #1F2937;
-  --sidebar-primary: #3B82F6;
+  --sidebar-primary: #2563EB;
   --sidebar-primary-foreground: #FFFFFF;
   --sidebar-accent: #F3F4F6;
   --sidebar-accent-foreground: #1F2937;
   --sidebar-border: #E5E7EB;
-  --sidebar-ring: #3B82F6;
+  --sidebar-ring: #2563EB;
 }
 
 /* ============================================

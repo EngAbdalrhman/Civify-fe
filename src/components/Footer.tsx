@@ -177,9 +177,9 @@ export function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             {/* Follow Us */}
             <div>
-              <h4 className="font-semibold text-gray-900 mb-2 text-xs">
+              <p className="font-semibold text-gray-900 mb-2 text-xs">
                 {t("followUs")}
-              </h4>
+              </p>
               <div className="flex gap-2">
                 <Link
                   href="https://www.facebook.com/civifyapp7"

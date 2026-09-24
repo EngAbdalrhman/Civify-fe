@@ -70,6 +70,7 @@ function BlogPreviewCard({
     <Link
       href={`/blog/${post.slug}`}
       className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      aria-label={`${readMoreLabel}: ${post.title}`}
     >
       <Card className="group h-full overflow-hidden border-2 transition-all duration-300 hover:border-primary hover:shadow-xl hover:shadow-primary/10">
         <CardContent className="p-0">
