@@ -76,6 +76,33 @@ function escapeHtml(text: string | null | undefined): string {
     .replace(/'/g, "&#039;");
 }
 
+// Parsers and MCP clients may group skills in tags; the editor also accepts
+// one skill per title. Normalize both forms without altering the saved resume.
+function normalizeRenderData(data: ResumeData): ResumeData {
+  return {
+    ...data,
+    sections: data.sections.map((section) => {
+      if (section.type !== "skills") return section;
+      const seen = new Set<string>();
+      const items = section.items.flatMap((item) => {
+        if (item.visible === false) return [];
+        const labels = [item.title, ...(item.tags || [])];
+        return labels.flatMap((label, index) => {
+          if (!label?.trim() || seen.has(label.trim().toLowerCase())) return [];
+          seen.add(label.trim().toLowerCase());
+          return [{ ...item, id: `${item.id || "skill"}-${index}`, title: label.trim(), tags: [] }];
+        });
+      });
+      return { ...section, items };
+    }),
+  };
+}
+
+function hasItemDetails(section: ResumeData["sections"][number]): boolean {
+  return section.items.some((item) => item.visible !== false &&
+    Boolean(item.subtitle || item.date || item.description || item.location));
+}
+
 // ============================================================================
 // Base HTML Template
 // ============================================================================
@@ -374,7 +401,7 @@ function renderClassicTemplate(data: ResumeData, color: string, watermark?: Wate
     if (section.type === 'certifications') {
       return coursesStyle === 'simple';
     }
-    return true;
+    return !hasItemDetails(section);
   };
 
   const content = `
@@ -619,7 +646,7 @@ function renderModernTemplate(data: ResumeData, color: string, watermark?: Water
     if (section.type === 'certifications') {
       return coursesStyle === 'simple';
     }
-    return true;
+    return !hasItemDetails(section);
   };
 
   // SVG icons for Modern template
@@ -887,7 +914,7 @@ function renderCreativeTemplate(data: ResumeData, color: string, watermark?: Wat
     if (section.type === 'certifications') {
       return coursesStyle === 'simple';
     }
-    return true;
+    return !hasItemDetails(section);
   };
 
   const content = `
@@ -1070,7 +1097,7 @@ function renderExecutiveTemplate(data: ResumeData, color: string, watermark?: Wa
 
   const renderLanguagesExec = (section: (typeof sections)[0]) => {
     const items = section.items.filter((item) => item.visible !== false);
-    return `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:13px;">
+    return `<div style="display:grid;grid-template-columns:1fr;gap:8px;font-size:13px;">
       ${items
         .map((item) => {
           const level = parseLevel(item.level || item.subtitle);
@@ -1079,8 +1106,8 @@ function renderExecutiveTemplate(data: ResumeData, color: string, watermark?: Wa
               ? renderLevelDots(level, color)
               : languagesStyle === "bar"
                 ? renderLevelBar(level, color)
-                : `<span style="color:#6b7280;font-size:12px;">${level}</span>`;
-          return `<div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:500;">${escapeHtml(item.title)}</span>${display}</div>`;
+                : `<span style="color:#6b7280;font-size:12px;">${escapeHtml(item.subtitle || item.level || "")}</span>`;
+          return `<div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;"><span style="font-weight:500;">${escapeHtml(item.title)}</span>${display}</div>`;
         })
         .join("")}
     </div>`;
@@ -1094,7 +1121,7 @@ function renderExecutiveTemplate(data: ResumeData, color: string, watermark?: Wa
     if (s.type === 'certifications') {
       return coursesStyle === 'simple';
     }
-    return true;
+    return !hasItemDetails(s);
   };
 
   const renderSimpleCols = (section: (typeof sections)[0]) => {
@@ -1254,7 +1281,7 @@ function renderMinimalTemplate(data: ResumeData, color: string, watermark?: Wate
 
   const renderLanguagesMin = (section: (typeof sections)[0]) => {
     const items = section.items.filter((i) => i.visible !== false);
-    return `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;font-size:13px;">
+    return `<div style="display:grid;grid-template-columns:1fr;gap:6px;font-size:13px;">
       ${items
         .map((item) => {
           const level = parseLevel(item.level || item.subtitle);
@@ -1263,8 +1290,8 @@ function renderMinimalTemplate(data: ResumeData, color: string, watermark?: Wate
               ? renderLevelDots(level, color)
               : languagesStyle === "bar"
                 ? renderLevelBar(level, color)
-                : `<span style="color:#9ca3af;font-size:12px;">${level}</span>`;
-          return `<div style="display:flex;justify-content:space-between;align-items:center;"><span>${escapeHtml(item.title)}</span>${display}</div>`;
+                : `<span style="color:#9ca3af;font-size:12px;">${escapeHtml(item.subtitle || item.level || "")}</span>`;
+          return `<div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;"><span>${escapeHtml(item.title)}</span>${display}</div>`;
         })
         .join("")}
     </div>`;
@@ -1278,7 +1305,7 @@ function renderMinimalTemplate(data: ResumeData, color: string, watermark?: Wate
     if (s.type === 'certifications') {
       return coursesStyle === 'simple';
     }
-    return true;
+    return !hasItemDetails(s);
   };
 
   const renderSimpleCols = (section: (typeof sections)[0]) => {
@@ -1413,6 +1440,7 @@ export function renderResumeHtml(
   color: string = "#000000",
   watermark?: WatermarkConfig,
 ): string {
+  data = normalizeRenderData(data);
   switch (template) {
     case "ats":
       return renderAtsTemplate(data, color, watermark);

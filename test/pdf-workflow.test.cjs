@@ -88,3 +88,29 @@ test('all PDF layouts accept absent contact fields and respect hidden sections',
     assert.ok(!html.includes('Hidden Employer'), template);
   }
 });
+
+test('all PDF layouts retain grouped skill tags, custom details and actual language proficiency', () => {
+  const { renderResumeHtml } = load('src/features/resume-builder/utils/renderResumeHtml.ts', {
+    '@/features/resume-builder/utils/socialLinks': load('src/features/resume-builder/utils/socialLinks.ts'),
+    '@/features/resume-builder/utils/renderWatermark': load('src/features/resume-builder/utils/renderWatermark.ts', {
+      '@/features/resume-builder/types/watermark': watermarkTypes,
+    }),
+  });
+  const resume = { personalInfo: { fullName: 'Candidate' }, sections: [
+    { id: 'skills', type: 'skills', title: 'Skills', items: [
+      { id: 'group', title: 'Technical skills', tags: ['OData', 'CDS Views', 'ABAP', 'ABAP', '<script>unsafe</script>'] },
+      { id: 'hidden', title: 'Secret skill', tags: ['HiddenTag'], visible: false },
+    ] },
+    { id: 'language', type: 'languages', title: 'Languages', items: [{ title: 'English', subtitle: 'Speaking: Very Good; Listening: Excellent' }] },
+    { id: 'custom', type: 'custom', title: 'Availability', items: [{ title: 'Notice period', subtitle: '30 days', description: 'Remote preferred' }] },
+  ] };
+  const original = JSON.stringify(resume);
+  for (const template of ['modern', 'classic', 'creative', 'executive', 'minimal', 'ats']) {
+    const html = renderResumeHtml(resume, template, '#000000');
+    for (const text of ['OData', 'CDS Views', '30 days', 'Remote preferred', 'Speaking: Very Good; Listening: Excellent']) assert.ok(html.includes(text), `${template}: ${text}`);
+    assert.ok(!html.includes('HiddenTag'), template);
+    assert.ok(!html.includes('<script>unsafe</script>'), template);
+    assert.equal((html.match(/\bABAP\b/g) || []).length, 1, `${template}: skill tags must not repeat`);
+  }
+  assert.equal(JSON.stringify(resume), original, 'export must not mutate saved data');
+});
