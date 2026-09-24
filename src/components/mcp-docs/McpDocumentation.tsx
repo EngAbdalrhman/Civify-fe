@@ -55,64 +55,10 @@ interface McpTool {
 }
 
 const MCP_TOOLS: McpTool[] = [
-  // ─── Authentication & Profile ──────────────────────────────────────────
   {
-    name: "civify_set_api_key",
-    category: "auth",
-    categoryLabel: "Auth & Account",
-    description: "Set or switch the active Civify API key (starts with 'cv-fy-') for this agent session. Validates the key with the server immediately.",
-    authRequired: false,
-    samplePrompt: "Use my Civify API key cv-fy-9a8b7c6d... for this session.",
-    parameters: [
-      { name: "api_key", type: "string", required: true, description: "Civify API key starting with 'cv-fy-'." },
-    ],
-  },
-  {
-    name: "civify_login",
-    category: "auth",
-    categoryLabel: "Auth & Account",
-    description: "Sign in to Civify using email or username and password. Automatically provisions an API key for the session (with 2FA support).",
-    authRequired: false,
-    samplePrompt: "Log in to my Civify account with email candidate@example.com and password mySecurePassword.",
-    parameters: [
-      { name: "identifier", type: "string", required: true, description: "User's email address or username." },
-      { name: "password", type: "string", required: true, description: "Civify account password." },
-    ],
-  },
-  {
-    name: "civify_verify_2fa",
-    category: "auth",
-    categoryLabel: "Auth & Account",
-    description: "Complete two-factor authentication (2FA) by submitting the 6-digit OTP code sent to the user's email after login.",
-    authRequired: false,
-    samplePrompt: "Here is the 2FA verification code sent to my email: 849201.",
-    parameters: [
-      { name: "code", type: "string", required: true, description: "6-digit OTP code received via email." },
-      { name: "username", type: "string", required: false, description: "Username or email (optional if login was called in this session)." },
-    ],
-  },
-  {
-    name: "civify_register",
-    category: "auth",
-    categoryLabel: "Auth & Account",
-    description: "Register a brand-new Civify account and automatically provision a session API key upon successful creation.",
-    authRequired: false,
-    samplePrompt: "Create a new Civify account for me with email me@example.com, username devcandidate, and password myPassword123.",
-    parameters: [
-      { name: "email", type: "string", required: true, description: "Valid email address." },
-      { name: "password", type: "string", required: true, description: "Account password (min 8 characters)." },
-      { name: "username", type: "string", required: true, description: "Unique username." },
-      { name: "referral_code", type: "string", required: false, description: "Optional referral / promo code." },
-    ],
-  },
-  {
-    name: "civify_logout",
-    category: "auth",
-    categoryLabel: "Auth & Account",
-    description: "Clear active credentials and reset all authentication state for this agent session.",
-    authRequired: false,
-    samplePrompt: "Log me out of my Civify session.",
-    parameters: [],
+    name: "civify_get_started", category: "auth", categoryLabel: "Getting Started",
+    description: "Discover account linking, attachment inputs, credits and the shortest workflow for your task.",
+    authRequired: false, isPublic: true, samplePrompt: "Help me use my attached CV with Civify.", parameters: [],
   },
   {
     name: "civify_get_account",
@@ -122,7 +68,6 @@ const MCP_TOOLS: McpTool[] = [
     authRequired: true,
     samplePrompt: "Check my Civify account profile and see how many AI tokens and credits I have left.",
     parameters: [
-      { name: "api_key", type: "string", required: false, description: "Optional API key override." },
     ],
   },
 
@@ -151,7 +96,6 @@ const MCP_TOOLS: McpTool[] = [
       { name: "method", type: "string", required: false, description: "'CARD' or 'WALLET' (default: CARD)." },
       { name: "phone_number", type: "string", required: false, description: "Phone number when the selected gateway requires it." },
       { name: "promo_code", type: "string", required: false, description: "Optional promotional code." },
-      { name: "api_key", type: "string", required: false, description: "Optional API key override." },
     ],
   },
   {
@@ -163,7 +107,6 @@ const MCP_TOOLS: McpTool[] = [
     samplePrompt: "Check if my CV with ID 104829 is unlocked for full export.",
     parameters: [
       { name: "resume_id", type: "string", required: true, description: "Civify resume ID to check." },
-      { name: "api_key", type: "string", required: false, description: "Optional API key override." },
     ],
   },
 
@@ -178,7 +121,6 @@ const MCP_TOOLS: McpTool[] = [
     samplePrompt: "Scrape the job requirements from this URL: https://boards.greenhouse.io/anthropic/jobs/529104.",
     parameters: [
       { name: "url", type: "string", required: true, description: "Public URL of the job description." },
-      { name: "api_key", type: "string", required: false, description: "Optional API key override." },
     ],
   },
   {
@@ -189,12 +131,12 @@ const MCP_TOOLS: McpTool[] = [
     authRequired: true,
     samplePrompt: "Parse my attached CV into structured JSON format.",
     parameters: [
+      { name: "file", type: "object", required: false, description: "Native ChatGPT attachment with download_url and file_id." },
+      { name: "file_url", type: "string", required: false, description: "Actual client-provided HTTPS download URL; never a sandbox path." },
       { name: "resume_text", type: "string", required: false, description: "Plain-text or Markdown resume content; best for an AI chat." },
-      { name: "file_base64", type: "string", required: false, description: "Base64-encoded PDF or DOCX; best for a remote MCP server." },
-      { name: "file_path", type: "string", required: false, description: "Path on the MCP server machine only; remote servers cannot read your sandbox path." },
+      { name: "file_base64", type: "string", required: false, description: "Actual base64 bytes when the client can supply them; prefer file or extracted text." },
       { name: "filename", type: "string", required: false, description: "Original filename with extension (e.g. resume.pdf)." },
       { name: "language", type: "string", required: false, description: "Language hint (e.g. 'en', 'ar')." },
-      { name: "api_key", type: "string", required: false, description: "Optional API key override." },
     ],
   },
   {
@@ -206,9 +148,10 @@ const MCP_TOOLS: McpTool[] = [
     samplePrompt: "Tailor my attached resume for this job description: 'Seeking Senior Fullstack Engineer with Next.js and Spring Boot...'. Generate a cover letter too.",
     parameters: [
       { name: "job_description", type: "string", required: true, description: "Target job description text or scraped requirements." },
+      { name: "file", type: "object", required: false, description: "Native ChatGPT attachment with download_url and file_id." },
+      { name: "file_url", type: "string", required: false, description: "Actual client-provided HTTPS download URL; never a sandbox path." },
       { name: "resume_text", type: "string", required: false, description: "Plain-text or Markdown resume content; best for an AI chat." },
-      { name: "file_base64", type: "string", required: false, description: "Base64-encoded PDF or DOCX; best for a remote MCP server." },
-      { name: "file_path", type: "string", required: false, description: "Path on the MCP server machine only." },
+      { name: "file_base64", type: "string", required: false, description: "Actual base64 bytes when the client can supply them; prefer file or extracted text." },
       { name: "filename", type: "string", required: false, description: "Original filename when providing Base64 content." },
       { name: "job_title", type: "string", required: false, description: "Target position title." },
       { name: "company_name", type: "string", required: false, description: "Target hiring company." },
@@ -216,7 +159,6 @@ const MCP_TOOLS: McpTool[] = [
       { name: "generate_cover_letter", type: "boolean", required: false, description: "Generate a targeted cover letter (default: false)." },
       { name: "include_interview_questions", type: "boolean", required: false, description: "Generate interview prep Q&A (default: false)." },
       { name: "include_roadmap", type: "boolean", required: false, description: "Generate a preparation roadmap (default: false)." },
-      { name: "api_key", type: "string", required: false, description: "Optional API key override." },
     ],
   },
   {
@@ -227,12 +169,12 @@ const MCP_TOOLS: McpTool[] = [
     authRequired: true,
     samplePrompt: "Calculate the ATS compatibility score for my attached resume.",
     parameters: [
+      { name: "file", type: "object", required: false, description: "Native ChatGPT attachment with download_url and file_id." },
+      { name: "file_url", type: "string", required: false, description: "Actual client-provided HTTPS download URL; never a sandbox path." },
       { name: "resume_text", type: "string", required: false, description: "Plain-text or Markdown resume content; best for an AI chat." },
-      { name: "file_base64", type: "string", required: false, description: "Base64-encoded PDF or DOCX; best for a remote MCP server." },
-      { name: "file_path", type: "string", required: false, description: "Path on the MCP server machine only." },
+      { name: "file_base64", type: "string", required: false, description: "Actual base64 bytes when the client can supply them; prefer file or extracted text." },
       { name: "filename", type: "string", required: false, description: "Original filename when providing Base64 content." },
       { name: "resume_data", type: "object", required: false, description: "Structured JSON resume data." },
-      { name: "api_key", type: "string", required: false, description: "Optional API key override." },
     ],
   },
   {
@@ -241,12 +183,12 @@ const MCP_TOOLS: McpTool[] = [
     categoryLabel: "Resume AI",
     description: "Sanitize personal identifiable information (name, phone, email, address, photo) to generate an anonymized PDF for blind applications.",
     authRequired: true,
-    samplePrompt: "Redact all personal contact details from /Users/me/cv.pdf and save the anonymized PDF.",
+    samplePrompt: "Redact personal contact details from my attached CV and return a link to the anonymized PDF.",
     parameters: [
-      { name: "file_path", type: "string", required: false, description: "Path on the MCP server machine only." },
+      { name: "file", type: "object", required: false, description: "Native ChatGPT attachment with download_url and file_id." },
+      { name: "file_url", type: "string", required: false, description: "Real HTTPS attachment URL." },
+      { name: "resume_text", type: "string", required: false, description: "Complete text read from the attached resume." },
       { name: "file_base64", type: "string", required: false, description: "Base64-encoded resume file for a remote MCP server." },
-      { name: "output_path", type: "string", required: false, description: "Destination path for masked PDF." },
-      { name: "api_key", type: "string", required: false, description: "Optional API key override." },
     ],
   },
   {
@@ -261,7 +203,6 @@ const MCP_TOOLS: McpTool[] = [
       { name: "template", type: "string", required: false, description: "Template style: 'modern', 'classic', 'minimal' (default: modern)." },
       { name: "color", type: "string", required: false, description: "Primary accent color hex (default: '#000000')." },
       { name: "filename", type: "string", required: false, description: "Filename for the exported PDF." },
-      { name: "output_path", type: "string", required: false, description: "Output filepath for generated PDF." },
     ],
   },
 
@@ -279,7 +220,6 @@ const MCP_TOOLS: McpTool[] = [
       { name: "job_url", type: "string", required: false, description: "Link to the job posting." },
       { name: "status", type: "string", required: false, description: "'EVALUATED', 'APPLIED', 'INTERVIEW', 'OFFER', 'REJECTED' (default: APPLIED)." },
       { name: "notes", type: "string", required: false, description: "Notes, recruiter contacts, or interview dates." },
-      { name: "api_key", type: "string", required: false, description: "Optional API key override." },
     ],
   },
   {
@@ -290,7 +230,6 @@ const MCP_TOOLS: McpTool[] = [
     authRequired: true,
     samplePrompt: "Show all my active job applications and interview stages from my Civify tracker.",
     parameters: [
-      { name: "api_key", type: "string", required: false, description: "Optional API key override." },
     ],
   },
 ];
@@ -311,13 +250,7 @@ export function McpDocumentation() {
       ? MCP_TOOLS
       : MCP_TOOLS.filter((t) => t.category === activeCategory);
 
-  const claudeRemoteConfig = `{
-  "mcpServers": {
-    "civify": {
-      "url": "https://mcp.civify.cv/mcp"
-    }
-  }
-}`;
+  const claudeRemoteConfig = "https://mcp.civify.cv/mcp";
 
   const claudeLocalConfig = `{
   "mcpServers": {
@@ -346,23 +279,23 @@ export function McpDocumentation() {
           target="_blank"
           rel="noreferrer"
           className="inline-flex items-center hover:opacity-85 transition-opacity"
-          title="Smithery 1-Click Install"
+          title="Civify on Smithery"
         >
           <Badge variant="outline" className="px-3 py-1 text-xs gap-1 border-primary/40 hover:bg-muted font-medium text-foreground">
-            Smithery Verified <ExternalLink className="h-3 w-3 text-primary" />
+            Smithery Listing <ExternalLink className="h-3 w-3 text-primary" />
           </Badge>
         </a>
         <Badge variant="secondary" className="px-3 py-1 font-mono text-xs">
-          MCP v1.3.3 Official
+          MCP v1.4.0
         </Badge>
         <Badge variant="outline" className="px-3 py-1 text-xs gap-1 border-primary/40 text-primary">
-          <Zap className="h-3 w-3" /> 17 Automated Tools
+          <Zap className="h-3 w-3" /> 13 Hosted Tools
         </Badge>
         <Badge variant="outline" className="px-3 py-1 text-xs gap-1">
           <Server className="h-3 w-3" /> Remote HTTP & Local npm
         </Badge>
         <Badge variant="outline" className="px-3 py-1 text-xs gap-1">
-          <Shield className="h-3 w-3" /> Dynamic Multi-User Auth
+          <Shield className="h-3 w-3" /> Browser OAuth
         </Badge>
       </div>
 
@@ -374,13 +307,13 @@ export function McpDocumentation() {
             <CardTitle>Connect AI Clients</CardTitle>
           </div>
           <CardDescription>
-            Configure Claude Desktop, Cursor, OpenCode, Windsurf, or any MCP client in seconds.
+            Connect ChatGPT or Claude with hosted OAuth, or use local stdio with a compatible client.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="claude-remote" className="w-full">
             <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-6">
-              <TabsTrigger value="claude-remote">Claude (Remote HTTP)</TabsTrigger>
+              <TabsTrigger value="claude-remote">ChatGPT / Claude</TabsTrigger>
               <TabsTrigger value="claude-local">Claude (Local npx)</TabsTrigger>
               <TabsTrigger value="cursor">Cursor IDE</TabsTrigger>
               <TabsTrigger value="cli">OpenCode / CLI</TabsTrigger>
@@ -404,7 +337,7 @@ export function McpDocumentation() {
 
               <div className="relative">
                 <div className="text-xs text-muted-foreground mb-1">
-                  Add to <code className="text-foreground font-mono">claude_desktop_config.json</code>:
+                  {t("workflow.connect")}
                 </div>
                 <pre className="p-4 rounded-lg bg-zinc-950 text-zinc-100 text-xs font-mono overflow-x-auto">
                   {claudeRemoteConfig}
@@ -481,47 +414,20 @@ export function McpDocumentation() {
         </CardContent>
       </Card>
 
-      {/* ─── Dynamic Authentication Banner ─── */}
       <Card className="border-primary/20 bg-primary/5 shadow-sm">
         <CardHeader>
-          <div className="flex items-center gap-2">
-            <Key className="h-5 w-5 text-primary" />
-            <CardTitle>Dynamic Multi-User Authentication</CardTitle>
-          </div>
-          <CardDescription>
-            No static or hardcoded API key required. Users can sign in or register straight from chat!
-          </CardDescription>
+          <CardTitle>{t("workflow.title")}</CardTitle>
+          <CardDescription>{t("workflow.subtitle")}</CardDescription>
         </CardHeader>
-        <CardContent className="grid md:grid-cols-3 gap-4 text-sm">
-          <div className="bg-background rounded-lg p-4 border space-y-2">
-            <div className="font-semibold text-foreground flex items-center gap-1.5">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-mono">1</span>
-              Interactive Sign-In
-            </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Call <code className="font-mono bg-muted px-1 py-0.5 rounded">civify_login</code> with your email & password. If 2FA is active, verify via <code className="font-mono bg-muted px-1 py-0.5 rounded">civify_verify_2fa</code> using the email OTP code.
-            </p>
-          </div>
-
-          <div className="bg-background rounded-lg p-4 border space-y-2">
-            <div className="font-semibold text-foreground flex items-center gap-1.5">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-mono">2</span>
-              In-Chat Registration
-            </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              New candidates can invoke <code className="font-mono bg-muted px-1 py-0.5 rounded">civify_register</code> to create an account and immediately receive session access tokens.
-            </p>
-          </div>
-
-          <div className="bg-background rounded-lg p-4 border space-y-2">
-            <div className="font-semibold text-foreground flex items-center gap-1.5">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-mono">3</span>
-              Developer Key
-            </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Developers who already have a key (<code className="font-mono text-xs">cv-fy-...</code>) can provide it anytime using <code className="font-mono bg-muted px-1 py-0.5 rounded">civify_set_api_key</code>.
-            </p>
-          </div>
+        <CardContent className="space-y-4 text-sm">
+          <ol className="list-decimal space-y-3 ps-5">
+            <li>{t("workflow.auth")}</li>
+            <li>{t("workflow.attach")}</li>
+            <li>{t("workflow.task")}</li>
+            <li>{t("workflow.download")}</li>
+          </ol>
+          <p className="text-muted-foreground">{t("workflow.fallback")}</p>
+          <p className="text-muted-foreground">{t("workflow.local")}</p>
         </CardContent>
       </Card>
 
@@ -541,8 +447,8 @@ export function McpDocumentation() {
           {/* Category Filter Pills */}
           <div className="flex flex-wrap gap-1.5">
             {[
-              { id: "all", label: "All (17)" },
-              { id: "auth", label: "Auth (6)" },
+              { id: "all", label: "All (13)" },
+              { id: "auth", label: "Start & Account (2)" },
               { id: "pay_per_cv", label: "Pay-Per-CV (3)" },
               { id: "resume_ai", label: "Resume AI (6)" },
               { id: "kanban", label: "Job Tracker (2)" },
@@ -705,6 +611,7 @@ export function McpDocumentation() {
         <CardContent>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
             {[
+              { name: "ChatGPT", tag: "Remote HTTP / OAuth" },
               { name: t("compatibility.claude"), tag: "Desktop / Remote HTTP" },
               { name: t("compatibility.cursor"), tag: "IDE stdio / npx" },
               { name: t("compatibility.windsurf"), tag: "Next-Gen IDE" },
@@ -772,7 +679,7 @@ export function McpDocumentation() {
         <CardContent className="py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <Globe className="h-4 w-4 text-primary" />
-            <span>Discoverable on official registries: Smithery, Glama, and PulseMCP.</span>
+            <span>Explore MCP directories: Smithery, Glama, and PulseMCP.</span>
           </div>
           <div className="flex items-center gap-3">
             <a

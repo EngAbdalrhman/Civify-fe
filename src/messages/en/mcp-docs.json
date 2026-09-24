@@ -6,36 +6,36 @@
     "subtitle": "Everything you need to know about integrating Civify with AI agents, Cursor, and Claude Desktop.",
     "items": {
       "q1": {
-        "question": "What is the Civify Model Context Protocol (MCP) Server?",
-        "answer": "The Civify MCP Server implements Anthropic's open Model Context Protocol standard (JSON-RPC 2.0). It exposes 17 specialized career tools—including PDF/DOCX resume parsing, AI bullet tailoring, 0–100 ATS scoring, PII redaction, and job application Kanban tracking—directly to AI agents in Claude Desktop, Cursor, OpenCode, and Windsurf."
+        "question": "What is the Civify MCP server?",
+        "answer": "The Civify MCP server connects agents to resume parsing, tailoring, ATS scoring, PII masking, PDF export and application tracking. Hosted OAuth provides 13 tools; local/legacy sessions include five additional authentication helpers."
       },
       "q2": {
-        "question": "How do I install and configure Civify in Claude Desktop or Cursor?",
-        "answer": "You can connect in seconds using either Remote SSE (zero-install at https://mcp.civify.cv/sse) or Local Command via npx (@civify/mcp-server). Simply add the server block to your claude_desktop_config.json or project .cursor/mcp.json as shown in the connection tabs above."
+        "question": "How do I connect ChatGPT or Claude?",
+        "answer": "Add https://mcp.civify.cv/mcp in the client’s connector settings and connect with OAuth. Complete browser account linking with a scoped Civify API key. No local npm installation is needed for hosted connections."
       },
       "q3": {
         "question": "Does Civify MCP support Arabic resumes, RTL layouts, and Arabic OCR?",
         "answer": "Yes! Civify is natively bilingual. The MCP server fully parses Arabic resume documents (PDF, DOCX, scanned images via Arabic OCR) and can generate RTL-formatted tailored resumes with specialized typography and localized keyword optimization for Egypt, Saudi Arabia, and GCC job markets."
       },
       "q4": {
-        "question": "Is an API key required to start using the MCP server?",
-        "answer": "No static API key is required to get started. Public tools like job scraping and pricing work with zero authentication. For personalized resume tailoring, you can either provide an existing developer key (cv-fy-...) or sign in interactively inside your chat using civify_login (with full 2FA support)."
+        "question": "How do I authenticate?",
+        "answer": "Public onboarding, pricing, job scraping and PDF rendering require no account. Private tools use OAuth account linking in the browser. Local stdio can use CIVIFY_API_KEY in trusted client settings. Do not share credentials in chat."
       },
       "q5": {
-        "question": "What tools are included in Civify's 17-tool suite?",
-        "answer": "The suite is organized into 4 categories: 1) Auth & Identity (civify_set_api_key, civify_login, civify_verify_2fa, civify_register, civify_get_account, civify_logout); 2) Monetization & Pay-Per-CV (civify_get_pay_per_cv_pricing, civify_purchase_cv_pass, civify_check_cv_entitlement); 3) Resume AI (civify_scrape_job, civify_parse_cv, civify_tailor_cv, civify_score_ats, civify_mask_pii, civify_generate_pdf); and 4) Job Tracker (civify_track_application, civify_list_applications)."
+        "question": "Which tools are available?",
+        "answer": "Start with civify_get_started. Hosted tools cover account balance, pricing, purchase initiation, entitlements, job scraping, parsing, tailoring, ATS scoring, masking, PDF generation and application creation/listing."
       },
       "q6": {
-        "question": "Which job boards can Civify MCP scrape?",
-        "answer": "The civify_scrape_job tool extracts structured job requirements, company names, and qualifications from any public job URL, including LinkedIn, Greenhouse, Lever, Ashby, Wuzzuf, Indeed, and company career portals."
+        "question": "Can every job URL be scraped?",
+        "answer": "Public job pages may be supported, but login walls, anti-bot checks and site changes can prevent scraping. Supply the job description text when the URL cannot be read."
       },
       "q7": {
-        "question": "How does regional pricing work for Pay-Per-CV (USD vs EGP/MENA)?",
-        "answer": "Civify automatically applies GeoIP-based pricing. Global users can purchase single CV passes in USD ($2.99) via credit card. Candidates in Egypt and MENA receive regional pricing in EGP (~150 EGP) payable via local debit/credit cards or Egyptian mobile wallets (Vodafone Cash, InstaPay) powered by Paymob and Fawaterak."
+        "question": "How do I check pricing?",
+        "answer": "Call civify_get_pay_per_cv_pricing for current offers. Confirm the currency and amount at checkout; regional detection can depend on gateway network location. Do not rely on a hardcoded price in a prompt."
       },
       "q8": {
-        "question": "What is the difference between local stdio (npx) and hosted remote SSE?",
-        "answer": "Local stdio (npx -y @civify/mcp-server) runs on your local machine via Node.js, making it ideal for desktop agents that need to access local files directly. Remote SSE (https://mcp.civify.cv/sse) runs in the cloud with zero installation, ideal for web agents, mobile apps, or cloud LLMs."
+        "question": "What is the difference between local stdio and hosted HTTP?",
+        "answer": "Local npx runs the server on your machine and can use local files. Hosted HTTP uses /mcp and OAuth, accepts attachments/URLs/text/base64, and returns temporary PDF links. Legacy SSE remains at /sse for older clients."
       }
     }
   },
@@ -55,6 +55,17 @@
     "windsurf": "Windsurf",
     "opencode": "OpenCode / CLI",
     "gemini": "Gemini CLI",
-    "statusVerified": "Verified & Tested"
+    "statusVerified": "Client validation required"
+  },
+  "workflow": {
+    "title": "From CV attachment to downloadable result",
+    "subtitle": "Hosted OAuth exposes 13 tools. Local stdio retains 18 tools, including legacy authentication helpers.",
+    "connect": "Add this URL in ChatGPT or Claude connector settings, select OAuth, and connect your account:",
+    "auth": "Connect your account in the browser. Create a dedicated, scoped key in the Civify API keys dashboard and enter it only on the consent page. Never paste passwords or API keys into chat.",
+    "attach": "Attach your CV. ChatGPT can supply a native file input where supported. Other clients can send an actual HTTPS download URL or the complete text they read from your attachment.",
+    "task": "Ask for the result you need. Tailoring already parses the CV; request separate parsing or scoring only when useful. AI operations may use account credits.",
+    "download": "Open the generated PDF download link within 15 minutes. Links also expire on server restart; anyone with the link can access the file.",
+    "fallback": "Attachment access depends on the client. If it cannot read or forward a file, provide readable CV text or a supported attachment. Never invent file URLs, base64, or server paths. Files are limited to 12 MiB.",
+    "local": "For local stdio, configure CIVIFY_API_KEY securely in the client environment. Hosted connectors run remotely and cannot read local sandbox paths."
   }
 }

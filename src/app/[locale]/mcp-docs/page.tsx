@@ -81,7 +81,7 @@ export default async function McpDocsPage({ params }: Props) {
       applicationCategory: "DeveloperApplication",
       applicationSubCategory: "AI Agent Tools",
       operatingSystem: "Cross-platform (Node.js, Docker, Streamable HTTP, SSE)",
-      softwareVersion: "1.3.3",
+      softwareVersion: "1.4.0",
       inLanguage: ["en", "ar"],
       offers: {
         "@type": "Offer",
@@ -92,10 +92,10 @@ export default async function McpDocsPage({ params }: Props) {
       },
       description:
         locale === "ar"
-          ? "سيرفر بروتوكول سياق النموذج (MCP) لمنصة Civify يتيح لوكلاء الذكاء الاصطناعي (Claude Desktop و Cursor) تحليل السير الذاتية وتخصيصها وفحص ATS وتتبع الوظائف عبر 17 أداة."
+          ? "سيرفر بروتوكول سياق النموذج (MCP) لمنصة Civify يتيح لوكلاء الذكاء الاصطناعي (Claude Desktop و Cursor) تحليل السير الذاتية وتخصيصها وفحص ATS وتتبع الوظائف عبر 13 أداة سحابية."
           : "Official Model Context Protocol server for Civify AI Career Platform. Enables autonomous AI agents to parse resumes, tailor CVs against job descriptions, score ATS compatibility, redact PII, and track applications.",
       featureList: [
-        "17 Automated Career AI Tools",
+        "13 Hosted Career Tools; 18 Local Tools",
         "Streamable HTTP Transport (https://mcp.civify.cv/mcp)",
         "Remote SSE Transport (https://mcp.civify.cv/sse)",
         "Local stdio Transport (npx -y @civify/mcp-server)",

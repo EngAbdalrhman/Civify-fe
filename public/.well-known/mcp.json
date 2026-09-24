@@ -1,6 +1,6 @@
 {
   "name": "Civify MCP Server",
-  "version": "1.3.3",
+  "version": "1.4.0",
   "description": "AI resume parsing, ATS scoring, and CV tailoring tools for autonomous agents.",
   "homepage": "https://civify.cv/mcp-docs",
   "serverCard": "https://mcp.civify.cv/.well-known/mcp/server-card.json",
@@ -15,9 +15,9 @@
     }
   ],
   "authentication": {
-    "type": "apiKey",
-    "headerName": "X-API-KEY",
-    "portalUrl": "https://civify.cv/settings/api-keys",
-    "interactiveAuthSupported": true
+    "type": "oauth2",
+    "resourceMetadataUrl": "https://mcp.civify.cv/.well-known/oauth-protected-resource/mcp",
+    "portalUrl": "https://civify.cv/dashboard/api-keys",
+    "description": "Browser account linking for private tools; public discovery and onboarding."
   }
 }
