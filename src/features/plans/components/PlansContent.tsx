@@ -144,7 +144,7 @@ export default function PlansContent({
               }`}
             >
               {t("yearly")}{" "}
-              <span className="text-xs text-green-600 font-bold">
+              <span className="text-xs text-green-700 dark:text-green-400 font-bold">
                 ({t("save20")})
               </span>
             </button>

@@ -119,6 +119,7 @@ function BlogCard({ post }: { post: BlogListItem }) {
           <Link
             href={`/blog/${post.slug}`}
             className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+            aria-label={`${t("readMore")}: ${post.title}`}
           >
             {t("readMore")}
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
