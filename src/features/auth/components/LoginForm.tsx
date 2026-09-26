@@ -8,6 +8,7 @@ import { SubmitHandler } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { safeReturnTo, rememberAuthReturn, readAuthReturn, clearAuthReturn } from "@/utils/auth-return";
 
 const REMEMBER_ME_KEY = "civify_remember_identifier";
 const OAUTH_RETURN_TO_KEY = "civify_oauth_returnTo";
@@ -24,7 +25,9 @@ export default function LoginForm() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
-      setReturnTo(params.get("returnTo"));
+      const destination = safeReturnTo(params.get("returnTo")) || readAuthReturn();
+      setReturnTo(destination);
+      rememberAuthReturn(destination);
     }
   }, []);
 
@@ -76,6 +79,7 @@ export default function LoginForm() {
     if ((isLoginSuccess && !requires2FA) || isVerifySuccess) {
       if (isRedirecting) return;
       setIsRedirecting(true);
+      clearAuthReturn();
       router.push(returnTo || "/app");
     }
   }, [
@@ -351,7 +355,7 @@ export default function LoginForm() {
 
         <p className="text-center text-sm">
           {t("noAccount")}{" "}
-          <Link href="/signup" className="text-primary hover:underline">
+          <Link href={returnTo ? `/signup?returnTo=${encodeURIComponent(returnTo)}` : "/signup"} className="text-primary hover:underline">
             {t("signup")}
           </Link>
         </p>

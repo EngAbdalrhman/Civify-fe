@@ -1,5 +1,3 @@
-"use client";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -46,7 +44,7 @@ export function TemplatesSection() {
                     <CardContent className="p-0">
                       <div className="relative h-[300px] sm:h-[340px] overflow-hidden border-b border-border/50">
                         <TemplatePreviewCard templateId={key} />
-                        <Badge className="absolute right-3 top-3 z-10 border-0 bg-green-600 shadow-md hover:bg-green-700">
+                        <Badge className="absolute right-3 top-3 z-10 border-0 bg-green-700 text-white shadow-md hover:bg-green-800">
                           ✓ {t("badge")}
                         </Badge>
                       </div>

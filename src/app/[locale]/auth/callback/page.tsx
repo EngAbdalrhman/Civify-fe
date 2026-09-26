@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { setAccessToken } from "@/utils/cookies";
 import { dispatchSessionUpdated } from "@/utils/session-events";
 import apiClient from "@/api/client";
+import { safeReturnTo, readAuthReturn, clearAuthReturn } from "@/utils/auth-return";
 
 const OAUTH_RETURN_TO_KEY = "civify_oauth_returnTo";
 
@@ -18,6 +19,8 @@ function AuthCallbackContent() {
     const accessToken = searchParams.get("accessToken");
     const verified = searchParams.get("verified");
     const error = searchParams.get("error");
+    const pendingReturn = readAuthReturn();
+    const loginPath = pendingReturn ? `/login?returnTo=${encodeURIComponent(pendingReturn)}` : "/login";
 
     // Handle OAuth2 callback (Google login)
     if (accessToken) {
@@ -35,14 +38,15 @@ function AuthCallbackContent() {
       }
 
       // Check for returnTo in localStorage (from guest builder flow)
-      let redirectPath = "/app";
+      let redirectPath = pendingReturn || "/app";
       try {
         const storedReturnTo = localStorage.getItem(OAUTH_RETURN_TO_KEY);
         if (storedReturnTo) {
-          redirectPath = storedReturnTo;
+          redirectPath = pendingReturn || safeReturnTo(storedReturnTo) || "/app";
           localStorage.removeItem(OAUTH_RETURN_TO_KEY);
         }
       } catch { }
+      clearAuthReturn();
 
       // Redirect to destination
       setTimeout(() => {
@@ -56,7 +60,7 @@ function AuthCallbackContent() {
 
       // Redirect to login page
       setTimeout(() => {
-        router.push("/login");
+        router.push(loginPath);
       }, 2000);
     } else if (verified === "false" || error) {
       // Email verification failed
@@ -68,7 +72,7 @@ function AuthCallbackContent() {
 
       // Redirect to login page
       setTimeout(() => {
-        router.push("/login");
+        router.push(loginPath);
       }, 2000);
     } else {
       // No token or verification status found - callback failed
@@ -76,7 +80,7 @@ function AuthCallbackContent() {
 
       // Redirect to login
       setTimeout(() => {
-        router.push("/login");
+        router.push(loginPath);
       }, 2000);
     }
   }, [searchParams, router]);

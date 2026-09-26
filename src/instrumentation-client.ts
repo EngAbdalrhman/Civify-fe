@@ -11,7 +11,8 @@ Sentry.init({
   // Direct ingest (DSN host). No /monitoring tunnel — avoids server-side proxy issues; some ad blockers may block Sentry domains.
 
   // Add optional integrations for additional features
-  integrations: [Sentry.replayIntegration()],
+  // Recording starts after page load; early errors are still captured immediately.
+  integrations: [],
 
   // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
   tracesSampleRate: 1,
@@ -33,5 +34,15 @@ Sentry.init({
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
   sendDefaultPii: true,
 });
+
+if (dsn && process.env.NODE_ENV === "production") {
+  const scheduleReplay = () => {
+    const load = () => { void import("@/lib/monitoring/replay").then(module => module.startReplay()).catch(() => {}); };
+    if ("requestIdleCallback" in window) window.requestIdleCallback(load, { timeout: 3000 });
+    else setTimeout(load, 1000);
+  };
+  if (document.readyState === "complete") scheduleReplay();
+  else window.addEventListener("load", scheduleReplay, { once: true });
+}
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

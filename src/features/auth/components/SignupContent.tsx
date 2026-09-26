@@ -8,6 +8,7 @@ import { SubmitHandler } from "react-hook-form";
 import { useSignup, SignupSchemaType } from "@/features/auth/hooks";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { safeReturnTo, rememberAuthReturn } from "@/utils/auth-return";
 
 export default function SignupContent() {
   const t = useTranslations("auth");
@@ -15,6 +16,7 @@ export default function SignupContent() {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const searchParams = useSearchParams();
   const refCode = searchParams.get("ref");
+  const returnTo = safeReturnTo(searchParams.get("returnTo"));
 
   const { form, signup, isSignupPending, isSignupSuccess } = useSignup();
 
@@ -25,6 +27,7 @@ export default function SignupContent() {
   } = form;
 
   const onSubmit: SubmitHandler<SignupSchemaType> = (data) => {
+    rememberAuthReturn(returnTo);
     signup(data);
   };
 
@@ -37,11 +40,12 @@ export default function SignupContent() {
   useEffect(() => {
     if (isSignupSuccess && !isRedirecting) {
       setIsRedirecting(true);
-      router.push("/app");
+      router.push(returnTo ? `/login?returnTo=${encodeURIComponent(returnTo)}` : "/app");
     }
-  }, [isSignupSuccess, isRedirecting, router]);
+  }, [isSignupSuccess, isRedirecting, router, returnTo]);
 
   const saveReferralForOAuth = () => {
+    rememberAuthReturn(returnTo);
     const code = form.getValues("referralCode");
     if (code) {
       localStorage.setItem("civify_pending_referral", code);
@@ -279,7 +283,7 @@ export default function SignupContent() {
 
         <p className="text-center text-sm">
           {t("hasAccount")}{" "}
-          <Link href="/login" className="text-primary hover:underline">
+          <Link href={returnTo ? `/login?returnTo=${encodeURIComponent(returnTo)}` : "/login"} className="text-primary hover:underline">
             {t("login")}
           </Link>
         </p>
