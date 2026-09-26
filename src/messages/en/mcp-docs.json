@@ -11,7 +11,7 @@
       },
       "q2": {
         "question": "How do I connect ChatGPT or Claude?",
-        "answer": "Add https://mcp.civify.cv/mcp in the client’s connector settings and connect with OAuth. Complete browser account linking with a scoped Civify API key. No local npm installation is needed for hosted connections."
+        "answer": "Add https://mcp.civify.cv/mcp in the client’s connector settings and connect with OAuth. Sign in to Civify in the browser and approve access. No API key or local npm installation is needed for hosted connections."
       },
       "q3": {
         "question": "Does Civify MCP support Arabic resumes, RTL layouts, and Arabic OCR?",
@@ -61,7 +61,7 @@
     "title": "From CV attachment to downloadable result",
     "subtitle": "Hosted OAuth exposes 13 tools. Local stdio retains 18 tools, including legacy authentication helpers.",
     "connect": "Add this URL in ChatGPT or Claude connector settings, select OAuth, and connect your account:",
-    "auth": "Connect your account in the browser. Create a dedicated, scoped key in the Civify API keys dashboard and enter it only on the consent page. Never paste passwords or API keys into chat.",
+    "auth": "Sign in to Civify in the browser using your existing account, or create an account first. Review the requesting app and permissions, then choose Allow and connect. No API key is needed. Never paste passwords or credentials into chat.",
     "attach": "Attach your CV. ChatGPT can supply a native file input where supported. Other clients can send an actual HTTPS download URL or the complete text they read from your attachment.",
     "task": "Parsing is optional: the agent can send structured CV data directly. Tailoring returns a PDF by default. If export fails, retry only PDF generation with the returned tailored CV. AI operations may use credits.",
     "download": "Open the generated PDF download link within 15 minutes. Links also expire on server restart; anyone with the link can access the file.",

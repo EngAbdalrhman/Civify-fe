@@ -20,7 +20,7 @@ Use Civify to upload a CV, review its contents, tailor it to a job description a
 - [Full agent reference](${baseUrl}/llms-full.txt): Authentication, attachment handoff and generated tool schemas.
 - [Hosted tool catalog](${baseUrl}/.well-known/mcp/server-card.json): Machine-readable definitions for this release.
 - [Streamable HTTP endpoint](https://mcp.civify.cv/mcp): Connect through the client's OAuth settings.
-- [Civify API keys](${baseUrl}/en/app/api-keys): Create a scoped key for browser account linking; never paste secrets into chat.
+- [Civify API keys](${baseUrl}/en/app/api-keys): Manage or revoke connected-app access; API keys are optional for developer clients.
 - [REST API guide](${baseUrl}/en/api-docs): Backend API documentation.
 
 ## Support and policies
@@ -40,7 +40,7 @@ export function llmsFull(baseUrl: string): string {
 ## Authentication and workflow
 
 This reference follows gateway ${serverCard.serverInfo.version}. Hosted OAuth exposes ${serverCard.tools.length} tools; local/legacy sessions include five additional authentication helpers.
-The hosted endpoint is https://mcp.civify.cv/mcp. Add it in the client's connector settings, then complete OAuth in the browser using a scoped Civify API key. This is browser API-key account linking, not Civify SSO. Never request passwords or API keys in chat.
+The hosted endpoint is https://mcp.civify.cv/mcp. Add it in the client's connector settings, then sign in to Civify in the browser and approve the requesting app. Existing Google/LinkedIn and two-factor login flows are reused. Users do not create or copy API keys. Never request passwords or API keys in chat. Deploy the matching backend, frontend and gateway release before using this flow.
 Local clients can run \`npx -y @civify/mcp-server\` and configure CIVIFY_API_KEY in their trusted environment. Legacy SSE is available at https://mcp.civify.cv/sse.
 
 Start with civify_get_started and check account credits before AI work. Parsing is optional. Agents can send canonical resume_data (personalInfo and sections) directly to tailoring, scoring or PDF export. Otherwise submit the original to tailoring, which handles extraction. AI calls can consume credits; do not automatically retry ambiguous requests. Initiate purchases or save applications only when the user requests them.

@@ -14,3 +14,9 @@ production build and `node --test test/pdf-workflow.test.cjs` after renderer or
 watermark changes. Account policy is authoritative; never honor an untrusted body
 that tries to disable watermarks. Backend policy and JSON-tailoring additions must
 deploy before the MCP gateway. Record remaining live verification in Knowledge.
+
+Browser account linking is /[locale]/mcp/connect. It reuses login/signup/2FA/SSO and
+calls authenticated backend /mcp/account-link routes. Never collect an API key on
+the consent page. auth-return.ts validates same-site login destinations and the
+fixed gateway callback; its tests are test/auth-return.test.cjs. See
+../Knowledge/2026-09-25-account-linking.md for coordinated deployment and limits.

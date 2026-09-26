@@ -5,6 +5,7 @@ import {
   clearAuthTokens,
 } from "@/utils/cookies";
 import { dispatchSessionUpdated } from "@/utils/session-events";
+import { safeReturnTo, rememberAuthReturn } from "@/utils/auth-return";
 
 // Constants
 const MAX_REFRESH_RETRIES = 3;
@@ -92,7 +93,9 @@ const clearAuthAndRedirect = () => {
 
     if (!isPublicPage) {
       console.log("[Auth] Redirecting to login from protected route");
-      window.location.href = "/login";
+      const returnTo = path.endsWith("/mcp/connect") ? safeReturnTo(path + window.location.search) : null;
+      rememberAuthReturn(returnTo);
+      window.location.href = returnTo ? `/login?returnTo=${encodeURIComponent(returnTo)}` : "/login";
     } else {
       console.log("[Auth] Staying on public page after auth clear");
     }
@@ -118,10 +121,6 @@ const attemptTokenRefresh = async (): Promise<string> => {
     console.log(
       "[Auth] DEBUG: Current origin:",
       typeof window !== "undefined" ? window.location.origin : "SSR",
-    );
-    console.log(
-      "[Auth] DEBUG: Document cookies (non-httpOnly):",
-      typeof document !== "undefined" ? document.cookie : "SSR",
     );
 
     const response = await fetch(refreshUrl, {
