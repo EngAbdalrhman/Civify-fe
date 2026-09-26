@@ -108,7 +108,7 @@ export function MinimalTemplate({ data, color }: TemplateProps) {
             <div key={item.id}>
               <span>{item.title}</span>
               {item.subtitle && (
-                <span className="text-gray-400"> — {item.subtitle}</span>
+                <span className="text-gray-600"> — {item.subtitle}</span>
               )}
             </div>
           ))}
@@ -186,7 +186,7 @@ export function MinimalTemplate({ data, color }: TemplateProps) {
             {personalInfo.jobTitle}
           </div>
         )}
-        <div className="text-xs text-gray-400 flex flex-wrap gap-x-2">
+        <div className="text-xs text-gray-600 flex flex-wrap gap-x-2">
           {personalInfo.email && <span>{personalInfo.email}</span>}
           {personalInfo.phone && (
             <>
@@ -290,7 +290,7 @@ export function MinimalTemplate({ data, color }: TemplateProps) {
                         )}
                       </span>
                       {(item.date || item.location) && (
-                        <span className="text-[11px] text-gray-400">
+                        <span className="text-[11px] text-gray-600">
                           {[item.date, item.location]
                             .filter(Boolean)
                             .join(" · ")}

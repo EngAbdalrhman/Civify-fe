@@ -102,9 +102,9 @@ export function getDemoResumeForTemplate(
     metadata: {
       templateId,
       primaryColor: TEMPLATE_COLORS[templateId] ?? "#000000",
-      fontFamily: "Inter",
-      bodyFontFamily: "Inter",
-      headingFontFamily: "Inter",
+      fontFamily: "Arial",
+      bodyFontFamily: "Arial",
+      headingFontFamily: "Arial",
       language: "en",
     },
   };

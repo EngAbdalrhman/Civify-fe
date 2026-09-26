@@ -1,12 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { ResumePreview } from "@/features/resume-builder/components/ResumePreview";
+import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import { useNearViewport } from "@/hooks/use-near-viewport";
 import {
   getDemoResumeForTemplate,
   type LandingTemplateId,
 } from "@/features/home-page/data/demoResumeByTemplate";
 import { cn } from "@/lib/utils";
+
+const ResumePreview = dynamic(
+  () => import("@/features/resume-builder/components/ResumePreview").then(module => module.ResumePreview),
+  { ssr: false },
+);
 
 const RESUME_WIDTH_PX = 794;
 const MIN_SCALE = 0.32;
@@ -21,17 +27,17 @@ export function TemplatePreviewCard({
   templateId,
   className,
 }: TemplatePreviewCardProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const { ref: containerRef, isNear } = useNearViewport<HTMLDivElement>();
   const [scale, setScale] = useState(0.34);
   const data = getDemoResumeForTemplate(templateId);
 
   useEffect(() => {
     const node = containerRef.current;
-    if (!node) return;
+    if (!node || !isNear) return;
 
-    const updateScale = () => {
+    const updateScale = (width: number) => {
       const padding = 20;
-      const available = node.clientWidth - padding;
+      const available = width - padding;
       const next = Math.min(
         Math.max(available / RESUME_WIDTH_PX, MIN_SCALE),
         MAX_SCALE,
@@ -39,11 +45,10 @@ export function TemplatePreviewCard({
       setScale(next);
     };
 
-    updateScale();
-    const observer = new ResizeObserver(updateScale);
+    const observer = new ResizeObserver(([entry]) => updateScale(entry.contentRect.width));
     observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  }, [isNear, containerRef]);
 
   return (
     <div
@@ -73,7 +78,7 @@ export function TemplatePreviewCard({
           transform: `translate(-50%, -8%) scale(${scale})`,
         }}
       >
-        <ResumePreview data={data} omitContentId />
+        {isNear && <ResumePreview data={data} omitContentId />}
       </div>
 
       {/* Fade so clipped content reads as a preview, not a bug */}

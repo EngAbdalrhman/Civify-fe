@@ -7,6 +7,14 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 const nextConfig: NextConfig = {
   reactCompiler: true,
   output: "standalone",
+  async headers() {
+    return [{ source: "/:locale/mcp/connect", headers: [
+      { key: "Referrer-Policy", value: "no-referrer" },
+      { key: "Cache-Control", value: "no-store" },
+      { key: "X-Frame-Options", value: "DENY" },
+      { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+    ] }];
+  },
   serverExternalPackages: ["puppeteer-core"],
   experimental: {
     globalNotFound: true,

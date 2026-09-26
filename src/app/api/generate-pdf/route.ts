@@ -67,7 +67,10 @@ async function getBrowser(): Promise<Browser> {
     browserInstance = browser;
     browserLaunchPromise = null;
     return browser;
-  })();
+  })().finally(() => {
+    // A failed launch must not poison every later export until the app restarts.
+    browserLaunchPromise = null;
+  });
 
   return browserLaunchPromise;
 }
@@ -80,6 +83,7 @@ interface GeneratePdfRequest {
   template?: TemplateType;
   color?: string;
   filename?: string;
+  resumeId?: string;
   watermark?: WatermarkConfig;
 }
 
@@ -95,9 +99,10 @@ export async function POST(request: NextRequest) {
       color = "#000000",
       filename = "resume",
       watermark: bodyWatermark,
+      resumeId,
     } = body;
 
-    if (!resumeData) {
+    if (!resumeData || (resumeId !== undefined && (typeof resumeId !== "string" || resumeId.length > 128))) {
       return NextResponse.json(
         { error: "Resume data is required" },
         { status: 400 },
@@ -107,6 +112,7 @@ export async function POST(request: NextRequest) {
     const watermarkResolved = await resolveWatermarkForRequest(
       request,
       bodyWatermark,
+      resumeId,
     );
     if (bodyWatermark !== undefined) {
       console.info(

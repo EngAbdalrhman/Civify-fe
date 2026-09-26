@@ -43,6 +43,13 @@ export function ResumePreview({ data, omitContentId }: ResumePreviewProps) {
   };
 
   return (
+    <>
+    {!omitContentId && (
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
+      />
+    )}
     <div
       className="bg-white shadow-2xl p-0 w-[210mm] min-h-[297mm] mx-auto origin-top transition-all flex flex-col"
       style={
@@ -55,5 +62,6 @@ export function ResumePreview({ data, omitContentId }: ResumePreviewProps) {
     >
       {renderTemplate()}
     </div>
+    </>
   );
 }
