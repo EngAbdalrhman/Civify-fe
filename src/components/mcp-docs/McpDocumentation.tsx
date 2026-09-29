@@ -290,7 +290,7 @@ export function McpDocumentation() {
           </Badge>
         </a>
         <Badge variant="secondary" className="px-3 py-1 font-mono text-xs">
-          MCP v1.4.0
+          MCP v1.5.0
         </Badge>
         <Badge variant="outline" className="px-3 py-1 text-xs gap-1 border-primary/40 text-primary">
           <Zap className="h-3 w-3" /> 13 Hosted Tools
