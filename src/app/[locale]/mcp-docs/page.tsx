@@ -81,7 +81,7 @@ export default async function McpDocsPage({ params }: Props) {
       applicationCategory: "DeveloperApplication",
       applicationSubCategory: "AI Agent Tools",
       operatingSystem: "Cross-platform (Node.js, Docker, Streamable HTTP, SSE)",
-      softwareVersion: "1.4.0",
+      softwareVersion: "1.5.0",
       inLanguage: ["en", "ar"],
       offers: {
         "@type": "Offer",
